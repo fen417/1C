@@ -371,6 +371,18 @@
   .shop-card .shop-icon { font-size: 24px; }
   .shop-card button { margin-top: 8px; }
   .shop-card button:disabled { opacity: .45; cursor: not-allowed; }
+  #sales-call {
+    position: absolute; display: none; left: 8px; top: 8px;
+    width: min(300px, calc(100% - 16px)); z-index: 40;
+    background: #f0f0f0; border: 2px solid #555;
+    box-shadow: 0 8px 24px rgba(0,0,0,.7); color: #222;
+  }
+  #sales-call-head { background: #ffd200; padding: 6px 9px; border-bottom: 1px solid #b99b00; font-size: 11px; font-weight: bold; }
+  #sales-call-body { padding: 10px; }
+  #sales-call-body h3 { color: #900; font-size: 14px; margin-bottom: 5px; }
+  #sales-call-body p { font-size: 11px; color: #444; line-height: 1.4; margin-bottom: 9px; }
+  #sales-call-actions { display: flex; gap: 7px; }
+  #sales-call-actions .btn-1c { flex: 1; padding: 6px 4px; font-size: 10px; }
 
   .win-1c {
     background: #f0f0f0;
@@ -486,7 +498,7 @@
     <button class="nav-btn" id="btn-dyn-update" onclick="game.triggerDynamicUpdate()" style="background:#55efc4; font-weight:bold;">⚡ Дин. Обновление [ПРОБЕЛ]</button>
     <span id="buff-indicator" style="font-weight:bold; color:#e67e22; margin-left:6px;"></span>
     <span style="margin-left:auto; font-size:11px; color:#594500; font-weight:bold;">💰 <span id="currency-display">0</span> фиткоинов</span>
-    <span id="shop-timer" style="font-size:11px; color:#594500;">🛒 03:00</span>
+    <span id="shop-timer" style="font-size:11px; color:#594500;">☎ 03:00</span>
     <span style="margin-left:auto; font-size:11px; color:#666;">Dreamlo Cloud Sync</span>
   </div>
 
@@ -540,6 +552,17 @@
 
     <div id="event-banner">⚠️ ВНИМАНИЕ: СЕРВЕР ОБНАРУЖИЛ КРИТИЧЕСКИЙ СБОЙ!</div>
     <div id="glitch-overlay"></div>
+    <div id="sales-call" onclick="event.stopPropagation()">
+      <div id="sales-call-head">📞 Манго Офис · входящий вызов</div>
+      <div id="sales-call-body">
+        <h3>Звонит отдел продаж</h3>
+        <p>Есть минутка обсудить платные интеграции? У нас как раз «уникальное предложение».</p>
+        <div id="sales-call-actions">
+          <button class="btn-1c" style="background:#55efc4;" onclick="game.answerSalesCall()">☎ Ответить</button>
+          <button class="btn-1c" onclick="game.declineSalesCall()">✖ Сбросить</button>
+        </div>
+      </div>
+    </div>
     <canvas id="canvas"></canvas>
   </div>
 
@@ -567,7 +590,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.3.0 — «Ночной клубный релиз»</h3>
-              <p>При боссе музыка становится жёстче и плавно возвращается после боя. Уровни героя идут как релизы 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Рикошет, мультивыстрел и замедляющие снаряды прокачиваются до 5 уровня. Больше историй телефонной поддержки через Манго Офис, AnyDesk и Rudesktop. Сборка: 8.3.27.1936.</p>
+              <p>При боссе музыка становится жёстче и плавно возвращается после боя. Уровни героя идут как релизы 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Рикошет, мультивыстрел и замедляющие снаряды прокачиваются до 5 уровня. Больше историй телефонной поддержки через Манго Офис, AnyDesk и Rudesktop, плюс звонки отдела продаж с платными интеграциями. Сборка: 8.3.27.1936.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.1.0 — «Закрытие смены»</h3>
@@ -602,7 +625,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Музыка плавно переходит в агрессивный режим при появлении босса и возвращается к обычной теме после гибели последнего; одновременные боссы усиливают общий режим без конфликтов. Уровни героя нумеруются релизами 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Новые боевые улучшения: рикошет, мультивыстрел и замедляющие снаряды — каждое до 5 уровней. Переписаны реплики телефонной техподдержки через Манго Офис, AnyDesk и Rudesktop. Номер сборки — 8.3.27.1936.</p></div>
+        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Музыка плавно переходит в агрессивный режим при появлении босса и возвращается к обычной теме после гибели последнего; одновременные боссы усиливают общий режим без конфликтов. Уровни героя нумеруются релизами 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Новые боевые улучшения: рикошет, мультивыстрел и замедляющие снаряды — каждое до 5 уровней. Звонки отдела продаж с плавающим окном раз в 3 минуты: можно ответить и посмотреть платные интеграции или сбросить вызов. Переписаны реплики телефонной техподдержки через Манго Офис, AnyDesk и Rudesktop. Номер сборки — 8.3.27.1936.</p></div>
         <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Главное меню, настройки, таблица лидеров и журнал патчей. Магазин каждые 3 минуты, фиткоины за собранный XP, 4 ячейки расходников на 7–0 и новые активные умения. Новые интеграционные приколы: Sigur / AVI, АТОЛ, ШТРИХ, Эвотор, IronLogic и мессенджеры. Исправлены награды боссов, смерть от снарядов, скорость на разных FPS и серия уровней за накопленный XP.</p></div>
         <div class="release-notes"><h3>1.1.0 — «Закрытие смены»</h3><p>Исправлено случайное зависание на критическом попадании и закрытие послематчевой таблицы. Добавлены полоска HP и меню паузы. Ограничено количество игровых эффектов, смягчён рост толпы и переосмыслены бухгалтерские отсылки в сторону фитнес-клуба.</p></div>
         <div style="text-align:right;"><button class="btn-1c" onclick="game.closeChangelog()">Назад в меню</button></div>
@@ -613,13 +636,13 @@
   <!-- Магазин -->
   <div id="modal-shop" class="modal-overlay">
     <div class="win-1c" style="width:790px;">
-      <div class="win-1c-head"><span>🛒 Магазин клуба · ассортимент обновлён</span><span id="shop-currency">💰 0 фиткоинов</span></div>
+      <div class="win-1c-head"><span>💼 Коммерческое предложение · отдел продаж</span><span id="shop-currency">💰 Бюджет: 0 фиткоинов</span></div>
       <div class="win-1c-body">
-        <p style="font-size:11px; color:#555; margin-bottom:9px;">Покупки добавляются в ячейки расходников. Можно носить не более четырёх видов; каждый расходник занимает клавишу 7, 8, 9 или 0.</p>
+        <p style="font-size:11px; color:#555; margin-bottom:9px;">Менеджер подготовил платные интеграции и временные лицензии. После подключения предмет попадёт в инвентарь; одновременно можно носить не более четырёх видов — клавиши 7, 8, 9 и 0.</p>
         <div id="shop-products" class="shop-grid"></div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-          <span id="shop-message" style="font-size:11px; color:#555;">Запаситесь перед следующей волной.</span>
-          <button class="btn-1c" style="background:#55efc4;" onclick="game.closeShop()">Продолжить тренировку</button>
+          <span id="shop-message" style="font-size:11px; color:#555;">Предложение действует до завершения звонка.</span>
+          <button class="btn-1c" style="background:#55efc4;" onclick="game.closeShop()">Завершить звонок и продолжить</button>
         </div>
       </div>
     </div>
@@ -1334,8 +1357,8 @@ const ACTIVE_SKILLS_DEF = {
 
 const CONSUMABLES_DEF = {
   protein_shot: {
-    name: 'Протеиновый шейк', icon: '🥤', cost: 135, stock: 2, maxStack: 3,
-    desc: 'Восстанавливает 45 HP. Не пьётся на полном здоровье.',
+    name: 'Интеграция «Питание по API»', icon: '🥤', cost: 135, stock: 2, maxStack: 3,
+    desc: 'Платный модуль восстановления: +45 HP. На полном здоровье менеджер предложит продлить лицензию.',
     use: (g) => {
       if (g.player.hp >= g.player.maxHp) return false;
       g.player.hp = Math.min(g.player.maxHp, g.player.hp + 45);
@@ -1344,8 +1367,8 @@ const CONSUMABLES_DEF = {
     }
   },
   turbo_preworkout: {
-    name: 'Предтренировочный комплекс', icon: '⚡', cost: 175, stock: 1, maxStack: 3,
-    desc: 'На 12 секунд ускоряет бег и перезарядку оружия.',
+    name: 'Интеграция «Турбо-SLA»', icon: '⚡', cost: 175, stock: 1, maxStack: 3,
+    desc: 'Расширенный тариф отдела продаж: на 12 секунд ускоряет бег и перезарядку оружия. Техподдержка оплачивается отдельно.',
     use: (g) => {
       g.player.speedBuffTimer = Math.max(g.player.speedBuffTimer, 12);
       g.player.turboBuffTimer = Math.max(g.player.turboBuffTimer, 12);
@@ -1353,8 +1376,8 @@ const CONSUMABLES_DEF = {
     }
   },
   crm_xp_campaign: {
-    name: 'CRM-кампания «Вернись в зал»', icon: '📲', cost: 190, stock: 1, maxStack: 3,
-    desc: 'Удваивает опыт и фиткоины с новых дискет на 20 секунд.',
+    name: 'CRM-интеграция «Вернись в зал»', icon: '📲', cost: 190, stock: 1, maxStack: 3,
+    desc: 'Платная кампания лояльности: удваивает опыт и фиткоины с новых дискет на 20 секунд. Автопродление включено по умолчанию.',
     use: (g) => {
       g.player.xpEventMult = 2;
       g.player.xpBoostTimer = Math.max(g.player.xpBoostTimer, 20);
@@ -1362,16 +1385,16 @@ const CONSUMABLES_DEF = {
     }
   },
   sigur_day_pass: {
-    name: 'Разовый пропуск Sigur', icon: '🛡️', cost: 220, stock: 1, maxStack: 2,
-    desc: 'Защищает от урона на 4 секунды. Турникет вас узнал, сервер — нет.',
+    name: 'Sigur: лицензия «Иммунитет»', icon: '🛡️', cost: 220, stock: 1, maxStack: 2,
+    desc: 'Платная интеграция СКУД защищает от урона на 4 секунды. Турникет вас узнал, сервер — только после оплаты.',
     use: (g) => {
       g.player.shieldTimer = Math.max(g.player.shieldTimer, 4);
       return true;
     }
   },
   messenger_push: {
-    name: 'Срочная рассылка', icon: '💬', cost: 155, stock: 2, maxStack: 3,
-    desc: 'Оглушает обычных врагов поблизости на 2 секунды.',
+    name: 'Интеграция мессенджеров «Срочный push»', icon: '💬', cost: 155, stock: 2, maxStack: 3,
+    desc: 'Платный пакет рассылок: обычные враги поблизости замирают на 2 секунды. Доставка push не гарантирует прочтение счёта.',
     use: (g) => {
       for (const e of g.enemies) {
         if (!e.isBoss && Math.hypot(e.x - g.player.x, e.y - g.player.y) < 420) e.freezeTimer = Math.max(e.freezeTimer, 2);
@@ -1381,8 +1404,8 @@ const CONSUMABLES_DEF = {
     }
   },
   evotor_connector: {
-    name: 'Эвотор: платный коннектор', icon: '💸', cost: 330, stock: 1, maxStack: 2,
-    desc: 'На 14 секунд даёт +35% к урону. В цену входит согласование счёта.',
+    name: 'Эвотор: VIP-интеграция «Ускоритель»', icon: '💸', cost: 330, stock: 1, maxStack: 2,
+    desc: 'Премиальный платный коннектор на 14 секунд даёт +35% к урону. Согласование счёта входит в стоимость, сама интеграция — в следующий счёт.',
     use: (g) => {
       g.player.damageBuffMult = 1.35;
       g.player.damageBuffTimer = Math.max(g.player.damageBuffTimer, 14);
@@ -1556,6 +1579,7 @@ class Game {
   }
 
   start() {
+    this.closeSalesCall();
     if (this.leaderboardOpenTimer) {
       clearTimeout(this.leaderboardOpenTimer);
       this.leaderboardOpenTimer = null;
@@ -1638,6 +1662,13 @@ class Game {
     this.nextShopTime = 180;
     this.shopVisit = 0;
     this.shopStock = {};
+    this.salesCallActive = false;
+    this.salesCallX = 8;
+    this.salesCallY = 8;
+    this.salesCallVX = 48;
+    this.salesCallVY = 31;
+    this.salesCallLastFrame = 0;
+    this.salesCallFrame = null;
 
     this.updateHUD();
     this.updateActiveHUD();
@@ -1654,6 +1685,7 @@ class Game {
   }
 
   showMainMenu() {
+    this.closeSalesCall();
     this.paused = true;
     this.keys = {};
     for (const id of ['modal-pause', 'modal-lvlup', 'modal-gameover', 'modal-settings', 'modal-changelog', 'modal-shop']) {
@@ -1685,26 +1717,87 @@ class Game {
   }
 
   openShop() {
+    this.closeSalesCall();
     this.paused = true;
     this.keys = {};
     this.shopVisit++;
-    this.nextShopTime += 180;
     this.shopStock = {};
     this.shopPrice = {};
     for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
       this.shopStock[key] = item.stock;
       this.shopPrice[key] = Math.round(item.cost * (1 + (this.shopVisit - 1) * 0.08));
     }
-    document.getElementById('shop-message').innerText = `Торговый зал открылся. Следующий магазин — через 3 минуты. Визит №${this.shopVisit}.`;
+    document.getElementById('shop-message').innerText = `Менеджер подготовил счёт и включил платные модули. Следующий звонок через 3 минуты. Коммерческое предложение №${this.shopVisit}.`;
     document.getElementById('modal-shop').style.display = 'flex';
     this.renderShop();
     this.updateHUD();
   }
 
+  showSalesCall() {
+    if (this.salesCallActive || this.player.hp <= 0) return;
+    this.salesCallActive = true;
+    this.salesCallX = 12;
+    this.salesCallY = 12;
+    this.salesCallVX = 48;
+    this.salesCallVY = 31;
+    this.salesCallLastFrame = 0;
+    const card = document.getElementById('sales-call');
+    card.style.display = 'block';
+    card.style.left = `${this.salesCallX}px`;
+    card.style.top = `${this.salesCallY}px`;
+    this.log('Манго Офис: звонит отдел продаж. «У нас для вас платные интеграции и всего пара уточняющих вопросов».' );
+    this.salesCallFrame = requestAnimationFrame((t) => this.animateSalesCall(t));
+  }
+
+  animateSalesCall(timestamp) {
+    if (!this.salesCallActive) return;
+    const card = document.getElementById('sales-call');
+    const viewport = document.getElementById('game-viewport');
+    const dt = this.salesCallLastFrame ? Math.min(0.05, (timestamp - this.salesCallLastFrame) / 1000) : 0;
+    this.salesCallLastFrame = timestamp;
+    const maxX = Math.max(0, viewport.clientWidth - card.offsetWidth);
+    const maxY = Math.max(0, viewport.clientHeight - card.offsetHeight);
+
+    this.salesCallX += this.salesCallVX * dt;
+    this.salesCallY += this.salesCallVY * dt;
+    if (this.salesCallX <= 0 || this.salesCallX >= maxX) {
+      this.salesCallX = Math.max(0, Math.min(maxX, this.salesCallX));
+      this.salesCallVX *= -1;
+    }
+    if (this.salesCallY <= 0 || this.salesCallY >= maxY) {
+      this.salesCallY = Math.max(0, Math.min(maxY, this.salesCallY));
+      this.salesCallVY *= -1;
+    }
+    card.style.left = `${this.salesCallX}px`;
+    card.style.top = `${this.salesCallY}px`;
+    this.salesCallFrame = requestAnimationFrame((t) => this.animateSalesCall(t));
+  }
+
+  closeSalesCall() {
+    this.salesCallActive = false;
+    if (this.salesCallFrame !== null && this.salesCallFrame !== undefined) {
+      cancelAnimationFrame(this.salesCallFrame);
+      this.salesCallFrame = null;
+    }
+    const card = document.getElementById('sales-call');
+    if (card) card.style.display = 'none';
+  }
+
+  answerSalesCall() {
+    if (!this.salesCallActive) return;
+    this.openShop();
+  }
+
+  declineSalesCall() {
+    if (!this.salesCallActive) return;
+    this.closeSalesCall();
+    this.log('Звонок сброшен. Отдел продаж перезвонит через три минуты — это уже согласовано с CRM.');
+  }
+
   renderShop() {
     const grid = document.getElementById('shop-products');
     grid.innerHTML = '';
-    document.getElementById('shop-currency').innerText = `💰 ${this.currency} фиткоинов`;
+    document.getElementById('shop-currency').innerText = `💰 Бюджет: ${this.currency} фиткоинов`;
     for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
       const owned = this.consumables.find(slot => slot.key === key);
       const stackFull = owned && owned.count >= item.maxStack;
@@ -1713,10 +1806,10 @@ class Game {
       const price = this.shopPrice[key] || item.cost;
       const card = document.createElement('div');
       card.className = 'shop-card';
-      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>Запас: ${stock}${owned ? ` · у вас: ${owned.count}` : ''}</b></p>`;
+      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>Лицензии: ${stock}${owned ? ` · подключено: ${owned.count}` : ''}</b></p>`;
       const button = document.createElement('button');
       button.className = 'btn-1c';
-      button.innerText = `Купить · ${price} 💰`;
+      button.innerText = `Подключить · ${price} 💰`;
       button.disabled = stock <= 0 || this.currency < price || stackFull || slotsFull;
       button.onclick = () => this.buyConsumable(key);
       card.appendChild(button);
@@ -1732,14 +1825,14 @@ class Game {
     if (stock <= 0 || this.currency < price) return;
     if (slot && slot.count >= item.maxStack) return;
     if (!slot && this.consumables.length >= 4) {
-      document.getElementById('shop-message').innerText = 'Все четыре ячейки расходников заняты. Используйте предмет или выберите уже имеющийся.';
+      document.getElementById('shop-message').innerText = 'В коммерческом предложении максимум четыре позиции одновременно. Уберите модуль из инвентаря или продлите уже подключённый.';
       return;
     }
     this.currency -= price;
     this.shopStock[key]--;
     if (slot) slot.count++;
     else this.consumables.push({ key, count: 1 });
-    document.getElementById('shop-message').innerText = `${item.name} добавлен в инвентарь.`;
+    document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} подключена и добавлена в инвентарь. Отдел продаж благодарит за выбор.`;
     this.updateConsumableHUD();
     this.updateHUD();
     this.renderShop();
@@ -2499,8 +2592,8 @@ class Game {
     this.sound.updateBossMusic(dt, aliveBosses);
     this.time += dt;
     if (this.time >= this.nextShopTime) {
-      this.openShop();
-      return;
+      this.nextShopTime += 180;
+      this.showSalesCall();
     }
     const frameScale = dt * 60;
 
@@ -3005,6 +3098,7 @@ class Game {
   }
 
   gameOver(reason) {
+    this.closeSalesCall();
     this.paused = true;
     this.sound.playTone(60, 'sawtooth', 0.7, 0.45);
 
@@ -3130,7 +3224,7 @@ class Game {
     document.getElementById('hp-val').innerText = `${Math.max(0, Math.round(this.player.hp))}/${this.player.maxHp} HP`;
     document.getElementById('currency-display').innerText = this.currency || 0;
     const shopRemaining = Math.max(0, Math.ceil((this.nextShopTime - this.time)));
-    document.getElementById('shop-timer').innerText = `🛒 ${Math.floor(shopRemaining / 60).toString().padStart(2, '0')}:${(shopRemaining % 60).toString().padStart(2, '0')}`;
+    document.getElementById('shop-timer').innerText = `☎ ${Math.floor(shopRemaining / 60).toString().padStart(2, '0')}:${(shopRemaining % 60).toString().padStart(2, '0')}`;
     const hpRatio = Math.max(0, Math.min(1, this.player.hp / this.player.maxHp));
     const hpFill = document.getElementById('hud-health-fill');
     hpFill.style.width = `${hpRatio * 100}%`;

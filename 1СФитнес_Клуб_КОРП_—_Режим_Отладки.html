@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП — Survivors 1.3.0</title>
+<title>1С:Фитнес Клуб КОРП — Survivors 1.4.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -280,6 +280,17 @@
     border-radius: 3px;
     overflow: hidden;
   }
+  #mega-boss-hud {
+    display: none; position: absolute; top: 76px; left: 50%; transform: translateX(-50%);
+    width: min(420px, calc(100% - 24px)); padding: 7px 10px;
+    background: rgba(18, 10, 28, .88); border: 2px solid #9b59b6; border-radius: 4px;
+    color: #fff; z-index: 12; pointer-events: none; text-align: center;
+    box-shadow: 0 3px 14px rgba(0,0,0,.65);
+  }
+  #mega-boss-title { font-size: 11px; font-weight: bold; color: #e0aaff; }
+  #mega-boss-track { height: 10px; margin: 5px 0 3px; background: #333; border: 1px solid #fff; border-radius: 3px; overflow: hidden; }
+  #mega-boss-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #8e44ad, #ff4757); transition: width .12s linear; }
+  #mega-boss-direction { font-size: 10px; color: #f1f2f6; }
   #hud-health-fill {
     width: 100%;
     height: 100%;
@@ -481,7 +492,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП — Survivors v1.3.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП — Survivors v1.4.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -514,6 +525,11 @@
     <div id="hud-health">
       <div id="hud-health-label"><span>❤️ ЗДОРОВЬЕ</span><span id="hud-health-value">100 / 100</span></div>
       <div id="hud-health-track"><div id="hud-health-fill"></div></div>
+    </div>
+    <div id="mega-boss-hud">
+      <div id="mega-boss-title">🧿 ЦЕНТРАЛЬНЫЙ КЛАСТЕР</div>
+      <div id="mega-boss-track"><div id="mega-boss-fill"></div></div>
+      <div id="mega-boss-direction"></div>
     </div>
     <div id="hud-stats">
       <div>⭐ Очки: <span id="score-display">0</span></div>
@@ -577,7 +593,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП — Survivors</span><span id="menu-version">v1.3.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП — Survivors</span><span id="menu-version">v1.4.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -585,12 +601,12 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.3.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.4.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 1.3.0 — «Ночной клубный релиз»</h3>
-              <p>При боссе музыка становится жёстче и плавно возвращается после боя. Уровни героя идут как релизы 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Рикошет, мультивыстрел и замедляющие снаряды прокачиваются до 5 уровня. Больше историй телефонной поддержки через Манго Офис, AnyDesk и Rudesktop, плюс звонки отдела продаж с платными интеграциями. Сборка: 8.3.27.1936.</p>
+              <h3>Версия 1.4.0 — «Центральный кластер»</h3>
+              <p>Одновременно может быть только один обычный босс. Каждые 5 минут карта очищается от врагов без выпадения опыта, а в центре появляется неподвижный большой босс с несколькими атаками и отдельным агрессивным битом. Расходники закреплены за слотами 7, 8, 9 и 0.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.1.0 — «Закрытие смены»</h3>
@@ -625,6 +641,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
+        <div class="release-notes"><h3>1.4.0 — «Центральный кластер»</h3><p>Ограничено одновременное количество обычных боссов. Каждые 5 минут карта очищается от мобов без выдачи опыта, затем в центре появляется большой неподвижный босс с веерным залпом, кольцевыми снарядами и телеграфируемыми зонами. Добавлены указатель и полоска здоровья босса, отдельный более быстрый агрессивный бит. Расходники остаются в своих слотах 7–0 и больше не сдвигаются после использования.</p></div>
         <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Музыка плавно переходит в агрессивный режим при появлении босса и возвращается к обычной теме после гибели последнего; одновременные боссы усиливают общий режим без конфликтов. Уровни героя нумеруются релизами 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Новые боевые улучшения: рикошет, мультивыстрел и замедляющие снаряды — каждое до 5 уровней. Звонки отдела продаж с плавающим окном раз в 3 минуты: можно ответить и посмотреть платные интеграции или сбросить вызов. Переписаны реплики телефонной техподдержки через Манго Офис, AnyDesk и Rudesktop. Номер сборки — 8.3.27.1936.</p></div>
         <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Главное меню, настройки, таблица лидеров и журнал патчей. Магазин каждые 3 минуты, фиткоины за собранный XP, 4 ячейки расходников на 7–0 и новые активные умения. Новые интеграционные приколы: Sigur / AVI, АТОЛ, ШТРИХ, Эвотор, IronLogic и мессенджеры. Исправлены награды боссов, смерть от снарядов, скорость на разных FPS и серия уровней за накопленный XP.</p></div>
         <div class="release-notes"><h3>1.1.0 — «Закрытие смены»</h3><p>Исправлено случайное зависание на критическом попадании и закрытие послематчевой таблицы. Добавлены полоска HP и меню паузы. Ограничено количество игровых эффектов, смягчён рост толпы и переосмыслены бухгалтерские отсылки в сторону фитнес-клуба.</p></div>
@@ -736,7 +753,7 @@
 </div>
 
 <script>
-const GAME_VERSION = '1.3.0';
+const GAME_VERSION = '1.4.0';
 /* ============================================================
    КОНФИГУРАЦИЯ DREAMLO
    ============================================================ */
@@ -767,6 +784,7 @@ class SoundEngine {
     this.step = 0;
     this.bpm = 132;
     this.bossIntensity = 0;
+    this.megaBossIntensity = 0;
     this.bossCount = 0;
     this.nextNoteTime = 0;
     this.noiseBuffer = null;
@@ -834,12 +852,15 @@ class SoundEngine {
     }
   }
 
-  updateBossMusic(dt, aliveBosses) {
+  updateBossMusic(dt, aliveBosses, aliveMegaBosses = 0) {
     this.bossCount = aliveBosses;
     const target = aliveBosses > 0 ? Math.min(1, 0.82 + (aliveBosses - 1) * 0.12) : 0;
     const transition = 1 - Math.exp(-dt / (target > this.bossIntensity ? 0.85 : 1.6));
     this.bossIntensity += (target - this.bossIntensity) * transition;
-    this.bpm = 132 + this.bossIntensity * 40;
+    const megaTarget = aliveMegaBosses > 0 ? 1 : 0;
+    const megaTransition = 1 - Math.exp(-dt / (megaTarget > this.megaBossIntensity ? 0.45 : 1.8));
+    this.megaBossIntensity += (megaTarget - this.megaBossIntensity) * megaTransition;
+    this.bpm = 132 + this.bossIntensity * 40 + this.megaBossIntensity * 68;
   }
 
   scheduleBeat() {
@@ -862,16 +883,18 @@ class SoundEngine {
   playStep(step, time) {
     const barStep = step % 16;
     const bar = Math.floor(step / 16);
-    const boss = this.bossIntensity;
+    const mega = this.megaBossIntensity;
+    const boss = Math.max(this.bossIntensity, mega);
 
     // На боссе бочка становится чаще и плотнее, а после его смерти сходит на нет.
-    if (barStep % 4 === 0 || (boss > 0.2 && (barStep === 6 || barStep === 14))) {
+    const kickHit = mega > 0.2 ? barStep % 2 === 0 : (barStep % 4 === 0 || (boss > 0.2 && (barStep === 6 || barStep === 14)));
+    if (kickHit) {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const offbeat = barStep === 6 || barStep === 14;
-      osc.frequency.setValueAtTime(offbeat ? 125 : 160 + boss * 25, time);
+      const offbeat = barStep % 4 !== 0;
+      osc.frequency.setValueAtTime(offbeat ? 125 + mega * 18 : 160 + boss * 25, time);
       osc.frequency.exponentialRampToValueAtTime(30 + boss * 8, time + 0.09);
-      gain.gain.setValueAtTime(offbeat ? 0.12 * boss : 0.35 + boss * 0.12, time);
+      gain.gain.setValueAtTime(offbeat ? 0.12 * boss + mega * 0.1 : 0.35 + boss * 0.12 + mega * 0.1, time);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -880,7 +903,7 @@ class SoundEngine {
     }
 
     // Snare
-    if (barStep === 4 || barStep === 12 || (boss > 0.55 && barStep === 15)) {
+    if (barStep === 4 || barStep === 12 || (boss > 0.55 && barStep === 15) || (mega > 0.25 && barStep === 7)) {
       if (this.noiseBuffer) {
         const noise = this.ctx.createBufferSource();
         noise.buffer = this.noiseBuffer;
@@ -896,6 +919,25 @@ class SoundEngine {
         noise.start(time);
         noise.stop(time + 0.14);
       }
+    }
+
+    // У большого босса появляется отдельный синкопированный индустриальный рифф.
+    if (mega > 0.12 && [2, 6, 10, 14].includes(barStep)) {
+      const stab = this.ctx.createOscillator();
+      const stabFilter = this.ctx.createBiquadFilter();
+      const stabGain = this.ctx.createGain();
+      stab.type = 'square';
+      stab.frequency.setValueAtTime([82, 92, 73, 98][bar] * (barStep === 10 ? 1.5 : 1), time);
+      stabFilter.type = 'lowpass';
+      stabFilter.frequency.setValueAtTime(420 + mega * 900, time);
+      stabGain.gain.setValueAtTime(0.0001, time);
+      stabGain.gain.linearRampToValueAtTime(0.07 * mega, time + 0.008);
+      stabGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.11);
+      stab.connect(stabFilter);
+      stabFilter.connect(stabGain);
+      stabGain.connect(this.ctx.destination);
+      stab.start(time);
+      stab.stop(time + 0.12);
     }
 
     // Hi-Hat
@@ -966,12 +1008,14 @@ class SoundEngine {
     const melodySteps = [0, 3, 6, 8, 11, 14];
     if (game.time > 12 && melodySteps.includes(barStep)) {
       const melodyRoot = [220, 174.61, 261.63, 196][bar];
-      const motif = boss > 0.25 ? [0, 3, 5, 10, 12, 10, 5, 3] : [0, 3, 7, 10, 12, 10, 7, 3];
+      const motif = mega > 0.2
+        ? [0, 2, 3, 7, 10, 11, 14, 15]
+        : boss > 0.25 ? [0, 3, 5, 10, 12, 10, 5, 3] : [0, 3, 7, 10, 12, 10, 7, 3];
       const semitones = motif[(Math.floor(barStep / 2) + bar) % motif.length];
       const lead = this.ctx.createOscillator();
       const leadGain = this.ctx.createGain();
-      lead.type = boss > 0.55 ? 'sawtooth' : 'triangle';
-      lead.frequency.setValueAtTime(melodyRoot * Math.pow(2, semitones / 12) * (boss > 0.7 ? 0.5 : 1), time);
+      lead.type = mega > 0.35 ? 'square' : boss > 0.55 ? 'sawtooth' : 'triangle';
+      lead.frequency.setValueAtTime(melodyRoot * Math.pow(2, semitones / 12) * (mega > 0.35 ? 0.72 : boss > 0.7 ? 0.5 : 1), time);
       leadGain.gain.setValueAtTime(0.0001, time);
       leadGain.gain.linearRampToValueAtTime(0.045 + boss * 0.045, time + 0.012);
       leadGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.16);
@@ -1580,6 +1624,10 @@ class Game {
 
   start() {
     this.closeSalesCall();
+    this.sound.bossIntensity = 0;
+    this.sound.megaBossIntensity = 0;
+    this.sound.bossCount = 0;
+    this.sound.bpm = 132;
     if (this.leaderboardOpenTimer) {
       clearTimeout(this.leaderboardOpenTimer);
       this.leaderboardOpenTimer = null;
@@ -1650,15 +1698,18 @@ class Game {
     this.particles = [];
     this.texts = [];
     this.whipSlashes = [];
+    this.bossWarnings = [];
 
     this.spawnTimer = 0;
     this.trailTimer = 0;
     this.backupTimer = 38;
     this.nextBossMinute = 1;
+    this.nextMegaBossTime = 300;
+    this.megaBossCount = 0;
     this.nextEventTime = 70;
     this.dynUpdateCd = 0;
     this.currency = 0;
-    this.consumables = [];
+    this.consumables = Array(4).fill(null);
     this.nextShopTime = 180;
     this.shopVisit = 0;
     this.shopStock = {};
@@ -1799,9 +1850,9 @@ class Game {
     grid.innerHTML = '';
     document.getElementById('shop-currency').innerText = `💰 Бюджет: ${this.currency} фиткоинов`;
     for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
-      const owned = this.consumables.find(slot => slot.key === key);
+      const owned = this.consumables.find(slot => slot && slot.key === key);
       const stackFull = owned && owned.count >= item.maxStack;
-      const slotsFull = !owned && this.consumables.length >= 4;
+      const slotsFull = !owned && this.consumables.every(Boolean);
       const stock = this.shopStock[key] || 0;
       const price = this.shopPrice[key] || item.cost;
       const card = document.createElement('div');
@@ -1821,17 +1872,18 @@ class Game {
     const item = CONSUMABLES_DEF[key];
     const price = this.shopPrice[key] || item.cost;
     const stock = this.shopStock[key] || 0;
-    let slot = this.consumables.find(entry => entry.key === key);
+    let slot = this.consumables.find(entry => entry && entry.key === key);
     if (stock <= 0 || this.currency < price) return;
     if (slot && slot.count >= item.maxStack) return;
-    if (!slot && this.consumables.length >= 4) {
+    const freeSlot = this.consumables.findIndex(entry => !entry);
+    if (!slot && freeSlot === -1) {
       document.getElementById('shop-message').innerText = 'В коммерческом предложении максимум четыре позиции одновременно. Уберите модуль из инвентаря или продлите уже подключённый.';
       return;
     }
     this.currency -= price;
     this.shopStock[key]--;
     if (slot) slot.count++;
-    else this.consumables.push({ key, count: 1 });
+    else this.consumables[freeSlot] = { key, count: 1 };
     document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} подключена и добавлена в инвентарь. Отдел продаж благодарит за выбор.`;
     this.updateConsumableHUD();
     this.updateHUD();
@@ -1856,7 +1908,7 @@ class Game {
       return;
     }
     slot.count--;
-    if (slot.count <= 0) this.consumables.splice(slotIndex, 1);
+    if (slot.count <= 0) this.consumables[slotIndex] = null;
     this.sound.playTone(620, 'sine', 0.13, 0.14);
     this.log(`Использовано: ${item.name}`);
     this.updateConsumableHUD();
@@ -2037,7 +2089,14 @@ class Game {
 
   spawnDirector(dt) {
     this.spawnTimer -= dt;
-    if (this.spawnTimer <= 0) {
+    if (this.time >= this.nextMegaBossTime) {
+      this.spawnMegaBoss();
+      this.nextMegaBossTime += 300;
+      while (this.nextBossMinute * 60 <= this.time) this.nextBossMinute++;
+    }
+
+    const megaBossAlive = this.enemies.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
+    if (!megaBossAlive && this.spawnTimer <= 0) {
       const maxAllowedEnemies = Math.min(72, 38 + Math.floor(this.time / 12));
 
       if (this.enemies.length < maxAllowedEnemies) {
@@ -2053,7 +2112,8 @@ class Game {
     }
 
     if (this.time >= this.nextBossMinute * 60) {
-      this.spawn1CBoss(this.nextBossMinute);
+      const anotherBossAlive = this.enemies.some(enemy => enemy.isBoss && enemy.hp > 0);
+      if (!megaBossAlive && !anotherBossAlive) this.spawn1CBoss(this.nextBossMinute);
       this.nextBossMinute++;
     }
 
@@ -2111,6 +2171,43 @@ class Game {
       freezeTimer: 0,
       isBoss: false
     });
+  }
+
+  spawnMegaBoss() {
+    // Очищение не проходит через смерть мобов: оно не даёт опыт, валюту, очки или лут.
+    this.enemies = [];
+    this.enemyProjectiles = [];
+    this.puddles = [];
+    this.bossWarnings = [];
+    this.megaBossCount++;
+
+    const hp = 28000 + (this.megaBossCount - 1) * 10000;
+    const boss = {
+      x: this.MAP_SIZE / 2,
+      y: this.MAP_SIZE / 2,
+      name: 'ЦЕНТРАЛЬНЫЙ КЛАСТЕР: ЯДРО ПРОДАКШЕНА',
+      hp,
+      maxHp: hp,
+      speed: 0,
+      dmg: 24,
+      icon: '🧿',
+      size: 76,
+      col: '#9b59b6',
+      xp: 280 + this.megaBossCount * 30,
+      isBoss: true,
+      isMegaBoss: true,
+      bossType: 'cluster_core',
+      freezeTimer: 0,
+      bossTimer1: 0,
+      bossTimer2: 0,
+      bossTimer3: 0,
+      ringPhase: 0
+    };
+    this.enemies.push(boss);
+    this.showBanner('🚨 МИРОВОЙ БОСС В ЦЕНТРЕ КАРТЫ — ИЩИТЕ ЯДРО КЛАСТЕРА!');
+    this.addPopup(boss.x, boss.y - boss.size - 20, '⚠️ ЦЕНТРАЛЬНЫЙ КЛАСТЕР АКТИВИРОВАН', '#ff7675');
+    this.log('Плановое окно 5 минут: карта очищена без выдачи опыта. Ядро продакшена развёрнуто в центре.');
+    this.sound.boss();
   }
 
   /* ============================================================
@@ -2179,7 +2276,87 @@ class Game {
     this.enemies.push(b);
   }
 
+  updateMegaBossAI(b, dt) {
+    b.bossTimer1 += dt;
+    b.bossTimer2 += dt;
+    b.bossTimer3 += dt;
+    const enraged = b.hp <= b.maxHp * 0.5;
+
+    // Aimed fan of server alerts. Keep moving to slip between the lanes.
+    if (b.bossTimer1 >= (enraged ? 1.9 : 2.7)) {
+      b.bossTimer1 = 0;
+      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      for (let k = -3; k <= 3; k++) {
+        const angle = aim + k * 0.14;
+        this.enemyProjectiles.push({
+          x: b.x, y: b.y,
+          vx: Math.cos(angle) * 4.1, vy: Math.sin(angle) * 4.1,
+          dmg: enraged ? 16 : 13, size: 9, life: 2.8, icon: '📡', color: '#ff4757'
+        });
+      }
+      this.addPopup(b.x, b.y - b.size - 20, 'ЗАЛП УВЕДОМЛЕНИЙ — МАНЁВР!', '#ff7675');
+    }
+
+    // Rotating ring with three gaps to dodge through.
+    if (b.bossTimer2 >= (enraged ? 4.5 : 6.2)) {
+      b.bossTimer2 = 0;
+      const phase = b.ringPhase++ * 0.17;
+      for (let k = 0; k < 18; k++) {
+        if (k % 6 === 2) continue;
+        const angle = phase + k * (Math.PI * 2 / 18);
+        this.enemyProjectiles.push({
+          x: b.x, y: b.y,
+          vx: Math.cos(angle) * 3.25, vy: Math.sin(angle) * 3.25,
+          dmg: enraged ? 18 : 15, size: 10, life: 3.3, icon: '🗄️', color: '#c56cf0'
+        });
+      }
+      this.sound.explosion();
+      this.addPopup(b.x, b.y - b.size - 20, 'КОЛЬЦО ТРАНЗАКЦИЙ — ИЩИТЕ ПРОЁМ!', '#d980fa');
+    }
+
+    // Telegraph three floor zones around the player's current position.
+    if (b.bossTimer3 >= (enraged ? 6.2 : 9.1)) {
+      b.bossTimer3 = 0;
+      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      for (const offset of [-0.8, 0, 0.8]) {
+        const x = Math.max(this.BOUND_MIN + 90, Math.min(this.BOUND_MAX - 90, this.player.x + Math.cos(aim + offset) * 150));
+        const y = Math.max(this.BOUND_MIN + 90, Math.min(this.BOUND_MAX - 90, this.player.y + Math.sin(aim + offset) * 150));
+        this.bossWarnings.push({ x, y, radius: 86, dmg: enraged ? 42 : 34, life: 1.05, maxLife: 1.05 });
+      }
+      this.addPopup(this.player.x, this.player.y - 34, 'ЗОНЫ ПЕРЕГРУЗКИ — ВЫЙДИТЕ ИЗ КРУГА!', '#ff7675');
+    }
+  }
+
+  updateBossWarnings(dt) {
+    for (let i = this.bossWarnings.length - 1; i >= 0; i--) {
+      const warning = this.bossWarnings[i];
+      warning.life -= dt;
+      if (warning.life > 0) continue;
+
+      if (Math.hypot(this.player.x - warning.x, this.player.y - warning.y) < warning.radius + 18) {
+        if (this.player.shieldTimer <= 0) {
+          this.player.hp -= warning.dmg;
+          this.sound.hit();
+          this.addPopup(this.player.x, this.player.y - 20, `-${warning.dmg} HP`, '#ff4757');
+        } else {
+          this.addPopup(this.player.x, this.player.y - 20, 'ЗОНА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
+        }
+      }
+      this.createHitFX(warning.x, warning.y, '#ff4757', 10);
+      this.bossWarnings.splice(i, 1);
+      if (this.player.hp <= 0) {
+        this.gameOver('Центральное ядро перегрузило целостность базы!');
+        return true;
+      }
+    }
+    return false;
+  }
+
   updateBossAI(b, dt) {
+    if (b.bossType === 'cluster_core') {
+      this.updateMegaBossAI(b, dt);
+      return;
+    }
     b.bossTimer1 += dt;
     b.bossTimer2 += dt;
 
@@ -2586,10 +2763,14 @@ class Game {
 
   update(dt) {
     let aliveBosses = 0;
+    let aliveMegaBosses = 0;
     for (const enemy of this.enemies) {
-      if (enemy.isBoss && enemy.hp > 0) aliveBosses++;
+      if (enemy.isBoss && enemy.hp > 0) {
+        if (enemy.isMegaBoss) aliveMegaBosses++;
+        else aliveBosses++;
+      }
     }
-    this.sound.updateBossMusic(dt, aliveBosses);
+    this.sound.updateBossMusic(dt, aliveBosses, aliveMegaBosses);
     this.time += dt;
     if (this.time >= this.nextShopTime) {
       this.nextShopTime += 180;
@@ -2769,6 +2950,7 @@ class Game {
       }
       if (ep.life <= 0) this.enemyProjectiles.splice(i, 1);
     }
+    if (this.updateBossWarnings(dt)) return;
     if (this.player.hp <= 0) {
       this.gameOver('База рухнула: вражеский снаряд уничтожил целостность!');
       return;
@@ -2811,8 +2993,10 @@ class Game {
 
       const ang = Math.atan2(this.player.y - e.y, this.player.x - e.x);
       const moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1);
-      e.x += Math.cos(ang) * moveSpeed * frameScale;
-      e.y += Math.sin(ang) * moveSpeed * frameScale;
+      if (!e.isMegaBoss) {
+        e.x += Math.cos(ang) * moveSpeed * frameScale;
+        e.y += Math.sin(ang) * moveSpeed * frameScale;
+      }
 
       if (e.isBoss) {
         this.updateBossAI(e, dt);
@@ -2859,6 +3043,10 @@ class Game {
 
       // Смерть моба
       if (e.hp <= 0) {
+        if (e.isMegaBoss) {
+          this.bossWarnings = [];
+          this.enemyProjectiles = [];
+        }
         this.kills++;
         this.createHitFX(e.x, e.y, e.col, 10);
 
@@ -3235,6 +3423,20 @@ class Game {
         : 'linear-gradient(90deg, #16a085, #55efc4)';
     document.getElementById('hud-health-value').innerText = `${Math.max(0, Math.round(this.player.hp))} / ${this.player.maxHp}`;
 
+    const megaBoss = this.enemies.find(enemy => enemy.isMegaBoss && enemy.hp > 0);
+    const megaHud = document.getElementById('mega-boss-hud');
+    megaHud.style.display = megaBoss ? 'block' : 'none';
+    if (megaBoss) {
+      const ratio = Math.max(0, Math.min(1, megaBoss.hp / megaBoss.maxHp));
+      document.getElementById('mega-boss-title').innerText = `🧿 ${megaBoss.name} · ${Math.ceil(megaBoss.hp)} / ${megaBoss.maxHp} HP`;
+      document.getElementById('mega-boss-fill').style.width = `${ratio * 100}%`;
+      const directionGlyphs = ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'];
+      const angle = (Math.atan2(megaBoss.y - this.player.y, megaBoss.x - this.player.x) + Math.PI * 2) % (Math.PI * 2);
+      const direction = directionGlyphs[Math.round(angle / (Math.PI / 4)) % 8];
+      const distance = Math.round(Math.hypot(megaBoss.x - this.player.x, megaBoss.y - this.player.y));
+      document.getElementById('mega-boss-direction').innerText = `Курс ${direction} · ${distance} м до центра карты`;
+    }
+
     // Грейд архитектора
     let grade = "Архитектор 1С";
     if (this.level >= 15) grade = "ИТ-Директор Холдинга";
@@ -3351,6 +3553,28 @@ class Game {
       this.ctx.fill();
     }
 
+    // Красные телеграфируемые зоны атак центрального босса.
+    for (const warning of this.bossWarnings) {
+      const urgency = 1 - warning.life / warning.maxLife;
+      this.ctx.save();
+      this.ctx.globalAlpha = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(urgency * Math.PI * 12));
+      this.ctx.beginPath();
+      this.ctx.arc(warning.x, warning.y, warning.radius, 0, Math.PI * 2);
+      this.ctx.fillStyle = '#ff1744';
+      this.ctx.fill();
+      this.ctx.setLineDash([10, 7]);
+      this.ctx.lineWidth = 4;
+      this.ctx.strokeStyle = '#fff';
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+      this.ctx.globalAlpha = 1;
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = 'bold 12px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('УКЛОНИТЕСЬ', warning.x, warning.y + 4);
+      this.ctx.restore();
+    }
+
     // Хлыст
     for (let w of this.whipSlashes) {
       this.ctx.save();
@@ -3388,6 +3612,18 @@ class Game {
         this.ctx.strokeStyle = e.enrage ? '#ff0000' : 'rgba(255, 210, 0, 0.5)';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
+        if (e.isMegaBoss) {
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, e.size + 22, e.bossTimer2 * 0.35, e.bossTimer2 * 0.35 + Math.PI * 1.45);
+          this.ctx.strokeStyle = '#e0aaff';
+          this.ctx.lineWidth = 5;
+          this.ctx.stroke();
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, e.size + 34, -e.bossTimer2 * 0.22, -e.bossTimer2 * 0.22 + Math.PI * 1.3);
+          this.ctx.strokeStyle = 'rgba(255, 71, 87, .8)';
+          this.ctx.lineWidth = 3;
+          this.ctx.stroke();
+        }
       }
 
       this.ctx.fillStyle = e.col;
@@ -3404,11 +3640,18 @@ class Game {
       this.ctx.fillText(e.freezeTimer > 0 ? '❄️' : e.icon, 0, 1);
 
       if (e.hp < e.maxHp) {
-        const bw = e.size * 2;
+        const bw = e.isMegaBoss ? 220 : e.size * 2;
+        const barY = -e.size - (e.isMegaBoss ? 25 : 10);
         this.ctx.fillStyle = '#111';
-        this.ctx.fillRect(-e.size, -e.size - 10, bw, 6);
+        this.ctx.fillRect(-bw / 2, barY, bw, e.isMegaBoss ? 10 : 6);
         this.ctx.fillStyle = e.isBoss ? '#e74c3c' : '#2ecc71';
-        this.ctx.fillRect(-e.size, -e.size - 10, bw * Math.max(0, e.hp / e.maxHp), 6);
+        this.ctx.fillRect(-bw / 2, barY, bw * Math.max(0, e.hp / e.maxHp), e.isMegaBoss ? 10 : 6);
+      }
+      if (e.isMegaBoss) {
+        this.ctx.font = 'bold 14px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillText('ЯДРО ПРОДАКШЕНА', 0, -e.size - 43);
       }
       this.ctx.restore();
     }

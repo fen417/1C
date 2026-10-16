@@ -1,0 +1,3337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1С:Фитнес Клуб КОРП — Survivors 1.3.0</title>
+<style>
+  :root {
+    --c-yellow: #ffd200;
+    --c-yellow-dark: #cca400;
+    --c-border: #7f9db9;
+    --c-win-bg: #ece9d8;
+  }
+  * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; font-family: 'Tahoma', 'Segoe UI', sans-serif; }
+  body {
+    background: #0f111a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  #app-window {
+    width: 1220px;
+    height: 820px;
+    background: #fff;
+    border: 3px solid #222;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.95);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Шапка 1С */
+  #header-1c {
+    background: var(--c-yellow);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-bottom: 2px solid var(--c-yellow-dark);
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 5;
+  }
+  .logo-box {
+    background: #d63031;
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* Меню */
+  #nav-bar {
+    background: #f1f2f6;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    padding: 4px 8px;
+    gap: 6px;
+    font-size: 11px;
+    align-items: center;
+    z-index: 5;
+  }
+  .nav-btn {
+    background: #fff;
+    border: 1px solid #aaa;
+    padding: 3px 9px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .nav-btn:hover { background: #fffbe6; border-color: #cca400; }
+  .nav-btn.special { background: #ffeaa7; font-weight: bold; border-color: #e17055; }
+  .nav-btn.active-music { background: #55efc4; border-color: #00b894; }
+
+  /* XP Bar */
+  #xp-bar-container {
+    height: 16px;
+    background: #2d3436;
+    position: relative;
+    border-bottom: 1px solid #111;
+    z-index: 5;
+  }
+  #xp-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #00cec9, #55efc4);
+    box-shadow: 0 0 12px #55efc4;
+    transition: width 0.08s linear;
+  }
+  #xp-bar-text {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #fff;
+    font-weight: bold;
+    line-height: 16px;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  /* Viewport */
+  #game-viewport {
+    flex: 1;
+    position: relative;
+    background: #111;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* HUD Пассивный инвентарь */
+  #hud-inventory {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .inv-slot {
+    width: 36px;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #ffd200;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 17px;
+    position: relative;
+  }
+  .inv-lvl {
+    position: absolute;
+    bottom: 0px;
+    right: 2px;
+    font-size: 9px;
+    color: #ffd200;
+    font-weight: bold;
+  }
+
+  /* Панель активных умений [1][2][3][4] */
+  #hud-active-skills {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+  #hud-consumables {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+  .consumable-slot {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #f39c12;
+    border-radius: 6px;
+    background: rgba(17, 24, 39, 0.9);
+    color: #fff;
+    font-size: 21px;
+    cursor: pointer;
+  }
+  .consumable-slot.empty { border-style: dashed; opacity: 0.55; cursor: default; }
+  .consumable-slot .consumable-key {
+    position: absolute; top: 2px; left: 4px; font-size: 9px; font-weight: bold;
+    color: #111; background: #ffd200; border-radius: 2px; padding: 0 3px;
+  }
+  .consumable-slot .consumable-count {
+    position: absolute; right: 3px; bottom: 1px; font-size: 11px; font-weight: bold;
+    color: #55efc4; text-shadow: 1px 1px #000;
+  }
+  .active-slot {
+    width: 56px;
+    height: 56px;
+    background: rgba(17, 24, 39, 0.9);
+    border: 2px solid #55efc4;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.08s;
+  }
+  .active-slot:hover { transform: translateY(-3px); border-color: #ffd200; }
+  .active-slot.empty {
+    border: 2px dashed #555;
+    background: rgba(0,0,0,0.4);
+    cursor: default;
+  }
+  .active-slot .act-key {
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    background: #ffd200;
+    color: #000;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 0 4px;
+    border-radius: 2px;
+  }
+  .active-slot .act-icon {
+    font-size: 22px;
+    margin-top: 2px;
+  }
+  .active-slot .act-lvl {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    color: #55efc4;
+  }
+  .active-slot .act-cd-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    border-radius: 4px;
+    pointer-events: none;
+    display: none;
+  }
+
+  #hud-stats {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    display: flex;
+    gap: 15px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    text-shadow: 2px 2px 4px #000;
+    z-index: 10;
+  }
+  #hud-health {
+    position: absolute;
+    top: 39px;
+    right: 15px;
+    width: 230px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px #000;
+    z-index: 10;
+  }
+  #hud-health-label { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  #hud-health-track {
+    height: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #hud-health-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #c0392b, #2ecc71);
+    transition: width 0.12s linear, background 0.12s linear;
+  }
+
+  /* Эффект глитча */
+  #glitch-overlay {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(231,76,60,0.3), rgba(231,76,60,0.3) 2px, transparent 2px, transparent 4px);
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+    animation: flashGlitch 0.1s infinite;
+  }
+  @keyframes flashGlitch { 0% { opacity: 0.8; } 50% { opacity: 0.2; } 100% { opacity: 0.9; } }
+
+  /* Баннеры */
+  #event-banner {
+    position: absolute;
+    top: 55px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, rgba(192,57,43,0.95), rgba(231,76,60,0.95), rgba(192,57,43,0.95));
+    color: #fff;
+    border: 2px solid #f1c40f;
+    padding: 8px 24px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    box-shadow: 0 4px 25px rgba(255,0,0,0.7);
+    display: none;
+    z-index: 20;
+    text-align: center;
+  }
+
+  /* Футер */
+  #footer-1c {
+    height: 26px;
+    background: var(--c-win-bg);
+    border-top: 1px solid #aaa;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 11px;
+    color: #222;
+    justify-content: space-between;
+    z-index: 5;
+  }
+
+  /* Модалки */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+  }
+  #modal-lvlup { z-index: 150; }
+  #modal-pause { z-index: 155; }
+  #modal-gameover { z-index: 160; }
+  #modal-lb { z-index: 250; }
+  #modal-shop { z-index: 180; }
+  #modal-settings, #modal-changelog { z-index: 280; }
+  #modal-main-menu { z-index: 300; }
+  .main-menu-window { width: min(900px, 94%); }
+  .main-menu-layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; }
+  .main-menu-actions { display: flex; flex-direction: column; gap: 9px; }
+  .main-menu-actions .btn-1c { padding: 11px 14px; text-align: left; }
+  .main-menu-version { color: #777; font-size: 11px; margin-top: 4px; }
+  @media (max-width: 640px) {
+    .main-menu-layout { grid-template-columns: 1fr; gap: 12px; }
+    .main-menu-actions .btn-1c { padding: 9px 11px; }
+    .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #modal-shop .win-1c, #modal-changelog .win-1c { width: 94% !important; max-height: 90vh; overflow-y: auto; }
+  }
+  .release-notes { background: #fff; border: 1px solid #ccc; padding: 12px; margin-bottom: 10px; }
+  .release-notes h3 { color: #900; font-size: 14px; margin-bottom: 6px; }
+  .release-notes p { color: #444; font-size: 11px; line-height: 1.5; }
+  .shop-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+  .shop-card { min-height: 150px; background: #fff; border: 1px solid #bbb; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; }
+  .shop-card h3 { color: #900; font-size: 12px; margin: 5px 0; }
+  .shop-card p { color: #444; font-size: 10px; line-height: 1.35; flex: 1; }
+  .shop-card .shop-icon { font-size: 24px; }
+  .shop-card button { margin-top: 8px; }
+  .shop-card button:disabled { opacity: .45; cursor: not-allowed; }
+
+  .win-1c {
+    background: #f0f0f0;
+    border: 2px solid #555;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.85);
+    width: 650px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .win-1c-head {
+    background: var(--c-yellow);
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 12px;
+    border-bottom: 1px solid #cca400;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .win-close-btn {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 2px;
+    background: #e74c3c;
+    color: #fff;
+    border: 1px solid #c0392b;
+    line-height: 14px;
+  }
+  .win-close-btn:hover { background: #c0392b; }
+
+  .win-1c-body { padding: 14px; }
+  .card-upgrade {
+    background: #fff;
+    border: 1px solid #bbb;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.1s;
+  }
+  .card-upgrade:hover {
+    background: #fffbe6;
+    border-color: #d4af00;
+    transform: translateX(4px);
+  }
+  .card-icon { font-size: 30px; min-width: 42px; text-align: center; }
+  .card-info h4 { color: #900; font-size: 13px; margin-bottom: 2px; }
+  .card-info p { font-size: 11px; color: #444; }
+
+  #lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: #fff;
+  }
+  #lb-table th {
+    background: #dfe6e9;
+    border: 1px solid #b2bec3;
+    padding: 6px;
+    text-align: left;
+  }
+  #lb-table td {
+    border: 1px solid #dfe6e9;
+    padding: 6px 8px;
+  }
+  #lb-table tr:nth-child(even) { background: #f8f9fa; }
+
+  .btn-1c {
+    background: #eaeaea;
+    border: 1px solid #777;
+    padding: 6px 14px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  .btn-1c:hover { background: #ffd200; border-color: #333; }
+  .input-1c {
+    padding: 5px 8px;
+    border: 1px solid #7f9db9;
+    font-size: 13px;
+    width: 240px;
+    outline: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="app-window">
+  <!-- Шапка -->
+  <div id="header-1c">
+    <div>
+      <span class="logo-box">1С</span>
+      <span>1С:Фитнес Клуб КОРП — Survivors v1.3.0 [Боевой кластер Продакшн]</span>
+    </div>
+    <div style="font-size:11px;">
+      Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
+    </div>
+  </div>
+
+  <!-- Меню -->
+  <div id="nav-bar">
+    <button class="nav-btn special" id="btn-pause" onclick="game.togglePause()">⏸ Пауза [Esc / P]</button>
+    <button class="nav-btn" onclick="game.showLeaderboard()">🏆 Таблица рекордов</button>
+    <button class="nav-btn" id="btn-sound" onclick="game.sound.toggleMute()">🔊 Звуки: ВКЛ</button>
+    <button class="nav-btn active-music" id="btn-music" onclick="game.sound.toggleMusic()">🔥 Бит: ВКЛ</button>
+    <button class="nav-btn special" onclick="game.quickHeal()">💊 Протеин (+30 HP)</button>
+    <button class="nav-btn" id="btn-dyn-update" onclick="game.triggerDynamicUpdate()" style="background:#55efc4; font-weight:bold;">⚡ Дин. Обновление [ПРОБЕЛ]</button>
+    <span id="buff-indicator" style="font-weight:bold; color:#e67e22; margin-left:6px;"></span>
+    <span style="margin-left:auto; font-size:11px; color:#594500; font-weight:bold;">💰 <span id="currency-display">0</span> фиткоинов</span>
+    <span id="shop-timer" style="font-size:11px; color:#594500;">🛒 03:00</span>
+    <span style="margin-left:auto; font-size:11px; color:#666;">Dreamlo Cloud Sync</span>
+  </div>
+
+  <!-- Опыт -->
+  <div id="xp-bar-container">
+    <div id="xp-bar-fill"></div>
+    <div id="xp-bar-text">РЕЛИЗ 1.0.0 [0 / 25 строк кода]</div>
+  </div>
+
+  <!-- Игровая область -->
+  <div id="game-viewport">
+    <div id="hud-inventory"></div>
+    <div id="hud-health">
+      <div id="hud-health-label"><span>❤️ ЗДОРОВЬЕ</span><span id="hud-health-value">100 / 100</span></div>
+      <div id="hud-health-track"><div id="hud-health-fill"></div></div>
+    </div>
+    <div id="hud-stats">
+      <div>⭐ Очки: <span id="score-display">0</span></div>
+      <div>💀 Багов: <span id="kill-display">0</span></div>
+      <div>⏱️ <span id="time-display">00:00</span></div>
+    </div>
+
+    <!-- Активные умения 1 2 3 4 -->
+    <div id="hud-active-skills">
+      <div class="active-slot empty" id="act-slot-0" onclick="game.useActiveSkill(0)">
+        <span class="act-key">1</span>
+        <span class="act-icon">🔒</span>
+        <span class="act-lvl"></span>
+        <div class="act-cd-overlay"></div>
+      </div>
+      <div class="active-slot empty" id="act-slot-1" onclick="game.useActiveSkill(1)">
+        <span class="act-key">2</span>
+        <span class="act-icon">🔒</span>
+        <span class="act-lvl"></span>
+        <div class="act-cd-overlay"></div>
+      </div>
+      <div class="active-slot empty" id="act-slot-2" onclick="game.useActiveSkill(2)">
+        <span class="act-key">3</span>
+        <span class="act-icon">🔒</span>
+        <span class="act-lvl"></span>
+        <div class="act-cd-overlay"></div>
+      </div>
+      <div class="active-slot empty" id="act-slot-3" onclick="game.useActiveSkill(3)">
+        <span class="act-key">4</span>
+        <span class="act-icon">🔒</span>
+        <span class="act-lvl"></span>
+        <div class="act-cd-overlay"></div>
+      </div>
+    </div>
+    <div id="hud-consumables"></div>
+
+    <div id="event-banner">⚠️ ВНИМАНИЕ: СЕРВЕР ОБНАРУЖИЛ КРИТИЧЕСКИЙ СБОЙ!</div>
+    <div id="glitch-overlay"></div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Футер -->
+  <div id="footer-1c">
+    <div id="footer-log">Инициализация боевого сервера 1С:Фитнес Клуб... ОК.</div>
+    <div>Целостность базы: <b id="hp-val">100/100 HP</b></div>
+  </div>
+
+  <!-- МОДАЛКИ -->
+
+  <!-- Главное меню -->
+  <div id="modal-main-menu" class="modal-overlay">
+    <div class="win-1c main-menu-window">
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП — Survivors</span><span id="menu-version">v1.3.0</span></div>
+      <div class="win-1c-body">
+        <div class="main-menu-layout">
+          <div class="main-menu-actions">
+            <button class="btn-1c" style="background:#55efc4;" onclick="game.start()">▶ Начать игру</button>
+            <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
+            <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
+            <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
+            <div class="main-menu-version">Текущая версия: <b>1.3.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+          </div>
+          <div>
+            <div class="release-notes">
+              <h3>Версия 1.3.0 — «Ночной клубный релиз»</h3>
+              <p>Обновлено музыкальное сопровождение: выразительнее ударные, бас и мелодическая тема. Сборка платформы: 8.3.27.1936.</p>
+            </div>
+            <div class="release-notes" style="margin-bottom:0;">
+              <h3>Версия 1.1.0 — «Закрытие смены»</h3>
+              <p>Исправлено случайное зависание на критическом попадании. Добавлены полоска HP, меню паузы, ограничения для эффектов и более ровный спавн.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Настройки -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="win-1c" style="width:480px;">
+      <div class="win-1c-head"><span>⚙️ Настройки кластера</span></div>
+      <div class="win-1c-body">
+        <p style="font-size:12px; margin-bottom:12px;">Звук и управление</p>
+        <div style="display:flex; gap:8px; margin-bottom:14px;">
+          <button class="btn-1c" id="settings-sound" onclick="game.sound.toggleMute()">🔊 Звуковые эффекты</button>
+          <button class="btn-1c" id="settings-music" onclick="game.sound.toggleMusic()">🎵 Музыка</button>
+        </div>
+        <div class="release-notes">
+          <p><b>Движение:</b> WASD / стрелки<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 7, 8, 9, 0<br><b>Пауза:</b> Esc / P</p>
+        </div>
+        <div style="text-align:right;"><button class="btn-1c" onclick="game.closeSettings()">Назад в меню</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- История обновлений -->
+  <div id="modal-changelog" class="modal-overlay">
+    <div class="win-1c" style="width:620px;">
+      <div class="win-1c-head"><span>📋 История обновлений</span></div>
+      <div class="win-1c-body">
+        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Обновлено музыкальное сопровождение: выразительнее ударные, бас и мелодическая тема. Номер сборки фитнес-кластера — 8.3.27.1936.</p></div>
+        <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Главное меню, настройки, таблица лидеров и журнал патчей. Магазин каждые 3 минуты, фиткоины за собранный XP, 4 ячейки расходников на 7–0 и новые активные умения. Новые интеграционные приколы: Sigur / AVI, АТОЛ, ШТРИХ, Эвотор, IronLogic и мессенджеры. Исправлены награды боссов, смерть от снарядов, скорость на разных FPS и серия уровней за накопленный XP.</p></div>
+        <div class="release-notes"><h3>1.1.0 — «Закрытие смены»</h3><p>Исправлено случайное зависание на критическом попадании и закрытие послематчевой таблицы. Добавлены полоска HP и меню паузы. Ограничено количество игровых эффектов, смягчён рост толпы и переосмыслены бухгалтерские отсылки в сторону фитнес-клуба.</p></div>
+        <div style="text-align:right;"><button class="btn-1c" onclick="game.closeChangelog()">Назад в меню</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Магазин -->
+  <div id="modal-shop" class="modal-overlay">
+    <div class="win-1c" style="width:790px;">
+      <div class="win-1c-head"><span>🛒 Магазин клуба · ассортимент обновлён</span><span id="shop-currency">💰 0 фиткоинов</span></div>
+      <div class="win-1c-body">
+        <p style="font-size:11px; color:#555; margin-bottom:9px;">Покупки добавляются в ячейки расходников. Можно носить не более четырёх видов; каждый расходник занимает клавишу 7, 8, 9 или 0.</p>
+        <div id="shop-products" class="shop-grid"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+          <span id="shop-message" style="font-size:11px; color:#555;">Запаситесь перед следующей волной.</span>
+          <button class="btn-1c" style="background:#55efc4;" onclick="game.closeShop()">Продолжить тренировку</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Меню паузы -->
+  <div id="modal-pause" class="modal-overlay">
+    <div class="win-1c" style="width:460px;" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span>⏸ Игра приостановлена</span><span>Esc — продолжить</span></div>
+      <div class="win-1c-body" style="text-align:center;">
+        <p style="margin-bottom:14px; color:#444; font-size:13px;">Кластер ждёт, пока вы вернётесь.</p>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn-1c" style="background:#55efc4;" onclick="game.resume()">▶ Продолжить</button>
+          <button class="btn-1c" onclick="game.start()">🔄 Начать заново</button>
+          <button class="btn-1c" onclick="game.showMainMenu()">⌂ Главное меню</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка Level Up -->
+  <div id="modal-lvlup" class="modal-overlay">
+    <div class="win-1c">
+      <div class="win-1c-head">
+        <span id="lvlup-title">⚙️ Доработка конфигурации (Выбор патча)</span>
+      </div>
+      <div class="win-1c-body">
+        <p id="lvlup-subtitle" style="margin-bottom:10px; font-size:12px; color:#444;">Накоплено достаточно строк кода! Выберите новую доработку:</p>
+        <div id="upgrade-items"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка Таблицы рекордов -->
+  <div id="modal-lb" class="modal-overlay" tabindex="-1">
+    <div class="win-1c" style="width:650px;" onclick="event.stopPropagation()">
+      <div class="win-1c-head">
+        <span>🏆 Регистр сведений: Таблица рекордов 1С-программистов</span>
+        <button class="win-close-btn" onclick="game.closeLeaderboard()" title="Закрыть окно (Esc)" aria-label="Закрыть таблицу рекордов">✕</button>
+      </div>
+      <div class="win-1c-body">
+        <div style="max-height:300px; overflow-y:auto; border:1px solid #ccc; margin-bottom:12px;">
+          <table id="lb-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th>Разработчик</th>
+                <th>Очки (Баги + Строки)</th>
+                <th>Аптайм</th>
+              </tr>
+            </thead>
+            <tbody id="lb-body">
+              <tr><td colspan="4" style="text-align:center;">Опрос кластера Dreamlo...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn-1c" onclick="game.fetchLeaderboard()">🔄 Обновить список</button>
+          <button class="btn-1c" style="background:#ffd200;" onclick="game.closeLeaderboard()">Закрыть окно [Esc]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка Game Over -->
+  <div id="modal-gameover" class="modal-overlay">
+    <div class="win-1c" style="border-color:#c0392b; width:530px;" onclick="event.stopPropagation()">
+      <div class="win-1c-head" style="background:#ff7675; color:#fff;">
+        <span>⛔ АВАРИЯ: СУБД упала с кодом ошибки 0xDEAD</span>
+      </div>
+      <div class="win-1c-body" style="text-align:center;">
+        <h2 style="color:#c0392b; margin-bottom:8px;">СЕАНС ПРЕРВАН!</h2>
+        <div id="gameover-stats" style="font-size:12px; font-family:Courier New; background:#f8f9fa; border:1px solid #ccc; padding:10px; text-align:left; margin-bottom:12px;"></div>
+
+        <div style="background:#fffbe6; border:1px solid #ffeaa7; padding:10px; border-radius:4px; margin-bottom:12px; text-align:left;">
+          <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:4px;">Имя специалиста для фиксации в регистре:</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="player-nickname" class="input-1c" maxlength="15" value="Архитектор_1С">
+            <button class="btn-1c" id="btn-submit-score" onclick="game.submitScore()">Записать рекорд</button>
+          </div>
+          <div id="submit-status" style="font-size:11px; margin-top:4px; color:#666;"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-around;">
+          <button class="btn-1c" onclick="game.start()">🔄 Сделать ТиИ и начать заново</button>
+          <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Посмотреть таблицу</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GAME_VERSION = '1.3.0';
+/* ============================================================
+   КОНФИГУРАЦИЯ DREAMLO
+   ============================================================ */
+const DREAMLO = {
+  privateCode: "Q81LVcFw90OHMBWMS22FwgR_i_24EKH0aP7bnoj2Jxww",
+  publicCode: "6ad227ed8f40bb12001e868d"
+};
+
+function getDreamloUrl(endpoint) {
+  const directHttp = `http://dreamlo.com/lb/${endpoint}`;
+  if (window.location.protocol === 'https:') {
+    return `https://api.allorigins.win/raw?url=${encodeURIComponent(directHttp)}`;
+  }
+  return directHttp;
+}
+
+/* ============================================================
+   АУДИО-ДВИЖОК
+   ============================================================ */
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.gemPitch = 220;
+    this.mutedSFX = false;
+    this.musicEnabled = true;
+
+    this.musicTimer = null;
+    this.step = 0;
+    this.bpm = 132;
+    this.nextNoteTime = 0;
+    this.noiseBuffer = null;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+      this.createNoiseBuffer();
+      if (this.musicEnabled) this.startMusic();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  createNoiseBuffer() {
+    const bufferSize = this.ctx.sampleRate * 2;
+    this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = this.noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+  }
+
+  toggleMute() {
+    this.mutedSFX = !this.mutedSFX;
+    document.getElementById('btn-sound').innerText = this.mutedSFX ? "🔇 Звуки: ВЫКЛ" : "🔊 Звуки: ВКЛ";
+    document.getElementById('settings-sound').innerText = this.mutedSFX ? "🔇 Звуковые эффекты: ВЫКЛ" : "🔊 Звуковые эффекты: ВКЛ";
+    game.log(this.mutedSFX ? "Звуковые эффекты отключены" : "Звуковые эффекты включены!");
+  }
+
+  toggleMusic() {
+    this.musicEnabled = !this.musicEnabled;
+    const btn = document.getElementById('btn-music');
+    if (this.musicEnabled) {
+      btn.innerText = "🔥 Бит: ВКЛ";
+      btn.classList.add('active-music');
+      document.getElementById('settings-music').innerText = "🎵 Музыка: ВКЛ";
+      this.init();
+      this.startMusic();
+      game.log("Адреналиновый бит кластера запущен!");
+    } else {
+      btn.innerText = "🎵 Бит: ВЫКЛ";
+      btn.classList.remove('active-music');
+      document.getElementById('settings-music').innerText = "🔇 Музыка: ВЫКЛ";
+      this.stopMusic();
+      game.log("Музыка остановлена.");
+    }
+  }
+
+  startMusic() {
+    if (this.musicTimer) clearInterval(this.musicTimer);
+    this.step = 0;
+    if (!this.ctx) return;
+    this.nextNoteTime = this.ctx.currentTime + 0.05;
+    this.musicTimer = setInterval(() => this.scheduleBeat(), 25);
+  }
+
+  stopMusic() {
+    if (this.musicTimer) {
+      clearInterval(this.musicTimer);
+      this.musicTimer = null;
+    }
+  }
+
+  scheduleBeat() {
+    if (!this.ctx || !this.musicEnabled || game.paused) return;
+
+    if (this.nextNoteTime < this.ctx.currentTime) {
+      this.nextNoteTime = this.ctx.currentTime + 0.05;
+    }
+
+    const secondsPerBeat = 60.0 / this.bpm;
+    const stepDuration = secondsPerBeat / 4;
+
+    while (this.nextNoteTime < this.ctx.currentTime + 0.12) {
+      this.playStep(this.step, this.nextNoteTime);
+      this.nextNoteTime += stepDuration;
+      this.step = (this.step + 1) % 64;
+    }
+  }
+
+  playStep(step, time) {
+    const barStep = step % 16;
+    const bar = Math.floor(step / 16);
+
+    // Kick
+    if (barStep % 4 === 0) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.frequency.setValueAtTime(160, time);
+      osc.frequency.exponentialRampToValueAtTime(34, time + 0.09);
+      gain.gain.setValueAtTime(0.35, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(time);
+      osc.stop(time + 0.22);
+    }
+
+    // Snare
+    if (barStep === 4 || barStep === 12) {
+      if (this.noiseBuffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1100;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.18, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(time);
+        noise.stop(time + 0.14);
+      }
+    }
+
+    // Hi-Hat
+    if ((barStep % 2 === 0 || barStep === 7 || barStep === 15) && this.noiseBuffer) {
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = this.noiseBuffer;
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 7500;
+      const gain = this.ctx.createGain();
+      const isOpen = (barStep === 7 || barStep === 15);
+      gain.gain.setValueAtTime(isOpen ? 0.09 : 0.04, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + (isOpen ? 0.09 : 0.04));
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      noise.start(time);
+      noise.stop(time + 0.1);
+    }
+
+    // Bassline
+    const rootNotes = [55, 43.65, 65.4, 49];
+    const baseFreq = rootNotes[bar];
+    const octave = (barStep % 4 === 2 || barStep === 15) ? 2 : 1;
+    const freq = baseFreq * octave;
+
+    const oscB = this.ctx.createOscillator();
+    oscB.type = 'sawtooth';
+    oscB.frequency.setValueAtTime(freq, time);
+
+    const filterB = this.ctx.createBiquadFilter();
+    filterB.type = 'lowpass';
+    filterB.Q.value = 6;
+    filterB.frequency.setValueAtTime(1400, time);
+    filterB.frequency.exponentialRampToValueAtTime(320, time + 0.08);
+
+    const gainB = this.ctx.createGain();
+    gainB.gain.setValueAtTime(0.16, time);
+    gainB.gain.exponentialRampToValueAtTime(0.001, time + 0.09);
+
+    oscB.connect(filterB);
+    filterB.connect(gainB);
+    gainB.connect(this.ctx.destination);
+    oscB.start(time);
+    oscB.stop(time + 0.09);
+
+    // Мягкая аккордовая подложка на сильных долях.
+    if (barStep === 0 || barStep === 8) {
+      const chordRoot = [110, 87.31, 130.81, 98][bar];
+      for (const interval of [1, 1.25, 1.5]) {
+        const pad = this.ctx.createOscillator();
+        const padGain = this.ctx.createGain();
+        pad.type = 'sine';
+        pad.frequency.setValueAtTime(chordRoot * interval, time);
+        padGain.gain.setValueAtTime(0.0001, time);
+        padGain.gain.linearRampToValueAtTime(0.018, time + 0.04);
+        padGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.42);
+        pad.connect(padGain);
+        padGain.connect(this.ctx.destination);
+        pad.start(time);
+        pad.stop(time + 0.44);
+      }
+    }
+
+    // Короткий мотив в минорной пентатонике, с вариацией по аккордам.
+    const melodySteps = [0, 3, 6, 8, 11, 14];
+    if (game.time > 12 && melodySteps.includes(barStep)) {
+      const melodyRoot = [220, 174.61, 261.63, 196][bar];
+      const motif = [0, 3, 7, 10, 12, 10, 7, 3];
+      const semitones = motif[(Math.floor(barStep / 2) + bar) % motif.length];
+      const lead = this.ctx.createOscillator();
+      const leadGain = this.ctx.createGain();
+      lead.type = 'triangle';
+      lead.frequency.setValueAtTime(melodyRoot * Math.pow(2, semitones / 12), time);
+      leadGain.gain.setValueAtTime(0.0001, time);
+      leadGain.gain.linearRampToValueAtTime(0.045, time + 0.012);
+      leadGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.16);
+      lead.connect(leadGain);
+      leadGain.connect(this.ctx.destination);
+      lead.start(time);
+      lead.stop(time + 0.17);
+    }
+  }
+
+  playTone(freq, type, duration, vol = 0.1) {
+    if (this.mutedSFX) return;
+    this.init();
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch(e){}
+  }
+
+  gemPickup() {
+    this.gemPitch = (this.gemPitch > 850) ? 240 : this.gemPitch + 14;
+    this.playTone(this.gemPitch, 'sine', 0.06, 0.06);
+  }
+  hit() { this.playTone(70, 'square', 0.07, 0.1); }
+  crit() {
+    this.playTone(920, 'triangle', 0.1, 0.2);
+    setTimeout(() => this.playTone(1380, 'sine', 0.12, 0.2), 35);
+  }
+  boss() { this.playTone(60, 'sawtooth', 0.8, 0.35); }
+  explosion() { this.playTone(45, 'square', 0.35, 0.3); }
+  dynamicUpdateSound() {
+    [300, 600, 900, 1200].forEach((f, i) => {
+      setTimeout(() => this.playTone(f, 'sawtooth', 0.12, 0.2), i * 50);
+    });
+  }
+  skillCast() {
+    [400, 700, 1100].forEach((f, i) => {
+      setTimeout(() => this.playTone(f, 'triangle', 0.12, 0.2), i * 40);
+    });
+  }
+  levelUp() {
+    [261, 329, 392, 523, 659].forEach((f, i) => {
+      setTimeout(() => this.playTone(f, 'triangle', 0.2, 0.14), i * 60);
+    });
+  }
+}
+
+/* ============================================================
+   ОРУЖИЕ
+   ============================================================ */
+const WEAPONS_DEF = {
+  turnstile: {
+    name: 'СКУД Sigur / AVI: турникет',
+    icon: '🚧',
+    desc: 'Антипассбэк не пустит толпу: турникеты Sigur / AVI отталкивают нарушителей очереди.',
+    baseCooldown: 0,
+    baseDmg: 16
+  },
+  keys: {
+    name: 'Карты доступа IronLogic',
+    icon: '🗝️',
+    desc: 'Считыватель IronLogic принимает карту с первого раза. Почти всегда. Стреляет картами по курсу.',
+    baseCooldown: 1.5,
+    baseDmg: 26
+  },
+  syntax: {
+    name: 'Синтаксис-Контроль',
+    icon: '⚡',
+    desc: 'Пуляет операторы {;} в ближайших незакрытых багов.',
+    baseCooldown: 0.85,
+    baseDmg: 28
+  },
+  heavy_archive: {
+    name: 'Чековый принтер ШТРИХ',
+    icon: '🧾',
+    desc: 'Печатает чек длиной с очередь на продление абонемента. Пробивает толпу насквозь.',
+    baseCooldown: 2.8,
+    baseDmg: 85
+  },
+  protein: {
+    name: 'Протеиновый Шейкер',
+    icon: '🥛',
+    desc: 'Бросает банку с протеином, разливая скользкую жижу урона.',
+    baseCooldown: 2.2,
+    baseDmg: 16
+  },
+  cache_aura: {
+    name: 'Сброс Кэша Сеансов',
+    icon: '🧄',
+    desc: 'Постоянная аура вокруг сервера разработки, выжигающая зависших.',
+    baseCooldown: 0.4,
+    baseDmg: 13
+  },
+  iron_logic: {
+    name: 'Считыватель IronLogic',
+    icon: '💳',
+    desc: 'Ударная дуга перед собой. Оглушает и отбрасывает качков.',
+    baseCooldown: 1.35,
+    baseDmg: 42
+  },
+  egais_laser: {
+    name: 'АТОЛ: фискальный сканер',
+    icon: '🔴',
+    desc: 'Красный лазерный луч, рикошетящий по нескольким целям.',
+    baseCooldown: 1.8,
+    baseDmg: 34
+  }
+};
+
+/* ============================================================
+   ПАССИВКИ
+   ============================================================ */
+const PASSIVES_DEF = {
+  sql_indexes: {
+    name: 'Индексы MSSQL',
+    icon: '⚡',
+    desc: '+18% шанс критического урона (x2.5) с яркой вспышкой.',
+    mod: (p) => { p.critChance += 0.18; }
+  },
+  coffee_machine: {
+    name: 'Кофе из зоны ресепшена',
+    icon: '☕',
+    desc: 'Очередь на ресепшене подождёт: оружие и умения перезаряжаются на 15% быстрее.',
+    mod: (p) => { p.cdMult *= 0.85; }
+  },
+  backup_cron: {
+    name: 'Авто-Бэкап в Облако',
+    icon: '🛡️',
+    desc: 'Каждые 38 сек активирует золотой щит неуязвимости на 3.5 сек.',
+    mod: (p) => { p.hasBackupShield = true; }
+  },
+  cert_specialist: {
+    name: 'Сертификат «1С:Специалист»',
+    icon: '🎓',
+    desc: 'Повышает опыт за сбор строк кода на +30%.',
+    mod: (p) => { p.xpMult += 0.30; }
+  },
+  overtime_pizza: {
+    name: 'Овертайм за Пиццу',
+    icon: '🍕',
+    desc: '+35% к общему урону, но программист тяжелеет (-8% скорости).',
+    mod: (p) => { p.dmgMult += 0.35; p.speedMult -= 0.08; }
+  },
+  shoe_covers: {
+    name: 'Одноразовые Бахилы',
+    icon: '👟',
+    desc: '+14% к скорости бега и оставляет замедляющую синюю жижу.',
+    mod: (p) => { p.speedMult += 0.14; p.hasShoeTrail = true; }
+  },
+  hasp_emu: {
+    name: 'HASP Эмулятор 2008',
+    icon: '🗝️',
+    desc: '+14% шанс увернуться от претензий клиента.',
+    mod: (p) => { p.dodge += 0.14; }
+  },
+  server_x64: {
+    name: 'Сервер 1С Предприятие x64',
+    icon: '🖥️',
+    desc: '+50% к радиусу сбора дискет. Сервер знает, кто записался, но не кто пришёл.',
+    mod: (p) => { p.magnetMult += 0.5; }
+  },
+  messenger_hub: {
+    name: 'Интеграция мессенджеров',
+    icon: '💬',
+    desc: 'MAX, Telegram и WhatsApp сходятся в одном окне: +18% к опыту за клиентские обращения.',
+    mod: (p) => { p.xpMult += 0.18; }
+  },
+  evotor_paid: {
+    name: 'Эвотор: платная интеграция',
+    icon: '💸',
+    desc: 'Интеграционный модуль уже оплачен: +22% к урону, но откат оружия длиннее на 8%.',
+    mod: (p) => { p.dmgMult += 0.22; p.cdMult *= 1.08; }
+  },
+  try_except: {
+    name: 'Попытка...Исключение',
+    icon: '🩹',
+    desc: 'Регенерация целостности базы (+2.5 HP в секунду).',
+    mod: (p) => { p.regen += 2.5; }
+  }
+};
+
+/* ============================================================
+   АКТИВНЫЕ УМЕНИЯ [1] [2] [3] [4]
+   ============================================================ */
+const ACTIVE_SKILLS_DEF = {
+  act_backup_dt: {
+    name: 'Акт: Выгрузка .dt (Резервная копия)',
+    icon: '💾',
+    desc: 'Мгновенное исцеление 40% HP, взрывная ударная волна отталкивания и золотая голограмма на 3.5с!',
+    baseCd: 22,
+    cast: (g, lvl) => {
+      const heal = Math.round(g.player.maxHp * (0.35 + lvl * 0.05));
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal);
+      g.player.shieldTimer = 3.5;
+      g.sound.playTone(700, 'sine', 0.3, 0.25);
+      g.addPopup(g.player.x, g.player.y - 25, `💾 ВЫГРУЗКА .DT! +${heal} HP`, '#2ecc71');
+
+      // Волна раскидывания
+      for (let e of g.enemies) {
+        const d = Math.hypot(e.x - g.player.x, e.y - g.player.y);
+        if (d < 300) {
+          const a = Math.atan2(e.y - g.player.y, e.x - g.player.x);
+          e.x += Math.cos(a) * 160;
+          e.y += Math.sin(a) * 160;
+          e.hp -= 90 + lvl * 30;
+          g.createHitFX(e.x, e.y, '#ffd200', 6);
+        }
+      }
+    }
+  },
+  act_kill_sessions: {
+    name: 'Акт: Завершить зависшие сеансы (Kill -9)',
+    icon: '✂️',
+    desc: 'Очистка диспетчера: убивает обычных врагов с HP < 30% на всём экране и станит боссов на 3с!',
+    baseCd: 18,
+    cast: (g, lvl) => {
+      g.sound.explosion();
+      g.triggerGlitchScreen();
+      g.addPopup(g.player.x, g.player.y - 30, '✂️ KILL -9 СЕАНСЫ СБРОШЕНЫ!', '#ff4757');
+
+      for (let e of g.enemies) {
+        if (!e.isBoss) {
+          if (e.hp / e.maxHp <= 0.32 + lvl * 0.05) {
+            e.hp = 0;
+            g.createHitFX(e.x, e.y, '#ff4757', 8);
+          } else {
+            e.hp -= (70 + lvl * 25);
+            e.freezeTimer = 2.0;
+          }
+        } else {
+          e.freezeTimer = 3.0 + lvl * 0.5;
+          e.hp -= (250 + lvl * 100);
+          g.addPopup(e.x, e.y - 25, `СТАН НА СЕРВЕРЕ! -${250 + lvl * 100}`, '#f1c40f');
+        }
+      }
+    }
+  },
+  act_turbo_mssql: {
+    name: 'Акт: Турбо-Режим MSSQL (Разгон RAM)',
+    icon: '🚀',
+    desc: 'На 6.5 сек скорость бега +50%, а оружие стреляет в 2 раза чаще с искрами молний!',
+    baseCd: 24,
+    cast: (g, lvl) => {
+      g.sound.skillCast();
+      g.player.turboBuffTimer = 6.5 + lvl * 0.5;
+      g.player.speedBuffTimer = 6.5 + lvl * 0.5;
+      g.addPopup(g.player.x, g.player.y - 30, '🚀 TURBO MSSQL: 2X СКОРОСТЬ АТАКИ!', '#00cec9');
+    }
+  },
+  act_lavender_raf: {
+    name: 'Акт: Двойной Раф с Лавандой',
+    icon: '☕',
+    desc: 'Кофеиновый вакуум: моментально всасывает ВСЕ дискеты с карты в карман и взрывает ауру!',
+    baseCd: 26,
+    cast: (g, lvl) => {
+      g.sound.playTone(850, 'triangle', 0.4, 0.25);
+      g.addPopup(g.player.x, g.player.y - 30, '☕ КОФЕИНОВЫЙ МАГНИТ!', '#e67e22');
+
+      // Притягиваем ВСЕ дискеты
+      for (let gem of g.gems) {
+        gem.x = g.player.x + (Math.random() - 0.5) * 20;
+        gem.y = g.player.y + (Math.random() - 0.5) * 20;
+      }
+      // Огненное кольцо
+      for (let i = 0; i < 24; i++) {
+        const ang = (i / 24) * Math.PI * 2;
+        g.projectiles.push({
+          x: g.player.x, y: g.player.y,
+          vx: Math.cos(ang) * 9.0, vy: Math.sin(ang) * 9.0,
+          dmg: 65 + lvl * 20, life: 0.9, icon: '☕', color: '#e67e22', size: 10
+        });
+      }
+    }
+  },
+  act_messenger_blast: {
+    name: 'Рассылка MAX / Telegram / WhatsApp',
+    icon: '📣',
+    desc: 'Все клиенты одновременно получают push. Обычные враги замирают, боссам тоже приходится выключить звук.',
+    baseCd: 30,
+    cast: (g, lvl) => {
+      g.sound.skillCast();
+      for (const e of g.enemies) {
+        e.freezeTimer = Math.max(e.freezeTimer || 0, e.isBoss ? 0.7 + lvl * 0.2 : 1.8 + lvl * 0.25);
+        e.hp -= e.isBoss ? 80 + lvl * 25 : 35 + lvl * 15;
+        g.createHitFX(e.x, e.y, '#74b9ff', 3);
+      }
+      g.addPopup(g.player.x, g.player.y - 34, '📣 ВАШЕ СООБЩЕНИЕ ПРОЧИТАЛИ ВСЕ!', '#74b9ff');
+    }
+  },
+  act_sigur_lockdown: {
+    name: 'Sigur / AVI: блокировка турникетов',
+    icon: '🚧',
+    desc: 'Антипассбэк сработал: отбрасывает врагов вокруг и наносит урон.',
+    baseCd: 24,
+    cast: (g, lvl) => {
+      for (const e of g.enemies) {
+        const dx = e.x - g.player.x, dy = e.y - g.player.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 310) {
+          const push = (310 - d) * 0.55;
+          e.x += (dx / (d || 1)) * push;
+          e.y += (dy / (d || 1)) * push;
+          e.hp -= (e.isBoss ? 90 : 120) + lvl * 30;
+          e.freezeTimer = Math.max(e.freezeTimer || 0, 0.6 + lvl * 0.15);
+          g.createHitFX(e.x, e.y, '#00cec9', 4);
+        }
+      }
+      g.sound.playTone(260, 'square', 0.2, 0.18);
+      g.addPopup(g.player.x, g.player.y - 34, '🚧 ДОСТУП ЗАКРЫТ!', '#00cec9');
+    }
+  },
+  act_atol_receipt_rain: {
+    name: 'АТОЛ: чековая очередь',
+    icon: '🧾',
+    desc: 'Касса печатает веер чеков во все стороны. Бумаги много, очередь тоже.',
+    baseCd: 21,
+    cast: (g, lvl) => {
+      const count = 16 + lvl * 2;
+      for (let i = 0; i < count; i++) {
+        const a = (i / count) * Math.PI * 2;
+        g.projectiles.push({
+          x: g.player.x, y: g.player.y,
+          vx: Math.cos(a) * 8.5, vy: Math.sin(a) * 8.5,
+          dmg: 38 + lvl * 14, life: 1.15, icon: '🧾', color: '#fdcb6e', size: 10
+        });
+      }
+      g.sound.playTone(220, 'sawtooth', 0.22, 0.18);
+      g.addPopup(g.player.x, g.player.y - 34, '🧾 ЧЕК НА ВСЮ ОЧЕРЕДЬ!', '#fdcb6e');
+    }
+  },
+  act_shtrikh_reconciliation: {
+    name: 'ШТРИХ: повторная печать',
+    icon: '🔁',
+    desc: 'Повторно пробивает ближайших врагов и сбивает им темп. «А копию чека можно?»',
+    baseCd: 19,
+    cast: (g, lvl) => {
+      let targets = [...g.enemies].sort((a, b) =>
+        Math.hypot(a.x - g.player.x, a.y - g.player.y) - Math.hypot(b.x - g.player.x, b.y - g.player.y)
+      ).slice(0, 5 + lvl);
+      for (const e of targets) {
+        e.hp -= (e.isBoss ? 110 : 180) + lvl * 35;
+        e.freezeTimer = Math.max(e.freezeTimer || 0, 0.45 + lvl * 0.12);
+        g.createHitFX(e.x, e.y, '#e17055', 5);
+      }
+      g.sound.playTone(500, 'triangle', 0.2, 0.18);
+      g.addPopup(g.player.x, g.player.y - 34, '🔁 КОПИЯ ЧЕКА ГОТОВА!', '#e17055');
+    }
+  },
+  act_evotor_approval: {
+    name: 'Эвотор: согласование интеграции',
+    icon: '💸',
+    desc: 'Счёт оплачен, модуль наконец подключён: временно +45% к урону.',
+    baseCd: 32,
+    cast: (g, lvl) => {
+      g.player.damageBuffMult = 1.45;
+      g.player.damageBuffTimer = Math.max(g.player.damageBuffTimer, 9 + lvl * 1.5);
+      g.addPopup(g.player.x, g.player.y - 34, '💸 ДОПЛАЧЕНО ЗА ИНТЕГРАЦИЮ!', '#f1c40f');
+      g.sound.skillCast();
+    }
+  },
+  act_membership_reactivation: {
+    name: 'CRM: вернуть ушедшего клиента',
+    icon: '📲',
+    desc: 'Автозадача сработала вовремя: лечит вас и возвращает дискету опыта за продление.',
+    baseCd: 34,
+    cast: (g, lvl) => {
+      const heal = Math.round(g.player.maxHp * (0.18 + lvl * 0.025));
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal);
+      g.gems.push({ x: g.player.x + 12, y: g.player.y, xp: 12 + lvl * 3, col: '#55efc4' });
+      g.addPopup(g.player.x, g.player.y - 34, `📲 КЛИЕНТ ВЕРНУЛСЯ! +${heal} HP`, '#55efc4');
+      g.sound.playTone(660, 'sine', 0.24, 0.18);
+    }
+  }
+};
+
+const CONSUMABLES_DEF = {
+  protein_shot: {
+    name: 'Протеиновый шейк', icon: '🥤', cost: 135, stock: 2, maxStack: 3,
+    desc: 'Восстанавливает 45 HP. Не пьётся на полном здоровье.',
+    use: (g) => {
+      if (g.player.hp >= g.player.maxHp) return false;
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + 45);
+      g.addPopup(g.player.x, g.player.y - 25, '+45 HP', '#2ecc71');
+      return true;
+    }
+  },
+  turbo_preworkout: {
+    name: 'Предтренировочный комплекс', icon: '⚡', cost: 175, stock: 1, maxStack: 3,
+    desc: 'На 12 секунд ускоряет бег и перезарядку оружия.',
+    use: (g) => {
+      g.player.speedBuffTimer = Math.max(g.player.speedBuffTimer, 12);
+      g.player.turboBuffTimer = Math.max(g.player.turboBuffTimer, 12);
+      return true;
+    }
+  },
+  crm_xp_campaign: {
+    name: 'CRM-кампания «Вернись в зал»', icon: '📲', cost: 190, stock: 1, maxStack: 3,
+    desc: 'Удваивает опыт и фиткоины с новых дискет на 20 секунд.',
+    use: (g) => {
+      g.player.xpEventMult = 2;
+      g.player.xpBoostTimer = Math.max(g.player.xpBoostTimer, 20);
+      return true;
+    }
+  },
+  sigur_day_pass: {
+    name: 'Разовый пропуск Sigur', icon: '🛡️', cost: 220, stock: 1, maxStack: 2,
+    desc: 'Защищает от урона на 4 секунды. Турникет вас узнал, сервер — нет.',
+    use: (g) => {
+      g.player.shieldTimer = Math.max(g.player.shieldTimer, 4);
+      return true;
+    }
+  },
+  messenger_push: {
+    name: 'Срочная рассылка', icon: '💬', cost: 155, stock: 2, maxStack: 3,
+    desc: 'Оглушает обычных врагов поблизости на 2 секунды.',
+    use: (g) => {
+      for (const e of g.enemies) {
+        if (!e.isBoss && Math.hypot(e.x - g.player.x, e.y - g.player.y) < 420) e.freezeTimer = Math.max(e.freezeTimer, 2);
+      }
+      g.addPopup(g.player.x, g.player.y - 25, '💬 УВЕДОМЛЕНИЕ ДОСТАВЛЕНО!', '#74b9ff');
+      return true;
+    }
+  },
+  evotor_connector: {
+    name: 'Эвотор: платный коннектор', icon: '💸', cost: 330, stock: 1, maxStack: 2,
+    desc: 'На 14 секунд даёт +35% к урону. В цену входит согласование счёта.',
+    use: (g) => {
+      g.player.damageBuffMult = 1.35;
+      g.player.damageBuffTimer = Math.max(g.player.damageBuffTimer, 14);
+      return true;
+    }
+  }
+};
+
+/* ============================================================
+   ПОВТОРЯЕМЫЕ КАРТОЧКИ (ФИКС ЗАВИСАНИЯ НА 9+ ЛВЛ)
+   ============================================================ */
+const REPEATABLE_UPGRADES = [
+  {
+    key: 'rep_bonus_pay',
+    name: '💳 Продление абонемента',
+    icon: '💵',
+    desc: 'Лояльный клиент клуба: +35 Max HP, полное восстановление и +5% к урону.',
+    apply: (g) => {
+      g.player.maxHp += 35;
+      g.player.hp = g.player.maxHp;
+      g.player.dmgMult += 0.05;
+      g.addPopup(g.player.x, g.player.y - 35, '+35 MAX HP & +5% DMG!', '#2ecc71');
+    }
+  },
+  {
+    key: 'rep_espresso',
+    name: '☕ Кофе перед утренней сменой',
+    icon: '☕',
+    desc: 'Откат умений ускорен на -6%, скорость бега +5%, исцеление +40 HP.',
+    apply: (g) => {
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + 40);
+      g.player.speedMult += 0.05;
+      g.player.cdMult *= 0.94;
+      g.addPopup(g.player.x, g.player.y - 35, '+40 HP & БЕГ +5%!', '#e67e22');
+    }
+  },
+  {
+    key: 'rep_cache_purge',
+    name: '🧹 Очистка Кэша v8 (ТиИ базы)',
+    icon: '💽',
+    desc: 'Регенерация целостности базы (+1.2 HP/сек) и магнит дискет +25%!',
+    apply: (g) => {
+      g.player.regen += 1.2;
+      g.player.magnetMult += 0.25;
+      g.addPopup(g.player.x, g.player.y - 35, '+1.2 РЕГЕН & МАГНИТ!', '#0984e3');
+    }
+  },
+  {
+    key: 'rep_salary_index',
+    name: '📈 Конверсия заявок в записи',
+    icon: '📊',
+    desc: '+15% к множителю опыта и очков, шанс крита +5%!',
+    apply: (g) => {
+      g.player.xpMult += 0.15;
+      g.player.critChance += 0.05;
+      g.addPopup(g.player.x, g.player.y - 35, '+15% ОПЫТ & +5% КРИТ!', '#ffd200');
+    }
+  }
+];
+
+/* ============================================================
+   ОСНОВНОЙ ДВИЖОК
+   ============================================================ */
+class Game {
+  constructor() {
+    this.canvas = document.getElementById('canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.sound = new SoundEngine();
+
+    this.MAP_SIZE = 4000;
+    this.BOUND_MIN = 90;
+    this.BOUND_MAX = 3910;
+
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+
+    // Клавиатура
+    this.keys = {};
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') {
+        if (document.getElementById('modal-lb').style.display === 'flex') {
+          this.closeLeaderboard();
+        } else if (document.getElementById('modal-shop').style.display === 'flex') {
+          this.closeShop();
+        } else if (document.getElementById('modal-settings').style.display === 'flex') {
+          this.closeSettings();
+        } else if (document.getElementById('modal-changelog').style.display === 'flex') {
+          this.closeChangelog();
+        } else if (document.getElementById('modal-pause').style.display === 'flex') {
+          this.resume();
+        } else if (document.getElementById('modal-main-menu').style.display === 'flex') {
+          return;
+        } else {
+          this.togglePause();
+        }
+        return;
+      }
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key.toLowerCase() === 'p') {
+        this.togglePause();
+        return;
+      }
+
+      this.keys[e.key.toLowerCase()] = true;
+      this.sound.init();
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        this.triggerDynamicUpdate();
+      }
+
+      // Активные умения 1 2 3 4
+      if (e.key === '1' || e.code === 'Digit1') this.useActiveSkill(0);
+      if (e.key === '2' || e.code === 'Digit2') this.useActiveSkill(1);
+      if (e.key === '3' || e.code === 'Digit3') this.useActiveSkill(2);
+      if (e.key === '4' || e.code === 'Digit4') this.useActiveSkill(3);
+      if (e.key === '7') this.useConsumable(0);
+      if (e.key === '8') this.useConsumable(1);
+      if (e.key === '9') this.useConsumable(2);
+      if (e.key === '0') this.useConsumable(3);
+
+    });
+
+    window.addEventListener('keyup', (e) => {
+      this.keys[e.key.toLowerCase()] = false;
+    });
+    window.addEventListener('blur', () => { this.keys = {}; });
+
+    document.addEventListener('visibilitychange', () => {
+      this.lastTime = performance.now();
+      if (document.hidden && this.sound.musicTimer) this.sound.stopMusic();
+      else if (!document.hidden && this.sound.musicEnabled && this.sound.ctx) this.sound.startMusic();
+    });
+
+    document.getElementById('modal-lb').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-lb') {
+        this.closeLeaderboard();
+      }
+    });
+
+    this.savedNick = localStorage.getItem('1c_nick') || 'Архитектор_1С';
+    document.getElementById('player-nickname').value = this.savedNick;
+
+    this.start();
+    this.paused = true;
+    document.getElementById('menu-version').innerText = `v${GAME_VERSION}`;
+    document.title = `1С:Фитнес Клуб КОРП — Survivors ${GAME_VERSION}`;
+    document.getElementById('modal-main-menu').style.display = 'flex';
+    this.lastTime = performance.now();
+    requestAnimationFrame((t) => this.loop(t));
+  }
+
+  resize() {
+    this.canvas.width = this.canvas.parentElement.clientWidth;
+    this.canvas.height = this.canvas.parentElement.clientHeight;
+  }
+
+  start() {
+    if (this.leaderboardOpenTimer) {
+      clearTimeout(this.leaderboardOpenTimer);
+      this.leaderboardOpenTimer = null;
+    }
+    this.leaderboardReturnState = null;
+    document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-settings').style.display = 'none';
+    document.getElementById('modal-changelog').style.display = 'none';
+    document.getElementById('modal-shop').style.display = 'none';
+    document.getElementById('modal-gameover').style.display = 'none';
+    document.getElementById('modal-pause').style.display = 'none';
+    document.getElementById('modal-lvlup').style.display = 'none';
+    document.getElementById('modal-lb').style.display = 'none';
+
+    this.paused = false;
+    this.time = 0;
+    this.kills = 0;
+    this.gemsCollected = 0;
+    this.level = 1;
+    this.xp = 0;
+    this.nextXp = 25;
+
+    this.player = {
+      x: 2000,
+      y: 2000,
+      hp: 100,
+      maxHp: 100,
+      baseSpeed: 3.2,
+      facingX: 1,
+      facingY: 0,
+      speedMult: 1.0,
+      dmgMult: 1.0,
+      cdMult: 1.0,
+      magnetMult: 1.0,
+      xpMult: 1.0,
+      xpEventMult: 1.0,
+      xpBoostTimer: 0,
+      damageBuffMult: 1.0,
+      damageBuffTimer: 0,
+      critChance: 0.05,
+      dodge: 0,
+      regen: 0,
+      hasShoeTrail: false,
+      hasBackupShield: false,
+      shieldTimer: 0,
+      speedBuffTimer: 0,
+      turboBuffTimer: 0
+    };
+
+    this.weapons = {
+      syntax: { lvl: 1, timer: 0 },
+      iron_logic: { lvl: 1, timer: 0 }
+    };
+    this.passives = {};
+
+    // 4 слота активных умений
+    this.activeSkills = [null, null, null, null];
+
+    this.enemies = [];
+    this.projectiles = [];
+    this.enemyProjectiles = [];
+    this.puddles = [];
+    this.gems = [];
+    this.pickups = [];
+    this.particles = [];
+    this.texts = [];
+    this.whipSlashes = [];
+
+    this.spawnTimer = 0;
+    this.trailTimer = 0;
+    this.backupTimer = 38;
+    this.nextBossMinute = 1;
+    this.nextEventTime = 70;
+    this.dynUpdateCd = 0;
+    this.currency = 0;
+    this.consumables = [];
+    this.nextShopTime = 180;
+    this.shopVisit = 0;
+    this.shopStock = {};
+
+    this.updateHUD();
+    this.updateActiveHUD();
+    this.updateConsumableHUD();
+    this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
+  }
+
+  calcScore() {
+    return (this.kills * 12) + (this.gemsCollected * 3);
+  }
+
+  showMainMenu() {
+    this.paused = true;
+    this.keys = {};
+    for (const id of ['modal-pause', 'modal-lvlup', 'modal-gameover', 'modal-settings', 'modal-changelog', 'modal-shop']) {
+      document.getElementById(id).style.display = 'none';
+    }
+    document.getElementById('modal-main-menu').style.display = 'flex';
+  }
+
+  showSettings() {
+    document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-settings').style.display = 'flex';
+    document.getElementById('settings-sound').innerText = this.sound.mutedSFX ? '🔇 Звуковые эффекты: ВЫКЛ' : '🔊 Звуковые эффекты: ВКЛ';
+    document.getElementById('settings-music').innerText = this.sound.musicEnabled ? '🎵 Музыка: ВКЛ' : '🔇 Музыка: ВЫКЛ';
+  }
+
+  closeSettings() {
+    document.getElementById('modal-settings').style.display = 'none';
+    document.getElementById('modal-main-menu').style.display = 'flex';
+  }
+
+  showChangelog() {
+    document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-changelog').style.display = 'flex';
+  }
+
+  closeChangelog() {
+    document.getElementById('modal-changelog').style.display = 'none';
+    document.getElementById('modal-main-menu').style.display = 'flex';
+  }
+
+  openShop() {
+    this.paused = true;
+    this.keys = {};
+    this.shopVisit++;
+    this.nextShopTime += 180;
+    this.shopStock = {};
+    this.shopPrice = {};
+    for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
+      this.shopStock[key] = item.stock;
+      this.shopPrice[key] = Math.round(item.cost * (1 + (this.shopVisit - 1) * 0.08));
+    }
+    document.getElementById('shop-message').innerText = `Торговый зал открылся. Следующий магазин — через 3 минуты. Визит №${this.shopVisit}.`;
+    document.getElementById('modal-shop').style.display = 'flex';
+    this.renderShop();
+    this.updateHUD();
+  }
+
+  renderShop() {
+    const grid = document.getElementById('shop-products');
+    grid.innerHTML = '';
+    document.getElementById('shop-currency').innerText = `💰 ${this.currency} фиткоинов`;
+    for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
+      const owned = this.consumables.find(slot => slot.key === key);
+      const stackFull = owned && owned.count >= item.maxStack;
+      const slotsFull = !owned && this.consumables.length >= 4;
+      const stock = this.shopStock[key] || 0;
+      const price = this.shopPrice[key] || item.cost;
+      const card = document.createElement('div');
+      card.className = 'shop-card';
+      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>Запас: ${stock}${owned ? ` · у вас: ${owned.count}` : ''}</b></p>`;
+      const button = document.createElement('button');
+      button.className = 'btn-1c';
+      button.innerText = `Купить · ${price} 💰`;
+      button.disabled = stock <= 0 || this.currency < price || stackFull || slotsFull;
+      button.onclick = () => this.buyConsumable(key);
+      card.appendChild(button);
+      grid.appendChild(card);
+    }
+  }
+
+  buyConsumable(key) {
+    const item = CONSUMABLES_DEF[key];
+    const price = this.shopPrice[key] || item.cost;
+    const stock = this.shopStock[key] || 0;
+    let slot = this.consumables.find(entry => entry.key === key);
+    if (stock <= 0 || this.currency < price) return;
+    if (slot && slot.count >= item.maxStack) return;
+    if (!slot && this.consumables.length >= 4) {
+      document.getElementById('shop-message').innerText = 'Все четыре ячейки расходников заняты. Используйте предмет или выберите уже имеющийся.';
+      return;
+    }
+    this.currency -= price;
+    this.shopStock[key]--;
+    if (slot) slot.count++;
+    else this.consumables.push({ key, count: 1 });
+    document.getElementById('shop-message').innerText = `${item.name} добавлен в инвентарь.`;
+    this.updateConsumableHUD();
+    this.updateHUD();
+    this.renderShop();
+  }
+
+  closeShop() {
+    if (document.getElementById('modal-shop').style.display !== 'flex') return;
+    document.getElementById('modal-shop').style.display = 'none';
+    this.paused = false;
+    this.keys = {};
+    this.lastTime = performance.now();
+  }
+
+  useConsumable(slotIndex) {
+    if (this.paused || this.player.hp <= 0) return;
+    const slot = this.consumables[slotIndex];
+    if (!slot) return;
+    const item = CONSUMABLES_DEF[slot.key];
+    if (!item.use(this)) {
+      this.log('Расходник не сработал: проверьте здоровье и условия применения.');
+      return;
+    }
+    slot.count--;
+    if (slot.count <= 0) this.consumables.splice(slotIndex, 1);
+    this.sound.playTone(620, 'sine', 0.13, 0.14);
+    this.log(`Использовано: ${item.name}`);
+    this.updateConsumableHUD();
+    this.updateHUD();
+  }
+
+  updateConsumableHUD() {
+    const hud = document.getElementById('hud-consumables');
+    if (!hud) return;
+    const keys = ['7', '8', '9', '0'];
+    hud.innerHTML = '';
+    for (let i = 0; i < 4; i++) {
+      const slot = this.consumables[i];
+      const button = document.createElement('button');
+      button.className = `consumable-slot${slot ? '' : ' empty'}`;
+      button.title = slot ? `${CONSUMABLES_DEF[slot.key].name} ×${slot.count} (клавиша ${keys[i]})` : `Пустая ячейка (${keys[i]})`;
+      button.innerHTML = `<span class="consumable-key">${keys[i]}</span>${slot ? `<span>${CONSUMABLES_DEF[slot.key].icon}</span><span class="consumable-count">${slot.count}</span>` : '<span>＋</span>'}`;
+      button.onclick = () => this.useConsumable(i);
+      hud.appendChild(button);
+    }
+  }
+
+  togglePause() {
+    if (this.paused || !this.player || this.player.hp <= 0) return;
+    this.paused = true;
+    this.keys = {};
+    document.getElementById('modal-pause').style.display = 'flex';
+  }
+
+  resume() {
+    if (document.getElementById('modal-pause').style.display !== 'flex') return;
+    document.getElementById('modal-pause').style.display = 'none';
+    this.paused = false;
+    this.keys = {};
+    this.lastTime = performance.now();
+  }
+
+  showLeaderboard() {
+    if (document.getElementById('modal-lb').style.display === 'flex') {
+      this.fetchLeaderboard();
+      return;
+    }
+    this.leaderboardReturnState = {
+      paused: this.paused,
+      gameover: document.getElementById('modal-gameover').style.display === 'flex',
+      pause: document.getElementById('modal-pause').style.display === 'flex',
+      levelup: document.getElementById('modal-lvlup').style.display === 'flex',
+      mainMenu: document.getElementById('modal-main-menu').style.display === 'flex',
+      settings: document.getElementById('modal-settings').style.display === 'flex',
+      changelog: document.getElementById('modal-changelog').style.display === 'flex'
+    };
+    this.paused = true;
+    document.getElementById('modal-gameover').style.display = 'none';
+    document.getElementById('modal-pause').style.display = 'none';
+    document.getElementById('modal-lvlup').style.display = 'none';
+    document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-settings').style.display = 'none';
+    document.getElementById('modal-changelog').style.display = 'none';
+    const modal = document.getElementById('modal-lb');
+    modal.style.display = 'flex';
+    modal.focus();
+    this.fetchLeaderboard();
+  }
+
+  closeLeaderboard() {
+    const modal = document.getElementById('modal-lb');
+    if (modal.style.display !== 'flex') return;
+    modal.style.display = 'none';
+
+    if (this.sound && this.sound.ctx) {
+      this.sound.nextNoteTime = this.sound.ctx.currentTime + 0.05;
+    }
+
+    const returnState = this.leaderboardReturnState;
+    this.leaderboardReturnState = null;
+    document.getElementById('modal-gameover').style.display = returnState?.gameover ? 'flex' : 'none';
+    document.getElementById('modal-pause').style.display = returnState?.pause ? 'flex' : 'none';
+    document.getElementById('modal-lvlup').style.display = returnState?.levelup ? 'flex' : 'none';
+    document.getElementById('modal-main-menu').style.display = returnState?.mainMenu ? 'flex' : 'none';
+    document.getElementById('modal-settings').style.display = returnState?.settings ? 'flex' : 'none';
+    document.getElementById('modal-changelog').style.display = returnState?.changelog ? 'flex' : 'none';
+
+    const shouldResume = returnState ? !returnState.paused : this.player && this.player.hp > 0;
+    this.paused = !shouldResume;
+    if (shouldResume) this.lastTime = performance.now();
+  }
+
+  /* Использование активного умения [1][2][3][4] */
+  useActiveSkill(slotIdx) {
+    if (this.paused || this.player.hp <= 0) return;
+    const skill = this.activeSkills[slotIdx];
+    if (!skill) return;
+
+    if (skill.cdTimer <= 0) {
+      const def = ACTIVE_SKILLS_DEF[skill.key];
+      if (def) {
+        def.cast(this, skill.lvl);
+        skill.cdTimer = def.baseCd * this.player.cdMult;
+        this.updateActiveHUD();
+      }
+    } else {
+      this.sound.playTone(180, 'square', 0.06, 0.05);
+    }
+  }
+
+  triggerDynamicUpdate() {
+    if (this.dynUpdateCd > 0 || this.player.hp <= 0 || this.paused) return;
+
+    this.dynUpdateCd = 35;
+    this.sound.dynamicUpdateSound();
+    this.showBanner("⚡ ДИНАМИЧЕСКОЕ ОБНОВЛЕНИЕ БАЗЫ! СЕАНСЫ ВРАГОВ ЗАМОРОЖЕНЫ!");
+    this.player.speedBuffTimer = 4.0;
+
+    for (let e of this.enemies) {
+      e.freezeTimer = 3.5;
+      e.hp -= 95;
+      this.createHitFX(e.x, e.y, '#ffd200', 6);
+    }
+    this.addPopup(this.player.x, this.player.y - 40, "СЕАНС РАЗОРВАН АДМИНИСТРАТОРОМ!", "#ffd200");
+  }
+
+  quickHeal() {
+    if (this.player.hp >= this.player.maxHp) {
+      this.log("Целостность 100%, приберегите банку для нагрузки!");
+      return;
+    }
+    this.player.hp = Math.min(this.player.maxHp, this.player.hp + 30);
+    this.sound.playTone(420, 'sine', 0.2, 0.15);
+    this.log("Заначка протеина: +30 HP к целостности базы!");
+    this.addPopup(this.player.x, this.player.y - 20, "+30 HP", "#2ecc71");
+  }
+
+  showBanner(msg) {
+    const banner = document.getElementById('event-banner');
+    banner.innerText = msg;
+    banner.style.display = 'block';
+    setTimeout(() => { banner.style.display = 'none'; }, 4200);
+  }
+
+  triggerGlitchScreen() {
+    const g = document.getElementById('glitch-overlay');
+    g.style.display = 'block';
+    this.sound.playTone(80, 'sawtooth', 0.35, 0.25);
+    setTimeout(() => { g.style.display = 'none'; }, 400);
+  }
+
+  triggerOfficeEvent() {
+    const roll = Math.floor(Math.random() * 4);
+    if (roll === 0) {
+      this.showBanner("🔥 ПЕРЕГРУЗКА РАСПИСАНИЯ: три групповые тренировки записаны в один зал!");
+      this.player.speedBuffTimer = 10;
+      for (let e of this.enemies) e.hp *= 0.8;
+    } else if (roll === 1) {
+      this.showBanner("🎁 УДЕРЖАНИЕ КЛИЕНТА: промокод сработал дважды, опыт x2!");
+      this.player.xpEventMult = 2.0;
+      this.player.xpBoostTimer = 14;
+    } else if (roll === 2) {
+      this.showBanner("🧹 ПОСЛЕ УБОРКИ: на ресепшене забыли поставить табличку «мокрый пол»!");
+      for (let i = 0; i < 8; i++) {
+        this.puddles.push({
+          x: this.player.x + (Math.random() - 0.5) * 500,
+          y: this.player.y + (Math.random() - 0.5) * 500,
+          radius: 60, dmg: 8, life: 12, isTrail: true
+        });
+      }
+    } else {
+      this.showBanner("🎟️ АКЦИЯ НА ПРОДЛЕНИЕ: абонементы и дискеты опыта сыплются с потолка!");
+      for (let i = 0; i < 16; i++) {
+        this.gems.push({
+          x: this.player.x + (Math.random() - 0.5) * 350,
+          y: this.player.y + (Math.random() - 0.5) * 350,
+          xp: 15,
+          col: '#ffd200'
+        });
+      }
+    }
+  }
+
+  spawnDirector(dt) {
+    this.spawnTimer -= dt;
+    if (this.spawnTimer <= 0) {
+      const maxAllowedEnemies = Math.min(72, 38 + Math.floor(this.time / 12));
+
+      if (this.enemies.length < maxAllowedEnemies) {
+        const wave = 1 + Math.floor(this.time / 22);
+        const toSpawn = Math.min(8, 1 + Math.floor(wave * 0.8));
+
+        for (let i = 0; i < toSpawn; i++) {
+          if (this.enemies.length >= maxAllowedEnemies) break;
+          this.spawnEnemy();
+        }
+      }
+      this.spawnTimer = Math.max(0.9, 1.55 - (this.time / 900));
+    }
+
+    if (this.time >= this.nextBossMinute * 60) {
+      this.spawn1CBoss(this.nextBossMinute);
+      this.nextBossMinute++;
+    }
+
+    if (this.time >= this.nextEventTime) {
+      this.triggerOfficeEvent();
+      this.nextEventTime += 70;
+    }
+  }
+
+  spawnEnemy() {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 640 + Math.random() * 80;
+    const x = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, this.player.x + Math.cos(angle) * dist));
+    const y = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, this.player.y + Math.sin(angle) * dist));
+
+    const roll = Math.random();
+    let type = 'gymbro';
+
+    if (this.time > 15 && roll < 0.22) type = 'trainee';
+    else if (this.time > 30 && roll < 0.40) type = 'fitgirl';
+    else if (this.time > 50 && roll < 0.58) type = 'cleaner';
+    else if (this.time > 80 && roll < 0.70) type = 'atol_kkt';
+    else if (this.time > 95 && roll < 0.85) type = 'trainer';
+    else if (this.time > 105 && roll > 0.91) type = 'evotor';
+    else if (this.time > 115) type = 'remote_dev';
+
+    const defs = {
+      gymbro: { name: 'Качок в сланцах', hp: 30, speed: 1.7, dmg: 7, icon: '💪', xp: 3, size: 16, col: '#e67e22' },
+      trainee: { name: 'Стажёр после курсов', hp: 18, speed: 2.9, dmg: 5, icon: '🐣', xp: 4, size: 13, col: '#f1c40f' },
+      cleaner: { name: 'Баба Клава со шваброй', hp: 44, speed: 2.6, dmg: 9, icon: '🧹', xp: 6, size: 15, col: '#00cec9', isCleaner: true },
+      fitgirl: { name: 'Фитоняшка со штативом', hp: 25, speed: 2.5, dmg: 6, icon: '🤳', xp: 4, size: 14, col: '#fd79a8' },
+      atol_kkt: { name: 'Касса АТОЛ (Зажевало ленту)', hp: 65, speed: 1.3, dmg: 10, icon: '🖨️', xp: 8, size: 18, col: '#b2bec3', explodes: true },
+      trainer: { name: 'Тренер без диплома', hp: 88, speed: 1.45, dmg: 14, icon: '🎽', xp: 10, size: 20, col: '#0984e3' },
+      remote_dev: { name: 'Тимлид на удаленке', hp: 120, speed: 1.2, dmg: 14, icon: '💻', xp: 14, size: 21, col: '#6c5ce7', shooter: true, shootTimer: 2.2 },
+      evotor: { name: 'Эвотор: «интеграция за отдельную плату»', hp: 96, speed: 1.15, dmg: 13, icon: '💸', xp: 12, size: 19, col: '#e84393', shooter: true, shootTimer: 2.8 }
+    };
+
+    const d = defs[type];
+    const hpBuff = 1 + (this.time / 150);
+    this.enemies.push({
+      x, y,
+      name: d.name,
+      hp: d.hp * hpBuff,
+      maxHp: d.hp * hpBuff,
+      speed: d.speed,
+      dmg: d.dmg,
+      icon: d.icon,
+      xp: d.xp,
+      size: d.size,
+      col: d.col,
+      explodes: d.explodes || false,
+      shooter: d.shooter || false,
+      shootTimer: d.shootTimer || 0,
+      isCleaner: d.isCleaner || false,
+      freezeTimer: 0,
+      isBoss: false
+    });
+  }
+
+  /* ============================================================
+     БОССЫ С УНИКАЛЬНЫМИ МЕХАНИКАМИ
+     ============================================================ */
+  spawn1CBoss(minute) {
+    const angle = Math.random() * Math.PI * 2;
+    const x = Math.max(200, Math.min(3800, this.player.x + Math.cos(angle) * 480));
+    const y = Math.max(200, Math.min(3800, this.player.y + Math.sin(angle) * 480));
+
+    let b = {
+      x, y, size: 45, speed: 1.35, isBoss: true, xp: 30 + minute * 15,
+      bossTimer1: 0, bossTimer2: 0, freezeTimer: 0, enrage: false
+    };
+
+    if (minute === 1) {
+      b.bossType = 'deadlock';
+      b.name = 'ВЗАИМОБЛОКИРОВКА DEADLOCK MSSQL';
+      b.hp = 2700; b.dmg = 24; b.icon = '🔒'; b.col = '#c0392b';
+      this.showBanner(`🚨 БОСС: ${b.name}!`);
+      this.log("БОСС: Взаимоблокировка транзакций парализовала таблицы!");
+    } else if (minute === 2) {
+      b.bossType = 'tax';
+      b.name = 'ДУБЛИ ЗАЯВОК В CRM';
+      b.hp = 3600; b.dmg = 28; b.icon = '📲'; b.col = '#8e44ad';
+      this.showBanner(`🚨 БОСС: ${b.name}!`);
+      this.log("БОСС: CRM записала клиента на две тренировки одновременно!");
+    } else if (minute === 3) {
+      b.bossType = 'tamara';
+      b.name = 'АБОНЕМЕНТ ИСТЁК В РАЗГАР ТРЕНИРОВКИ';
+      b.hp = 6000; b.dmg = 36; b.icon = '🎟️'; b.col = '#d35400';
+      this.showBanner(`🚨 БОСС: ${b.name}!`);
+      this.log("БОСС: Абонемент истёк ровно перед записью на тренировку!");
+    } else if (minute === 4) {
+      b.bossType = 'ldf_blob';
+      b.name = 'ЛОГ ТРАНЗАКЦИЙ LDF РАЗДУЛСЯ ДО 3 ТБ';
+      b.hp = 12500; b.dmg = 48; b.icon = '🗄️'; b.col = '#2c3e50';
+      b.size = 52;
+      this.showBanner(`🚨 БОСС: ${b.name}!`);
+      this.log("БОСС: Жесткий диск переполнен файлами транзакций .ldf!");
+    } else if (minute === 5) {
+      b.bossType = 'ceo';
+      b.name = 'ГЕНЕРАЛЬНЫЙ ДИРЕКТОР: «НАДО БЫЛО ВЧЕРА»';
+      b.hp = 16500; b.dmg = 54; b.icon = '👔'; b.col = '#b71540';
+      b.size = 50;
+      this.showBanner(`🚨 БОСС: ${b.name}!`);
+      this.log("БОСС: Гендир собрал внеочередную планёрку на весь день!");
+    } else if (minute === 6) {
+      b.bossType = 'franchisee';
+      b.name = 'ФРАНЧАЙЗИ-ИНТЕГРАТОР НА ПОЧАСОВКЕ';
+      b.hp = 21000; b.dmg = 58; b.icon = '💸'; b.col = '#10ac84';
+      b.size = 54;
+      this.showBanner(`🚨 БОСС: ${b.name}!`);
+      this.log("БОСС: Интегратор прислал смету настройки клуба на 400 часов!");
+    } else {
+      b.bossType = 'friday_deploy';
+      b.name = `АВАРИЙНЫЙ РЕЛИЗ В ПЯТНИЦУ 18:00 (ЭТАП ${minute})`;
+      b.hp = 24000 + minute * 3500; b.dmg = 64; b.icon = '💥'; b.col = '#ff0055';
+      b.size = 58;
+      this.showBanner(`🚨 МЕГА-БОСС: ${b.name}!`);
+      this.log(`МЕГА-БОСС: Конфигурация повреждена необратимо!`);
+    }
+
+    this.sound.boss();
+    b.maxHp = b.hp;
+    this.enemies.push(b);
+  }
+
+  updateBossAI(b, dt) {
+    b.bossTimer1 += dt;
+    b.bossTimer2 += dt;
+
+    // 1. DEADLOCK MSSQL
+    if (b.bossType === 'deadlock') {
+      if (b.bossTimer1 > 3.8) {
+        b.bossTimer1 = 0;
+        // Кольцо замков
+        for (let k = 0; k < 8; k++) {
+          const ra = k * (Math.PI / 4);
+          this.enemyProjectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(ra) * 3.6, vy: Math.sin(ra) * 3.6,
+            dmg: 18, size: 8, life: 2.2, icon: '🔒', color: '#e74c3c'
+          });
+        }
+      }
+      if (b.bossTimer2 > 7.0) {
+        b.bossTimer2 = 0;
+        this.addPopup(b.x, b.y - 30, 'СПАВН: Фоновый процесс!', '#c0392b');
+        this.enemies.push({
+          x: b.x + 40, y: b.y + 40,
+          name: 'Фоновый процесс',
+          hp: 120, maxHp: 120, speed: 2.3, dmg: 12, icon: '⚙️', xp: 5, size: 16, col: '#e74c3c',
+          isBoss: false, freezeTimer: 0
+        });
+      }
+    }
+
+    // 2. ДУБЛИ ЗАПИСЕЙ В CRM
+    else if (b.bossType === 'tax') {
+      if (b.bossTimer1 > 2.6) {
+        b.bossTimer1 = 0;
+        // Залп уведомлений о конфликтующих записях
+        const a = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        for (let k = -2; k <= 2; k++) {
+          this.enemyProjectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(a + k * 0.18) * 4.4, vy: Math.sin(a + k * 0.18) * 4.4,
+            dmg: 16, size: 8, life: 2.4, icon: '📑', color: '#8e44ad'
+          });
+        }
+      }
+      if (b.bossTimer2 > 5.5) {
+        b.bossTimer2 = 0;
+        // Очередь недовольных клиентов у стойки ресепшена
+        this.puddles.push({
+          x: b.x, y: b.y,
+          radius: 70, dmg: 14, life: 7.0, isTrail: false
+        });
+        this.addPopup(b.x, b.y - 25, 'РАСПИСАНИЕ ПЕРЕПОЛНЕНО!', '#8e44ad');
+      }
+    }
+
+    // 3. ПРОСРОЧЕННЫЙ АБОНЕМЕНТ
+    else if (b.bossType === 'tamara') {
+      // Ярость при < 50% HP
+      if (b.hp < b.maxHp * 0.5 && !b.enrage) {
+        b.enrage = true;
+        b.speed *= 1.45;
+        b.col = '#c0392b';
+      this.showBanner('🎟️ АБОНЕМЕНТ ПРОСРОЧЕН: «ТРЕНИРОВКА НЕ СПИСАЛАСЬ!»');
+      }
+      if (b.bossTimer1 > 3.0) {
+        b.bossTimer1 = 0;
+        // Бросок тяжёлых гирь
+        const a = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        this.enemyProjectiles.push({
+          x: b.x, y: b.y,
+          vx: Math.cos(a) * 5.2, vy: Math.sin(a) * 5.2,
+          dmg: 25, size: 12, life: 2.5, icon: '🏋️', color: '#d35400'
+        });
+      }
+      if (b.bossTimer2 > 6.5) {
+        b.bossTimer2 = 0;
+        // Воронка незакрытых заявок (подтягивает игрока)
+        const d = Math.hypot(this.player.x - b.x, this.player.y - b.y);
+        if (d < 450) {
+          this.player.x -= (this.player.x - b.x) * 0.25;
+          this.player.y -= (this.player.y - b.y) * 0.25;
+          this.addPopup(this.player.x, this.player.y - 20, 'НЕУДЕРЖИМЫЙ ПОТОК НА РЕСЕПШЕН!', '#d35400');
+        }
+      }
+    }
+
+    // 4. LDF ТРАНЗАКЦИЙ (РАЗДУВАЕТСЯ)
+    else if (b.bossType === 'ldf_blob') {
+      b.size = 52 + Math.min(24, Math.floor(b.bossTimer2 * 0.8));
+      if (b.bossTimer1 > 4.5) {
+        b.bossTimer1 = 0;
+        // Ударная сейсмическая волна
+        this.sound.explosion();
+        this.addPopup(b.x, b.y - 30, '💥 ПЕРЕПОЛНЕНИЕ ДИСКА С:!', '#2c3e50');
+        for (let k = 0; k < 12; k++) {
+          const ra = k * (Math.PI / 6);
+          this.enemyProjectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(ra) * 3.8, vy: Math.sin(ra) * 3.8,
+            dmg: 22, size: 10, life: 2.2, icon: '🗄️', color: '#34495e'
+          });
+        }
+      }
+    }
+
+    // 5. ГЕНДИРЕКТОР («НАДО БЫЛО ВЧЕРА»)
+    else if (b.bossType === 'ceo') {
+      if (b.bossTimer1 > 4.2) {
+        b.bossTimer1 = 0;
+        // Дедлайны во все стороны
+        this.addPopup(b.x, b.y - 30, '«ПОЧЕМУ НЕ В ПРОДЕ?!»', '#b71540');
+        for (let k = 0; k < 10; k++) {
+          const ra = k * (Math.PI / 5);
+          this.enemyProjectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(ra) * 4.2, vy: Math.sin(ra) * 4.2,
+            dmg: 24, size: 9, life: 2.2, icon: '⏰', color: '#b71540'
+          });
+        }
+      }
+      if (b.bossTimer2 > 8.0) {
+        b.bossTimer2 = 0;
+        // Рывок за спину
+        const a = Math.random() * Math.PI * 2;
+        b.x = this.player.x + Math.cos(a) * 140;
+        b.y = this.player.y + Math.sin(a) * 140;
+        this.addPopup(b.x, b.y - 25, 'ВНЕЗАПНАЯ ПЛАНЁРКА!', '#b71540');
+      }
+    }
+
+    // 6. ФРАНЧАЙЗИ НА ПОЧАСОВКЕ
+    else if (b.bossType === 'franchisee') {
+      if (b.bossTimer1 > 3.0) {
+        b.bossTimer1 = 0;
+        // Бросок стопки заявок
+        const a = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        for (let k = -1; k <= 1; k++) {
+          this.enemyProjectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(a + k * 0.25) * 5.0, vy: Math.sin(a + k * 0.25) * 5.0,
+            dmg: 26, size: 10, life: 2.5, icon: '💸', color: '#10ac84'
+          });
+        }
+      }
+      if (b.bossTimer2 > 6.0) {
+        b.bossTimer2 = 0;
+        // Кража части дискет на поле
+        if (this.gems.length > 5) {
+          this.gems.splice(0, 3);
+          b.hp = Math.min(b.maxHp, b.hp + 350);
+          this.addPopup(b.x, b.y - 25, '+350 HP (Оплачено по безналу)', '#10ac84');
+        }
+      }
+    }
+
+    // 7. АВАРИЙНЫЙ РЕЛИЗ В ПЯТНИЦУ
+    else if (b.bossType === 'friday_deploy') {
+      if (b.bossTimer1 > 3.2) {
+        b.bossTimer1 = 0;
+        this.triggerGlitchScreen();
+        for (let k = 0; k < 14; k++) {
+          const ra = k * (Math.PI / 7);
+          this.enemyProjectiles.push({
+            x: b.x, y: b.y,
+            vx: Math.cos(ra) * 4.6, vy: Math.sin(ra) * 4.6,
+            dmg: 28, size: 9, life: 2.3, icon: '💥', color: '#ff0055'
+          });
+        }
+      }
+    }
+  }
+
+  dealPlayerDamage(baseDmg) {
+    let dmg = baseDmg * this.player.dmgMult * (this.player.damageBuffMult || 1);
+    let isCrit = Math.random() < this.player.critChance;
+    if (isCrit) {
+      dmg *= 2.5;
+      this.sound.crit();
+    }
+    return { dmg, isCrit };
+  }
+
+  updateWeapons(dt) {
+    let cdFactor = this.player.cdMult;
+    if (this.player.turboBuffTimer > 0) {
+      cdFactor *= 0.50; // В турбо-режиме оружие лупит в 2 раза чаще
+    }
+
+    // Турникет
+    if (this.weapons.turnstile) {
+      const w = this.weapons.turnstile;
+      w.angle = (w.angle || 0) + (this.player.turboBuffTimer > 0 ? 5.5 : 3.0) * dt;
+      const bladeCount = Math.min(5, 1 + Math.floor(w.lvl / 2));
+      const orbitRadius = 88;
+
+      for (let i = 0; i < bladeCount; i++) {
+        const a = w.angle + (i * (Math.PI * 2 / bladeCount));
+        const bx = this.player.x + Math.cos(a) * orbitRadius;
+        const by = this.player.y + Math.sin(a) * orbitRadius;
+
+        for (let e of this.enemies) {
+          if (Math.hypot(e.x - bx, e.y - by) < e.size + 15) {
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
+            e.hp -= hit.dmg * dt * 3.8;
+            this.createHitFX(bx, by, '#ffd200', 1);
+            if (hit.isCrit && Math.random() < 0.2) {
+              this.addPopup(e.x, e.y - 12, `КРИТ! ${Math.round(hit.dmg)}`, '#f1c40f');
+            }
+          }
+        }
+      }
+    }
+
+    // Ключи СКУД
+    if (this.weapons.keys) {
+      const w = this.weapons.keys;
+      w.timer -= dt;
+      if (w.timer <= 0) {
+        w.timer = WEAPONS_DEF.keys.baseCooldown * cdFactor;
+        const count = Math.min(6, 1 + Math.floor(w.lvl / 2));
+        const baseA = Math.atan2(this.player.facingY, this.player.facingX);
+        for (let i = 0; i < count; i++) {
+          const a = baseA + (i - (count - 1) / 2) * 0.13;
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.keys.baseDmg + w.lvl * 6);
+          this.projectiles.push({
+            x: this.player.x, y: this.player.y,
+            vx: Math.cos(a) * 11.0, vy: Math.sin(a) * 11.0,
+            dmg: hit.dmg, isCrit: hit.isCrit,
+            life: 0.9, icon: '🗝️', color: '#fdcb6e', size: 9
+          });
+        }
+        this.sound.playTone(550, 'square', 0.05, 0.08);
+      }
+    }
+
+    // Синтаксис
+    if (this.weapons.syntax) {
+      const w = this.weapons.syntax;
+      w.timer -= dt;
+      if (w.timer <= 0 && this.enemies.length > 0) {
+        w.timer = WEAPONS_DEF.syntax.baseCooldown * cdFactor;
+        let target = null, minDist = 500;
+        for (let e of this.enemies) {
+          const d = Math.hypot(e.x - this.player.x, e.y - this.player.y);
+          if (d < minDist) { minDist = d; target = e; }
+        }
+        if (target) {
+          const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.syntax.baseDmg + w.lvl * 9);
+          this.projectiles.push({
+            x: this.player.x, y: this.player.y,
+            vx: Math.cos(angle) * 10.0, vy: Math.sin(angle) * 10.0,
+            dmg: hit.dmg, isCrit: hit.isCrit,
+            life: 1.4, icon: '{;}', color: '#00cec9', size: 8
+          });
+          this.sound.playTone(460, 'sine', 0.04, 0.08);
+        }
+      }
+    }
+
+    // Архив 7.7
+    if (this.weapons.heavy_archive) {
+      const w = this.weapons.heavy_archive;
+      w.timer -= dt;
+      if (w.timer <= 0) {
+        w.timer = WEAPONS_DEF.heavy_archive.baseCooldown * cdFactor;
+        const ang = Math.atan2(this.player.facingY, this.player.facingX);
+        const hit = this.dealPlayerDamage(WEAPONS_DEF.heavy_archive.baseDmg + w.lvl * 25);
+        this.projectiles.push({
+          x: this.player.x, y: this.player.y,
+          vx: Math.cos(ang) * 5.8, vy: Math.sin(ang) * 5.8,
+          dmg: hit.dmg, isCrit: hit.isCrit,
+          life: 2.5, icon: '💾', color: '#0984e3', size: 22, piercing: true, hits: []
+        });
+        this.sound.playTone(180, 'sawtooth', 0.15, 0.25);
+      }
+    }
+
+    // Шейкер
+    if (this.weapons.protein) {
+      const w = this.weapons.protein;
+      w.timer -= dt;
+      if (w.timer <= 0) {
+        w.timer = WEAPONS_DEF.protein.baseCooldown * cdFactor;
+        const ang = Math.random() * Math.PI * 2;
+        const dst = 80 + Math.random() * 120;
+        const hit = this.dealPlayerDamage(WEAPONS_DEF.protein.baseDmg + w.lvl * 4);
+        this.puddles.push({
+          x: this.player.x + Math.cos(ang) * dst,
+          y: this.player.y + Math.sin(ang) * dst,
+          radius: 46 + w.lvl * 7,
+          dmg: hit.dmg,
+          life: 3.5
+        });
+      }
+    }
+
+    // Аура
+    if (this.weapons.cache_aura) {
+      const w = this.weapons.cache_aura;
+      const rad = 72 + w.lvl * 14;
+      for (let e of this.enemies) {
+        if (Math.hypot(e.x - this.player.x, e.y - this.player.y) < rad + e.size) {
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
+          e.hp -= hit.dmg * dt;
+        }
+      }
+    }
+
+    // Хлыст IronLogic
+    if (this.weapons.iron_logic) {
+      const w = this.weapons.iron_logic;
+      w.timer -= dt;
+      if (w.timer <= 0) {
+        w.timer = WEAPONS_DEF.iron_logic.baseCooldown * cdFactor;
+        const ang = Math.atan2(this.player.facingY, this.player.facingX);
+        const slashRange = 120 + w.lvl * 15;
+        this.whipSlashes.push({
+          x: this.player.x, y: this.player.y,
+          angle: ang, radius: slashRange, life: 0.25
+        });
+
+        for (let e of this.enemies) {
+          const d = Math.hypot(e.x - this.player.x, e.y - this.player.y);
+          if (d < slashRange) {
+            const eAngle = Math.atan2(e.y - this.player.y, e.x - this.player.x);
+            let diff = Math.abs(ang - eAngle);
+            if (diff > Math.PI) diff = Math.PI * 2 - diff;
+            if (diff < 0.8) {
+              const hit = this.dealPlayerDamage(WEAPONS_DEF.iron_logic.baseDmg + w.lvl * 12);
+              e.hp -= hit.dmg;
+              e.x += Math.cos(ang) * 45;
+              e.y += Math.sin(ang) * 45;
+              this.createHitFX(e.x, e.y, '#0984e3', 6);
+              if (hit.isCrit) {
+                this.addPopup(e.x, e.y - 15, `КРИТ! ${Math.round(hit.dmg)}`, '#f1c40f');
+              }
+            }
+          }
+        }
+        this.sound.playTone(320, 'triangle', 0.12, 0.15);
+      }
+    }
+
+    // Лазер ЕГАИС
+    if (this.weapons.egais_laser) {
+      const w = this.weapons.egais_laser;
+      w.timer -= dt;
+      if (w.timer <= 0 && this.enemies.length > 0) {
+        w.timer = WEAPONS_DEF.egais_laser.baseCooldown * cdFactor;
+        let chain = [];
+        let currX = this.player.x, currY = this.player.y;
+        let available = [...this.enemies];
+
+        for (let c = 0; c < 3 + Math.floor(w.lvl / 2); c++) {
+          if (available.length === 0) break;
+          available.sort((a,b) => Math.hypot(a.x-currX, a.y-currY) - Math.hypot(b.x-currX, b.y-currY));
+          let tgt = available.shift();
+          if (tgt && Math.hypot(tgt.x - currX, tgt.y - currY) < 380) {
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.egais_laser.baseDmg + w.lvl * 8);
+            tgt.hp -= hit.dmg;
+            chain.push({ x1: currX, y1: currY, x2: tgt.x, y2: tgt.y });
+            currX = tgt.x; currY = tgt.y;
+            this.createHitFX(tgt.x, tgt.y, '#ff4757', 4);
+          }
+        }
+        if (chain.length > 0) {
+          this.projectiles.push({ type: 'laser_visual', lines: chain, life: 0.15 });
+          this.sound.playTone(750, 'sawtooth', 0.08, 0.09);
+        }
+      }
+    }
+  }
+
+  triggerNukeITS() {
+    this.sound.explosion();
+    this.log("ПРИМЕНЕН ДИСК ИТС: Полное тестирование и исправление базы!");
+    for (let e of this.enemies) {
+      if (!e.isBoss) {
+        e.hp = 0;
+        this.createHitFX(e.x, e.y, '#ffd200', 8);
+      } else {
+        e.hp -= 900;
+        this.addPopup(e.x, e.y - 30, "-900 (ИТС ТиИ)", "#f1c40f");
+      }
+    }
+    this.addPopup(this.player.x, this.player.y - 40, "💥 ТЕСТИРОВАНИЕ И ИСПРАВЛЕНИЕ!", "#ffd200");
+  }
+
+  update(dt) {
+    this.time += dt;
+    if (this.time >= this.nextShopTime) {
+      this.openShop();
+      return;
+    }
+    const frameScale = dt * 60;
+
+    if (this.projectiles.length > 180) this.projectiles.splice(0, this.projectiles.length - 180);
+    if (this.enemyProjectiles.length > 240) this.enemyProjectiles.splice(0, this.enemyProjectiles.length - 240);
+    if (this.puddles.length > 120) this.puddles.splice(0, this.puddles.length - 120);
+
+    if (this.dynUpdateCd > 0) {
+      this.dynUpdateCd = Math.max(0, this.dynUpdateCd - dt);
+      const btn = document.getElementById('btn-dyn-update');
+      if (this.dynUpdateCd === 0) {
+        btn.innerText = "⚡ Дин. Обновление [ПРОБЕЛ]";
+        btn.style.background = "#55efc4";
+      } else {
+        btn.innerText = `⏳ Дин. Обновл. (${Math.ceil(this.dynUpdateCd)}с)`;
+        btn.style.background = "#dfe6e9";
+      }
+    }
+
+    // Обновление таймеров активных умений
+    for (let slot of this.activeSkills) {
+      if (slot && slot.cdTimer > 0) {
+        slot.cdTimer = Math.max(0, slot.cdTimer - dt);
+      }
+    }
+    this.updateActiveHUD();
+
+    if (this.player.regen > 0) {
+      this.player.hp = Math.min(this.player.maxHp, this.player.hp + this.player.regen * dt);
+    }
+    if (this.player.xpBoostTimer > 0) {
+      this.player.xpBoostTimer = Math.max(0, this.player.xpBoostTimer - dt);
+      if (this.player.xpBoostTimer === 0) this.player.xpEventMult = 1.0;
+    }
+    if (this.player.damageBuffTimer > 0) {
+      this.player.damageBuffTimer = Math.max(0, this.player.damageBuffTimer - dt);
+      if (this.player.damageBuffTimer === 0) this.player.damageBuffMult = 1.0;
+    }
+
+    if (this.player.hasBackupShield) {
+      this.backupTimer -= dt;
+      if (this.backupTimer <= 0) {
+        this.player.shieldTimer = 3.5;
+        this.backupTimer = 38;
+        this.sound.playTone(880, 'sine', 0.3, 0.2);
+        this.addPopup(this.player.x, this.player.y - 30, "🛡️ БЭКАП В ОБЛАКО (ЩИТ 3.5c)", "#00cec9");
+      }
+    }
+    if (this.player.shieldTimer > 0) this.player.shieldTimer -= dt;
+
+    if (this.player.turboBuffTimer > 0) {
+      this.player.turboBuffTimer -= dt;
+    }
+
+    let effectiveSpeedMult = this.player.speedMult;
+    if (this.player.speedBuffTimer > 0) {
+      this.player.speedBuffTimer -= dt;
+      effectiveSpeedMult += 0.50;
+      document.getElementById('buff-indicator').innerText = `⚡ УСКОРЕНИЕ (${Math.ceil(this.player.speedBuffTimer)}с)`;
+    } else {
+      document.getElementById('buff-indicator').innerText = '';
+    }
+
+    // Движение
+    let mx = 0, my = 0;
+    if (this.keys['w'] || this.keys['ц'] || this.keys['arrowup']) my -= 1;
+    if (this.keys['s'] || this.keys['ы'] || this.keys['arrowdown']) my += 1;
+    if (this.keys['a'] || this.keys['ф'] || this.keys['arrowleft']) mx -= 1;
+    if (this.keys['d'] || this.keys['в'] || this.keys['arrowright']) mx += 1;
+
+    if (mx !== 0 || my !== 0) {
+      const len = Math.hypot(mx, my);
+      this.player.facingX = mx / len;
+      this.player.facingY = my / len;
+      this.player.x += (mx / len) * (this.player.baseSpeed * effectiveSpeedMult) * frameScale;
+      this.player.y += (my / len) * (this.player.baseSpeed * effectiveSpeedMult) * frameScale;
+
+      if (this.player.hasShoeTrail) {
+        this.trailTimer -= dt;
+        if (this.trailTimer <= 0) {
+          this.puddles.push({
+            x: this.player.x, y: this.player.y,
+            radius: 22, dmg: 5, life: 2.0, isTrail: true
+          });
+          this.trailTimer = 0.25;
+        }
+      }
+    }
+
+    this.player.x = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.x));
+    this.player.y = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.y));
+
+    this.updateWeapons(dt);
+
+    // Снаряды
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const p = this.projectiles[i];
+      p.life -= dt;
+      if (p.type !== 'laser_visual') {
+        p.x += p.vx * frameScale; p.y += p.vy * frameScale;
+
+        if (p.piercing) {
+          for (let e of this.enemies) {
+            if (!p.hits.includes(e) && Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
+              e.hp -= p.dmg;
+              p.hits.push(e);
+              this.createHitFX(p.x, p.y, p.color, 4);
+              this.sound.hit();
+              this.addPopup(e.x, e.y - 12, `7.7: -${Math.round(p.dmg)}`, '#0984e3');
+            }
+          }
+        } else {
+          for (let e of this.enemies) {
+            if (Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
+              e.hp -= p.dmg;
+              this.createHitFX(p.x, p.y, p.color);
+              this.sound.hit();
+              if (p.isCrit) {
+                this.addPopup(e.x, e.y - 15, `КРИТ! ${Math.round(p.dmg)}`, '#f1c40f');
+              }
+              p.life = 0;
+              break;
+            }
+          }
+        }
+      }
+      if (p.life <= 0) this.projectiles.splice(i, 1);
+    }
+
+    // Вражеские пули
+    for (let i = this.enemyProjectiles.length - 1; i >= 0; i--) {
+      const ep = this.enemyProjectiles[i];
+      ep.life -= dt;
+      ep.x += ep.vx * frameScale; ep.y += ep.vy * frameScale;
+
+      if (Math.hypot(this.player.x - ep.x, this.player.y - ep.y) < 18 + ep.size) {
+        if (this.player.shieldTimer <= 0) {
+          this.player.hp -= ep.dmg;
+          this.sound.hit();
+          this.addPopup(this.player.x, this.player.y - 20, `-${ep.dmg}`, '#ff4757');
+        } else {
+          this.addPopup(this.player.x, this.player.y - 20, "ОТРАЖЕНО ЩИТОМ", "#00cec9");
+        }
+        ep.life = 0;
+      }
+      if (ep.life <= 0) this.enemyProjectiles.splice(i, 1);
+    }
+    if (this.player.hp <= 0) {
+      this.gameOver('База рухнула: вражеский снаряд уничтожил целостность!');
+      return;
+    }
+
+    // Лужи
+    for (let i = this.puddles.length - 1; i >= 0; i--) {
+      const pud = this.puddles[i];
+      pud.life -= dt;
+      for (let e of this.enemies) {
+        if (Math.hypot(e.x - pud.x, e.y - pud.y) < pud.radius + e.size) {
+          e.hp -= pud.dmg * dt;
+          if (pud.isTrail) e.x -= (e.x - this.player.x) * 0.01 * frameScale;
+        }
+      }
+      if (pud.life <= 0) this.puddles.splice(i, 1);
+    }
+
+    // Хлыст
+    for (let i = this.whipSlashes.length - 1; i >= 0; i--) {
+      this.whipSlashes[i].life -= dt;
+      if (this.whipSlashes[i].life <= 0) this.whipSlashes.splice(i, 1);
+    }
+
+    this.spawnDirector(dt);
+
+    // Логика врагов
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+
+      if (e.freezeTimer > 0) {
+        e.freezeTimer -= dt;
+        continue;
+      }
+
+      const ang = Math.atan2(this.player.y - e.y, this.player.x - e.x);
+      e.x += Math.cos(ang) * e.speed * frameScale;
+      e.y += Math.sin(ang) * e.speed * frameScale;
+
+      if (e.isBoss) {
+        this.updateBossAI(e, dt);
+      }
+
+      if (e.shooter) {
+        e.shootTimer -= dt;
+        if (e.shootTimer <= 0 && Math.hypot(this.player.x - e.x, this.player.y - e.y) < 450) {
+          e.shootTimer = 2.4;
+          this.enemyProjectiles.push({
+            x: e.x, y: e.y,
+            vx: Math.cos(ang) * 4.5, vy: Math.sin(ang) * 4.5,
+            dmg: 16, size: 7, life: 2.2, icon: '⚠️', color: '#ff3838'
+          });
+        }
+      }
+
+      // Касание
+      if (Math.hypot(this.player.x - e.x, this.player.y - e.y) < e.size + 18) {
+        if (e.isCleaner && Math.random() < 0.08) {
+          this.triggerGlitchScreen();
+          this.addPopup(this.player.x, this.player.y - 20, "«КУДА ПО ПОМЫТОМУ?!» (Выдернут шнур)", "#00cec9");
+        }
+
+        if (this.player.shieldTimer <= 0) {
+          if (Math.random() > this.player.dodge) {
+            this.player.hp -= e.dmg * dt;
+            if (Math.random() < 0.08) {
+              this.sound.hit();
+              this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(e.dmg)}`, '#e74c3c');
+            }
+          } else if (Math.random() < 0.05) {
+            this.addPopup(this.player.x, this.player.y - 20, "DODGE (HASP)", '#f1c40f');
+          }
+        } else {
+          if (Math.random() < 0.08) this.addPopup(this.player.x, this.player.y - 20, "ЩИТ 1С", "#00cec9");
+        }
+
+        if (this.player.hp <= 0) {
+          this.gameOver(`База рухнула: «${e.name}» вызвал аварийный сброс сеансов!`);
+          return;
+        }
+      }
+
+      // Смерть моба
+      if (e.hp <= 0) {
+        this.kills++;
+        this.createHitFX(e.x, e.y, e.col, 10);
+
+        if (e.explodes) {
+          this.sound.explosion();
+          this.addPopup(e.x, e.y - 20, "💥 ХЛОПОК КАССЫ", "#d63031");
+          for (let other of this.enemies) {
+            if (other !== e && Math.hypot(other.x - e.x, other.y - e.y) < 75) {
+              other.hp -= 60;
+              this.createHitFX(other.x, other.y, '#e17055', 4);
+            }
+          }
+        }
+
+        this.gems.push({
+          x: e.x, y: e.y,
+          xp: Math.round(e.xp * this.player.xpMult * this.player.xpEventMult),
+          col: e.xp > 15 ? '#e84393' : (e.xp > 5 ? '#0984e3' : '#00b894')
+        });
+
+        const hasNukeOnMap = this.pickups.some(p => p.type === 'its_box');
+        const dropRoll = Math.random();
+
+        if (!hasNukeOnMap && (e.xp >= 8 || e.isBoss) && dropRoll < 0.009) {
+          this.pickups.push({ x: e.x, y: e.y, type: 'its_box', icon: '📦' });
+        } else if (dropRoll < 0.04) {
+          this.pickups.push({ x: e.x, y: e.y, type: 'coffee', icon: '☕' });
+        } else if (dropRoll < 0.07) {
+          this.pickups.push({ x: e.x, y: e.y, type: 'banana', icon: '🍌' });
+        }
+
+        this.enemies.splice(i, 1);
+      }
+    }
+
+    // Лут
+    for (let i = this.pickups.length - 1; i >= 0; i--) {
+      const item = this.pickups[i];
+      if (Math.hypot(this.player.x - item.x, this.player.y - item.y) < 32) {
+        if (item.type === 'its_box') {
+          this.triggerNukeITS();
+        } else if (item.type === 'coffee') {
+          this.player.speedBuffTimer = 8.0;
+          this.sound.playTone(660, 'sine', 0.2, 0.15);
+          this.addPopup(this.player.x, this.player.y - 25, "⚡ КОФЕИНОВЫЙ СПРИНТ!", "#e67e22");
+        } else if (item.type === 'banana') {
+          this.player.hp = Math.min(this.player.maxHp, this.player.hp + 20);
+          this.sound.playTone(520, 'triangle', 0.15, 0.12);
+          this.addPopup(this.player.x, this.player.y - 25, "+20 HP (Банан)", "#2ecc71");
+        }
+        this.pickups.splice(i, 1);
+      }
+    }
+
+    // Магнит
+    const magnetRange = 100 * this.player.magnetMult;
+    for (let i = this.gems.length - 1; i >= 0; i--) {
+      const g = this.gems[i];
+      const d = Math.hypot(this.player.x - g.x, this.player.y - g.y);
+      if (d < magnetRange) {
+        const a = Math.atan2(this.player.y - g.y, this.player.x - g.x);
+        g.x += Math.cos(a) * 9.8 * frameScale;
+        g.y += Math.sin(a) * 9.8 * frameScale;
+      }
+      if (d < 22) {
+        this.gemsCollected++;
+        this.addXP(g.xp);
+        this.currency += Math.max(0, Math.round(g.xp));
+        document.getElementById('currency-display').innerText = this.currency;
+        this.gems.splice(i, 1);
+        if (this.paused) break;
+      }
+    }
+
+    // Частицы
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx * frameScale; p.y += p.vy * frameScale; p.life -= dt;
+      if (p.life <= 0) this.particles.splice(i, 1);
+    }
+    for (let i = this.texts.length - 1; i >= 0; i--) {
+      const t = this.texts[i];
+      t.y -= 22 * dt; t.life -= dt;
+      if (t.life <= 0) this.texts.splice(i, 1);
+    }
+
+    this.updateHUD();
+  }
+
+  addXP(val) {
+    this.xp += val;
+    this.sound.gemPickup();
+    if (this.xp >= this.nextXp) {
+      this.levelUp();
+    }
+  }
+
+  /* ============================================================
+     ПРОКАЧКА ГГ И УСТРАНЕНИЕ БАГА НА 9+ ЛВЛ
+     ============================================================ */
+  levelUp() {
+    this.level++;
+    this.xp -= this.nextXp;
+    this.nextXp = Math.floor(this.nextXp * 1.34);
+    this.sound.levelUp();
+    this.paused = true;
+
+    // ПАССИВНЫЙ РОСТ СИЛЫ ПРОГРАММИСТА С КАЖДЫМ РЕЛИЗОМ:
+    this.player.maxHp += 10;
+    this.player.hp = Math.min(this.player.maxHp, this.player.hp + 15);
+    this.player.dmgMult += 0.02;
+    this.player.baseSpeed += 0.02;
+
+    this.addPopup(this.player.x, this.player.y - 30, `ГРЕЙД UP! +10 MAX HP & +2% СИЛЫ`, '#ffd200');
+
+    // Сбор доступных улучшений
+    const available = [];
+
+    // Оружие
+    for (let k in WEAPONS_DEF) {
+      const w = this.weapons[k];
+      if (!w) available.push({ type: 'weapon_new', key: k, def: WEAPONS_DEF[k] });
+      else if (w.lvl < 5) available.push({ type: 'weapon_up', key: k, def: WEAPONS_DEF[k], lvl: w.lvl + 1 });
+    }
+    // Пассивки
+    for (let k in PASSIVES_DEF) {
+      const p = this.passives[k];
+      if (!p) available.push({ type: 'pass_new', key: k, def: PASSIVES_DEF[k] });
+      else if (p.lvl < 5) available.push({ type: 'pass_up', key: k, def: PASSIVES_DEF[k], lvl: p.lvl + 1 });
+    }
+
+    // Активные умения [1][2][3][4]
+    const hasFreeActiveSlot = this.activeSkills.some(s => s === null);
+    for (let k in ACTIVE_SKILLS_DEF) {
+      const equipped = this.activeSkills.find(s => s && s.key === k);
+      if (!equipped && hasFreeActiveSlot) {
+        available.push({ type: 'active_new', key: k, def: ACTIVE_SKILLS_DEF[k] });
+      } else if (equipped && equipped.lvl < 5) {
+        available.push({ type: 'active_up', key: k, def: ACTIVE_SKILLS_DEF[k], lvl: equipped.lvl + 1 });
+      }
+    }
+
+    // ГАРАНТИЯ: Если доступных карт меньше 3 (например, на 9+ релизе всё выкачано),
+    // добиваем повторяемыми денежными бонусами, чтобы игра никогда не висла!
+    let choices = available.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+    if (choices.length < 3) {
+      const needed = 3 - choices.length;
+      const shuffledRep = [...REPEATABLE_UPGRADES].sort(() => 0.5 - Math.random());
+      for (let i = 0; i < needed; i++) {
+        const rep = shuffledRep[i % shuffledRep.length];
+        choices.push({
+          type: 'repeatable',
+          key: rep.key,
+          def: rep,
+          applyFn: rep.apply
+        });
+      }
+    }
+
+    const box = document.getElementById('upgrade-items');
+    box.innerHTML = '';
+
+    choices.forEach(ch => {
+      const card = document.createElement('div');
+      card.className = 'card-upgrade';
+
+      let title = '';
+      if (ch.type.endsWith('new')) title = `${ch.def.name} <b style="color:#27ae60">[НОВОЕ]</b>`;
+      else if (ch.type.endsWith('up')) title = `${ch.def.name} [УР. ${ch.lvl}]`;
+      else title = `${ch.def.name} <b style="color:#f39c12">[БОНУС РЕЛИЗА]</b>`;
+
+      card.innerHTML = `
+        <div class="card-icon">${ch.def.icon}</div>
+        <div class="card-info">
+          <h4>${title}</h4>
+          <p>${ch.def.desc}</p>
+        </div>
+      `;
+      card.onclick = () => {
+        this.applyUpgrade(ch);
+        document.getElementById('modal-lvlup').style.display = 'none';
+        this.lastTime = performance.now();
+        if (this.xp >= this.nextXp) {
+          this.levelUp();
+        } else {
+          this.paused = false;
+        }
+      };
+      box.appendChild(card);
+    });
+
+    document.getElementById('modal-lvlup').style.display = 'flex';
+  }
+
+  applyUpgrade(ch) {
+    if (ch.type === 'weapon_new') {
+      this.weapons[ch.key] = { lvl: 1, timer: 0 };
+    } else if (ch.type === 'weapon_up') {
+      this.weapons[ch.key].lvl++;
+    } else if (ch.type === 'pass_new') {
+      this.passives[ch.key] = { lvl: 1 };
+      PASSIVES_DEF[ch.key].mod(this.player);
+    } else if (ch.type === 'pass_up') {
+      this.passives[ch.key].lvl++;
+      PASSIVES_DEF[ch.key].mod(this.player);
+    } else if (ch.type === 'active_new') {
+      const freeIdx = this.activeSkills.findIndex(s => s === null);
+      if (freeIdx !== -1) {
+        this.activeSkills[freeIdx] = { key: ch.key, lvl: 1, cdTimer: 0 };
+      }
+    } else if (ch.type === 'active_up') {
+      const item = this.activeSkills.find(s => s && s.key === ch.key);
+      if (item) item.lvl++;
+    } else if (ch.type === 'repeatable') {
+      ch.applyFn(this);
+    }
+
+    this.updateInventoryHUD();
+    this.updateActiveHUD();
+    this.log(`Успешно внедрена доработка: ${ch.def.name}`);
+  }
+
+  gameOver(reason) {
+    this.paused = true;
+    this.sound.playTone(60, 'sawtooth', 0.7, 0.45);
+
+    const totalScore = this.calcScore();
+    const statsBox = document.getElementById('gameover-stats');
+    statsBox.innerHTML = `
+      <b>Причина сбоя:</b> ${reason}<br><br>
+      • Время аптайма: <b>${Math.floor(this.time)} сек</b><br>
+      • Закрыто инцидентов (багов): <b>${this.kills}</b> (x12 = ${this.kills * 12} очк.)<br>
+      • Написано строк кода: <b>${this.gemsCollected}</b> (x3 = ${this.gemsCollected * 3} очк.)<br>
+      • Остаток фиткоинов: <b>${this.currency}</b><br>
+      • Достигнутый релиз: <b>Релиз ${this.level}.0</b><br>
+      • <b>ИТОГОВЫЙ СЧЁТ РЕКОРДА: ${totalScore}</b>
+    `;
+
+    document.getElementById('submit-status').innerText = '';
+    document.getElementById('btn-submit-score').disabled = false;
+    document.getElementById('modal-gameover').style.display = 'flex';
+  }
+
+  submitScore() {
+    const nickInput = document.getElementById('player-nickname');
+    let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '') || 'Архитектор_1С';
+    localStorage.setItem('1c_nick', nick);
+
+    const score = this.calcScore();
+    const seconds = Math.floor(this.time);
+    const status = document.getElementById('submit-status');
+    const btn = document.getElementById('btn-submit-score');
+
+    status.innerText = "Запись в регистр Dreamlo...";
+    btn.disabled = true;
+
+    const url = getDreamloUrl(`${DREAMLO.privateCode}/add/${encodeURIComponent(nick)}/${score}/${seconds}`);
+
+    fetch(url)
+      .then(r => r.text())
+      .then(text => {
+        if (text.startsWith("ERROR")) throw new Error(text);
+        status.innerHTML = `<b style="color:#27ae60">Рекорд успешно зафиксирован!</b>`;
+        if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
+        this.leaderboardOpenTimer = setTimeout(() => {
+          this.leaderboardOpenTimer = null;
+          if (document.getElementById('modal-gameover').style.display === 'flex') this.showLeaderboard();
+        }, 800);
+      })
+      .catch(err => {
+        status.innerHTML = `<span style="color:#c0392b">Ошибка записи: ${err.message}</span>`;
+        btn.disabled = false;
+      });
+  }
+
+  fetchLeaderboard() {
+    const tbody = document.getElementById('lb-body');
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Запрос регистра рекордов...</td></tr>`;
+
+    const url = getDreamloUrl(`${DREAMLO.publicCode}/json`);
+
+    fetch(url)
+      .then(res => res.text())
+      .then(text => {
+        if (text.startsWith("ERROR")) throw new Error(text);
+        const data = JSON.parse(text);
+        tbody.innerHTML = '';
+        let entries = data?.dreamlo?.leaderboard?.entry;
+        if (!entries) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Регистр пуст. Будьте первым!</td></tr>`;
+          return;
+        }
+        if (!Array.isArray(entries)) entries = [entries];
+
+        entries.forEach((e, idx) => {
+          const m = Math.floor(parseInt(e.seconds || 0) / 60).toString().padStart(2, '0');
+          const s = (parseInt(e.seconds || 0) % 60).toString().padStart(2, '0');
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><b>${idx + 1}</b></td>
+            <td><b>${this.escapeHtml(e.name)}</b></td>
+            <td style="color:#b33939; font-weight:bold;">${e.score}</td>
+            <td>${m}:${s}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Ошибка соединения: ${err.message}</td></tr>`;
+      });
+  }
+
+  escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  log(msg) {
+    document.getElementById('footer-log').innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  }
+
+  addPopup(x, y, text, color = '#fff') {
+    if (this.texts.length >= 120) this.texts.shift();
+    this.texts.push({ x, y, text, color, life: 0.95 });
+  }
+
+  createHitFX(x, y, col, count = 5) {
+    count = Math.min(count, 8, Math.max(0, 420 - this.particles.length));
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.random() * 4 + 1;
+      this.particles.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 0.35, col });
+    }
+  }
+
+  updateHUD() {
+    const pct = Math.min(100, (this.xp / this.nextXp) * 100);
+    document.getElementById('xp-bar-fill').style.width = pct + '%';
+    document.getElementById('xp-bar-text').innerText = `РЕЛИЗ ${this.level}.0.0 [${this.xp} / ${this.nextXp} СТРОК КОДА]`;
+
+    const m = Math.floor(this.time / 60).toString().padStart(2, '0');
+    const s = Math.floor(this.time % 60).toString().padStart(2, '0');
+    document.getElementById('time-display').innerText = `${m}:${s}`;
+    document.getElementById('kill-display').innerText = this.kills;
+    document.getElementById('score-display').innerText = this.calcScore();
+
+    document.getElementById('hp-val').innerText = `${Math.max(0, Math.round(this.player.hp))}/${this.player.maxHp} HP`;
+    document.getElementById('currency-display').innerText = this.currency || 0;
+    const shopRemaining = Math.max(0, Math.ceil((this.nextShopTime - this.time)));
+    document.getElementById('shop-timer').innerText = `🛒 ${Math.floor(shopRemaining / 60).toString().padStart(2, '0')}:${(shopRemaining % 60).toString().padStart(2, '0')}`;
+    const hpRatio = Math.max(0, Math.min(1, this.player.hp / this.player.maxHp));
+    const hpFill = document.getElementById('hud-health-fill');
+    hpFill.style.width = `${hpRatio * 100}%`;
+    hpFill.style.background = hpRatio <= 0.25
+      ? 'linear-gradient(90deg, #8e1b16, #e74c3c)'
+      : hpRatio <= 0.55
+        ? 'linear-gradient(90deg, #d35400, #f1c40f)'
+        : 'linear-gradient(90deg, #16a085, #55efc4)';
+    document.getElementById('hud-health-value').innerText = `${Math.max(0, Math.round(this.player.hp))} / ${this.player.maxHp}`;
+
+    // Грейд архитектора
+    let grade = "Архитектор 1С";
+    if (this.level >= 15) grade = "ИТ-Директор Холдинга";
+    else if (this.level >= 10) grade = "Эксперт по тех. вопросам";
+    else if (this.level >= 5) grade = "Ведущий Разработчик КОРП";
+    document.getElementById('arch-grade').innerText = grade;
+  }
+
+  updateInventoryHUD() {
+    const box = document.getElementById('hud-inventory');
+    box.innerHTML = '';
+    for (let k in this.weapons) {
+      box.innerHTML += `<div class="inv-slot">${WEAPONS_DEF[k].icon}<span class="inv-lvl">${this.weapons[k].lvl}</span></div>`;
+    }
+    for (let k in this.passives) {
+      box.innerHTML += `<div class="inv-slot" style="border-color:#55efc4;">${PASSIVES_DEF[k].icon}<span class="inv-lvl">${this.passives[k].lvl}</span></div>`;
+    }
+  }
+
+  updateActiveHUD() {
+    for (let i = 0; i < 4; i++) {
+      const el = document.getElementById(`act-slot-${i}`);
+      const skill = this.activeSkills[i];
+      const iconEl = el.querySelector('.act-icon');
+      const lvlEl = el.querySelector('.act-lvl');
+      const overlay = el.querySelector('.act-cd-overlay');
+
+      if (!skill) {
+        el.className = 'active-slot empty';
+        iconEl.innerText = '🔒';
+        lvlEl.innerText = '';
+        overlay.style.display = 'none';
+      } else {
+        const def = ACTIVE_SKILLS_DEF[skill.key];
+        el.className = 'active-slot';
+        iconEl.innerText = def.icon;
+        lvlEl.innerText = `v${skill.lvl}`;
+
+        if (skill.cdTimer > 0) {
+          overlay.style.display = 'flex';
+          overlay.innerText = `${Math.ceil(skill.cdTimer)}с`;
+        } else {
+          overlay.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  render() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    const camX = this.player.x - this.canvas.width / 2;
+    const camY = this.player.y - this.canvas.height / 2;
+
+    this.ctx.save();
+    this.ctx.translate(-camX, -camY);
+
+    // Сетка
+    const ts = 64;
+    const startX = Math.floor(camX / ts) * ts;
+    const startY = Math.floor(camY / ts) * ts;
+    for (let x = startX; x < camX + this.canvas.width + ts; x += ts) {
+      for (let y = startY; y < camY + this.canvas.height + ts; y += ts) {
+        if (x >= this.BOUND_MIN && x <= this.BOUND_MAX && y >= this.BOUND_MIN && y <= this.BOUND_MAX) {
+          this.ctx.fillStyle = ((x / ts + y / ts) % 2 === 0) ? '#22252a' : '#1a1c22';
+        } else {
+          this.ctx.fillStyle = '#0a0a0a';
+        }
+        this.ctx.fillRect(x, y, ts, ts);
+      }
+    }
+
+    // Логотип 1С
+    this.ctx.save();
+    this.ctx.translate(2000, 2000);
+    this.ctx.fillStyle = 'rgba(255, 210, 0, 0.08)';
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, 160, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.strokeStyle = 'rgba(255, 210, 0, 0.2)';
+    this.ctx.lineWidth = 4;
+    this.ctx.stroke();
+    this.ctx.fillStyle = 'rgba(214, 48, 49, 0.15)';
+    this.ctx.font = 'bold 80px sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText('1С', 0, 0);
+    this.ctx.restore();
+
+    // Границы базы
+    const bMin = this.BOUND_MIN;
+    const bMax = this.BOUND_MAX;
+    this.ctx.strokeStyle = '#d63031';
+    this.ctx.lineWidth = 8;
+    this.ctx.strokeRect(bMin, bMin, bMax - bMin, bMax - bMin);
+
+    this.ctx.strokeStyle = '#ffd200';
+    this.ctx.lineWidth = 3;
+    this.ctx.setLineDash([16, 12]);
+    this.ctx.strokeRect(bMin - 6, bMin - 6, (bMax - bMin) + 12, (bMax - bMin) + 12);
+    this.ctx.setLineDash([]);
+
+    this.ctx.font = 'bold 16px monospace';
+    this.ctx.fillStyle = '#ff7675';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('⚠️ ГРАНИЦА ИНФОРМАЦИОННОЙ БАЗЫ: ВЫХОД ЗАПРЕЩЕН ТРАНЗАКЦИЕЙ ⚠️', 2000, bMin + 28);
+    this.ctx.fillText('⚠️ ГРАНИЦА ИНФОРМАЦИОННОЙ БАЗЫ: ВЫХОД ЗАПРЕЩЕН ТРАНЗАКЦИЕЙ ⚠️', 2000, bMax - 20);
+
+    // Лужи
+    for (let pud of this.puddles) {
+      this.ctx.beginPath();
+      this.ctx.arc(pud.x, pud.y, pud.radius, 0, Math.PI * 2);
+      this.ctx.fillStyle = pud.isTrail ? 'rgba(9, 132, 227, 0.3)' : 'rgba(255, 234, 167, 0.35)';
+      this.ctx.fill();
+    }
+
+    // Хлыст
+    for (let w of this.whipSlashes) {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.arc(w.x, w.y, w.radius, w.angle - 0.75, w.angle + 0.75);
+      this.ctx.strokeStyle = '#0984e3';
+      this.ctx.lineWidth = 9;
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
+    // Дискеты
+    for (let g of this.gems) {
+      this.ctx.fillStyle = g.col;
+      this.ctx.fillRect(g.x - 4, g.y - 4, 8, 8);
+    }
+
+    // Лут
+    for (let item of this.pickups) {
+      this.ctx.font = '22px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(item.icon, item.x, item.y);
+    }
+
+    // Враги и боссы
+    for (let e of this.enemies) {
+      this.ctx.save();
+      this.ctx.translate(e.x, e.y);
+
+      // Особая аура для ярости или боссов
+      if (e.isBoss) {
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, e.size + 8, 0, Math.PI * 2);
+        this.ctx.strokeStyle = e.enrage ? '#ff0000' : 'rgba(255, 210, 0, 0.5)';
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
+      }
+
+      this.ctx.fillStyle = e.col;
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, e.size, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.strokeStyle = e.isBoss ? '#ffd200' : (e.freezeTimer > 0 ? '#00cec9' : '#fff');
+      this.ctx.lineWidth = e.isBoss ? 4 : 1.5;
+      this.ctx.stroke();
+
+      this.ctx.font = `${Math.floor(e.size * 1.1)}px sans-serif`;
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(e.freezeTimer > 0 ? '❄️' : e.icon, 0, 1);
+
+      if (e.hp < e.maxHp) {
+        const bw = e.size * 2;
+        this.ctx.fillStyle = '#111';
+        this.ctx.fillRect(-e.size, -e.size - 10, bw, 6);
+        this.ctx.fillStyle = e.isBoss ? '#e74c3c' : '#2ecc71';
+        this.ctx.fillRect(-e.size, -e.size - 10, bw * Math.max(0, e.hp / e.maxHp), 6);
+      }
+      this.ctx.restore();
+    }
+
+    // Турникеты
+    if (this.weapons.turnstile) {
+      const w = this.weapons.turnstile;
+      const bladeCount = Math.min(5, 1 + Math.floor(w.lvl / 2));
+      const orbitRadius = 88;
+      for (let i = 0; i < bladeCount; i++) {
+        const a = w.angle + (i * (Math.PI * 2 / bladeCount));
+        const bx = this.player.x + Math.cos(a) * orbitRadius;
+        const by = this.player.y + Math.sin(a) * orbitRadius;
+        this.ctx.font = '22px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🚧', bx, by);
+      }
+    }
+
+    // Снаряды
+    for (let p of this.projectiles) {
+      if (p.type === 'laser_visual') {
+        this.ctx.strokeStyle = '#ff4757';
+        this.ctx.lineWidth = 3;
+        for (let l of p.lines) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(l.x1, l.y1);
+          this.ctx.lineTo(l.x2, l.y2);
+          this.ctx.stroke();
+        }
+      } else {
+        this.ctx.font = `${p.size * 1.5}px monospace`;
+        this.ctx.fillStyle = p.color;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(p.icon, p.x, p.y);
+      }
+    }
+
+    // Пули врагов
+    for (let ep of this.enemyProjectiles) {
+      this.ctx.font = '16px monospace';
+      this.ctx.fillStyle = ep.color;
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(ep.icon, ep.x, ep.y);
+    }
+
+    // Игрок
+    this.ctx.save();
+    this.ctx.translate(this.player.x, this.player.y);
+
+    if (this.player.turboBuffTimer > 0) {
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, 32, 0, Math.PI * 2);
+      this.ctx.strokeStyle = '#00cec9';
+      this.ctx.setLineDash([6, 6]);
+      this.ctx.lineWidth = 3;
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+    }
+
+    if (this.player.shieldTimer > 0) {
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, 28, 0, Math.PI * 2);
+      this.ctx.strokeStyle = '#ffd200';
+      this.ctx.lineWidth = 4;
+      this.ctx.stroke();
+    }
+
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, 19, 0, Math.PI * 2);
+    this.ctx.fillStyle = '#ffd200';
+    this.ctx.fill();
+    this.ctx.strokeStyle = '#b29100';
+    this.ctx.lineWidth = 3;
+    this.ctx.stroke();
+
+    this.ctx.fillStyle = '#c0392b';
+    this.ctx.font = 'bold 12px sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText('1С', 0, 0);
+
+    this.ctx.fillStyle = '#2f3542';
+    this.ctx.fillRect(this.player.facingX * 12 - 4, this.player.facingY * 12 - 4, 8, 8);
+    this.ctx.restore();
+
+    // Частицы
+    for (let pt of this.particles) {
+      this.ctx.fillStyle = pt.col;
+      this.ctx.beginPath();
+      this.ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+
+    // Текстовые попапы
+    for (let t of this.texts) {
+      this.ctx.font = 'bold 13px monospace';
+      this.ctx.fillStyle = t.color;
+      this.ctx.fillText(t.text, t.x, t.y);
+    }
+
+    this.ctx.restore();
+  }
+
+  loop(currentTime) {
+    const dt = Math.min(Math.max(0, (currentTime - this.lastTime) / 1000), 0.05);
+    this.lastTime = currentTime;
+
+    if (!this.paused) {
+      this.update(dt);
+    }
+    this.render();
+
+    requestAnimationFrame((t) => this.loop(t));
+  }
+}
+
+window.onload = () => {
+  window.game = new Game();
+};
+</script>
+</body>
+</html>

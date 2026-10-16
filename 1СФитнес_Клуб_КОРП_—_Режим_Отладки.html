@@ -567,7 +567,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.3.0 — «Ночной клубный релиз»</h3>
-              <p>Обновлено музыкальное сопровождение: выразительнее ударные, бас и мелодическая тема. Сборка платформы: 8.3.27.1936.</p>
+              <p>При боссе музыка становится жёстче и плавно возвращается после боя. Уровни героя идут как релизы 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Больше историй из выездной техподдержки. Сборка: 8.3.27.1936.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.1.0 — «Закрытие смены»</h3>
@@ -602,7 +602,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Обновлено музыкальное сопровождение: выразительнее ударные, бас и мелодическая тема. Номер сборки фитнес-кластера — 8.3.27.1936.</p></div>
+        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Музыка плавно переходит в агрессивный режим при появлении босса и возвращается к обычной теме после гибели последнего; одновременные боссы усиливают общий режим без конфликтов. Уровни героя нумеруются релизами 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Переписаны реплики и описания про подключение оборудования, интеграции и развёртывание базы у клиента. Номер сборки — 8.3.27.1936.</p></div>
         <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Главное меню, настройки, таблица лидеров и журнал патчей. Магазин каждые 3 минуты, фиткоины за собранный XP, 4 ячейки расходников на 7–0 и новые активные умения. Новые интеграционные приколы: Sigur / AVI, АТОЛ, ШТРИХ, Эвотор, IronLogic и мессенджеры. Исправлены награды боссов, смерть от снарядов, скорость на разных FPS и серия уровней за накопленный XP.</p></div>
         <div class="release-notes"><h3>1.1.0 — «Закрытие смены»</h3><p>Исправлено случайное зависание на критическом попадании и закрытие послематчевой таблицы. Добавлены полоска HP и меню паузы. Ограничено количество игровых эффектов, смягчён рост толпы и переосмыслены бухгалтерские отсылки в сторону фитнес-клуба.</p></div>
         <div style="text-align:right;"><button class="btn-1c" onclick="game.closeChangelog()">Назад в меню</button></div>
@@ -743,6 +743,8 @@ class SoundEngine {
     this.musicTimer = null;
     this.step = 0;
     this.bpm = 132;
+    this.bossIntensity = 0;
+    this.bossCount = 0;
     this.nextNoteTime = 0;
     this.noiseBuffer = null;
   }
@@ -809,6 +811,14 @@ class SoundEngine {
     }
   }
 
+  updateBossMusic(dt, aliveBosses) {
+    this.bossCount = aliveBosses;
+    const target = aliveBosses > 0 ? Math.min(1, 0.82 + (aliveBosses - 1) * 0.12) : 0;
+    const transition = 1 - Math.exp(-dt / (target > this.bossIntensity ? 0.85 : 1.6));
+    this.bossIntensity += (target - this.bossIntensity) * transition;
+    this.bpm = 132 + this.bossIntensity * 40;
+  }
+
   scheduleBeat() {
     if (!this.ctx || !this.musicEnabled || game.paused) return;
 
@@ -829,14 +839,16 @@ class SoundEngine {
   playStep(step, time) {
     const barStep = step % 16;
     const bar = Math.floor(step / 16);
+    const boss = this.bossIntensity;
 
-    // Kick
-    if (barStep % 4 === 0) {
+    // На боссе бочка становится чаще и плотнее, а после его смерти сходит на нет.
+    if (barStep % 4 === 0 || (boss > 0.2 && (barStep === 6 || barStep === 14))) {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.frequency.setValueAtTime(160, time);
-      osc.frequency.exponentialRampToValueAtTime(34, time + 0.09);
-      gain.gain.setValueAtTime(0.35, time);
+      const offbeat = barStep === 6 || barStep === 14;
+      osc.frequency.setValueAtTime(offbeat ? 125 : 160 + boss * 25, time);
+      osc.frequency.exponentialRampToValueAtTime(30 + boss * 8, time + 0.09);
+      gain.gain.setValueAtTime(offbeat ? 0.12 * boss : 0.35 + boss * 0.12, time);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -845,7 +857,7 @@ class SoundEngine {
     }
 
     // Snare
-    if (barStep === 4 || barStep === 12) {
+    if (barStep === 4 || barStep === 12 || (boss > 0.55 && barStep === 15)) {
       if (this.noiseBuffer) {
         const noise = this.ctx.createBufferSource();
         noise.buffer = this.noiseBuffer;
@@ -853,7 +865,7 @@ class SoundEngine {
         filter.type = 'bandpass';
         filter.frequency.value = 1100;
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.18, time);
+        gain.gain.setValueAtTime(0.18 + boss * 0.13, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
         noise.connect(filter);
         filter.connect(gain);
@@ -864,15 +876,16 @@ class SoundEngine {
     }
 
     // Hi-Hat
-    if ((barStep % 2 === 0 || barStep === 7 || barStep === 15) && this.noiseBuffer) {
+    const hatEveryStep = boss > 0.45;
+    if ((hatEveryStep || barStep % 2 === 0 || barStep === 7 || barStep === 15) && this.noiseBuffer) {
       const noise = this.ctx.createBufferSource();
       noise.buffer = this.noiseBuffer;
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'highpass';
-      filter.frequency.value = 7500;
+      filter.frequency.value = 7500 - boss * 1600;
       const gain = this.ctx.createGain();
       const isOpen = (barStep === 7 || barStep === 15);
-      gain.gain.setValueAtTime(isOpen ? 0.09 : 0.04, time);
+      gain.gain.setValueAtTime((isOpen ? 0.09 : 0.04) + boss * (isOpen ? 0.07 : 0.035), time);
       gain.gain.exponentialRampToValueAtTime(0.001, time + (isOpen ? 0.09 : 0.04));
       noise.connect(filter);
       filter.connect(gain);
@@ -888,17 +901,17 @@ class SoundEngine {
     const freq = baseFreq * octave;
 
     const oscB = this.ctx.createOscillator();
-    oscB.type = 'sawtooth';
+    oscB.type = boss > 0.58 ? 'square' : 'sawtooth';
     oscB.frequency.setValueAtTime(freq, time);
 
     const filterB = this.ctx.createBiquadFilter();
     filterB.type = 'lowpass';
-    filterB.Q.value = 6;
-    filterB.frequency.setValueAtTime(1400, time);
-    filterB.frequency.exponentialRampToValueAtTime(320, time + 0.08);
+    filterB.Q.value = 6 + boss * 5;
+    filterB.frequency.setValueAtTime(1400 + boss * 900, time);
+    filterB.frequency.exponentialRampToValueAtTime(320 + boss * 130, time + 0.08);
 
     const gainB = this.ctx.createGain();
-    gainB.gain.setValueAtTime(0.16, time);
+    gainB.gain.setValueAtTime(0.16 + boss * 0.13, time);
     gainB.gain.exponentialRampToValueAtTime(0.001, time + 0.09);
 
     oscB.connect(filterB);
@@ -916,7 +929,8 @@ class SoundEngine {
         pad.type = 'sine';
         pad.frequency.setValueAtTime(chordRoot * interval, time);
         padGain.gain.setValueAtTime(0.0001, time);
-        padGain.gain.linearRampToValueAtTime(0.018, time + 0.04);
+        const padLevel = 0.018 * (1 - boss * 0.62);
+        padGain.gain.linearRampToValueAtTime(padLevel, time + 0.04);
         padGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.42);
         pad.connect(padGain);
         padGain.connect(this.ctx.destination);
@@ -929,14 +943,14 @@ class SoundEngine {
     const melodySteps = [0, 3, 6, 8, 11, 14];
     if (game.time > 12 && melodySteps.includes(barStep)) {
       const melodyRoot = [220, 174.61, 261.63, 196][bar];
-      const motif = [0, 3, 7, 10, 12, 10, 7, 3];
+      const motif = boss > 0.25 ? [0, 3, 5, 10, 12, 10, 5, 3] : [0, 3, 7, 10, 12, 10, 7, 3];
       const semitones = motif[(Math.floor(barStep / 2) + bar) % motif.length];
       const lead = this.ctx.createOscillator();
       const leadGain = this.ctx.createGain();
-      lead.type = 'triangle';
-      lead.frequency.setValueAtTime(melodyRoot * Math.pow(2, semitones / 12), time);
+      lead.type = boss > 0.55 ? 'sawtooth' : 'triangle';
+      lead.frequency.setValueAtTime(melodyRoot * Math.pow(2, semitones / 12) * (boss > 0.7 ? 0.5 : 1), time);
       leadGain.gain.setValueAtTime(0.0001, time);
-      leadGain.gain.linearRampToValueAtTime(0.045, time + 0.012);
+      leadGain.gain.linearRampToValueAtTime(0.045 + boss * 0.045, time + 0.012);
       leadGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.16);
       lead.connect(leadGain);
       leadGain.connect(this.ctx.destination);
@@ -995,30 +1009,30 @@ class SoundEngine {
    ============================================================ */
 const WEAPONS_DEF = {
   turnstile: {
-    name: 'СКУД Sigur / AVI: турникет',
+    name: 'Выезд: подключение СКУД Sigur / AVI',
     icon: '🚧',
-    desc: 'Антипассбэк не пустит толпу: турникеты Sigur / AVI отталкивают нарушителей очереди.',
+    desc: 'Клиент: «Коробочка мигает — значит подключена?» Техспец: «Питание есть. Теперь подключим контроллер и настроим обмен». Турникет отталкивает толпу.',
     baseCooldown: 0,
     baseDmg: 16
   },
   keys: {
-    name: 'Карты доступа IronLogic',
+    name: 'Пусконаладка считывателя IronLogic',
     icon: '🗝️',
-    desc: 'Считыватель IronLogic принимает карту с первого раза. Почти всегда. Стреляет картами по курсу.',
+    desc: 'На объекте всё подключено, но считыватель не видит карту. Техспец нашёл причину: кабель воткнули в соседний порт. Метает пропуска по курсу.',
     baseCooldown: 1.5,
     baseDmg: 26
   },
   syntax: {
     name: 'Синтаксис-Контроль',
     icon: '⚡',
-    desc: 'Пуляет операторы {;} в ближайших незакрытых багов.',
+    desc: 'Клиент трое суток не нажимал «Обновить конфигурацию». Техспец нажал — синтаксические ошибки посыпались на врагов.',
     baseCooldown: 0.85,
     baseDmg: 28
   },
   heavy_archive: {
     name: 'Чековый принтер ШТРИХ',
     icon: '🧾',
-    desc: 'Печатает чек длиной с очередь на продление абонемента. Пробивает толпу насквозь.',
+    desc: 'Заявка: «АТОЛ не печатает». Диагностика: лента вставлена наоборот. После пусконаладки чеки пробивают толпу насквозь.',
     baseCooldown: 2.8,
     baseDmg: 85
   },
@@ -1046,7 +1060,7 @@ const WEAPONS_DEF = {
   egais_laser: {
     name: 'АТОЛ: фискальный сканер',
     icon: '🔴',
-    desc: 'Красный лазерный луч, рикошетящий по нескольким целям.',
+    desc: 'Эвотор подключили, обмен настроили, счёт согласовали в трёх отделах. Теперь красный луч проходит по нескольким целям.',
     baseCooldown: 1.8,
     baseDmg: 34
   }
@@ -1077,7 +1091,7 @@ const PASSIVES_DEF = {
   cert_specialist: {
     name: 'Сертификат «1С:Специалист»',
     icon: '🎓',
-    desc: 'Повышает опыт за сбор строк кода на +30%.',
+    desc: 'Обновление конфигурации прошло у техспеца. Клиент пока ищет кнопку «Запустить новую версию». +30% к опыту.',
     mod: (p) => { p.xpMult += 0.30; }
   },
   overtime_pizza: {
@@ -1101,19 +1115,19 @@ const PASSIVES_DEF = {
   server_x64: {
     name: 'Сервер 1С Предприятие x64',
     icon: '🖥️',
-    desc: '+50% к радиусу сбора дискет. Сервер знает, кто записался, но не кто пришёл.',
+    desc: 'Развёртывание базы у клиента: на тестовом сервере всё летало, на боевом внезапно закончилось место. Магнит +50%.',
     mod: (p) => { p.magnetMult += 0.5; }
   },
   messenger_hub: {
     name: 'Интеграция мессенджеров',
     icon: '💬',
-    desc: 'MAX, Telegram и WhatsApp сходятся в одном окне: +18% к опыту за клиентские обращения.',
+    desc: 'Интеграция с мессенджерами настроена. Клиент всё равно звонит и спрашивает, дошло ли сообщение. +18% к опыту.',
     mod: (p) => { p.xpMult += 0.18; }
   },
   evotor_paid: {
     name: 'Эвотор: платная интеграция',
     icon: '💸',
-    desc: 'Интеграционный модуль уже оплачен: +22% к урону, но откат оружия длиннее на 8%.',
+    desc: 'Техспец подключил платный модуль Эвотор, настроил обмен и объяснил, почему оплата не равна интеграции. +22% к урону, откат дольше на 8%.',
     mod: (p) => { p.dmgMult += 0.22; p.cdMult *= 1.08; }
   },
   try_except: {
@@ -1220,7 +1234,7 @@ const ACTIVE_SKILLS_DEF = {
   act_messenger_blast: {
     name: 'Рассылка MAX / Telegram / WhatsApp',
     icon: '📣',
-    desc: 'Все клиенты одновременно получают push. Обычные враги замирают, боссам тоже приходится выключить звук.',
+    desc: 'Техспец настроил интеграцию — теперь даже клиент, отключивший уведомления, получает push. Обычные враги замирают; боссы тоже выключают звук.',
     baseCd: 30,
     cast: (g, lvl) => {
       g.sound.skillCast();
@@ -1294,7 +1308,7 @@ const ACTIVE_SKILLS_DEF = {
   act_evotor_approval: {
     name: 'Эвотор: согласование интеграции',
     icon: '💸',
-    desc: 'Счёт оплачен, модуль наконец подключён: временно +45% к урону.',
+    desc: 'Счёт согласован, модуль подключён, обмен проверен на тестовой базе: временно +45% к урону.',
     baseCd: 32,
     cast: (g, lvl) => {
       g.player.damageBuffMult = 1.45;
@@ -1617,6 +1631,10 @@ class Game {
     return (this.kills * 12) + (this.gemsCollected * 3);
   }
 
+  heroReleaseVersion() {
+    return `4.0.${this.level}.1`;
+  }
+
   showMainMenu() {
     this.paused = true;
     this.keys = {};
@@ -1838,7 +1856,7 @@ class Game {
 
     this.dynUpdateCd = 35;
     this.sound.dynamicUpdateSound();
-    this.showBanner("⚡ ДИНАМИЧЕСКОЕ ОБНОВЛЕНИЕ БАЗЫ! СЕАНСЫ ВРАГОВ ЗАМОРОЖЕНЫ!");
+    this.showBanner('⚡ ТЕХСПЕЦ НАКАТИЛ ОБНОВЛЕНИЕ КОНФИГУРАЦИИ. «БЭКАП ЕСТЬ?»');
     this.player.speedBuffTimer = 4.0;
 
     for (let e of this.enemies) {
@@ -1856,7 +1874,7 @@ class Game {
     }
     this.player.hp = Math.min(this.player.maxHp, this.player.hp + 30);
     this.sound.playTone(420, 'sine', 0.2, 0.15);
-    this.log("Заначка протеина: +30 HP к целостности базы!");
+    this.log('Техспец нашёл запасной протеин в серверной: +30 HP к целостности базы.');
     this.addPopup(this.player.x, this.player.y - 20, "+30 HP", "#2ecc71");
   }
 
@@ -1877,11 +1895,11 @@ class Game {
   triggerOfficeEvent() {
     const roll = Math.floor(Math.random() * 4);
     if (roll === 0) {
-      this.showBanner("🔥 ПЕРЕГРУЗКА РАСПИСАНИЯ: три групповые тренировки записаны в один зал!");
+      this.showBanner('🔥 Клиент подключил три кассы в один COM-порт и спрашивает, почему очередь.');
       this.player.speedBuffTimer = 10;
       for (let e of this.enemies) e.hp *= 0.8;
     } else if (roll === 1) {
-      this.showBanner("🎁 УДЕРЖАНИЕ КЛИЕНТА: промокод сработал дважды, опыт x2!");
+      this.showBanner('🎁 Клиент нажал «Обновить» после совета техспеца: конфигурация наконец обновлена, опыт x2!');
       this.player.xpEventMult = 2.0;
       this.player.xpBoostTimer = 14;
     } else if (roll === 2) {
@@ -1894,7 +1912,7 @@ class Game {
         });
       }
     } else {
-      this.showBanner("🎟️ АКЦИЯ НА ПРОДЛЕНИЕ: абонементы и дискеты опыта сыплются с потолка!");
+      this.showBanner('🎟️ Базу развернули на сервере клиента. Пароль от него нашли на стикере под клавиатурой!');
       for (let i = 0; i < 16; i++) {
         this.gems.push({
           x: this.player.x + (Math.random() - 0.5) * 350,
@@ -1999,50 +2017,50 @@ class Game {
 
     if (minute === 1) {
       b.bossType = 'deadlock';
-      b.name = 'ВЗАИМОБЛОКИРОВКА DEADLOCK MSSQL';
+      b.name = 'СКУД SIGUR НЕ ВИДИТ КОНТРОЛЛЕР';
       b.hp = 2700; b.dmg = 24; b.icon = '🔒'; b.col = '#c0392b';
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log("БОСС: Взаимоблокировка транзакций парализовала таблицы!");
+      this.log('Техспец: «Сервер клиента не видит СКУД». Клиент: «Она включена». Техспец: «А к сети подключена?»');
     } else if (minute === 2) {
       b.bossType = 'tax';
-      b.name = 'ДУБЛИ ЗАЯВОК В CRM';
+      b.name = 'КЛИЕНТ НАЖАЛ «ПОДКЛЮЧИТЬ» ДВЕНАДЦАТЬ РАЗ';
       b.hp = 3600; b.dmg = 28; b.icon = '📲'; b.col = '#8e44ad';
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log("БОСС: CRM записала клиента на две тренировки одновременно!");
+      this.log('Клиент: «Интеграция не сработала, я нажал ещё одиннадцать раз». Техспец открывает журнал обмена.');
     } else if (minute === 3) {
       b.bossType = 'tamara';
-      b.name = 'АБОНЕМЕНТ ИСТЁК В РАЗГАР ТРЕНИРОВКИ';
+      b.name = 'ОБНОВЛЕНИЕ КОНФИГУРАЦИИ БЕЗ РЕЗЕРВНОЙ КОПИИ';
       b.hp = 6000; b.dmg = 36; b.icon = '🎟️'; b.col = '#d35400';
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log("БОСС: Абонемент истёк ровно перед записью на тренировку!");
+      this.log('Клиент: «Обновляйте прямо сейчас». Техспец: «Резервная копия есть?» Клиент: «Какая копия?»');
     } else if (minute === 4) {
       b.bossType = 'ldf_blob';
-      b.name = 'ЛОГ ТРАНЗАКЦИЙ LDF РАЗДУЛСЯ ДО 3 ТБ';
+      b.name = 'БАЗА КЛИЕНТА РАЗВЁРНУТА НЕ НА ТОМ СЕРВЕРЕ';
       b.hp = 12500; b.dmg = 48; b.icon = '🗄️'; b.col = '#2c3e50';
       b.size = 52;
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log("БОСС: Жесткий диск переполнен файлами транзакций .ldf!");
+      this.log('База развернулась на сервере клиента. Свободно 2 ГБ. Резервная копия весит 240 ГБ.');
     } else if (minute === 5) {
       b.bossType = 'ceo';
-      b.name = 'ГЕНЕРАЛЬНЫЙ ДИРЕКТОР: «НАДО БЫЛО ВЧЕРА»';
+      b.name = 'КЛИЕНТСКИЙ СЕРВЕР ВЫКЛЮЧИЛИ ИЗ РОЗЕТКИ';
       b.hp = 16500; b.dmg = 54; b.icon = '👔'; b.col = '#b71540';
       b.size = 50;
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log("БОСС: Гендир собрал внеочередную планёрку на весь день!");
+      this.log('Клиент: «После обновления всё перестало работать». Техспец: «Сервер включён?» Клиент: «Он шумел».');
     } else if (minute === 6) {
       b.bossType = 'franchisee';
-      b.name = 'ФРАНЧАЙЗИ-ИНТЕГРАТОР НА ПОЧАСОВКЕ';
+      b.name = 'ПУСКОНАЛАДКА: «А ЭТОТ КАБЕЛЬ КУДА?»';
       b.hp = 21000; b.dmg = 58; b.icon = '💸'; b.col = '#10ac84';
       b.size = 54;
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log("БОСС: Интегратор прислал смету настройки клуба на 400 часов!");
+      this.log('Клиент: «Я сам подключил турникет». Техспец: «Почему он подключён к кассе?» Клиент: «Разъём подошёл».');
     } else {
       b.bossType = 'friday_deploy';
-      b.name = `АВАРИЙНЫЙ РЕЛИЗ В ПЯТНИЦУ 18:00 (ЭТАП ${minute})`;
+      b.name = `ОБНОВЛЕНИЕ В ПЯТНИЦУ 18:00 БЕЗ БЭКАПА (ЭТАП ${minute})`;
       b.hp = 24000 + minute * 3500; b.dmg = 64; b.icon = '💥'; b.col = '#ff0055';
       b.size = 58;
       this.showBanner(`🚨 МЕГА-БОСС: ${b.name}!`);
-      this.log(`МЕГА-БОСС: Конфигурация повреждена необратимо!`);
+      this.log('Клиент: «Можно обновить без остановки?» Техспец: «Можно. Но сначала сделаем копию». Клиент: «Не успеем, я уже нажал».');
     }
 
     this.sound.boss();
@@ -2440,6 +2458,11 @@ class Game {
   }
 
   update(dt) {
+    let aliveBosses = 0;
+    for (const enemy of this.enemies) {
+      if (enemy.isBoss && enemy.hp > 0) aliveBosses++;
+    }
+    this.sound.updateBossMusic(dt, aliveBosses);
     this.time += dt;
     if (this.time >= this.nextShopTime) {
       this.openShop();
@@ -2788,7 +2811,7 @@ class Game {
     this.player.dmgMult += 0.02;
     this.player.baseSpeed += 0.02;
 
-    this.addPopup(this.player.x, this.player.y - 30, `ГРЕЙД UP! +10 MAX HP & +2% СИЛЫ`, '#ffd200');
+    this.addPopup(this.player.x, this.player.y - 30, `РЕЛИЗ ${this.heroReleaseVersion()} УСТАНОВЛЕН!`, '#ffd200');
 
     // Сбор доступных улучшений
     const available = [];
@@ -3013,7 +3036,7 @@ class Game {
   updateHUD() {
     const pct = Math.min(100, (this.xp / this.nextXp) * 100);
     document.getElementById('xp-bar-fill').style.width = pct + '%';
-    document.getElementById('xp-bar-text').innerText = `РЕЛИЗ ${this.level}.0.0 [${this.xp} / ${this.nextXp} СТРОК КОДА]`;
+    document.getElementById('xp-bar-text').innerText = `РЕЛИЗ ${this.heroReleaseVersion()} [${this.xp} / ${this.nextXp} СТРОК КОДА]`;
 
     const m = Math.floor(this.time / 60).toString().padStart(2, '0');
     const s = Math.floor(this.time % 60).toString().padStart(2, '0');

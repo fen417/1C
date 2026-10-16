@@ -567,7 +567,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.3.0 — «Ночной клубный релиз»</h3>
-              <p>При боссе музыка становится жёстче и плавно возвращается после боя. Уровни героя идут как релизы 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Больше историй телефонной поддержки, подключений через AnyDesk и Rudesktop. Сборка: 8.3.27.1936.</p>
+              <p>При боссе музыка становится жёстче и плавно возвращается после боя. Уровни героя идут как релизы 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Рикошет, мультивыстрел и замедляющие снаряды прокачиваются до 5 уровня. Больше историй телефонной поддержки через Манго Офис, AnyDesk и Rudesktop. Сборка: 8.3.27.1936.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.1.0 — «Закрытие смены»</h3>
@@ -602,7 +602,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Музыка плавно переходит в агрессивный режим при появлении босса и возвращается к обычной теме после гибели последнего; одновременные боссы усиливают общий режим без конфликтов. Уровни героя нумеруются релизами 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Переписаны реплики телефонной техподдержки: звонки через Манго Офис, удалённые подключения через AnyDesk и Rudesktop, а также истории про оборудование, интеграции и базы на сервере клиента. Номер сборки — 8.3.27.1936.</p></div>
+        <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Музыка плавно переходит в агрессивный режим при появлении босса и возвращается к обычной теме после гибели последнего; одновременные боссы усиливают общий режим без конфликтов. Уровни героя нумеруются релизами 4.0.1.1, 4.0.2.1, 4.0.3.1 и далее. Новые боевые улучшения: рикошет, мультивыстрел и замедляющие снаряды — каждое до 5 уровней. Переписаны реплики телефонной техподдержки через Манго Офис, AnyDesk и Rudesktop. Номер сборки — 8.3.27.1936.</p></div>
         <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Главное меню, настройки, таблица лидеров и журнал патчей. Магазин каждые 3 минуты, фиткоины за собранный XP, 4 ячейки расходников на 7–0 и новые активные умения. Новые интеграционные приколы: Sigur / AVI, АТОЛ, ШТРИХ, Эвотор, IronLogic и мессенджеры. Исправлены награды боссов, смерть от снарядов, скорость на разных FPS и серия уровней за накопленный XP.</p></div>
         <div class="release-notes"><h3>1.1.0 — «Закрытие смены»</h3><p>Исправлено случайное зависание на критическом попадании и закрытие послематчевой таблицы. Добавлены полоска HP и меню паузы. Ограничено количество игровых эффектов, смягчён рост толпы и переосмыслены бухгалтерские отсылки в сторону фитнес-клуба.</p></div>
         <div style="text-align:right;"><button class="btn-1c" onclick="game.closeChangelog()">Назад в меню</button></div>
@@ -1394,6 +1394,21 @@ const CONSUMABLES_DEF = {
 /* ============================================================
    ПОВТОРЯЕМЫЕ КАРТОЧКИ (ФИКС ЗАВИСАНИЯ НА 9+ ЛВЛ)
    ============================================================ */
+const COMBAT_UPGRADES = {
+  ricochet: {
+    name: 'Рикошет снаряда', icon: '↗️',
+    desc: 'Снаряды отскакивают ещё к одному противнику за каждый уровень. Максимум 5 рикошетов.'
+  },
+  multishot: {
+    name: 'Мультивыстрел', icon: '🎯',
+    desc: 'Каждый уровень добавляет один снаряд к залпу. Максимум +5 снарядов.'
+  },
+  slowshot: {
+    name: 'Замедляющие снаряды', icon: '❄️',
+    desc: 'Попадания замедляют противников сильнее с каждым уровнем. Максимум 5 уровней.'
+  }
+};
+
 const REPEATABLE_UPGRADES = [
   {
     key: 'rep_bonus_pay',
@@ -1583,6 +1598,9 @@ class Game {
       critChance: 0.05,
       dodge: 0,
       regen: 0,
+      ricochetLevel: 0,
+      multishotLevel: 0,
+      slowShotLevel: 0,
       hasShoeTrail: false,
       hasBackupShield: false,
       shieldTimer: 0,
@@ -2250,6 +2268,14 @@ class Game {
     return { dmg, isCrit };
   }
 
+  applyProjectileSlow(enemy) {
+    const level = this.player.slowShotLevel || 0;
+    if (level <= 0) return;
+    const slowPower = Math.min(0.4, level * 0.08) * (enemy.isBoss ? 0.5 : 1);
+    enemy.slowFactor = Math.min(enemy.slowFactor ?? 1, 1 - slowPower);
+    enemy.slowTimer = Math.max(enemy.slowTimer || 0, 2.2);
+  }
+
   updateWeapons(dt) {
     let cdFactor = this.player.cdMult;
     if (this.player.turboBuffTimer > 0) {
@@ -2287,7 +2313,7 @@ class Game {
       w.timer -= dt;
       if (w.timer <= 0) {
         w.timer = WEAPONS_DEF.keys.baseCooldown * cdFactor;
-        const count = Math.min(6, 1 + Math.floor(w.lvl / 2));
+        const count = Math.min(6, 1 + Math.floor(w.lvl / 2)) + this.player.multishotLevel;
         const baseA = Math.atan2(this.player.facingY, this.player.facingX);
         for (let i = 0; i < count; i++) {
           const a = baseA + (i - (count - 1) / 2) * 0.13;
@@ -2316,13 +2342,17 @@ class Game {
         }
         if (target) {
           const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.syntax.baseDmg + w.lvl * 9);
-          this.projectiles.push({
-            x: this.player.x, y: this.player.y,
-            vx: Math.cos(angle) * 10.0, vy: Math.sin(angle) * 10.0,
-            dmg: hit.dmg, isCrit: hit.isCrit,
-            life: 1.4, icon: '{;}', color: '#00cec9', size: 8
-          });
+          const extraShots = this.player.multishotLevel;
+          for (let i = 0; i <= extraShots; i++) {
+            const shotAngle = angle + (i - extraShots / 2) * 0.12;
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.syntax.baseDmg + w.lvl * 9);
+            this.projectiles.push({
+              x: this.player.x, y: this.player.y,
+              vx: Math.cos(shotAngle) * 10.0, vy: Math.sin(shotAngle) * 10.0,
+              dmg: hit.dmg, isCrit: hit.isCrit,
+              life: 1.4, icon: '{;}', color: '#00cec9', size: 8
+            });
+          }
           this.sound.playTone(460, 'sine', 0.04, 0.08);
         }
       }
@@ -2335,13 +2365,17 @@ class Game {
       if (w.timer <= 0) {
         w.timer = WEAPONS_DEF.heavy_archive.baseCooldown * cdFactor;
         const ang = Math.atan2(this.player.facingY, this.player.facingX);
-        const hit = this.dealPlayerDamage(WEAPONS_DEF.heavy_archive.baseDmg + w.lvl * 25);
-        this.projectiles.push({
-          x: this.player.x, y: this.player.y,
-          vx: Math.cos(ang) * 5.8, vy: Math.sin(ang) * 5.8,
-          dmg: hit.dmg, isCrit: hit.isCrit,
-          life: 2.5, icon: '💾', color: '#0984e3', size: 22, piercing: true, hits: []
-        });
+        const extraShots = this.player.multishotLevel;
+        for (let i = 0; i <= extraShots; i++) {
+          const shotAngle = ang + (i - extraShots / 2) * 0.10;
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.heavy_archive.baseDmg + w.lvl * 25);
+          this.projectiles.push({
+            x: this.player.x, y: this.player.y,
+            vx: Math.cos(shotAngle) * 5.8, vy: Math.sin(shotAngle) * 5.8,
+            dmg: hit.dmg, isCrit: hit.isCrit,
+            life: 2.5, icon: '💾', color: '#0984e3', size: 22, piercing: true, hits: []
+          });
+        }
         this.sound.playTone(180, 'sawtooth', 0.15, 0.25);
       }
     }
@@ -2572,6 +2606,7 @@ class Game {
           for (let e of this.enemies) {
             if (!p.hits.includes(e) && Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
               e.hp -= p.dmg;
+              this.applyProjectileSlow(e);
               p.hits.push(e);
               this.createHitFX(p.x, p.y, p.color, 4);
               this.sound.hit();
@@ -2580,14 +2615,41 @@ class Game {
           }
         } else {
           for (let e of this.enemies) {
+            if (p.hitTargets?.includes(e)) continue;
             if (Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
               e.hp -= p.dmg;
+              this.applyProjectileSlow(e);
               this.createHitFX(p.x, p.y, p.color);
               this.sound.hit();
               if (p.isCrit) {
                 this.addPopup(e.x, e.y - 15, `КРИТ! ${Math.round(p.dmg)}`, '#f1c40f');
               }
-              p.life = 0;
+              p.hitTargets ||= [];
+              p.hitTargets.push(e);
+              p.ricochetsRemaining ??= this.player.ricochetLevel || 0;
+              let nextTarget = null;
+              let closest = 300;
+              if (p.ricochetsRemaining > 0) {
+                for (const candidate of this.enemies) {
+                  if (candidate.hp <= 0 || p.hitTargets.includes(candidate)) continue;
+                  const distance = Math.hypot(candidate.x - p.x, candidate.y - p.y);
+                  if (distance < closest) {
+                    closest = distance;
+                    nextTarget = candidate;
+                  }
+                }
+              }
+              if (nextTarget) {
+                const angle = Math.atan2(nextTarget.y - p.y, nextTarget.x - p.x);
+                const speed = Math.hypot(p.vx, p.vy);
+                p.vx = Math.cos(angle) * speed;
+                p.vy = Math.sin(angle) * speed;
+                p.ricochetsRemaining--;
+                p.dmg *= 0.82;
+                p.color = '#ffeaa7';
+              } else {
+                p.life = 0;
+              }
               break;
             }
           }
@@ -2649,9 +2711,15 @@ class Game {
         continue;
       }
 
+      if (e.slowTimer > 0) {
+        e.slowTimer = Math.max(0, e.slowTimer - dt);
+        if (e.slowTimer === 0) e.slowFactor = 1;
+      }
+
       const ang = Math.atan2(this.player.y - e.y, this.player.x - e.x);
-      e.x += Math.cos(ang) * e.speed * frameScale;
-      e.y += Math.sin(ang) * e.speed * frameScale;
+      const moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1);
+      e.x += Math.cos(ang) * moveSpeed * frameScale;
+      e.y += Math.sin(ang) * moveSpeed * frameScale;
 
       if (e.isBoss) {
         this.updateBossAI(e, dt);
@@ -2840,6 +2908,17 @@ class Game {
       }
     }
 
+    // Боевые модификаторы доступны до 5 уровня каждый.
+    for (const [key, stat] of Object.entries({
+      ricochet: 'ricochetLevel',
+      multishot: 'multishotLevel',
+      slowshot: 'slowShotLevel'
+    })) {
+      if (this.player[stat] < 5) {
+        available.push({ type: 'combat_up', key, def: COMBAT_UPGRADES[key], lvl: this.player[stat] + 1 });
+      }
+    }
+
     // ГАРАНТИЯ: Если доступных карт меньше 3 (например, на 9+ релизе всё выкачано),
     // добиваем повторяемыми денежными бонусами, чтобы игра никогда не висла!
     let choices = available.sort(() => 0.5 - Math.random()).slice(0, 3);
@@ -2912,6 +2991,10 @@ class Game {
     } else if (ch.type === 'active_up') {
       const item = this.activeSkills.find(s => s && s.key === ch.key);
       if (item) item.lvl++;
+    } else if (ch.type === 'combat_up') {
+      const statByKey = { ricochet: 'ricochetLevel', multishot: 'multishotLevel', slowshot: 'slowShotLevel' };
+      const stat = statByKey[ch.key];
+      if (stat) this.player[stat] = Math.min(5, this.player[stat] + 1);
     } else if (ch.type === 'repeatable') {
       ch.applyFn(this);
     }

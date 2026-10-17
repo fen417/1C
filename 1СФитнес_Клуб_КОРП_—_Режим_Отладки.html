@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.5.0</title>
+<title>1С:Фитнес Клуб КОРП 1.6.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -580,7 +580,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.5.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.6.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -697,7 +697,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.5.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.6.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -705,16 +705,16 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.5.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.6.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 1.5.0 — «Новые обращения»</h3>
-              <p>Принимайте срочные задания и получайте опыт. В паузе можно посмотреть все собранные умения, улучшения, активные эффекты и расходники. Усиленные улучшения теперь требуют небольшого компромисса.</p>
+              <h3>Версия 1.6.0 — «Релиз без отката»</h3>
+              <p>На помощь можно вызвать техподдержку, между мини-боссами появилась передышка, а большие боссы приходят с разными атаками. Тикеты стали сложнее и срочнее, в прокачке появились новые усиления.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
-              <h3>Версия 1.4.0 — «Центральный кластер»</h3>
-              <p>Каждые пять минут появляется большой босс с новыми атаками и собственной музыкой. Слоты расходников закреплены: после использования предметы не перемещаются.</p>
+              <h3>Версия 1.5.0 — «Новые обращения»</h3>
+              <p>Принимайте срочные задания и получайте опыт. В паузе можно посмотреть все собранные умения, улучшения, активные эффекты и расходники. Усиленные улучшения теперь требуют небольшого компромисса.</p>
             </div>
           </div>
         </div>
@@ -745,6 +745,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
+        <div class="release-notes"><h3>1.6.0 — «Релиз без отката»</h3><p>На помощь можно вызвать техподдержку, между мини-боссами появилась передышка, а большие боссы приходят с разными атаками. Тикеты стали сложнее и срочнее, в прокачке появились новые усиления.</p></div>
         <div class="release-notes"><h3>1.5.0 — «Новые обращения»</h3><p>Время от времени появляются задания от клиентов. Беритесь за них, пока не истёк срок, и получайте дополнительный опыт. В паузе можно посмотреть все собранные умения, улучшения, активные эффекты и расходники. Усиленные улучшения теперь требуют небольшого компромисса.</p></div>
         <div class="release-notes"><h3>1.4.0 — «Центральный кластер»</h3><p>Большой босс приходит каждые пять минут и проверяет, насколько хорошо вы умеете уклоняться. У него своя музыка, а расходники больше не меняются местами после использования.</p></div>
         <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Боссы получили собственное музыкальное сопровождение. В прокачке появились новые улучшения снарядов, а отдел продаж теперь иногда звонит с заманчивыми предложениями. Добавлены новые шутки про телефонную техподдержку и её непростые подключения.</p></div>
@@ -866,7 +867,7 @@
 </div>
 
 <script>
-const GAME_VERSION = '1.5.0';
+const GAME_VERSION = '1.6.0';
 /* ============================================================
    КОНФИГУРАЦИЯ DREAMLO
    ============================================================ */
@@ -1319,6 +1320,18 @@ const PASSIVES_DEF = {
     icon: '🩹',
     desc: 'Регенерация целостности базы (+2.5 HP в секунду).',
     mod: (p) => { p.regen += 2.5; }
+  },
+  mango_hold: {
+    name: 'Клиент ищет кнопку «Разрешить»',
+    icon: '📞',
+    desc: 'Пока клиент сверяет код из SMS с письмом, опыт приходит быстрее. Но отвлекающие звонки немного снижают урон.',
+    mod: (p) => { p.xpMult += 0.08; p.dmgMult -= 0.015; }
+  },
+  rudesktop_lag: {
+    name: 'Rudesktop: курсор уже почти здесь',
+    icon: '🖱️',
+    desc: 'Пока экран обновляет один пиксель, специалист успевает сделать больше. Скорость выше, перезарядка чуть дольше.',
+    mod: (p) => { p.speedMult += 0.07; p.cdMult *= 1.04; }
   }
 };
 
@@ -1512,6 +1525,45 @@ const ACTIVE_SKILLS_DEF = {
       g.gems.push({ x: g.player.x + 12, y: g.player.y, xp: 12 + lvl * 3, col: '#55efc4' });
       g.addPopup(g.player.x, g.player.y - 34, `📲 КЛИЕНТ ВЕРНУЛСЯ! +${heal} HP`, '#55efc4');
       g.sound.playTone(660, 'sine', 0.24, 0.18);
+    }
+  },
+  act_support_call: {
+    name: 'Позвать помощь с техподдержки',
+    icon: '☎️',
+    desc: 'На срок действия подключаются 1–4 помощника (по уровню навыка). Следуют за вами, атакуют ближайших врагов и могут принять на себя вражеский снаряд.',
+    baseCd: 38,
+    cast: (g, lvl) => {
+      g.summons = g.summons.filter(s => s.role !== 'support');
+      const count = Math.min(4, Math.max(1, lvl));
+      for (let i = 0; i < count; i++) {
+        g.summons.push({
+          role: 'support', id: `${g.time}-${i}`, x: g.player.x + (Math.random() - 0.5) * 50,
+          y: g.player.y + (Math.random() - 0.5) * 50, size: 13,
+          hp: 78 + lvl * 16, maxHp: 78 + lvl * 16, life: 11 + lvl * 1.4, maxLife: 11 + lvl * 1.4,
+          dmg: 15 + lvl * 4, attackTimer: 0.4 + i * 0.18, orbitAngle: i * (Math.PI * 2 / count),
+          icon: '🧑‍💻', color: '#55efc4'
+        });
+      }
+      g.addPopup(g.player.x, g.player.y - 34, `☎️ ПОДКЛЮЧЕНО СПЕЦИАЛИСТОВ: ${count}`, '#55efc4');
+      g.sound.playTone(620, 'sine', 0.22, 0.17);
+    }
+  },
+  act_senior_escalation: {
+    name: 'Эскалация во вторую линию',
+    icon: '🧑‍🔧',
+    desc: 'На время приходит старший специалист: выдерживает урон и периодически разбирает толпу вокруг себя. Боссы получают меньше урона.',
+    baseCd: 44,
+    cast: (g, lvl) => {
+      g.summons = g.summons.filter(s => s.role !== 'senior');
+      const duration = 8 + lvl * 1.6;
+      g.summons.push({
+        role: 'senior', id: `${g.time}-senior`, x: g.player.x + 38, y: g.player.y + 20,
+        size: 18, hp: 205 + lvl * 38, maxHp: 205 + lvl * 38,
+        life: duration, maxLife: duration, dmg: 34 + lvl * 9, attackTimer: 1.2,
+        orbitAngle: Math.PI, icon: '🧑‍🔧', color: '#f1c40f'
+      });
+      g.addPopup(g.player.x, g.player.y - 34, '🧑‍🔧 ВТОРАЯ ЛИНИЯ ПОДКЛЮЧИЛАСЬ', '#f1c40f');
+      g.sound.playTone(460, 'triangle', 0.3, 0.2);
     }
   }
 };
@@ -1811,6 +1863,7 @@ class Game {
     this.activeSkills = [null, null, null, null];
 
     this.enemies = [];
+    this.summons = [];
     this.projectiles = [];
     this.enemyProjectiles = [];
     this.puddles = [];
@@ -1825,6 +1878,7 @@ class Game {
     this.trailTimer = 0;
     this.backupTimer = 38;
     this.nextBossMinute = 1;
+    this.nextMiniBossAllowedTime = 0;
     this.nextMegaBossTime = 300;
     this.nextBananaSupplyTime = 75;
     this.megaBossCount = 0;
@@ -1973,36 +2027,39 @@ class Game {
 
   createChallenge() {
     const difficulty = Math.min(8, Math.floor(this.time / 240));
-    const killsTarget = Math.min(42, 28 + difficulty * 2);
-    const gemsTarget = Math.min(16, 11 + Math.floor(difficulty / 2));
+    const killsTarget = Math.min(62, 38 + difficulty * 3);
+    const gemsTarget = Math.min(22, 14 + difficulty);
+    const shooterTarget = Math.min(15, 7 + difficulty);
+    const comboKills = Math.min(42, 26 + difficulty * 2);
+    const comboGems = Math.min(14, 10 + Math.floor(difficulty / 2));
     const options = [
       {
-        objectives: [{ type: 'kills', target: killsTarget, label: 'устранить багов' }], duration: 55,
-        reward: 42 + difficulty * 3,
-        title: `После обновления конфигурации у клиента размножились ошибки. Устранить ${killsTarget} до конца смены — времени 55 секунд.`
+        objectives: [{ type: 'kills', target: killsTarget, label: 'устранить багов' }], duration: 43,
+        reward: 58 + difficulty * 4,
+        title: `После обновления конфигурации продакшен сыплет ошибками. Устранить ${killsTarget} за 43 секунды: клиент уже ждёт на линии.`
       },
       {
-        objectives: [{ type: 'gems', target: gemsTarget, label: 'собрать дискет опыта' }], duration: 65,
-        reward: 44 + difficulty * 3,
-        title: `Серверная база забита необработанными обращениями. Собрать ${gemsTarget} дискет опыта за 65 секунд и не потерять ни одной.`
+        objectives: [{ type: 'gems', target: gemsTarget, label: 'собрать дискет опыта' }], duration: 48,
+        reward: 60 + difficulty * 4,
+        title: `На сервере клиента свободного места на одну выгрузку. Собрать ${gemsTarget} дискет опыта за 48 секунд, пока он не прислал скриншот ошибки.`
       },
       {
-        objectives: [{ type: 'survive', target: 38, label: 'продержаться без урона, сек.' }], duration: 48,
-        reward: 48 + difficulty * 3,
-        title: 'Подключение к серверу клиента через Rudesktop: пережить 38 секунд без урона, пока экран через Манго Офис расшаривают в третий раз.'
+        objectives: [{ type: 'survive', target: 32, label: 'продержаться без урона, сек.' }], duration: 36,
+        reward: 64 + difficulty * 4,
+        title: 'Подключение к серверу через Rudesktop: продержаться 32 секунды без урона. Клиент уже трижды спросил, виден ли его экран в Манго Офис.'
       },
       {
-        objectives: [{ type: 'shooters', target: 5 + Math.floor(difficulty / 2), label: 'нейтрализовать удалённых специалистов' }], duration: 75,
-        reward: 52 + difficulty * 3,
-        title: `У клиента зависла интеграция, а удалённая команда шлёт встречные запросы. Остановить ${5 + Math.floor(difficulty / 2)} дальнобойных специалистов за 75 секунд.`
+        objectives: [{ type: 'shooters', target: shooterTarget, label: 'нейтрализовать удалённых специалистов' }], duration: 55,
+        reward: 68 + difficulty * 4,
+        title: `Интеграция не отвечает, а удалённая команда шлёт встречные запросы. Остановить ${shooterTarget} дальнобойных специалистов за 55 секунд.`
       },
       {
         objectives: [
-          { type: 'kills', target: Math.min(27, 18 + difficulty), label: 'устранить багов' },
-          { type: 'gems', target: Math.min(10, 7 + Math.floor(difficulty / 3)), label: 'собрать дискет опыта' }
-        ], duration: 70,
-        reward: 60 + difficulty * 4,
-        title: `После переноса базы на сервер проверить результат: устранить ${Math.min(27, 18 + difficulty)} ошибок и собрать ${Math.min(10, 7 + Math.floor(difficulty / 3))} дискет опыта за 70 секунд.`
+          { type: 'kills', target: comboKills, label: 'устранить багов' },
+          { type: 'gems', target: comboGems, label: 'собрать дискет опыта' }
+        ], duration: 52,
+        reward: 78 + difficulty * 5,
+        title: `После переноса базы на сервер: устранить ${comboKills} ошибок и собрать ${comboGems} дискет за 52 секунды. Окно обновления уже согласовано.`
       }
     ];
     const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
@@ -2296,6 +2353,10 @@ class Game {
       section('Пассивные улучшения', passives),
       section('Боевые модификаторы', combat),
       section('Активные умения · 1–4', active),
+      section('Помощники на линии', this.summons.map(s => ({
+        icon: s.icon, name: s.role === 'senior' ? 'Старший специалист второй линии' : 'Специалист техподдержки',
+        value: `${Math.ceil(s.hp)} HP · ${Math.ceil(s.life)}с`, detail: 'Следует за героем и помогает в бою.'
+      }))),
       section('Временные усиления', temporary),
       section('Расходники в слотах', consumables)
     ].join('');
@@ -2374,6 +2435,57 @@ class Game {
       }
     } else {
       this.sound.playTone(180, 'square', 0.06, 0.05);
+    }
+  }
+
+  updateSummons(dt, frameScale) {
+    if (!this.summons?.length) return;
+    for (let i = this.summons.length - 1; i >= 0; i--) {
+      const summon = this.summons[i];
+      summon.life -= dt;
+      if (summon.life <= 0 || summon.hp <= 0) {
+        this.summons.splice(i, 1);
+        if (summon.hp <= 0) this.addPopup(summon.x, summon.y - 18, 'Связь со специалистом потеряна', '#a4b0be');
+        continue;
+      }
+
+      summon.orbitAngle += dt * (summon.role === 'senior' ? 0.42 : 0.7);
+      const orbit = summon.role === 'senior' ? 62 : 38 + (i % 2) * 12;
+      const targetX = this.player.x + Math.cos(summon.orbitAngle) * orbit;
+      const targetY = this.player.y + Math.sin(summon.orbitAngle) * orbit;
+      const follow = Math.min(1, dt * (summon.role === 'senior' ? 5.2 : 7.5));
+      summon.x += (targetX - summon.x) * follow;
+      summon.y += (targetY - summon.y) * follow;
+      summon.attackTimer -= dt;
+      if (summon.attackTimer > 0) continue;
+
+      if (summon.role === 'senior') {
+        summon.attackTimer = 2.7;
+        let hits = 0;
+        for (const enemy of this.enemies) {
+          if (enemy.hp <= 0 || Math.hypot(enemy.x - summon.x, enemy.y - summon.y) > 145) continue;
+          enemy.hp -= summon.dmg * (enemy.isBoss ? 0.48 : 1);
+          this.applyProjectileSlow(enemy);
+          this.createHitFX(enemy.x, enemy.y, '#f1c40f', 3);
+          hits++;
+        }
+        if (hits) this.addPopup(summon.x, summon.y - 22, `Вторая линия: ${hits} обращ.`, '#f1c40f');
+      } else {
+        summon.attackTimer = 1.55;
+        let target = null, closest = 470;
+        for (const enemy of this.enemies) {
+          if (enemy.hp <= 0) continue;
+          const distance = Math.hypot(enemy.x - summon.x, enemy.y - summon.y);
+          if (distance < closest) { closest = distance; target = enemy; }
+        }
+        if (target) {
+          const angle = Math.atan2(target.y - summon.y, target.x - summon.x);
+          this.projectiles.push({ x: summon.x, y: summon.y,
+            vx: Math.cos(angle) * 8.2, vy: Math.sin(angle) * 8.2,
+            dmg: summon.dmg, life: 1.8, icon: '📞', color: '#55efc4', size: 7,
+            hitTargets: [], ricochetsRemaining: 0, isSummon: true });
+        }
+      }
     }
   }
 
@@ -2463,10 +2575,12 @@ class Game {
       this.spawnTimer = Math.max(0.9, 1.55 - (this.time / 900));
     }
 
-    if (this.time >= this.nextBossMinute * 60) {
+    if (this.time >= this.nextBossMinute * 60 && this.time >= this.nextMiniBossAllowedTime) {
       const anotherBossAlive = this.enemies.some(enemy => enemy.isBoss && enemy.hp > 0);
-      if (!megaBossAlive && !anotherBossAlive) this.spawn1CBoss(this.nextBossMinute);
-      this.nextBossMinute++;
+      if (!megaBossAlive && !anotherBossAlive) {
+        this.spawn1CBoss(this.nextBossMinute);
+        this.nextBossMinute++;
+      }
     }
 
     if (this.time >= this.nextEventTime) {
@@ -2484,7 +2598,9 @@ class Game {
     const roll = Math.random();
     let type = 'gymbro';
 
-    if (this.time > 15 && roll < 0.22) type = 'trainee';
+    if (this.time > 150 && roll < 0.08) type = 'mango_client';
+    else if (this.time > 150 && roll < 0.16) type = 'rudesktop_cursor';
+    else if (this.time > 15 && roll < 0.22) type = 'trainee';
     else if (this.time > 30 && roll < 0.40) type = 'fitgirl';
     else if (this.time > 50 && roll < 0.58) type = 'cleaner';
     else if (this.time > 80 && roll < 0.70) type = 'atol_kkt';
@@ -2500,7 +2616,9 @@ class Game {
       atol_kkt: { name: 'Касса АТОЛ (Зажевало ленту)', hp: 65, speed: 1.3, dmg: 10, icon: '🖨️', xp: 8, size: 18, col: '#b2bec3', explodes: true },
       trainer: { name: 'Тренер без диплома', hp: 88, speed: 1.45, dmg: 14, icon: '🎽', xp: 10, size: 20, col: '#0984e3' },
       remote_dev: { name: 'Тимлид на удаленке', hp: 120, speed: 1.2, dmg: 14, icon: '💻', xp: 14, size: 21, col: '#6c5ce7', shooter: true, shootTimer: 2.2 },
-      evotor: { name: 'Эвотор: «интеграция за отдельную плату»', hp: 96, speed: 1.15, dmg: 13, icon: '💸', xp: 12, size: 19, col: '#e84393', shooter: true, shootTimer: 2.8 }
+      evotor: { name: 'Эвотор: «интеграция за отдельную плату»', hp: 96, speed: 1.15, dmg: 13, icon: '💸', xp: 12, size: 19, col: '#e84393', shooter: true, shootTimer: 2.8 },
+      mango_client: { name: 'Клиент: «Алло, вы меня слышите?»', hp: 105, speed: 1.35, dmg: 12, icon: '📞', xp: 12, size: 19, col: '#16a085', shooter: true, shootTimer: 3.4 },
+      rudesktop_cursor: { name: 'Курсор Rudesktop (ещё 3 пикселя)', hp: 82, speed: 3.5, dmg: 9, icon: '🖱️', xp: 9, size: 14, col: '#6c5ce7' }
     };
 
     const d = defs[type];
@@ -2533,22 +2651,29 @@ class Game {
     this.bossWarnings = [];
     this.megaBossCount++;
 
+    const bossVariants = [
+      { type: 'cluster_core', name: 'ОШИБКА: ИНФОРМАЦИОННАЯ БАЗА УНИЧТОЖЕНА', icon: '🧿', col: '#9b59b6', label: 'КРИТИЧЕСКАЯ ОШИБКА' },
+      { type: 'release_break', name: 'РЕЛИЗ НА ПРОДЕ: ТЕСТОВОЙ БАЗЫ НЕ БЫЛО', icon: '📦', col: '#e84393', label: 'ОБНОВЛЕНИЕ БЕЗ ОТКАТА' },
+      { type: 'backup_99', name: 'РЕЗЕРВНАЯ КОПИЯ: 99% (ОСТАЛОСЬ 14 ЧАСОВ)', icon: '💾', col: '#0984e3', label: 'БЭКАП НЕ ЗАВЕРШЁН' }
+    ];
+    const variant = bossVariants[(this.megaBossCount - 1) % bossVariants.length];
     const hp = 28000 + (this.megaBossCount - 1) * 10000;
     const boss = {
       x: this.MAP_SIZE / 2,
       y: this.MAP_SIZE / 2,
-      name: 'ЦЕНТРАЛЬНЫЙ КЛАСТЕР: ЯДРО ПРОДАКШЕНА',
+      name: variant.name,
+      bigLabel: variant.label,
       hp,
       maxHp: hp,
       speed: 0,
       dmg: 24,
-      icon: '🧿',
+      icon: variant.icon,
       size: 76,
-      col: '#9b59b6',
+      col: variant.col,
       xp: 280 + this.megaBossCount * 30,
       isBoss: true,
       isMegaBoss: true,
-      bossType: 'cluster_core',
+      bossType: variant.type,
       freezeTimer: 0,
       bossTimer1: 0,
       bossTimer2: 0,
@@ -2556,9 +2681,9 @@ class Game {
       ringPhase: 0
     };
     this.enemies.push(boss);
-    this.showBanner('🚨 МИРОВОЙ БОСС В ЦЕНТРЕ КАРТЫ — ИЩИТЕ ЯДРО КЛАСТЕРА!');
-    this.addPopup(boss.x, boss.y - boss.size - 20, '⚠️ ЦЕНТРАЛЬНЫЙ КЛАСТЕР АКТИВИРОВАН', '#ff7675');
-    this.log('Плановое окно 5 минут: карта очищена без выдачи опыта. Ядро продакшена развёрнуто в центре.');
+    this.showBanner(`🚨 БОЛЬШОЙ БОСС В ЦЕНТРЕ КАРТЫ: ${boss.name}!`);
+    this.addPopup(boss.x, boss.y - boss.size - 20, `⚠️ ${variant.label}`, '#ff7675');
+    this.log(`Плановое окно 5 минут: карта очищена без выдачи опыта. В центре развёрнута проблема: ${boss.name}.`);
     this.sound.boss();
   }
 
@@ -2596,10 +2721,10 @@ class Game {
       this.log('Клиент уверяет, что СКУД включена. Через AnyDesk выяснилось: к сети её никто не подключил.');
     } else if (minute === 2) {
       b.bossType = 'tax';
-      b.name = 'КЛИЕНТ НАЖАЛ «ПОДКЛЮЧИТЬ» ДВЕНАДЦАТЬ РАЗ';
+      b.name = 'ВЫШЕЛ НОВЫЙ РЕЛИЗ И ИНТЕГРАЦИИ СЛОМАЛИСЬ';
       b.hp = 3600; b.dmg = 28; b.icon = '📲'; b.col = '#8e44ad';
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('Клиент нажал «Подключить» двенадцать раз. Техспец по AnyDesk открывает журнал обмена и просит больше не нажимать.');
+      this.log('Вышел новый релиз, интеграции сломались. По телефону техспец подключается через AnyDesk и просит клиента пока не нажимать «Подключить» ещё раз.');
     } else if (minute === 3) {
       b.bossType = 'tamara';
       b.name = 'ОБНОВЛЕНИЕ КОНФИГУРАЦИИ БЕЗ РЕЗЕРВНОЙ КОПИИ';
@@ -2692,6 +2817,85 @@ class Game {
     }
   }
 
+  updateReleaseMegaBossAI(b, dt) {
+    b.bossTimer1 += dt;
+    b.bossTimer2 += dt;
+    b.bossTimer3 += dt;
+    const enraged = b.hp <= b.maxHp * 0.5;
+    if (b.bossTimer1 >= (enraged ? 2.2 : 3.1)) {
+      b.bossTimer1 = 0;
+      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      for (let k = -2; k <= 2; k++) {
+        const angle = aim + k * 0.2;
+        this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 4.7, vy: Math.sin(angle) * 4.7,
+          dmg: enraged ? 17 : 14, size: 9, life: 2.8, icon: '🧾', color: '#fd79a8' });
+      }
+      this.addPopup(b.x, b.y - b.size - 20, 'РЕЛИЗНЫЕ ЗАМЕЧАНИЯ — ПОПРОБУЙТЕ УВЕРНУТЬСЯ', '#fd79a8');
+    }
+    if (b.bossTimer2 >= (enraged ? 5.4 : 7.2)) {
+      b.bossTimer2 = 0;
+      const x = this.player.x, y = this.player.y;
+      for (const offset of [-112, -56, 0, 56, 112]) {
+        this.bossWarnings.push({ x: Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, x + offset)), y,
+          radius: 31, dmg: enraged ? 34 : 28, life: 1.05, maxLife: 1.05 });
+        if (offset !== 0) this.bossWarnings.push({ x, y: Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, y + offset)),
+          radius: 31, dmg: enraged ? 34 : 28, life: 1.05, maxLife: 1.05 });
+      }
+      this.addPopup(x, y - 45, 'ОТКАТ НЕ ПРЕДУСМОТРЕН — ПОКИНЬТЕ ЛИНИИ!', '#ff7675');
+    }
+    if (b.bossTimer3 >= (enraged ? 8.2 : 10.5)) {
+      b.bossTimer3 = 0;
+      this.bossWarnings.push({ x: this.player.x, y: this.player.y, radius: 128, dmg: enraged ? 58 : 46, life: 1.35, maxLife: 1.35 });
+      this.addPopup(this.player.x, this.player.y - 36, 'ПЕРЕЗАПУСК СЕРВЕРА — СРОЧНО ОТОЙДИТЕ!', '#ff7675');
+    }
+  }
+
+  updateBackupMegaBossAI(b, dt) {
+    b.bossTimer1 += dt;
+    b.bossTimer2 += dt;
+    b.bossTimer3 += dt;
+    const enraged = b.hp <= b.maxHp * 0.5;
+    if (b.bossTimer1 >= (enraged ? 2.4 : 3.3)) {
+      b.bossTimer1 = 0;
+      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      for (let k = -2; k <= 2; k++) {
+        const angle = aim + k * 0.32;
+        this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.3, vy: Math.sin(angle) * 3.3,
+          dmg: enraged ? 20 : 16, size: 12, life: 3.8, icon: '💽', color: '#74b9ff' });
+      }
+      this.addPopup(b.x, b.y - b.size - 20, 'БЭКАП НАЙДЕН — ФАЙЛЫ ВЫГРУЖЕНЫ!', '#74b9ff');
+    }
+    if (b.bossTimer2 >= (enraged ? 7 : 9)) {
+      b.bossTimer2 = 0;
+      const backupMobs = this.enemies.filter(enemy => enemy.summonedByBackup && enemy.hp > 0);
+      if (backupMobs.length < 3) {
+        const angle = Math.random() * Math.PI * 2;
+        this.enemies.push({ x: b.x + Math.cos(angle) * 115, y: b.y + Math.sin(angle) * 115,
+          name: 'Файл из бэкапа: «финал_точно_последний»', hp: 210, maxHp: 210, speed: 1.55, dmg: 15,
+          icon: '📁', size: 18, col: '#74b9ff', xp: 9, freezeTimer: 0, isBoss: false, summonedByBackup: true });
+        this.addPopup(b.x, b.y - b.size - 20, 'ВОССТАНОВЛЕН ФАЙЛ «ФИНАЛ_ТОЧНО_ПОСЛЕДНИЙ»', '#74b9ff');
+      }
+    }
+    if (b.bossTimer3 >= (enraged ? 6.2 : 8.4)) {
+      b.bossTimer3 = 0;
+      const backupMobs = this.enemies.filter(enemy => enemy.summonedByBackup && enemy.hp > 0);
+      if (backupMobs.length) {
+        const heal = Math.min(b.maxHp - b.hp, 360 + backupMobs.length * 150);
+        b.hp += heal;
+        this.addPopup(b.x, b.y - b.size - 40, `БЭКАП ВОССТАНОВЛЕН: +${heal} HP`, '#55efc4');
+      } else {
+        for (let k = 0; k < 14; k++) {
+          if (k % 7 === 3) continue;
+          const angle = b.ringPhase + k * Math.PI * 2 / 14;
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.6, vy: Math.sin(angle) * 3.6,
+            dmg: enraged ? 21 : 17, size: 10, life: 3.4, icon: '🗂️', color: '#0984e3' });
+        }
+        b.ringPhase += 0.22;
+        this.addPopup(b.x, b.y - b.size - 40, 'БЭКАП НЕ НАЙДЕН — РАЗОСЛАНЫ ФАЙЛЫ', '#74b9ff');
+      }
+    }
+  }
+
   updateBossWarnings(dt) {
     for (let i = this.bossWarnings.length - 1; i >= 0; i--) {
       const warning = this.bossWarnings[i];
@@ -2710,7 +2914,7 @@ class Game {
       this.createHitFX(warning.x, warning.y, '#ff4757', 10);
       this.bossWarnings.splice(i, 1);
       if (this.player.hp <= 0) {
-        this.gameOver('Центральное ядро перегрузило целостность базы!');
+        this.gameOver('Атака большого босса разрушила целостность базы!');
         return true;
       }
     }
@@ -2718,8 +2922,10 @@ class Game {
   }
 
   updateBossAI(b, dt) {
-    if (b.bossType === 'cluster_core') {
-      this.updateMegaBossAI(b, dt);
+    if (b.isMegaBoss) {
+      if (b.bossType === 'cluster_core') this.updateMegaBossAI(b, dt);
+      else if (b.bossType === 'release_break') this.updateReleaseMegaBossAI(b, dt);
+      else if (b.bossType === 'backup_99') this.updateBackupMegaBossAI(b, dt);
       return;
     }
     b.bossTimer1 += dt;
@@ -3238,6 +3444,7 @@ class Game {
     this.player.x = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.x));
     this.player.y = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.y));
 
+    this.updateSummons(dt, frameScale);
     this.updateWeapons(dt);
 
     // Снаряды
@@ -3309,7 +3516,20 @@ class Game {
       ep.life -= dt;
       ep.x += ep.vx * frameScale; ep.y += ep.vy * frameScale;
 
-      if (Math.hypot(this.player.x - ep.x, this.player.y - ep.y) < 18 + ep.size) {
+      let summonHit = null;
+      for (const summon of this.summons) {
+        if (summon.hp <= 0) continue;
+        const distance = Math.hypot(summon.x - ep.x, summon.y - ep.y);
+        if (distance < summon.size + ep.size) { summonHit = summon; break; }
+      }
+      if (summonHit) {
+        summonHit.hp -= ep.dmg;
+        ep.life = 0;
+        this.createHitFX(summonHit.x, summonHit.y, '#ff7675', 3);
+        if (summonHit.hp <= 0) this.addPopup(summonHit.x, summonHit.y - 18, 'Помощник выбыл', '#ff7675');
+      }
+
+      if (!summonHit && Math.hypot(this.player.x - ep.x, this.player.y - ep.y) < 18 + ep.size) {
         if (this.player.shieldTimer <= 0) {
           this.player.hp -= ep.dmg;
           this.sound.hit();
@@ -3414,6 +3634,9 @@ class Game {
 
       // Смерть моба
       if (e.hp <= 0) {
+        if (e.isBoss && !e.isMegaBoss) {
+          this.nextMiniBossAllowedTime = this.time + 40 + Math.random() * 10;
+        }
         if (e.isMegaBoss) {
           this.bossWarnings = [];
           this.enemyProjectiles = [];
@@ -4045,8 +4268,35 @@ class Game {
         this.ctx.font = 'bold 14px sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = '#fff';
-        this.ctx.fillText('ЯДРО ПРОДАКШЕНА', 0, -e.size - 43);
+        this.ctx.fillText(e.bigLabel || 'БОЛЬШОЙ БОСС', 0, -e.size - 43);
       }
+      this.ctx.restore();
+    }
+
+    // Вызванные специалисты: показываем и здоровье, и оставшееся время.
+    for (const summon of (this.summons || [])) {
+      this.ctx.save();
+      this.ctx.translate(summon.x, summon.y);
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, summon.size, 0, Math.PI * 2);
+      this.ctx.fillStyle = summon.role === 'senior' ? 'rgba(241,196,15,.24)' : 'rgba(85,239,196,.22)';
+      this.ctx.fill();
+      this.ctx.strokeStyle = summon.role === 'senior' ? '#f1c40f' : '#55efc4';
+      this.ctx.lineWidth = 2;
+      this.ctx.stroke();
+      this.ctx.font = '20px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(summon.icon, 0, 1);
+      const barWidth = summon.role === 'senior' ? 40 : 32;
+      this.ctx.fillStyle = '#111';
+      this.ctx.fillRect(-barWidth / 2, -summon.size - 11, barWidth, 4);
+      this.ctx.fillStyle = '#55efc4';
+      this.ctx.fillRect(-barWidth / 2, -summon.size - 11, barWidth * Math.max(0, summon.hp / summon.maxHp), 4);
+      this.ctx.fillStyle = '#111';
+      this.ctx.fillRect(-barWidth / 2, summon.size + 5, barWidth, 3);
+      this.ctx.fillStyle = '#74b9ff';
+      this.ctx.fillRect(-barWidth / 2, summon.size + 5, barWidth * Math.max(0, summon.life / summon.maxLife), 3);
       this.ctx.restore();
     }
 

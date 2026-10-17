@@ -1922,25 +1922,42 @@ class Game {
   }
 
   createChallenge() {
-    const difficulty = Math.min(12, Math.floor(this.time / 180));
+    const difficulty = Math.min(8, Math.floor(this.time / 240));
+    const killsTarget = Math.min(42, 28 + difficulty * 2);
+    const gemsTarget = Math.min(16, 11 + Math.floor(difficulty / 2));
     const options = [
       {
-        type: 'kills', target: Math.min(22, 10 + difficulty), duration: 32,
-        reward: 22 + difficulty * 2,
-        title: `Пофиксить ${Math.min(22, 10 + difficulty)} багов за 32 секунды. Клиент уже нажал «Обновить конфигурацию» второй раз.`
+        objectives: [{ type: 'kills', target: killsTarget, label: 'устранить багов' }], duration: 55,
+        reward: 42 + difficulty * 3,
+        title: `После обновления конфигурации у клиента размножились ошибки. Устранить ${killsTarget} до конца смены — времени 55 секунд.`
       },
       {
-        type: 'gems', target: Math.min(9, 5 + Math.floor(difficulty / 3)), duration: 42,
-        reward: 20 + difficulty * 2,
-        title: `Собрать ${Math.min(9, 5 + Math.floor(difficulty / 3))} дискет опыта за 42 секунды. Клиент прислал резервную копию частями в Манго Офис.`
+        objectives: [{ type: 'gems', target: gemsTarget, label: 'собрать дискет опыта' }], duration: 65,
+        reward: 44 + difficulty * 3,
+        title: `Серверная база забита необработанными обращениями. Собрать ${gemsTarget} дискет опыта за 65 секунд и не потерять ни одной.`
       },
       {
-        type: 'survive', target: 20, duration: 24,
-        reward: 26 + difficulty * 2,
-        title: 'Продержаться 20 секунд на звонке в Манго Офис: клиент ищет AnyDesk, пока техспец уже подключён через Rudesktop.'
+        objectives: [{ type: 'survive', target: 38, label: 'продержаться без урона, сек.' }], duration: 48,
+        reward: 48 + difficulty * 3,
+        title: 'Подключение к серверу клиента через Rudesktop: пережить 38 секунд без урона, пока экран через Манго Офис расшаривают в третий раз.'
+      },
+      {
+        objectives: [{ type: 'shooters', target: 5 + Math.floor(difficulty / 2), label: 'нейтрализовать удалённых специалистов' }], duration: 75,
+        reward: 52 + difficulty * 3,
+        title: `У клиента зависла интеграция, а удалённая команда шлёт встречные запросы. Остановить ${5 + Math.floor(difficulty / 2)} дальнобойных специалистов за 75 секунд.`
+      },
+      {
+        objectives: [
+          { type: 'kills', target: Math.min(27, 18 + difficulty), label: 'устранить багов' },
+          { type: 'gems', target: Math.min(10, 7 + Math.floor(difficulty / 3)), label: 'собрать дискет опыта' }
+        ], duration: 70,
+        reward: 60 + difficulty * 4,
+        title: `После переноса базы на сервер проверить результат: устранить ${Math.min(27, 18 + difficulty)} ошибок и собрать ${Math.min(10, 7 + Math.floor(difficulty / 3))} дискет опыта за 70 секунд.`
       }
     ];
-    const challenge = { ...options[Math.floor(Math.random() * options.length)], progress: 0, remaining: 0, status: 'pending' };
+    const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
+    const selected = available[Math.floor(Math.random() * available.length)];
+    const challenge = { ...selected, objectives: selected.objectives.map(objective => ({ ...objective, progress: 0 })), remaining: 0, status: 'pending' };
     this.activeChallenge = challenge;
     this.challengeNoticeUntil = 0;
     this.updateChallengeUI();
@@ -1973,10 +1990,11 @@ class Game {
     } else if (challenge.status === 'active') {
       head.textContent = '📩 Тикет в работе';
       actions.style.display = 'none';
-      const amount = challenge.type === 'survive'
-        ? `${Math.min(challenge.target, Math.floor(challenge.progress))}/${challenge.target} сек.`
-        : `${challenge.progress}/${challenge.target}`;
-      progress.textContent = `Прогресс: ${amount} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
+      const amounts = challenge.objectives.map(objective => {
+        const current = objective.type === 'survive' ? Math.floor(objective.progress) : objective.progress;
+        return `${objective.label}: ${Math.min(objective.target, current)}/${objective.target}${objective.type === 'survive' ? ' сек.' : ''}`;
+      });
+      progress.textContent = `${amounts.join(' · ')} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
     } else {
       head.textContent = challenge.status === 'success' ? '✅ Тикет закрыт' : '⌛ Тикет просрочен';
       progress.textContent = challenge.status === 'success'
@@ -2007,9 +2025,16 @@ class Game {
 
   recordChallengeProgress(type, amount = 1) {
     const challenge = this.activeChallenge;
-    if (!challenge || challenge.status !== 'active' || challenge.type !== type) return;
-    challenge.progress += amount;
-    if (challenge.progress >= challenge.target) {
+    if (!challenge || challenge.status !== 'active') return;
+    let changed = false;
+    challenge.objectives.forEach(objective => {
+      if (objective.type === type && objective.progress < objective.target) {
+        objective.progress = Math.min(objective.target, objective.progress + amount);
+        changed = true;
+      }
+    });
+    if (!changed) return;
+    if (challenge.objectives.every(objective => objective.progress >= objective.target)) {
       this.closeChallenge(true);
       return;
     }
@@ -2026,16 +2051,18 @@ class Game {
       return;
     }
     if (challenge.status === 'active') {
-      if (challenge.type === 'survive') {
+      if (challenge.objectives.some(objective => objective.type === 'survive')) {
         if (this.player.hp < challenge.lastHp - 0.01) {
           this.closeChallenge(false);
           return;
         }
-        challenge.progress = Math.min(challenge.target, challenge.progress + dt);
+        challenge.objectives.forEach(objective => {
+          if (objective.type === 'survive') objective.progress = Math.min(objective.target, objective.progress + dt);
+        });
       }
       challenge.lastHp = this.player.hp;
       challenge.remaining = Math.max(0, challenge.remaining - dt);
-      if (challenge.progress >= challenge.target) {
+      if (challenge.objectives.every(objective => objective.progress >= objective.target)) {
         this.closeChallenge(true);
         return;
       }
@@ -3296,6 +3323,7 @@ class Game {
         }
         this.kills++;
         this.recordChallengeProgress('kills');
+        if (e.shooter) this.recordChallengeProgress('shooters');
         this.createHitFX(e.x, e.y, e.col, 10);
 
         if (e.explodes) {

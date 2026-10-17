@@ -83,6 +83,15 @@
   #nav-actions { flex: 0 0 auto; gap: 6px; }
   #nav-status { flex: 0 0 auto; gap: 10px; margin-left: auto; }
   #nav-status > span { margin-left: 0 !important; }
+  @media (max-width: 1050px) {
+    #nav-bar { height: 58px; min-height: 58px; flex-basis: 58px; flex-direction: column; align-items: stretch; justify-content: center; gap: 3px; overflow: hidden; }
+    #nav-actions { width: 100%; min-width: 0; justify-content: space-between; }
+    #nav-status { width: 100%; min-height: 14px; justify-content: flex-end; margin-left: 0; }
+  }
+  @media (max-width: 720px) {
+    #nav-actions { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+    #nav-actions::-webkit-scrollbar { display: none; }
+  }
   .nav-btn {
     background: #fff;
     border: 1px solid #aaa;

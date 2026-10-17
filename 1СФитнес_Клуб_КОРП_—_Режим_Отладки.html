@@ -395,6 +395,19 @@
   }
   #modal-lvlup { z-index: 150; }
   #modal-pause { z-index: 155; }
+  #modal-pause .win-1c { width: min(820px, 94vw); max-height: 92vh; overflow-y: auto; }
+  .pause-layout { display: grid; grid-template-columns: minmax(190px, .8fr) minmax(0, 1.6fr); gap: 16px; text-align: left; }
+  .pause-loadout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 48vh; overflow-y: auto; padding-right: 3px; }
+  .loadout-section { background: #f7f7f7; border: 1px solid #ccc; padding: 8px; min-width: 0; }
+  .loadout-section h3 { color: #900; font-size: 12px; margin: 0 0 5px; }
+  .loadout-section ul { list-style: none; padding: 0; margin: 0; }
+  .loadout-section li { font-size: 11px; line-height: 1.4; padding: 2px 0; border-top: 1px solid #e5e5e5; overflow-wrap: anywhere; }
+  .loadout-section li:first-child { border-top: 0; }
+  .loadout-section li b { float: right; margin-left: 5px; color: #555; white-space: nowrap; }
+  @media (max-width: 600px) {
+    .pause-layout { grid-template-columns: 1fr; }
+    .pause-loadout { grid-template-columns: 1fr; max-height: 42vh; }
+  }
   #modal-gameover { z-index: 160; }
   #modal-lb { z-index: 250; }
   #modal-shop { z-index: 180; }
@@ -670,7 +683,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.5.0 — «Новые обращения»</h3>
-              <p>Принимайте срочные задания и получайте опыт. Перед сложным боем теперь можно найти бананы, а кофейный бонус виден рядом с улучшениями, пока действует.</p>
+              <p>Принимайте срочные задания и получайте опыт. В паузе можно посмотреть все собранные умения, улучшения, активные эффекты и расходники. Усиленные улучшения теперь требуют небольшого компромисса.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.4.0 — «Центральный кластер»</h3>
@@ -705,7 +718,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <div class="release-notes"><h3>1.5.0 — «Новые обращения»</h3><p>Время от времени появляются задания от клиентов. Беритесь за них, пока не истёк срок, и получайте дополнительный опыт. Перед сложными боями можно найти запас бананов, а кофейный бонус виден рядом с улучшениями, пока действует.</p></div>
+        <div class="release-notes"><h3>1.5.0 — «Новые обращения»</h3><p>Время от времени появляются задания от клиентов. Беритесь за них, пока не истёк срок, и получайте дополнительный опыт. В паузе можно посмотреть все собранные умения, улучшения, активные эффекты и расходники. Усиленные улучшения теперь требуют небольшого компромисса.</p></div>
         <div class="release-notes"><h3>1.4.0 — «Центральный кластер»</h3><p>Большой босс приходит каждые пять минут и проверяет, насколько хорошо вы умеете уклоняться. У него своя музыка, а расходники больше не меняются местами после использования.</p></div>
         <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Боссы получили собственное музыкальное сопровождение. В прокачке появились новые улучшения снарядов, а отдел продаж теперь иногда звонит с заманчивыми предложениями. Добавлены новые шутки про телефонную техподдержку и её непростые подключения.</p></div>
         <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Появились главное меню, настройки, таблица лидеров и новые умения. Теперь можно тратить собранную энергию на полезные покупки, а по пути вас ждут шутки про знакомые рабочие будни.</p></div>
@@ -732,14 +745,22 @@
 
   <!-- Меню паузы -->
   <div id="modal-pause" class="modal-overlay">
-    <div class="win-1c" style="width:460px;" onclick="event.stopPropagation()">
+    <div class="win-1c" onclick="event.stopPropagation()">
       <div class="win-1c-head"><span>⏸ Игра приостановлена</span><span>Esc — продолжить</span></div>
-      <div class="win-1c-body" style="text-align:center;">
-        <p style="margin-bottom:14px; color:#444; font-size:13px;">Кластер ждёт, пока вы вернётесь.</p>
-        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+      <div class="win-1c-body">
+        <div class="pause-layout">
+          <div>
+            <p style="margin-bottom:14px; color:#444; font-size:13px;">Кластер ждёт, пока вы вернётесь.</p>
+            <div style="display:flex; justify-content:flex-start; gap:8px; flex-wrap:wrap;">
           <button class="btn-1c" style="background:#55efc4;" onclick="game.resume()">▶ Продолжить</button>
           <button class="btn-1c" onclick="game.start()">🔄 Начать заново</button>
           <button class="btn-1c" onclick="game.showMainMenu()">⌂ Главное меню</button>
+            </div>
+          </div>
+          <div>
+            <h2 style="font-size:14px; margin:0 0 8px;">Ваш персонаж: активные улучшения</h2>
+            <div id="pause-loadout" class="pause-loadout"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1209,8 +1230,8 @@ const PASSIVES_DEF = {
   sql_indexes: {
     name: 'Индексы MSSQL',
     icon: '⚡',
-    desc: '+18% шанс критического урона (x2.5) с яркой вспышкой.',
-    mod: (p) => { p.critChance += 0.18; }
+    desc: '+18% шанс критического урона (x2.5), но тяжёлые запросы немного замедляют атаки.',
+    mod: (p) => { p.critChance += 0.18; p.cdMult *= 1.03; }
   },
   coffee_machine: {
     name: 'Кофе из 308 кабинета',
@@ -1227,8 +1248,8 @@ const PASSIVES_DEF = {
   cert_specialist: {
     name: 'Сертификат «1С:Специалист»',
     icon: '🎓',
-    desc: 'Обновление конфигурации прошло у техспеца. Клиент пока ищет кнопку «Запустить новую версию». +30% к опыту.',
-    mod: (p) => { p.xpMult += 0.30; }
+    desc: 'Обновление конфигурации прошло у техспеца. Клиент пока ищет кнопку «Запустить новую версию». +30% к опыту, но бег немного медленнее.',
+    mod: (p) => { p.xpMult += 0.30; p.speedMult -= 0.025; }
   },
   overtime_pizza: {
     name: 'Овертайм за Пиццу',
@@ -1251,14 +1272,14 @@ const PASSIVES_DEF = {
   server_x64: {
     name: 'Сервер 1С Предприятие x64',
     icon: '🖥️',
-    desc: 'Развёртывание базы у клиента: на тестовом сервере всё летало, на боевом внезапно закончилось место. Магнит +50%.',
-    mod: (p) => { p.magnetMult += 0.5; }
+    desc: 'Развёртывание базы у клиента: на тестовом сервере всё летало, на боевом внезапно закончилось место. Магнит +50%, скорость чуть ниже.',
+    mod: (p) => { p.magnetMult += 0.5; p.speedMult -= 0.02; }
   },
   messenger_hub: {
     name: 'Интеграция мессенджеров',
     icon: '💬',
-    desc: 'Клиент отключил уведомления и просит проверить доставку сообщения по телефону. +18% к опыту.',
-    mod: (p) => { p.xpMult += 0.18; }
+    desc: 'Клиент отключил уведомления и просит проверить доставку сообщения по телефону. +18% к опыту, но бег немного медленнее.',
+    mod: (p) => { p.xpMult += 0.18; p.speedMult -= 0.02; }
   },
   evotor_paid: {
     name: 'Эвотор: платная интеграция',
@@ -1585,10 +1606,11 @@ const REPEATABLE_UPGRADES = [
     key: 'rep_salary_index',
     name: '📈 Конверсия заявок в записи',
     icon: '📊',
-    desc: '+15% к множителю опыта и очков, шанс крита +5%!',
+    desc: '+15% к опыту и очкам, шанс крита +5%; каждое такое улучшение немного снижает скорость (до 20 раз).',
     apply: (g) => {
       g.player.xpMult += 0.15;
       g.player.critChance += 0.05;
+      if ((g.repeatableUpgradeCounts["rep_salary_index"] || 0) < 20) g.player.speedMult -= 0.01;
       g.addPopup(g.player.x, g.player.y - 35, '+15% ОПЫТ & +5% КРИТ!', '#ffd200');
     }
   }
@@ -1756,6 +1778,7 @@ class Game {
       iron_logic: { lvl: 1, timer: 0 }
     };
     this.passives = {};
+    this.repeatableUpgradeCounts = {};
 
     // 4 слота активных умений
     this.activeSkills = [null, null, null, null];
@@ -2190,7 +2213,65 @@ class Game {
     if (this.paused || !this.player || this.player.hp <= 0) return;
     this.paused = true;
     this.keys = {};
+    this.renderPauseLoadout();
     document.getElementById('modal-pause').style.display = 'flex';
+  }
+
+  renderPauseLoadout() {
+    const container = document.getElementById('pause-loadout');
+    if (!container || !this.player) return;
+    const esc = value => this.escapeHtml(String(value));
+    const section = (title, entries) => {
+      const rows = entries.length
+        ? entries.map(entry => `<li title="${esc(entry.detail || entry.name)}">${esc(entry.icon || '•')} ${esc(entry.name)}<b>${esc(entry.value || '')}</b></li>`).join('')
+        : '<li style="color:#888;">Нет активных</li>';
+      return `<section class="loadout-section"><h3>${esc(title)}</h3><ul>${rows}</ul></section>`;
+    };
+    const weapons = Object.entries(this.weapons).map(([key, weapon]) => ({
+      icon: WEAPONS_DEF[key].icon, name: WEAPONS_DEF[key].name, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key].desc
+    }));
+    const passives = Object.entries(this.passives).map(([key, passive]) => ({
+      icon: PASSIVES_DEF[key].icon, name: PASSIVES_DEF[key].name, value: `ур. ${passive.lvl}`, detail: PASSIVES_DEF[key].desc
+    }));
+    const combat = [
+      ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot']
+    ].filter(([stat]) => this.player[stat] > 0).map(([stat, key]) => ({
+      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${this.player[stat]}`, detail: COMBAT_UPGRADES[key].desc
+    }));
+    const active = this.activeSkills.filter(Boolean).map(skill => ({
+      icon: ACTIVE_SKILLS_DEF[skill.key].icon,
+      name: ACTIVE_SKILLS_DEF[skill.key].name,
+      value: `ур. ${skill.lvl} · ${skill.cdTimer > 0 ? `${Math.ceil(skill.cdTimer)}с` : 'готово'}`,
+      detail: ACTIVE_SKILLS_DEF[skill.key].desc
+    }));
+    Object.entries(this.repeatableUpgradeCounts || {}).forEach(([key, count]) => {
+      const upgrade = REPEATABLE_UPGRADES.find(item => item.key === key);
+      if (upgrade && count > 0) passives.push({ icon: upgrade.icon, name: upgrade.name, value: `×${count}`, detail: upgrade.desc });
+    });
+    const temporary = [];
+    const addTimer = (timer, name, icon, value) => {
+      if (timer > 0) temporary.push({ icon, name, value: `${value} · ${Math.ceil(timer)}с` });
+    };
+    addTimer(this.player.damageBuffTimer, 'Усиление урона', '💥', `×${(this.player.damageBuffMult || 1).toFixed(2)}`);
+    addTimer(this.player.xpBoostTimer, 'Удвоение опыта и фиткоинов', '📲', '×2');
+    addTimer(this.player.speedBuffTimer, 'Ускорение бега', '⚡', '+50%');
+    addTimer(this.player.turboBuffTimer, 'Турбо-режим: скорострельность', '🚀', '×2');
+    addTimer(this.player.coffeeBuffTimer, 'Кофе из 308 кабинета', '☕', 'ускорение');
+    addTimer(this.player.shieldTimer, 'Защитный щит', '🛡️', 'неуязвимость');
+    if (this.player.hasBackupShield) temporary.push({ icon: '☁️', name: 'Автоматический щит от бэкапа', value: `через ${Math.ceil(this.backupTimer)}с` });
+    const consumables = this.consumables.map((slot, index) => slot && ({
+      icon: CONSUMABLES_DEF[slot.key].icon,
+      name: `${CONSUMABLES_DEF[slot.key].name} · слот ${['7', '8', '9', '0'][index]}`,
+      value: `×${slot.count}`
+    })).filter(Boolean);
+    container.innerHTML = [
+      section('Оружие', weapons),
+      section('Пассивные улучшения', passives),
+      section('Боевые модификаторы', combat),
+      section('Активные умения · 1–4', active),
+      section('Временные усиления', temporary),
+      section('Расходники в слотах', consumables)
+    ].join('');
   }
 
   resume() {
@@ -3556,6 +3637,7 @@ class Game {
       if (stat) this.player[stat] = Math.min(5, this.player[stat] + 1);
     } else if (ch.type === 'repeatable') {
       ch.applyFn(this);
+      this.repeatableUpgradeCounts[ch.key] = (this.repeatableUpgradeCounts[ch.key] || 0) + 1;
     }
 
     this.updateInventoryHUD();

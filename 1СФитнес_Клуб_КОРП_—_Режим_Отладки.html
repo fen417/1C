@@ -1721,7 +1721,7 @@ class Game {
 
     // Клавиатура
     this.keys = {};
-    this.mouseMoveTarget = null;
+    this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Escape') {
@@ -1775,29 +1775,29 @@ class Game {
       if (e.pointerType !== 'mouse' || e.button !== 0 || this.paused || !this.player || this.player.hp <= 0) return;
       e.preventDefault();
       this.mouseMovePointerId = e.pointerId;
-      this.setMouseMoveTarget(e.clientX, e.clientY);
+      this.setMouseMoveAim(e.clientX, e.clientY);
       this.canvas.setPointerCapture(e.pointerId);
       this.sound.init();
     });
     this.canvas.addEventListener('pointermove', (e) => {
       if (e.pointerId === this.mouseMovePointerId && (e.buttons & 1)) {
-        this.setMouseMoveTarget(e.clientX, e.clientY);
+        this.setMouseMoveAim(e.clientX, e.clientY);
       }
     });
     window.addEventListener('pointerup', (e) => {
       if (e.pointerId === this.mouseMovePointerId) {
         this.mouseMovePointerId = null;
-        this.mouseMoveTarget = null;
+        this.mouseMoveAim = null;
       }
     });
     window.addEventListener('pointercancel', () => {
       this.mouseMovePointerId = null;
-      this.mouseMoveTarget = null;
+      this.mouseMoveAim = null;
     });
     window.addEventListener('blur', () => {
       this.keys = {};
       this.mouseMovePointerId = null;
-      this.mouseMoveTarget = null;
+      this.mouseMoveAim = null;
     });
 
     document.addEventListener('visibilitychange', () => {
@@ -1829,21 +1829,17 @@ class Game {
     this.canvas.height = this.canvas.parentElement.clientHeight;
   }
 
-  setMouseMoveTarget(clientX, clientY) {
+  setMouseMoveAim(clientX, clientY) {
     const rect = this.canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const screenX = (clientX - rect.left) * (this.canvas.width / rect.width);
-    const screenY = (clientY - rect.top) * (this.canvas.height / rect.height);
-    const camX = this.player.x - this.canvas.width / 2;
-    const camY = this.player.y - this.canvas.height / 2;
-    this.mouseMoveTarget = {
-      x: Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, camX + screenX)),
-      y: Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, camY + screenY))
+    this.mouseMoveAim = {
+      x: (clientX - rect.left) * (this.canvas.width / rect.width),
+      y: (clientY - rect.top) * (this.canvas.height / rect.height)
     };
   }
 
   start() {
-    this.mouseMoveTarget = null;
+    this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     this.closeSalesCall();
     this.clearChallenge();
@@ -2350,7 +2346,7 @@ class Game {
     if (this.paused || !this.player || this.player.hp <= 0) return;
     this.paused = true;
     this.keys = {};
-    this.mouseMoveTarget = null;
+    this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     this.renderPauseLoadout();
     document.getElementById('modal-pause').style.display = 'flex';
@@ -3476,12 +3472,11 @@ class Game {
     if (this.keys['s'] || this.keys['ы'] || this.keys['arrowdown']) my += 1;
     if (this.keys['a'] || this.keys['ф'] || this.keys['arrowleft']) mx -= 1;
     if (this.keys['d'] || this.keys['в'] || this.keys['arrowright']) mx += 1;
-    if (mx === 0 && my === 0 && this.mouseMoveTarget) {
-      const dx = this.mouseMoveTarget.x - this.player.x;
-      const dy = this.mouseMoveTarget.y - this.player.y;
+    if (mx === 0 && my === 0 && this.mouseMoveAim) {
+      const dx = this.mouseMoveAim.x - this.canvas.width / 2;
+      const dy = this.mouseMoveAim.y - this.canvas.height / 2;
       const distance = Math.hypot(dx, dy);
-      if (distance <= 14) this.mouseMoveTarget = null;
-      else { mx = dx / distance; my = dy / distance; }
+      if (distance > 18) { mx = dx / distance; my = dy / distance; }
     }
 
     if (mx !== 0 || my !== 0) {

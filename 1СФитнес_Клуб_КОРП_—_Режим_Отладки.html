@@ -2639,8 +2639,10 @@ class Game {
     }
 
     if (this.time >= this.nextBossMinute * 60 && this.time >= this.nextMiniBossAllowedTime) {
-      const anotherBossAlive = this.enemies.some(enemy => enemy.isBoss && enemy.hp > 0);
-      if (!megaBossAlive && !anotherBossAlive) {
+      // Keep a defeated mini-boss as a blocker until its death is processed below.
+      // Otherwise an overdue spawn can race ahead of the 40–50 second cooldown.
+      const anotherMiniBossPresent = this.enemies.some(enemy => enemy.isBoss && !enemy.isMegaBoss);
+      if (!megaBossAlive && !anotherMiniBossPresent) {
         this.spawn1CBoss(this.nextBossMinute);
         this.nextBossMinute++;
       }

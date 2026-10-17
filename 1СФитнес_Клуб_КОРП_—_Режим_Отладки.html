@@ -64,16 +64,14 @@
     background: #f1f2f6;
     border-bottom: 1px solid #ccc;
     display: flex;
-    flex: 0 0 36px;
-    height: 36px;
+    flex: 0 0 auto;
     min-height: 36px;
     box-sizing: border-box;
+    flex-wrap: wrap;
     padding: 4px 8px;
     gap: 6px;
     font-size: 11px;
     align-items: center;
-    overflow-x: auto;
-    overflow-y: hidden;
     z-index: 5;
   }
   .nav-btn {
@@ -86,7 +84,7 @@
     white-space: nowrap;
     flex: 0 0 auto;
   }
-  #btn-dyn-update { width: 205px; flex-basis: 205px; box-sizing: border-box; }
+  #btn-dyn-update { width: 224px; flex-basis: 224px; box-sizing: border-box; }
   .nav-btn:hover { background: #fffbe6; border-color: #cca400; }
   .nav-btn.special { background: #ffeaa7; font-weight: bold; border-color: #e17055; }
   .nav-btn.active-music { background: #55efc4; border-color: #00b894; }

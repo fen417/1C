@@ -877,7 +877,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
   import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-  import { getDatabase, ref, get, query, orderByChild, limitToLast, runTransaction } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
+  import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: 'AIzaSyDI54wAFmr2y_kHg1-wwcHgOwF8zWGK0L4',
@@ -896,7 +896,7 @@
     return {
       db: getDatabase(app),
       uid: credential.user.uid,
-      ref, get, query, orderByChild, limitToLast, runTransaction
+      ref, get, query, orderByChild, limitToLast, push, set
     };
   })();
 </script>
@@ -3992,16 +3992,10 @@ class Game {
     btn.disabled = true;
     try {
       const fb = await window.firebaseLeaderboardReady;
-      const recordRef = fb.ref(fb.db, `leaderboard/${fb.uid}`);
-      const result = await fb.runTransaction(recordRef, current => {
-        if (!current || score > Number(current.score) || (score === Number(current.score) && seconds < Number(current.seconds))) {
-          return { name: nick, score, seconds, updatedAt: Date.now() };
-        }
-        return current;
-      });
-      if (!result.committed) throw new Error('Firebase не подтвердил сохранение результата.');
-      const isBest = Number(result.snapshot.val()?.score) === score;
-      status.innerHTML = `<b style="color:#27ae60">${isBest ? 'Рекорд сохранён в Firebase!' : 'Ваш лучший результат уже выше — он остался в таблице.'}</b>`;
+      const recordsRef = fb.ref(fb.db, 'leaderboard');
+      const recordRef = fb.push(recordsRef);
+      await fb.set(recordRef, { uid: fb.uid, name: nick, score, seconds, createdAt: Date.now() });
+      status.innerHTML = '<b style="color:#27ae60">Результат этого забега добавлен в таблицу!</b>';
       if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
       this.leaderboardOpenTimer = setTimeout(() => {
         this.leaderboardOpenTimer = null;

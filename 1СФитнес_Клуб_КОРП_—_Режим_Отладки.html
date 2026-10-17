@@ -124,14 +124,44 @@
   }
 
   /* HUD Пассивный инвентарь */
-  #hud-inventory {
+  #hud-top-left {
     position: absolute;
     top: 10px;
     left: 10px;
     display: flex;
-    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
     z-index: 10;
     pointer-events: none;
+  }
+  #hud-inventory {
+    display: flex;
+    gap: 5px;
+  }
+  #hud-buffs {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 8px 0 0;
+    border: 1px solid rgba(230, 126, 34, .9);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, .82);
+    color: #ffd08a;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #coffee-buff-icon {
+    width: 36px;
+    height: 36px;
+    border-color: #e67e22;
+    font-size: 18px;
+  }
+  #coffee-buff-timer {
+    color: #ffd08a;
   }
   .inv-slot {
     width: 36px;
@@ -528,7 +558,6 @@
     <button class="nav-btn active-music" id="btn-music" onclick="game.sound.toggleMusic()">🔥 Бит: ВКЛ</button>
     <button class="nav-btn special" onclick="game.quickHeal()">💊 Протеин (+30 HP)</button>
     <button class="nav-btn" id="btn-dyn-update" onclick="game.triggerDynamicUpdate()" style="background:#55efc4; font-weight:bold;">⚡ Дин. Обновление [ПРОБЕЛ]</button>
-    <span id="buff-indicator" style="font-weight:bold; color:#e67e22; margin-left:6px;"></span>
     <span style="margin-left:auto; font-size:11px; color:#594500; font-weight:bold;">💰 <span id="currency-display">0</span> фиткоинов</span>
     <span id="shop-timer" style="font-size:11px; color:#594500;">☎ 03:00</span>
     <span style="margin-left:auto; font-size:11px; color:#666;">Dreamlo Cloud Sync</span>
@@ -542,7 +571,10 @@
 
   <!-- Игровая область -->
   <div id="game-viewport">
-    <div id="hud-inventory"></div>
+    <div id="hud-top-left">
+      <div id="hud-inventory"></div>
+      <div id="hud-buffs"><div class="inv-slot" id="coffee-buff-icon"><span id="coffee-buff-symbol">☕</span><span class="inv-lvl" id="coffee-buff-timer"></span></div><span id="buff-indicator"></span></div>
+    </div>
     <div id="hud-health">
       <div id="hud-health-label"><span>❤️ ЗДОРОВЬЕ</span><span id="hud-health-value">100 / 100</span></div>
       <div id="hud-health-track"><div id="hud-health-fill"></div></div>
@@ -638,7 +670,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.5.0 — «Новые обращения»</h3>
-              <p>Принимайте срочные задания и получайте опыт. Перед сложным боем теперь можно найти бананы, а некоторые улучшения стали чуть сбалансированнее.</p>
+              <p>Принимайте срочные задания и получайте опыт. Перед сложным боем теперь можно найти бананы, а кофейный бонус виден рядом с улучшениями, пока действует.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.4.0 — «Центральный кластер»</h3>
@@ -673,7 +705,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <div class="release-notes"><h3>1.5.0 — «Новые обращения»</h3><p>Время от времени появляются задания от клиентов. Беритесь за них, пока не истёк срок, и получайте дополнительный опыт. Перед сложными боями можно найти запас бананов, а несколько улучшений стали чуть сбалансированнее.</p></div>
+        <div class="release-notes"><h3>1.5.0 — «Новые обращения»</h3><p>Время от времени появляются задания от клиентов. Беритесь за них, пока не истёк срок, и получайте дополнительный опыт. Перед сложными боями можно найти запас бананов, а кофейный бонус виден рядом с улучшениями, пока действует.</p></div>
         <div class="release-notes"><h3>1.4.0 — «Центральный кластер»</h3><p>Большой босс приходит каждые пять минут и проверяет, насколько хорошо вы умеете уклоняться. У него своя музыка, а расходники больше не меняются местами после использования.</p></div>
         <div class="release-notes"><h3>1.3.0 — «Ночной клубный релиз»</h3><p>Боссы получили собственное музыкальное сопровождение. В прокачке появились новые улучшения снарядов, а отдел продаж теперь иногда звонит с заманчивыми предложениями. Добавлены новые шутки про телефонную техподдержку и её непростые подключения.</p></div>
         <div class="release-notes"><h3>1.2.0 — «Абонемент PRO»</h3><p>Появились главное меню, настройки, таблица лидеров и новые умения. Теперь можно тратить собранную энергию на полезные покупки, а по пути вас ждут шутки про знакомые рабочие будни.</p></div>
@@ -1715,6 +1747,7 @@ class Game {
       hasBackupShield: false,
       shieldTimer: 0,
       speedBuffTimer: 0,
+      coffeeBuffTimer: 0,
       turboBuffTimer: 0
     };
 
@@ -3041,15 +3074,16 @@ class Game {
     if (this.player.turboBuffTimer > 0) {
       this.player.turboBuffTimer -= dt;
     }
+    if (this.player.coffeeBuffTimer > 0) {
+      this.player.coffeeBuffTimer = Math.max(0, this.player.coffeeBuffTimer - dt);
+    }
 
     let effectiveSpeedMult = this.player.speedMult;
     if (this.player.speedBuffTimer > 0) {
       this.player.speedBuffTimer -= dt;
       effectiveSpeedMult += 0.50;
-      document.getElementById('buff-indicator').innerText = `⚡ УСКОРЕНИЕ (${Math.ceil(this.player.speedBuffTimer)}с)`;
-    } else {
-      document.getElementById('buff-indicator').innerText = '';
     }
+    this.updateBuffHUD();
 
     // Движение
     let mx = 0, my = 0;
@@ -3303,7 +3337,8 @@ class Game {
         if (item.type === 'its_box') {
           this.triggerNukeITS();
         } else if (item.type === 'coffee') {
-          this.player.speedBuffTimer = 8.0;
+          this.player.speedBuffTimer = Math.max(this.player.speedBuffTimer, 8.0);
+          this.player.coffeeBuffTimer = Math.max(this.player.coffeeBuffTimer, 8.0);
           this.sound.playTone(660, 'sine', 0.2, 0.15);
           this.addPopup(this.player.x, this.player.y - 25, "⚡ КОФЕИНОВЫЙ СПРИНТ!", "#e67e22");
         } else if (item.type === 'banana') {
@@ -3659,6 +3694,23 @@ class Game {
     else if (this.level >= 10) grade = "Эксперт по тех. вопросам";
     else if (this.level >= 5) grade = "Ведущий Разработчик КОРП";
     document.getElementById('arch-grade').innerText = grade;
+    this.updateBuffHUD();
+  }
+
+  updateBuffHUD() {
+    const panel = document.getElementById('hud-buffs');
+    const coffeeTimer = this.player.coffeeBuffTimer || 0;
+    const speedTimer = this.player.speedBuffTimer || 0;
+    if (coffeeTimer <= 0 && speedTimer <= 0) {
+      panel.style.display = 'none';
+      return;
+    }
+    const coffeeActive = coffeeTimer > 0;
+    const timer = coffeeActive ? coffeeTimer : speedTimer;
+    panel.style.display = 'flex';
+    document.getElementById('coffee-buff-symbol').innerText = coffeeActive ? '☕' : '⚡';
+    document.getElementById('coffee-buff-timer').innerText = `${Math.ceil(timer)}с`;
+    document.getElementById('buff-indicator').innerText = coffeeActive ? 'КОФЕ ИЗ 308' : 'УСКОРЕНИЕ';
   }
 
   updateInventoryHUD() {

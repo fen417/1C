@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП — Survivors 1.5.0</title>
+<title>1С:Фитнес Клуб КОРП 1.5.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -513,7 +513,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП — Survivors v1.5.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.5.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -625,7 +625,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП — Survivors</span><span id="menu-version">v1.5.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.5.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1648,7 +1648,7 @@ class Game {
     this.start();
     this.paused = true;
     document.getElementById('menu-version').innerText = `v${GAME_VERSION}`;
-    document.title = `1С:Фитнес Клуб КОРП — Survivors ${GAME_VERSION}`;
+    document.title = `1С:Фитнес Клуб КОРП ${GAME_VERSION}`;
     document.getElementById('modal-main-menu').style.display = 'flex';
     this.lastTime = performance.now();
     requestAnimationFrame((t) => this.loop(t));

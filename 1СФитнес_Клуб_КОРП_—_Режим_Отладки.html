@@ -834,7 +834,7 @@
               </tr>
             </thead>
             <tbody id="lb-body">
-              <tr><td colspan="4" style="text-align:center;">Опрос кластера Dreamlo...</td></tr>
+              <tr><td colspan="4" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
             </tbody>
           </table>
         </div>
@@ -874,23 +874,35 @@
   </div>
 </div>
 
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
+  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+  import { getDatabase, ref, get, query, orderByChild, limitToLast, runTransaction } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyDI54wAFmr2y_kHg1-wwcHgOwF8zWGK0L4',
+    authDomain: 'c-fitness-leaderboard.firebaseapp.com',
+    databaseURL: 'https://c-fitness-leaderboard-default-rtdb.europe-west1.firebasedatabase.app',
+    projectId: 'c-fitness-leaderboard',
+    storageBucket: 'c-fitness-leaderboard.firebasestorage.app',
+    messagingSenderId: '712022218463',
+    appId: '1:712022218463:web:3a1b863a6118f1a3e57b6a'
+  };
+
+  window.firebaseLeaderboardReady = (async () => {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const credential = await signInAnonymously(auth);
+    return {
+      db: getDatabase(app),
+      uid: credential.user.uid,
+      ref, get, query, orderByChild, limitToLast, runTransaction
+    };
+  })();
+</script>
+
 <script>
 const GAME_VERSION = '1.6.0';
-/* ============================================================
-   КОНФИГУРАЦИЯ DREAMLO
-   ============================================================ */
-const DREAMLO = {
-  privateCode: "Q81LVcFw90OHMBWMS22FwgR_i_24EKH0aP7bnoj2Jxww",
-  publicCode: "6ad227ed8f40bb12001e868d"
-};
-
-function getDreamloUrl(endpoint) {
-  const directHttp = `http://dreamlo.com/lb/${endpoint}`;
-  if (window.location.protocol === 'https:') {
-    return `https://api.allorigins.win/raw?url=${encodeURIComponent(directHttp)}`;
-  }
-  return directHttp;
-}
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -3964,7 +3976,7 @@ class Game {
     document.getElementById('modal-gameover').style.display = 'flex';
   }
 
-  submitScore() {
+  async submitScore() {
     const nickInput = document.getElementById('player-nickname');
     let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '') || 'Архитектор_1С';
     localStorage.setItem('1c_nick', nick);
@@ -3974,63 +3986,63 @@ class Game {
     const status = document.getElementById('submit-status');
     const btn = document.getElementById('btn-submit-score');
 
-    status.innerText = "Запись в регистр Dreamlo...";
+    status.innerText = 'Подключаемся к Firebase...';
     btn.disabled = true;
-
-    const url = getDreamloUrl(`${DREAMLO.privateCode}/add/${encodeURIComponent(nick)}/${score}/${seconds}`);
-
-    fetch(url)
-      .then(r => r.text())
-      .then(text => {
-        if (text.startsWith("ERROR")) throw new Error(text);
-        status.innerHTML = `<b style="color:#27ae60">Рекорд успешно зафиксирован!</b>`;
-        if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
-        this.leaderboardOpenTimer = setTimeout(() => {
-          this.leaderboardOpenTimer = null;
-          if (document.getElementById('modal-gameover').style.display === 'flex') this.showLeaderboard();
-        }, 800);
-      })
-      .catch(err => {
-        status.innerHTML = `<span style="color:#c0392b">Ошибка записи: ${err.message}</span>`;
-        btn.disabled = false;
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      const recordRef = fb.ref(fb.db, `leaderboard/${fb.uid}`);
+      const result = await fb.runTransaction(recordRef, current => {
+        if (!current || score > Number(current.score) || (score === Number(current.score) && seconds < Number(current.seconds))) {
+          return { name: nick, score, seconds, updatedAt: Date.now() };
+        }
+        return current;
       });
+      if (!result.committed) throw new Error('Firebase не подтвердил сохранение результата.');
+      const isBest = Number(result.snapshot.val()?.score) === score;
+      status.innerHTML = `<b style="color:#27ae60">${isBest ? 'Рекорд сохранён в Firebase!' : 'Ваш лучший результат уже выше — он остался в таблице.'}</b>`;
+      if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
+      this.leaderboardOpenTimer = setTimeout(() => {
+        this.leaderboardOpenTimer = null;
+        if (document.getElementById('modal-gameover').style.display === 'flex') this.showLeaderboard();
+      }, 800);
+    } catch (err) {
+      status.innerHTML = `<span style="color:#c0392b">Не удалось сохранить: ${this.escapeHtml(err.message || 'ошибка Firebase')}</span>`;
+      btn.disabled = false;
+    }
   }
 
-  fetchLeaderboard() {
+  async fetchLeaderboard() {
     const tbody = document.getElementById('lb-body');
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Запрос регистра рекордов...</td></tr>`;
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Загружаем рейтинг Firebase...</td></tr>';
 
-    const url = getDreamloUrl(`${DREAMLO.publicCode}/json`);
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      const scoresQuery = fb.query(fb.ref(fb.db, 'leaderboard'), fb.orderByChild('score'), fb.limitToLast(100));
+      const snapshot = await fb.get(scoresQuery);
+      const scores = snapshot.exists() ? Object.values(snapshot.val()) : [];
+      scores.sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
+      tbody.innerHTML = '';
+      if (!scores.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Таблица пока пуста. Запишите первый результат!</td></tr>';
+        return;
+      }
 
-    fetch(url)
-      .then(res => res.text())
-      .then(text => {
-        if (text.startsWith("ERROR")) throw new Error(text);
-        const data = JSON.parse(text);
-        tbody.innerHTML = '';
-        let entries = data?.dreamlo?.leaderboard?.entry;
-        if (!entries) {
-          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Регистр пуст. Будьте первым!</td></tr>`;
-          return;
-        }
-        if (!Array.isArray(entries)) entries = [entries];
-
-        entries.forEach((e, idx) => {
-          const m = Math.floor(parseInt(e.seconds || 0) / 60).toString().padStart(2, '0');
-          const s = (parseInt(e.seconds || 0) % 60).toString().padStart(2, '0');
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><b>${idx + 1}</b></td>
-            <td><b>${this.escapeHtml(e.name)}</b></td>
-            <td style="color:#b33939; font-weight:bold;">${e.score}</td>
-            <td>${m}:${s}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      })
-      .catch(err => {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Ошибка соединения: ${err.message}</td></tr>`;
+      scores.forEach((entry, idx) => {
+        const seconds = Math.max(0, Number(entry.seconds) || 0);
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b>${idx + 1}</b></td>
+          <td><b>${this.escapeHtml(String(entry.name || 'Архитектор_1С'))}</b></td>
+          <td style="color:#b33939; font-weight:bold;">${Math.max(0, Number(entry.score) || 0)}</td>
+          <td>${m}:${s}</td>
+        `;
+        tbody.appendChild(tr);
       });
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Firebase недоступен: ${this.escapeHtml(err.message || 'проверьте настройки')}</td></tr>`;
+    }
   }
 
   escapeHtml(str) {

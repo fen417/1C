@@ -65,26 +65,35 @@
     border-bottom: 1px solid #ccc;
     display: flex;
     flex: 0 0 auto;
+    height: 36px;
     min-height: 36px;
     box-sizing: border-box;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding: 4px 8px;
     gap: 6px;
     font-size: 11px;
     align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
     z-index: 5;
   }
+  #nav-bar::-webkit-scrollbar { display: none; }
+  #nav-actions, #nav-status { display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
+  #nav-actions { flex: 0 0 auto; gap: 6px; }
+  #nav-status { flex: 0 0 auto; gap: 10px; margin-left: auto; }
+  #nav-status > span { margin-left: 0 !important; }
   .nav-btn {
     background: #fff;
     border: 1px solid #aaa;
-    padding: 3px 9px;
+    padding: 3px 6px;
     border-radius: 2px;
     cursor: pointer;
     font-weight: 600;
     white-space: nowrap;
     flex: 0 0 auto;
   }
-  #btn-dyn-update { width: 224px; flex-basis: 224px; box-sizing: border-box; }
+  #btn-dyn-update { width: 210px; flex-basis: 210px; box-sizing: border-box; }
   .nav-btn:hover { background: #fffbe6; border-color: #cca400; }
   .nav-btn.special { background: #ffeaa7; font-weight: bold; border-color: #e17055; }
   .nav-btn.active-music { background: #55efc4; border-color: #00b894; }
@@ -571,15 +580,18 @@
 
   <!-- Меню -->
   <div id="nav-bar">
-    <button class="nav-btn special" id="btn-pause" onclick="game.togglePause()">⏸ Пауза [Esc / P]</button>
-    <button class="nav-btn" onclick="game.showLeaderboard()">🏆 Таблица рекордов</button>
-    <button class="nav-btn" id="btn-sound" onclick="game.sound.toggleMute()">🔊 Звуки: ВКЛ</button>
-    <button class="nav-btn active-music" id="btn-music" onclick="game.sound.toggleMusic()">🔥 Бит: ВКЛ</button>
-    <button class="nav-btn special" onclick="game.quickHeal()">💊 Протеин (+30 HP)</button>
-    <button class="nav-btn" id="btn-dyn-update" onclick="game.triggerDynamicUpdate()" style="background:#55efc4; font-weight:bold;">⚡ Дин. Обновление [ПРОБЕЛ]</button>
-    <span style="margin-left:auto; font-size:11px; color:#594500; font-weight:bold;">💰 <span id="currency-display">0</span> фиткоинов</span>
-    <span id="shop-timer" style="font-size:11px; color:#594500;">☎ 03:00</span>
-    <span style="margin-left:auto; font-size:11px; color:#666;">Dreamlo Cloud Sync</span>
+    <div id="nav-actions">
+      <button class="nav-btn special" id="btn-pause" onclick="game.togglePause()">⏸ Пауза [Esc / P]</button>
+      <button class="nav-btn" onclick="game.showLeaderboard()">🏆 Таблица рекордов</button>
+      <button class="nav-btn" id="btn-sound" onclick="game.sound.toggleMute()">🔊 Звуки: ВКЛ</button>
+      <button class="nav-btn active-music" id="btn-music" onclick="game.sound.toggleMusic()">🔥 Бит: ВКЛ</button>
+      <button class="nav-btn" id="btn-dyn-update" onclick="game.triggerDynamicUpdate()" style="background:#55efc4; font-weight:bold;">⚡ Дин. Обновление [ПРОБЕЛ]</button>
+    </div>
+    <div id="nav-status">
+      <span style="font-size:11px; color:#594500; font-weight:bold;">💰 <span id="currency-display">0</span> фиткоинов</span>
+      <span id="shop-timer" style="font-size:11px; color:#594500;">☎ 03:00</span>
+      <span style="font-size:11px; color:#666;">Helix</span>
+    </div>
   </div>
 
   <!-- Опыт -->
@@ -2370,17 +2382,6 @@ class Game {
       this.createHitFX(e.x, e.y, '#ffd200', 6);
     }
     this.addPopup(this.player.x, this.player.y - 40, "СЕАНС РАЗОРВАН АДМИНИСТРАТОРОМ!", "#ffd200");
-  }
-
-  quickHeal() {
-    if (this.player.hp >= this.player.maxHp) {
-      this.log("Целостность 100%, приберегите банку для нагрузки!");
-      return;
-    }
-    this.player.hp = Math.min(this.player.maxHp, this.player.hp + 30);
-    this.sound.playTone(420, 'sine', 0.2, 0.15);
-    this.log('Техспец по Манго Офису подключился через AnyDesk и нашёл запасной протеин: +30 HP к целостности базы.');
-    this.addPopup(this.player.x, this.player.y - 20, "+30 HP", "#2ecc71");
   }
 
   showBanner(msg) {

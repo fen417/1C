@@ -753,7 +753,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; в прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
+        <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
         <details class="release-notes"><summary><h3>1.4.0 — «Центральный кластер»</h3></summary><p>Каждые пять минут карта очищается от обычных противников, и в центре появляется неподвижный большой босс. Перед его атаками появляются предупреждения — нужно уворачиваться и наносить урон своими умениями. У босса отдельная агрессивная музыка, которая после победы плавно уступает обычному биту. По карте периодически появляются бананы, чтобы помочь пережить бой. Расходники закреплены за своими клавишами и не сдвигаются после использования.</p></details>
         <details class="release-notes"><summary><h3>1.3.0 — «Ночной клубный релиз»</h3></summary><p>Боссы получили отдельный агрессивный бит, который меняется вместе с боем и плавно возвращается к обычной музыке после победы. Для прокачки добавлены рикошет снарядов, мультивыстрел и замедляющие попадания — каждое улучшение можно развить до пятого уровня. Отдел продаж раз в несколько минут присылает движущееся уведомление: ответьте на звонок, чтобы открыть магазин, или сбросьте его. Появились новые шутки про телефонную поддержку, Манго Офис, AnyDesk и медленный Rudesktop.</p></details>
@@ -2110,6 +2110,11 @@ class Game {
         title: 'Подключение к серверу через Rudesktop: продержаться 32 секунды без урона. Клиент уже трижды спросил, виден ли его экран в Манго Офис.'
       },
       {
+        objectives: [{ type: 'surviveInverted', target: 45, label: 'пережить инверсию управления' }], duration: 45,
+        reward: 76 + difficulty * 4, invertControls: true,
+        title: 'Тикет от Максима Воронина: всё управление инвертировано. Продержаться 45 секунд — Максим на линии и ждёт подтверждения.'
+      },
+      {
         objectives: [{ type: 'shooters', target: shooterTarget, label: 'нейтрализовать удалённых специалистов' }], duration: 55,
         reward: 68 + difficulty * 4,
         title: `Интеграция не отвечает, а удалённая команда шлёт встречные запросы. Остановить ${shooterTarget} дальнобойных специалистов за 55 секунд.`
@@ -2159,10 +2164,11 @@ class Game {
       head.textContent = '📩 Тикет в работе';
       actions.style.display = 'none';
       const amounts = challenge.objectives.map(objective => {
-        const current = objective.type === 'survive' ? Math.floor(objective.progress) : objective.progress;
-        return `${objective.label}: ${Math.min(objective.target, current)}/${objective.target}${objective.type === 'survive' ? ' сек.' : ''}`;
+        const isTimed = objective.type === 'survive' || objective.type === 'surviveInverted';
+        const current = isTimed ? Math.floor(objective.progress) : objective.progress;
+        return `${objective.label}: ${Math.min(objective.target, current)}/${objective.target}${isTimed ? ' сек.' : ''}`;
       });
-      progress.textContent = `${amounts.join(' · ')} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
+      progress.textContent = `${challenge.invertControls ? '🔀 Управление инвертировано · ' : ''}${amounts.join(' · ')} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
     } else {
       head.textContent = challenge.status === 'success' ? '✅ Тикет закрыт' : '⌛ Тикет просрочен';
       progress.textContent = challenge.status === 'success'
@@ -2224,10 +2230,12 @@ class Game {
           this.closeChallenge(false);
           return;
         }
-        challenge.objectives.forEach(objective => {
-          if (objective.type === 'survive') objective.progress = Math.min(objective.target, objective.progress + dt);
-        });
       }
+      challenge.objectives.forEach(objective => {
+        if (objective.type === 'survive' || objective.type === 'surviveInverted') {
+          objective.progress = Math.min(objective.target, objective.progress + dt);
+        }
+      });
       challenge.lastHp = this.player.hp;
       challenge.remaining = Math.max(0, challenge.remaining - dt);
       if (challenge.objectives.every(objective => objective.progress >= objective.target)) {
@@ -3491,6 +3499,10 @@ class Game {
       const dy = this.mouseMoveAim.y - this.canvas.height / 2;
       const distance = Math.hypot(dx, dy);
       if (distance > 18) { mx = dx / distance; my = dy / distance; }
+    }
+    if (this.activeChallenge?.status === 'active' && this.activeChallenge.invertControls) {
+      mx *= -1;
+      my *= -1;
     }
 
     if (mx !== 0 || my !== 0) {

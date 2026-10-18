@@ -753,7 +753,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
+        <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
         <details class="release-notes"><summary><h3>1.4.0 — «Центральный кластер»</h3></summary><p>Каждые пять минут карта очищается от обычных противников, и в центре появляется неподвижный большой босс. Перед его атаками появляются предупреждения — нужно уворачиваться и наносить урон своими умениями. У босса отдельная агрессивная музыка, которая после победы плавно уступает обычному биту. По карте периодически появляются бананы, чтобы помочь пережить бой. Расходники закреплены за своими клавишами и не сдвигаются после использования.</p></details>
         <details class="release-notes"><summary><h3>1.3.0 — «Ночной клубный релиз»</h3></summary><p>Боссы получили отдельный агрессивный бит, который меняется вместе с боем и плавно возвращается к обычной музыке после победы. Для прокачки добавлены рикошет снарядов, мультивыстрел и замедляющие попадания — каждое улучшение можно развить до пятого уровня. Отдел продаж раз в несколько минут присылает движущееся уведомление: ответьте на звонок, чтобы открыть магазин, или сбросьте его. Появились новые шутки про телефонную поддержку, Mango Talker, AnyDesk и медленный Rudesktop.</p></details>
@@ -1279,81 +1279,145 @@ const PASSIVES_DEF = {
     name: 'Индексы MSSQL',
     icon: '⚡',
     desc: '+18% шанс критического урона (x2.5), но тяжёлые запросы немного замедляют атаки.',
-    mod: (p) => { p.critChance += 0.18; p.cdMult *= 1.03; }
+    levels: [
+      { critChance: 0.12, cdMult: 1.02 }, { critChance: 0.18, cdMult: 1.03 },
+      { critChance: 0.24, cdMult: 1.05 }, { critChance: 0.30, cdMult: 1.07 }, { critChance: 0.36, cdMult: 1.10 }
+    ],
+    levelDescriptions: ['+12% к шансу крита; перезарядка ×1,02.', '+18% к шансу крита; перезарядка ×1,03.', '+24% к шансу крита; перезарядка ×1,05.', '+30% к шансу крита; перезарядка ×1,07.', '+36% к шансу крита; перезарядка ×1,10.']
   },
   coffee_machine: {
     name: 'Кофе из 308 кабинета',
     icon: '☕',
     desc: 'Очередь на ресепшене подождёт: оружие и умения перезаряжаются на 12% быстрее.',
-    mod: (p) => { p.cdMult *= 0.88; }
+    levels: [
+      { cdMult: 0.94 }, { cdMult: 0.88 }, { cdMult: 0.82 }, { cdMult: 0.76 }, { cdMult: 0.70 }
+    ],
+    levelDescriptions: ['Перезарядка быстрее на 6%.', 'Перезарядка быстрее на 12%.', 'Перезарядка быстрее на 18%.', 'Перезарядка быстрее на 24%.', 'Перезарядка быстрее на 30%.']
   },
   backup_cron: {
     name: 'Авто-Бэкап в Облако',
     icon: '🛡️',
-    desc: 'Каждые 38 сек активирует золотой щит неуязвимости на 3.5 сек.',
-    mod: (p) => { p.hasBackupShield = true; }
+    desc: 'Автоматически активирует золотой щит неуязвимости.',
+    levels: [
+      { hasBackupShield: true, backupInterval: 42, backupDuration: 3.0 },
+      { hasBackupShield: true, backupInterval: 38, backupDuration: 3.5 },
+      { hasBackupShield: true, backupInterval: 35, backupDuration: 4.0 },
+      { hasBackupShield: true, backupInterval: 32, backupDuration: 4.5 },
+      { hasBackupShield: true, backupInterval: 29, backupDuration: 5.0 }
+    ],
+    levelDescriptions: ['Щит на 3 сек. каждые 42 сек.', 'Щит на 3,5 сек. каждые 38 сек.', 'Щит на 4 сек. каждые 35 сек.', 'Щит на 4,5 сек. каждые 32 сек.', 'Щит на 5 сек. каждые 29 сек.']
   },
   cert_specialist: {
     name: 'Сертификат «1С:Специалист»',
     icon: '🎓',
     desc: 'Обновление конфигурации прошло у техспеца. Клиент пока ищет кнопку «Запустить новую версию». +30% к опыту, но бег немного медленнее.',
-    mod: (p) => { p.xpMult += 0.30; p.speedMult -= 0.025; }
+    levels: [
+      { xpMult: 0.20, speedMult: -0.02 }, { xpMult: 0.30, speedMult: -0.025 },
+      { xpMult: 0.40, speedMult: -0.03 }, { xpMult: 0.52, speedMult: -0.035 }, { xpMult: 0.65, speedMult: -0.04 }
+    ],
+    levelDescriptions: ['+20% опыта, −2% скорости.', '+30% опыта, −2,5% скорости.', '+40% опыта, −3% скорости.', '+52% опыта, −3,5% скорости.', '+65% опыта, −4% скорости.']
   },
   overtime_pizza: {
     name: 'Овертайм за Пиццу',
     icon: '🍕',
     desc: '+35% к общему урону, но программист тяжелеет (-8% скорости).',
-    mod: (p) => { p.dmgMult += 0.35; p.speedMult -= 0.08; }
+    levels: [
+      { dmgMult: 0.25, speedMult: -0.05 }, { dmgMult: 0.35, speedMult: -0.08 },
+      { dmgMult: 0.45, speedMult: -0.09 }, { dmgMult: 0.56, speedMult: -0.11 }, { dmgMult: 0.68, speedMult: -0.13 }
+    ],
+    levelDescriptions: ['+25% урона, −5% скорости.', '+35% урона, −8% скорости.', '+45% урона, −9% скорости.', '+56% урона, −11% скорости.', '+68% урона, −13% скорости.']
   },
   shoe_covers: {
     name: 'Одноразовые Бахилы',
     icon: '👟',
     desc: '+14% к скорости бега и оставляет замедляющую синюю жижу.',
-    mod: (p) => { p.speedMult += 0.14; p.hasShoeTrail = true; }
+    levels: [
+      { speedMult: 0.10, hasShoeTrail: true }, { speedMult: 0.14, hasShoeTrail: true },
+      { speedMult: 0.18, hasShoeTrail: true }, { speedMult: 0.22, hasShoeTrail: true }, { speedMult: 0.26, hasShoeTrail: true }
+    ],
+    levelDescriptions: ['+10% скорости и синяя дорожка.', '+14% скорости и синяя дорожка.', '+18% скорости и синяя дорожка.', '+22% скорости и синяя дорожка.', '+26% скорости и синяя дорожка.']
   },
   hasp_emu: {
     name: 'HASP Эмулятор 2008',
     icon: '🗝️',
     desc: '+14% шанс увернуться от претензий клиента.',
-    mod: (p) => { p.dodge += 0.14; }
+    levels: [{ dodge: 0.10 }, { dodge: 0.14 }, { dodge: 0.18 }, { dodge: 0.22 }, { dodge: 0.26 }],
+    levelDescriptions: ['+10% к шансу уклонения.', '+14% к шансу уклонения.', '+18% к шансу уклонения.', '+22% к шансу уклонения.', '+26% к шансу уклонения.']
   },
   server_x64: {
     name: 'Сервер 1С Предприятие x64',
     icon: '🖥️',
     desc: 'Развёртывание базы у клиента: на тестовом сервере всё летало, на боевом внезапно закончилось место. Магнит +50%, скорость чуть ниже.',
-    mod: (p) => { p.magnetMult += 0.5; p.speedMult -= 0.02; }
+    levels: [
+      { magnetMult: 0.35, speedMult: -0.01 }, { magnetMult: 0.50, speedMult: -0.02 },
+      { magnetMult: 0.65, speedMult: -0.03 }, { magnetMult: 0.80, speedMult: -0.04 }, { magnetMult: 0.95, speedMult: -0.05 }
+    ],
+    levelDescriptions: ['+35% радиуса сбора, −1% скорости.', '+50% радиуса сбора, −2% скорости.', '+65% радиуса сбора, −3% скорости.', '+80% радиуса сбора, −4% скорости.', '+95% радиуса сбора, −5% скорости.']
   },
   messenger_hub: {
     name: 'Интеграция мессенджеров',
     icon: '💬',
     desc: 'Клиент отключил уведомления и просит проверить доставку сообщения по телефону. +18% к опыту, но бег немного медленнее.',
-    mod: (p) => { p.xpMult += 0.18; p.speedMult -= 0.02; }
+    levels: [
+      { xpMult: 0.12, speedMult: -0.01 }, { xpMult: 0.18, speedMult: -0.02 },
+      { xpMult: 0.24, speedMult: -0.03 }, { xpMult: 0.30, speedMult: -0.04 }, { xpMult: 0.36, speedMult: -0.05 }
+    ],
+    levelDescriptions: ['+12% опыта, −1% скорости.', '+18% опыта, −2% скорости.', '+24% опыта, −3% скорости.', '+30% опыта, −4% скорости.', '+36% опыта, −5% скорости.']
   },
   evotor_paid: {
     name: 'Эвотор: платная интеграция',
     icon: '💸',
     desc: 'Техспец подключил платный модуль Эвотор, настроил обмен и объяснил, почему оплата не равна интеграции. +22% к урону, откат дольше на 8%.',
-    mod: (p) => { p.dmgMult += 0.22; p.cdMult *= 1.08; }
+    levels: [
+      { dmgMult: 0.15, cdMult: 1.05 }, { dmgMult: 0.22, cdMult: 1.08 },
+      { dmgMult: 0.29, cdMult: 1.11 }, { dmgMult: 0.36, cdMult: 1.15 }, { dmgMult: 0.43, cdMult: 1.19 }
+    ],
+    levelDescriptions: ['+15% урона, перезарядка ×1,05.', '+22% урона, перезарядка ×1,08.', '+29% урона, перезарядка ×1,11.', '+36% урона, перезарядка ×1,15.', '+43% урона, перезарядка ×1,19.']
   },
   try_except: {
     name: 'Попытка...Исключение',
     icon: '🩹',
     desc: 'Регенерация целостности базы (+2.5 HP в секунду).',
-    mod: (p) => { p.regen += 2.5; }
+    levels: [{ regen: 1.5 }, { regen: 2.5 }, { regen: 3.2 }, { regen: 4.0 }, { regen: 5.0 }],
+    levelDescriptions: ['+1,5 HP регенерации в секунду.', '+2,5 HP регенерации в секунду.', '+3,2 HP регенерации в секунду.', '+4 HP регенерации в секунду.', '+5 HP регенерации в секунду.']
   },
   mango_hold: {
     name: 'Клиент ищет кнопку «Разрешить»',
     icon: '📞',
     desc: 'Пока клиент сверяет код из SMS с письмом, опыт приходит быстрее. Но отвлекающие звонки немного снижают урон.',
-    mod: (p) => { p.xpMult += 0.08; p.dmgMult -= 0.015; }
+    levels: [
+      { xpMult: 0.05, dmgMult: -0.01 }, { xpMult: 0.08, dmgMult: -0.015 },
+      { xpMult: 0.11, dmgMult: -0.02 }, { xpMult: 0.14, dmgMult: -0.025 }, { xpMult: 0.17, dmgMult: -0.03 }
+    ],
+    levelDescriptions: ['+5% опыта, −1% урона.', '+8% опыта, −1,5% урона.', '+11% опыта, −2% урона.', '+14% опыта, −2,5% урона.', '+17% опыта, −3% урона.']
   },
   rudesktop_lag: {
     name: 'Rudesktop: курсор уже почти здесь',
     icon: '🖱️',
     desc: 'Пока экран обновляет один пиксель, специалист успевает сделать больше. Скорость выше, перезарядка чуть дольше.',
-    mod: (p) => { p.speedMult += 0.07; p.cdMult *= 1.04; }
+    levels: [
+      { speedMult: 0.04, cdMult: 1.02 }, { speedMult: 0.07, cdMult: 1.04 },
+      { speedMult: 0.10, cdMult: 1.06 }, { speedMult: 0.13, cdMult: 1.08 }, { speedMult: 0.16, cdMult: 1.10 }
+    ],
+    levelDescriptions: ['+4% скорости, перезарядка ×1,02.', '+7% скорости, перезарядка ×1,04.', '+10% скорости, перезарядка ×1,06.', '+13% скорости, перезарядка ×1,08.', '+16% скорости, перезарядка ×1,10.']
   }
 };
+
+const PASSIVE_MULTIPLIERS = new Set(['cdMult']);
+const PASSIVE_FIXED_STATS = new Set(['hasBackupShield', 'hasShoeTrail', 'backupInterval', 'backupDuration']);
+
+function applyPassiveLevel(player, key, fromLevel, toLevel) {
+  const definition = PASSIVES_DEF[key];
+  const previous = definition.levels[fromLevel - 1] || {};
+  const current = definition.levels[toLevel - 1];
+  for (const stat of new Set([...Object.keys(previous), ...Object.keys(current)])) {
+    const before = previous[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0);
+    const after = current[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0);
+    if (PASSIVE_FIXED_STATS.has(stat)) player[stat] = after;
+    else if (PASSIVE_MULTIPLIERS.has(stat)) player[stat] *= after / before;
+    else player[stat] += after - before;
+  }
+}
 
 /* ============================================================
    АКТИВНЫЕ УМЕНИЯ [1] [2] [3] [4]
@@ -1906,6 +1970,8 @@ class Game {
       slowShotLevel: 0,
       hasShoeTrail: false,
       hasBackupShield: false,
+      backupInterval: 38,
+      backupDuration: 3.5,
       shieldTimer: 0,
       speedBuffTimer: 0,
       coffeeBuffTimer: 0,
@@ -1936,7 +2002,7 @@ class Game {
 
     this.spawnTimer = 0;
     this.trailTimer = 0;
-    this.backupTimer = 38;
+    this.backupTimer = this.player.backupInterval;
     this.nextBossMinute = 1;
     this.nextMiniBossAllowedTime = 0;
     this.nextMegaBossTime = 300;
@@ -2386,7 +2452,8 @@ class Game {
       icon: WEAPONS_DEF[key].icon, name: WEAPONS_DEF[key].name, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key].desc
     }));
     const passives = Object.entries(this.passives).map(([key, passive]) => ({
-      icon: PASSIVES_DEF[key].icon, name: PASSIVES_DEF[key].name, value: `ур. ${passive.lvl}`, detail: PASSIVES_DEF[key].desc
+      icon: PASSIVES_DEF[key].icon, name: PASSIVES_DEF[key].name, value: `ур. ${passive.lvl}/5`,
+      detail: PASSIVES_DEF[key].levelDescriptions[passive.lvl - 1]
     }));
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot']
@@ -3466,10 +3533,10 @@ class Game {
     if (this.player.hasBackupShield) {
       this.backupTimer -= dt;
       if (this.backupTimer <= 0) {
-        this.player.shieldTimer = 3.5;
-        this.backupTimer = 38;
+        this.player.shieldTimer = this.player.backupDuration;
+        this.backupTimer = this.player.backupInterval;
         this.sound.playTone(880, 'sine', 0.3, 0.2);
-        this.addPopup(this.player.x, this.player.y - 30, "🛡️ БЭКАП В ОБЛАКО (ЩИТ 3.5c)", "#00cec9");
+        this.addPopup(this.player.x, this.player.y - 30, `🛡️ БЭКАП В ОБЛАКО (ЩИТ ${this.player.backupDuration}с)`, "#00cec9");
       }
     }
     if (this.player.shieldTimer > 0) this.player.shieldTimer -= dt;
@@ -3910,12 +3977,16 @@ class Game {
       if (ch.type.endsWith('new')) title = `${ch.def.name} <b style="color:#27ae60">[НОВОЕ]</b>`;
       else if (ch.type.endsWith('up')) title = `${ch.def.name} [УР. ${ch.lvl}]`;
       else title = `${ch.def.name} <b style="color:#f39c12">[БОНУС РЕЛИЗА]</b>`;
+      const passiveLevel = ch.type === 'pass_new' ? 1 : (ch.type === 'pass_up' ? ch.lvl : 0);
+      const description = passiveLevel
+        ? `${ch.def.levelDescriptions[passiveLevel - 1]} (уровень ${passiveLevel} из 5)`
+        : ch.def.desc;
 
       card.innerHTML = `
         <div class="card-icon">${ch.def.icon}</div>
         <div class="card-info">
           <h4>${title}</h4>
-          <p>${ch.def.desc}</p>
+          <p>${description}</p>
         </div>
       `;
       card.onclick = () => {
@@ -3941,10 +4012,13 @@ class Game {
       this.weapons[ch.key].lvl++;
     } else if (ch.type === 'pass_new') {
       this.passives[ch.key] = { lvl: 1 };
-      PASSIVES_DEF[ch.key].mod(this.player);
+      applyPassiveLevel(this.player, ch.key, 0, 1);
+      if (ch.key === 'backup_cron') this.backupTimer = this.player.backupInterval;
     } else if (ch.type === 'pass_up') {
+      const previousLevel = this.passives[ch.key].lvl;
       this.passives[ch.key].lvl++;
-      PASSIVES_DEF[ch.key].mod(this.player);
+      applyPassiveLevel(this.player, ch.key, previousLevel, this.passives[ch.key].lvl);
+      if (ch.key === 'backup_cron') this.backupTimer = this.player.backupInterval;
     } else if (ch.type === 'active_new') {
       const freeIdx = this.activeSkills.findIndex(s => s === null);
       if (freeIdx !== -1) {

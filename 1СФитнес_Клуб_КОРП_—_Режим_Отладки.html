@@ -719,7 +719,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.7.0 — «Три отказа и М.В.»</h3>
-              <p>В паузе видны характеристики героя с учётом усилений. После трёх отказов на героя выходит М.В., а после десятой минуты приходят новые мини-боссы. Магазин пополнился пассивными улучшениями и шестью слотами инвентаря; громкость бита и звуков игры настраивается отдельно.</p>
+              <p>В паузе видны характеристики героя с учётом усилений. После трёх отказов на героя выходит М.В., а после десятой минуты приходят новые мини-боссы. Магазин пополнился пассивными улучшениями и шестью слотами инвентаря; громкость бита и звуков игры настраивается отдельно. Появились новые умения и противники с разными повадками, а встречи в клубе стали ещё веселее. После пятнадцатой минуты за героем до конца забега медленно следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит» — при встрече с ним сессия завершается.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.5.0 — «Новые обращения»</h3>
@@ -760,7 +760,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе.</p></details>
+        <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
         <details class="release-notes"><summary><h3>1.4.0 — «Центральный кластер»</h3></summary><p>Каждые пять минут карта очищается от обычных противников, и в центре появляется неподвижный большой босс. Перед его атаками появляются предупреждения — нужно уворачиваться и наносить урон своими умениями. У босса отдельная агрессивная музыка, которая после победы плавно уступает обычному биту. По карте периодически появляются бананы, чтобы помочь пережить бой. Расходники закреплены за своими клавишами и не сдвигаются после использования.</p></details>
@@ -1253,7 +1253,7 @@ const WEAPONS_DEF = {
   turnstile: {
     name: 'СКУД Sigur / AVI',
     icon: '🚧',
-    desc: '«Коробочка мигает — значит подключена?» Через AnyDesk выяснилось: питание есть, сетевой кабель лежит рядом. Турникет отталкивает толпу.',
+    desc: '«Коробочка мигает — значит подключена?» Питание есть, кабель лежит рядом, а клиент уже прислал счёт за простой. Турникет отталкивает толпу.',
     baseCooldown: 0,
     baseDmg: 16
   },
@@ -1281,14 +1281,14 @@ const WEAPONS_DEF = {
   protein: {
     name: 'Протеиновый Шейкер',
     icon: '🥛',
-    desc: 'Бросает банку с протеином, разливая скользкую жижу урона.',
+    desc: 'Бросает шейкер с протеином. Разлив бодрит врагов, но пол после него скользкий даже для кассы.',
     baseCooldown: 2.2,
     baseDmg: 16
   },
   cache_aura: {
     name: 'Сброс Кэша Сеансов',
     icon: '🧄',
-    desc: 'Постоянная аура вокруг сервера разработки, выжигающая зависших.',
+    desc: 'Постоянная аура вокруг сервера разработки. Чистит кэш, кроме папки «Новая папка (7) — точно не трогать».',
     baseCooldown: 0.4,
     baseDmg: 12
   },
@@ -1668,6 +1668,49 @@ const ACTIVE_SKILLS_DEF = {
       }
       g.addPopup(g.player.x, g.player.y - 34, `☎️ ПОДКЛЮЧЕНО СПЕЦИАЛИСТОВ: ${count}`, '#55efc4');
       g.sound.playTone(620, 'sine', 0.22, 0.17);
+    }
+  },
+  act_cache_purge: {
+    name: 'Очистка кэша на боевом сервере',
+    icon: '🧹',
+    desc: 'Волна техподдержки бьёт врагов, отталкивает и ненадолго останавливает обычных. Заодно закрывает вражеские снаряды. «А корзину очистить?» — «Тоже».' ,
+    baseCd: 27,
+    cast: (g, lvl) => {
+      const radius = 300 + lvl * 24;
+      for (const e of g.enemies) {
+        if (e.is24hPursuer) continue;
+        const dx = e.x - g.player.x, dy = e.y - g.player.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance > radius) continue;
+        e.hp -= (e.isBoss ? 110 : 180) + lvl * 45;
+        e.freezeTimer = Math.max(e.freezeTimer || 0, e.isBoss ? 0.5 : 1.1 + lvl * 0.12);
+        const push = Math.min(130, radius - distance + 30);
+        e.x += (dx / (distance || 1)) * push;
+        e.y += (dy / (distance || 1)) * push;
+        g.createHitFX(e.x, e.y, '#55efc4', 5);
+      }
+      const before = g.enemyProjectiles.length;
+      g.enemyProjectiles = g.enemyProjectiles.filter(p => Math.hypot(p.x - g.player.x, p.y - g.player.y) > radius);
+      g.sound.skillCast();
+      g.addPopup(g.player.x, g.player.y - 34, `🧹 КЭШ ОЧИЩЕН · СНАРЯДОВ УБРАНО: ${before - g.enemyProjectiles.length}`, '#55efc4');
+    }
+  },
+  act_technician_drone: {
+    name: 'Дрон техспециалиста на удалёнке',
+    icon: '🛠️',
+    desc: 'На несколько секунд вызывает дрон, который кружит рядом и обстреливает врагов. Перед вылетом спрашивает: «Экран видно?» — «Виден только счёт».' ,
+    baseCd: 36,
+    cast: (g, lvl) => {
+      g.summons = g.summons.filter(s => s.role !== 'drone');
+      const life = 10 + lvl * 2;
+      g.summons.push({
+        role: 'drone', id: `${g.time}-drone`, x: g.player.x + 42, y: g.player.y - 24,
+        size: 14, hp: 110 + lvl * 28, maxHp: 110 + lvl * 28,
+        life, maxLife: life, dmg: 34 + lvl * 12, attackTimer: 0.35,
+        orbitAngle: Math.PI * 1.5, icon: '🛠️', color: '#74b9ff'
+      });
+      g.addPopup(g.player.x, g.player.y - 34, '🛠️ УДАЛЁННЫЙ СПЕЦИАЛИСТ ПОДКЛЮЧИЛСЯ', '#74b9ff');
+      g.sound.skillCast();
     }
   },
   act_senior_escalation: {
@@ -2609,7 +2652,7 @@ class Game {
       section('Боевые модификаторы', combat),
       section('Активные умения · 1–4', active),
       section('Помощники на линии', this.summons.map(s => ({
-        icon: s.icon, name: s.role === 'senior' ? 'Старший специалист второй линии' : 'Специалист техподдержки',
+        icon: s.icon, name: s.role === 'senior' ? 'Старший специалист второй линии' : s.role === 'drone' ? 'Дрон техспециалиста' : 'Специалист техподдержки',
         value: `${Math.ceil(s.hp)} HP · ${Math.ceil(s.life)}с`, detail: 'Следует за героем и помогает в бою.'
       }))),
       section('Временные усиления', temporary),
@@ -2737,7 +2780,7 @@ class Game {
           const angle = Math.atan2(target.y - summon.y, target.x - summon.x);
           this.projectiles.push({ x: summon.x, y: summon.y,
             vx: Math.cos(angle) * 8.2, vy: Math.sin(angle) * 8.2,
-            dmg: summon.dmg, life: 1.8, icon: '📞', color: '#55efc4', size: 7,
+            dmg: summon.dmg, life: 1.8, icon: summon.role === 'drone' ? '🛠️' : '📞', color: summon.color || '#55efc4', size: summon.role === 'drone' ? 9 : 7,
             hitTargets: [], ricochetsRemaining: 0, isSummon: true });
         }
       }
@@ -2775,37 +2818,42 @@ class Game {
   }
 
   triggerOfficeEvent() {
-    const roll = Math.floor(Math.random() * 4);
+    const roll = Math.floor(Math.random() * 8);
     if (roll === 0) {
-      this.showBanner('🔥 Три кассы подключены в один COM-порт. Клиент спрашивает, почему очередь.');
+      this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
-      for (let e of this.enemies) e.hp *= 0.8;
+      for (const e of this.enemies) if (!e.is24hPursuer) e.hp *= 0.8;
     } else if (roll === 1) {
-      this.showBanner('🎁 «После обновления ничего не работает». Клиент нажал «Обновить» раньше инструкции. Конфигурация обновлена, опыт x2!');
+      this.showBanner('🎁 «После обновления ничего не работает». Клиент нажал «Обновить» раньше инструкции. Опыт x2 — хоть что-то обновилось успешно.');
       this.player.xpEventMult = 2.0;
       this.player.xpBoostTimer = 14;
     } else if (roll === 2) {
-      this.showBanner("🧹 ПОСЛЕ УБОРКИ: на ресепшене забыли поставить табличку «мокрый пол»!");
+      this.showBanner('🧹 Уборка завершена. Табличка «мокрый пол» ушла в отпуск вместе с уборщицей.');
       for (let i = 0; i < 8; i++) {
-        this.puddles.push({
-          x: this.player.x + (Math.random() - 0.5) * 500,
-          y: this.player.y + (Math.random() - 0.5) * 500,
-          radius: 60, dmg: 8, life: 12, isTrail: true
-        });
+        this.puddles.push({ x: this.player.x + (Math.random() - 0.5) * 500, y: this.player.y + (Math.random() - 0.5) * 500, radius: 60, dmg: 8, life: 12, isTrail: true });
       }
+    } else if (roll === 3) {
+      this.showBanner('🎟️ Базу развернули через AnyDesk. Пароль нашли под клавиатурой — клиент прочитал его по телефону вверх ногами.');
+      for (let i = 0; i < 16; i++) this.gems.push({ x: this.player.x + (Math.random() - 0.5) * 350, y: this.player.y + (Math.random() - 0.5) * 350, xp: 15, col: '#ffd200' });
+    } else if (roll === 4) {
+      this.showBanner('🖥️ Перезагрузка помогла. Правда, перезагрузили принтер, зато он теперь знает пароль от Wi-Fi.');
+      for (const e of this.enemies) {
+        if (e.is24hPursuer) continue;
+        e.hp -= e.isBoss ? 110 : 85;
+        e.freezeTimer = Math.max(e.freezeTimer || 0, e.isBoss ? 0.8 : 1.6);
+      }
+    } else if (roll === 5) {
+      this.showBanner('📅 Внеплановая планёрка назначена на вчера. За опоздание списали только половину опыта.');
+      this.player.speedBuffTimer = Math.max(this.player.speedBuffTimer, 8);
+      for (let i = 0; i < 7; i++) this.gems.push({ x: this.player.x + (Math.random() - 0.5) * 280, y: this.player.y + (Math.random() - 0.5) * 280, xp: 11, col: '#55efc4' });
+    } else if (roll === 6) {
+      this.showBanner('📞 «Алло, вы меня слышите?» — «Да». — «Тогда почему молчите?» За терпение: защитный щит на 3 секунды.');
+      this.player.shieldTimer = Math.max(this.player.shieldTimer, 3);
     } else {
-      this.showBanner('🎟️ Базу развернули на сервере клиента через AnyDesk. Пароль нашли на стикере под клавиатурой — клиент прочитал его по телефону.');
-      for (let i = 0; i < 16; i++) {
-        this.gems.push({
-          x: this.player.x + (Math.random() - 0.5) * 350,
-          y: this.player.y + (Math.random() - 0.5) * 350,
-          xp: 15,
-          col: '#ffd200'
-        });
-      }
+      this.showBanner('🧪 «У нас на тестовой базе работало». Клиент подключил её к продакшену. В зал зашли три тестировщика.');
+      for (let i = 0; i < 3; i++) this.spawnEnemy();
     }
   }
-
   spawnDirector(dt) {
     this.spawnTimer -= dt;
     if (this.time >= this.nextMegaBossTime) {
@@ -2871,7 +2919,10 @@ class Game {
     const roll = Math.random();
     let type = 'gymbro';
 
-    if (this.time > 150 && roll < 0.08) type = 'mango_client';
+    if (this.time > 480 && roll < 0.06) type = 'queue_blob';
+    else if (this.time > 360 && roll < 0.12) type = 'audit_bot';
+    else if (this.time > 240 && roll < 0.18) type = 'refresh_client';
+    else if (this.time > 150 && roll < 0.08) type = 'mango_client';
     else if (this.time > 150 && roll < 0.16) type = 'rudesktop_cursor';
     else if (this.time > 15 && roll < 0.22) type = 'trainee';
     else if (this.time > 30 && roll < 0.40) type = 'fitgirl';
@@ -2891,7 +2942,10 @@ class Game {
       remote_dev: { name: 'Тимлид на удаленке', hp: 120, speed: 1.2, dmg: 14, icon: '💻', xp: 14, size: 21, col: '#6c5ce7', shooter: true, shootTimer: 2.2 },
       evotor: { name: 'Эвотор: «интеграция за отдельную плату»', hp: 96, speed: 1.15, dmg: 13, icon: '💸', xp: 12, size: 19, col: '#e84393', shooter: true, shootTimer: 2.8 },
       mango_client: { name: 'Клиент: «Алло, вы меня слышите?»', hp: 105, speed: 1.35, dmg: 12, icon: '📞', xp: 12, size: 19, col: '#16a085', shooter: true, shootTimer: 3.4 },
-      rudesktop_cursor: { name: 'Курсор Rudesktop (ещё 3 пикселя)', hp: 82, speed: 3.5, dmg: 9, icon: '🖱️', xp: 9, size: 14, col: '#6c5ce7' }
+      rudesktop_cursor: { name: 'Курсор Rudesktop (ещё 3 пикселя)', hp: 82, speed: 3.5, dmg: 9, icon: '🖱️', xp: 9, size: 14, col: '#6c5ce7' },
+      refresh_client: { name: 'Клиент обновляет страницу, пока вы объясняете', hp: 96, speed: 1.55, dmg: 11, icon: '🔄', xp: 11, size: 16, col: '#00b894', isRefreshClient: true },
+      audit_bot: { name: 'Аудитор с чек-листом на 47 пунктов', hp: 150, speed: 1.05, dmg: 13, icon: '🧾', xp: 16, size: 20, col: '#f39c12', shooter: true, burstShooter: true, shootTimer: 3.0 },
+      queue_blob: { name: 'Очередь на ресепшене · растёт сама', hp: 250, speed: 0.82, dmg: 21, icon: '🗂️', xp: 20, size: 24, col: '#6c5ce7', explodes: true }
     };
 
     const d = defs[type];
@@ -2909,6 +2963,8 @@ class Game {
       col: d.col,
       explodes: d.explodes || false,
       shooter: d.shooter || false,
+      burstShooter: d.burstShooter || false,
+      isRefreshClient: d.isRefreshClient || false,
       shootTimer: d.shootTimer || 0,
       isCleaner: d.isCleaner || false,
       freezeTimer: 0,
@@ -3931,7 +3987,21 @@ class Game {
       }
 
       const ang = Math.atan2(this.player.y - e.y, this.player.x - e.x);
-      const moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1);
+      let moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1);
+      if (e.isRefreshClient) {
+        e.dashTimer = (e.dashTimer ?? 3.8) - dt;
+        if (e.dashTimer <= 0) {
+          e.dashTimer = 5.2;
+          e.dashDuration = 0.72;
+          this.addPopup(e.x, e.y - 20, 'F5 — ОБНОВЛЕНИЕ УЖЕ ПОШЛО', '#00b894');
+        }
+        if (e.dashDuration > 0) {
+          e.dashDuration -= dt;
+          moveSpeed *= 2.7;
+        } else {
+          moveSpeed *= 0.62;
+        }
+      }
       if (!e.isMegaBoss) {
         e.x += Math.cos(ang) * moveSpeed * frameScale;
         e.y += Math.sin(ang) * moveSpeed * frameScale;
@@ -3943,16 +4013,23 @@ class Game {
 
       if (e.shooter) {
         e.shootTimer -= dt;
-        if (e.shootTimer <= 0 && Math.hypot(this.player.x - e.x, this.player.y - e.y) < 450) {
-          e.shootTimer = 2.4;
-          this.enemyProjectiles.push({
-            x: e.x, y: e.y,
-            vx: Math.cos(ang) * 4.5, vy: Math.sin(ang) * 4.5,
-            dmg: 16, size: 7, life: 2.2, icon: '⚠️', color: '#ff3838'
-          });
+        if (e.shootTimer <= 0 && Math.hypot(this.player.x - e.x, this.player.y - e.y) < 520) {
+          e.shootTimer = e.burstShooter ? 3.4 : 2.4;
+          const aim = Math.atan2(this.player.y - e.y, this.player.x - e.x);
+          const offsets = e.burstShooter ? [-0.2, 0, 0.2] : [0];
+          for (const offset of offsets) {
+            const angle = aim + offset;
+            this.enemyProjectiles.push({
+              x: e.x, y: e.y,
+              vx: Math.cos(angle) * (e.burstShooter ? 4.2 : 4.5),
+              vy: Math.sin(angle) * (e.burstShooter ? 4.2 : 4.5),
+              dmg: e.burstShooter ? 13 : 16, size: e.burstShooter ? 8 : 7, life: 2.2,
+              icon: e.burstShooter ? '🧾' : '⚠️', color: e.col
+            });
+          }
+          if (e.burstShooter) this.addPopup(e.x, e.y - e.size - 12, 'ПРОВЕРКА ПО ПУНКТАМ!', '#f39c12');
         }
       }
-
       // Касание
       if (Math.hypot(this.player.x - e.x, this.player.y - e.y) < e.size + 18) {
         if (e.is24hPursuer) {

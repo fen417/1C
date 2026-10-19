@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.6.0</title>
+<title>1С:Фитнес Клуб КОРП 1.7.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -588,7 +588,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.6.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.7.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -622,6 +622,7 @@
     <div id="hud-top-left">
       <div id="hud-inventory"></div>
       <div id="hud-buffs"><div class="inv-slot" id="coffee-buff-icon"><span id="coffee-buff-symbol">☕</span><span class="inv-lvl" id="coffee-buff-timer"></span></div><span id="buff-indicator"></span></div>
+      <div id="hud-shop-passives" aria-label="Пассивные предметы" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;"></div>
     </div>
     <div id="hud-health">
       <div id="hud-health-label"><span>❤️ ЗДОРОВЬЕ</span><span id="hud-health-value">100 / 100</span></div>
@@ -705,7 +706,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.6.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.7.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -713,12 +714,12 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.6.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.7.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 1.6.0 — «Релиз без отката»</h3>
-              <p>На помощь можно вызвать техподдержку, а героем можно управлять клавиатурой или мышью. Между мини-боссами появилась передышка, большие боссы приходят с разными атаками, а тикеты стали сложнее и срочнее.</p>
+              <h3>Версия 1.7.0 — «Три отказа и М.В.»</h3>
+              <p>В паузе видны характеристики героя с учётом усилений. После трёх отказов на героя выходит М.В., а после десятой минуты приходят новые мини-боссы. Магазин пополнился пассивными улучшениями и шестью слотами инвентаря; громкость бита и звуков игры настраивается отдельно.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
               <h3>Версия 1.5.0 — «Новые обращения»</h3>
@@ -740,6 +741,12 @@
           <button class="btn-1c" id="settings-sound" onclick="game.sound.toggleMute()">🔊 Звуковые эффекты</button>
           <button class="btn-1c" id="settings-music" onclick="game.sound.toggleMusic()">🎵 Музыка</button>
         </div>
+        <div class="release-notes" style="margin-bottom:14px;">
+          <label for="music-volume" style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:7px;"><b>🔥 Громкость бита</b><span id="music-volume-value">70%</span></label>
+          <input id="music-volume" type="range" min="0" max="100" value="70" oninput="game.sound.setVolume('music', this.value)" style="width:100%; margin-bottom:12px;">
+          <label for="sfx-volume" style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:7px;"><b>🔊 Звуки игры</b><span id="sfx-volume-value">70%</span></label>
+          <input id="sfx-volume" type="range" min="0" max="100" value="70" oninput="game.sound.setVolume('sfx', this.value)" style="width:100%;">
+        </div>
         <div class="release-notes">
           <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 7, 8, 9, 0<br><b>Пауза:</b> Esc / P</p>
         </div>
@@ -753,6 +760,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
+        <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
         <details class="release-notes"><summary><h3>1.4.0 — «Центральный кластер»</h3></summary><p>Каждые пять минут карта очищается от обычных противников, и в центре появляется неподвижный большой босс. Перед его атаками появляются предупреждения — нужно уворачиваться и наносить урон своими умениями. У босса отдельная агрессивная музыка, которая после победы плавно уступает обычному биту. По карте периодически появляются бананы, чтобы помочь пережить бой. Расходники закреплены за своими клавишами и не сдвигаются после использования.</p></details>
@@ -769,8 +777,11 @@
     <div class="win-1c" style="width:790px;">
       <div class="win-1c-head"><span>💼 Коммерческое предложение · отдел продаж</span><span id="shop-currency">💰 Бюджет: 0 фиткоинов</span></div>
       <div class="win-1c-body">
-        <p style="font-size:11px; color:#555; margin-bottom:9px;">Менеджер подготовил платные интеграции и временные лицензии. После подключения предмет попадёт в инвентарь; одновременно можно носить не более четырёх видов — клавиши 7, 8, 9 и 0.</p>
+        <p style="font-size:11px; color:#555; margin-bottom:9px;">Расходники занимают четыре быстрых слота (клавиши 7, 8, 9 и 0). Пассивные улучшения помещаются в отдельный инвентарь на шесть предметов и действуют до конца забега.</p>
+        <h3 style="font-size:13px; margin:10px 0 7px;">Расходники</h3>
         <div id="shop-products" class="shop-grid"></div>
+        <h3 style="font-size:13px; margin:14px 0 7px;">Пассивные предметы · инвентарь <span id="shop-passive-slots">0/6</span></h3>
+        <div id="shop-passive-products" class="shop-grid"></div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
           <span id="shop-message" style="font-size:11px; color:#555;">Предложение действует до завершения звонка.</span>
           <button class="btn-1c" style="background:#55efc4;" onclick="game.closeShop()">Завершить звонок и продолжить</button>
@@ -794,7 +805,9 @@
             </div>
           </div>
           <div>
-            <h2 style="font-size:14px; margin:0 0 8px;">Ваш персонаж: активные улучшения</h2>
+            <h2 style="font-size:14px; margin:0 0 8px;">Характеристики героя</h2>
+            <div id="pause-stats" class="pause-loadout" style="margin-bottom:12px;"></div>
+            <h2 style="font-size:14px; margin:0 0 8px;">Активные улучшения</h2>
             <div id="pause-loadout" class="pause-loadout"></div>
           </div>
         </div>
@@ -902,7 +915,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '1.6.0';
+const GAME_VERSION = '1.7.0';
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -913,6 +926,10 @@ class SoundEngine {
     this.gemPitch = 220;
     this.mutedSFX = false;
     this.musicEnabled = true;
+    this.musicVolume = Math.max(0, Math.min(1, Number(localStorage.getItem('1c_music_volume') ?? 0.7)));
+    this.sfxVolume = Math.max(0, Math.min(1, Number(localStorage.getItem('1c_sfx_volume') ?? 0.7)));
+    this.musicBus = null;
+    this.sfxBus = null;
     this.lastCritSoundAt = 0;
 
     this.musicTimer = null;
@@ -929,6 +946,12 @@ class SoundEngine {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AudioCtx();
+      this.musicBus = this.ctx.createGain();
+      this.sfxBus = this.ctx.createGain();
+      this.musicBus.gain.value = this.musicVolume;
+      this.sfxBus.gain.value = this.sfxVolume;
+      this.musicBus.connect(this.ctx.destination);
+      this.sfxBus.connect(this.ctx.destination);
       this.createNoiseBuffer();
       if (this.musicEnabled) this.startMusic();
     }
@@ -946,6 +969,20 @@ class SoundEngine {
     }
   }
 
+  setVolume(channel, value) {
+    const volume = Math.max(0, Math.min(1, Number(value) / 100));
+    if (channel === 'music') {
+      this.musicVolume = volume;
+      localStorage.setItem('1c_music_volume', String(volume));
+      document.getElementById('music-volume-value').textContent = `${Math.round(volume * 100)}%`;
+      if (this.musicBus) this.musicBus.gain.setTargetAtTime(volume, this.ctx.currentTime, 0.03);
+    } else {
+      this.sfxVolume = volume;
+      localStorage.setItem('1c_sfx_volume', String(volume));
+      document.getElementById('sfx-volume-value').textContent = `${Math.round(volume * 100)}%`;
+      if (this.sfxBus) this.sfxBus.gain.setTargetAtTime(volume, this.ctx.currentTime, 0.03);
+    }
+  }
   toggleMute() {
     this.mutedSFX = !this.mutedSFX;
     document.getElementById('btn-sound').innerText = this.mutedSFX ? "🔇 Звуки: ВЫКЛ" : "🔊 Звуки: ВКЛ";
@@ -1032,7 +1069,7 @@ class SoundEngine {
       gain.gain.setValueAtTime(offbeat ? 0.12 * boss + mega * 0.1 : 0.35 + boss * 0.12 + mega * 0.1, time);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.musicBus);
       osc.start(time);
       osc.stop(time + 0.22);
     }
@@ -1050,7 +1087,7 @@ class SoundEngine {
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
         noise.connect(filter);
         filter.connect(gain);
-        gain.connect(this.ctx.destination);
+        gain.connect(this.musicBus);
         noise.start(time);
         noise.stop(time + 0.14);
       }
@@ -1070,7 +1107,7 @@ class SoundEngine {
       stabGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.11);
       stab.connect(stabFilter);
       stabFilter.connect(stabGain);
-      stabGain.connect(this.ctx.destination);
+      stabGain.connect(this.musicBus);
       stab.start(time);
       stab.stop(time + 0.12);
     }
@@ -1089,7 +1126,7 @@ class SoundEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, time + (isOpen ? 0.09 : 0.04));
       noise.connect(filter);
       filter.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.musicBus);
       noise.start(time);
       noise.stop(time + 0.1);
     }
@@ -1116,7 +1153,7 @@ class SoundEngine {
 
     oscB.connect(filterB);
     filterB.connect(gainB);
-    gainB.connect(this.ctx.destination);
+    gainB.connect(this.musicBus);
     oscB.start(time);
     oscB.stop(time + 0.09);
 
@@ -1133,7 +1170,7 @@ class SoundEngine {
         padGain.gain.linearRampToValueAtTime(padLevel, time + 0.04);
         padGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.42);
         pad.connect(padGain);
-        padGain.connect(this.ctx.destination);
+        padGain.connect(this.musicBus);
         pad.start(time);
         pad.stop(time + 0.44);
       }
@@ -1155,7 +1192,7 @@ class SoundEngine {
       leadGain.gain.linearRampToValueAtTime(0.045 + boss * 0.045, time + 0.012);
       leadGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.16);
       lead.connect(leadGain);
-      leadGain.connect(this.ctx.destination);
+      leadGain.connect(this.musicBus);
       lead.start(time);
       lead.stop(time + 0.17);
     }
@@ -1172,7 +1209,7 @@ class SoundEngine {
       gain.gain.setValueAtTime(vol, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.sfxBus);
       osc.start();
       osc.stop(this.ctx.currentTime + duration);
     } catch(e){}
@@ -1459,6 +1496,7 @@ const ACTIVE_SKILLS_DEF = {
       g.addPopup(g.player.x, g.player.y - 30, '✂️ KILL -9 СЕАНСЫ СБРОШЕНЫ!', '#ff4757');
 
       for (let e of g.enemies) {
+        if (e.is24hPursuer) continue;
         if (!e.isBoss) {
           if (e.hp / e.maxHp <= 0.32 + lvl * 0.05) {
             e.hp = 0;
@@ -1650,6 +1688,17 @@ const ACTIVE_SKILLS_DEF = {
       g.sound.playTone(460, 'triangle', 0.3, 0.2);
     }
   }
+};
+
+const STORE_PASSIVES_DEF = {
+  stability_belt: { name: 'Ремень стабильной конфигурации', icon: '❤️', cost: 260, stock: 4, desc: '+20 к максимальному здоровью.', apply: p => { p.maxHp += 20; p.hp = Math.min(p.maxHp, p.hp + 20); } },
+  fast_service_shoes: { name: 'Кроссовки быстрого обслуживания', icon: '👟', cost: 320, stock: 4, desc: '+10% к скорости бега.', apply: p => { p.speedMult += 0.10; } },
+  tech_gloves: { name: 'Перчатки техспециалиста', icon: '🧤', cost: 380, stock: 4, desc: '+12% к урону.', apply: p => { p.dmgMult += 0.12; } },
+  mssql_card: { name: 'Индекс-карта MSSQL', icon: '🎯', cost: 340, stock: 4, desc: '+6% к шансу критического удара.', apply: p => { p.critChance += 0.06; } },
+  floppy_magnet: { name: 'Магнит для дискет', icon: '🧲', cost: 290, stock: 4, desc: '+25% к радиусу сбора опыта.', apply: p => { p.magnetMult += 0.25; } },
+  backup_coil: { name: 'Контур автоматического бэкапа', icon: '🩹', cost: 420, stock: 3, desc: '+1,5 HP регенерации в секунду.', apply: p => { p.regen += 1.5; } },
+  coffee_thermos: { name: 'Термокружка из 308 кабинета', icon: '☕', cost: 400, stock: 3, desc: 'Умения и оружие перезаряжаются на 8% быстрее.', apply: p => { p.cdMult *= 0.92; } },
+  hasp_license: { name: 'HASP-лицензия на уклонение', icon: '🗝️', cost: 360, stock: 3, desc: '+5% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.05); } }
 };
 
 const CONSUMABLES_DEF = {
@@ -1939,6 +1988,7 @@ class Game {
 
     this.paused = false;
     this.time = 0;
+    this.challengeDeclines = 0;
     this.kills = 0;
     this.gemsCollected = 0;
     this.level = 1;
@@ -2012,6 +2062,7 @@ class Game {
     this.dynUpdateCd = 0;
     this.currency = 0;
     this.consumables = Array(4).fill(null);
+    this.shopPassives = [];
     this.nextShopTime = 180;
     this.shopVisit = 0;
     this.shopStock = {};
@@ -2057,8 +2108,11 @@ class Game {
     document.getElementById('modal-settings').style.display = 'flex';
     document.getElementById('settings-sound').innerText = this.sound.mutedSFX ? '🔇 Звуковые эффекты: ВЫКЛ' : '🔊 Звуковые эффекты: ВКЛ';
     document.getElementById('settings-music').innerText = this.sound.musicEnabled ? '🎵 Музыка: ВКЛ' : '🔇 Музыка: ВЫКЛ';
+    document.getElementById('music-volume').value = Math.round(this.sound.musicVolume * 100);
+    document.getElementById('sfx-volume').value = Math.round(this.sound.sfxVolume * 100);
+    document.getElementById('music-volume-value').textContent = `${Math.round(this.sound.musicVolume * 100)}%`;
+    document.getElementById('sfx-volume-value').textContent = `${Math.round(this.sound.sfxVolume * 100)}%`;
   }
-
   closeSettings() {
     document.getElementById('modal-settings').style.display = 'none';
     document.getElementById('modal-main-menu').style.display = 'flex';
@@ -2084,6 +2138,11 @@ class Game {
     for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
       this.shopStock[key] = item.stock;
       this.shopPrice[key] = Math.round(item.cost * (1 + (this.shopVisit - 1) * 0.08));
+    }
+    for (const [key, item] of Object.entries(STORE_PASSIVES_DEF)) {
+      const stockKey = `passive_${key}`;
+      this.shopStock[stockKey] = item.stock;
+      this.shopPrice[stockKey] = Math.round(item.cost * (1 + (this.shopVisit - 1) * 0.08));
     }
     document.getElementById('shop-message').innerText = `Менеджер подготовил счёт и включил платные модули. Следующий звонок через 3 минуты. Коммерческое предложение №${this.shopVisit}.`;
     document.getElementById('modal-shop').style.display = 'flex';
@@ -2257,6 +2316,11 @@ class Game {
   declineChallenge() {
     if (!this.activeChallenge || this.activeChallenge.status !== 'pending') return;
     this.log('Тикет отклонён. Клиент сказал, что «там дел на пять минут» и попробует сам.');
+    this.challengeDeclines = (this.challengeDeclines || 0) + 1;
+    if (this.challengeDeclines >= 3) {
+      this.challengeDeclines = 0;
+      this.spawnMVBoss();
+    }
     this.activeChallenge = null;
     this.challengeNoticeUntil = 0;
     this.nextChallengeTime = this.time + 115 + Math.random() * 45;
@@ -2344,8 +2408,11 @@ class Game {
 
   renderShop() {
     const grid = document.getElementById('shop-products');
+    const passiveGrid = document.getElementById('shop-passive-products');
     grid.innerHTML = '';
+    passiveGrid.innerHTML = '';
     document.getElementById('shop-currency').innerText = `💰 Бюджет: ${this.currency} фиткоинов`;
+    document.getElementById('shop-passive-slots').textContent = `${this.shopPassives.length}/6`;
     for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
       const owned = this.consumables.find(slot => slot && slot.key === key);
       const stackFull = owned && owned.count >= item.maxStack;
@@ -2363,8 +2430,36 @@ class Game {
       card.appendChild(button);
       grid.appendChild(card);
     }
+    for (const [key, item] of Object.entries(STORE_PASSIVES_DEF)) {
+      const stockKey = `passive_${key}`;
+      const stock = this.shopStock[stockKey] || 0;
+      const price = this.shopPrice[stockKey] || item.cost;
+      const card = document.createElement('div');
+      card.className = 'shop-card';
+      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>В инвентаре: ${this.shopPassives.filter(slot => slot.key === key).length} · Остаток: ${stock}</b></p>`;
+      const button = document.createElement('button');
+      button.className = 'btn-1c';
+      button.innerText = `Купить · ${price} 💰`;
+      button.disabled = stock <= 0 || this.currency < price || this.shopPassives.length >= 6;
+      button.onclick = () => this.buyPassiveItem(key);
+      card.appendChild(button);
+      passiveGrid.appendChild(card);
+    }
   }
-
+  buyPassiveItem(key) {
+    const item = STORE_PASSIVES_DEF[key];
+    const stockKey = `passive_${key}`;
+    const price = this.shopPrice[stockKey] || item.cost;
+    if (!item || this.shopPassives.length >= 6 || (this.shopStock[stockKey] || 0) <= 0 || this.currency < price) return;
+    this.currency -= price;
+    this.shopStock[stockKey]--;
+    this.shopPassives.push({ key });
+    item.apply(this.player);
+    document.getElementById('shop-message').innerText = `${item.name}: улучшение добавлено в инвентарь и сразу действует.`;
+    this.updateInventoryHUD();
+    this.updateHUD();
+    this.renderShop();
+  }
   buyConsumable(key) {
     const item = CONSUMABLES_DEF[key];
     const price = this.shopPrice[key] || item.cost;
@@ -2448,7 +2543,28 @@ class Game {
         : '<li style="color:#888;">Нет активных</li>';
       return `<section class="loadout-section"><h3>${esc(title)}</h3><ul>${rows}</ul></section>`;
     };
-    const weapons = Object.entries(this.weapons).map(([key, weapon]) => ({
+    const statsContainer = document.getElementById('pause-stats');
+    const player = this.player;
+    const activeDamage = player.dmgMult * (player.damageBuffTimer > 0 ? player.damageBuffMult : 1);
+    const activeSpeedMult = player.speedMult + (player.speedBuffTimer > 0 ? 0.5 : 0);
+    const cooldown = player.cdMult * (player.turboBuffTimer > 0 ? 0.5 : 1);
+    const currentStats = [
+      { icon: '❤️', name: 'Здоровье', value: `${Math.ceil(player.hp)} / ${player.maxHp}` },
+      { icon: '⚔️', name: 'Урон', value: `×${activeDamage.toFixed(2)}${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
+      { icon: '⚡', name: 'Скорость бега', value: `${(player.baseSpeed * activeSpeedMult).toFixed(2)} · ×${activeSpeedMult.toFixed(2)}` },
+      { icon: '🎯', name: 'Шанс крита', value: `${Math.round(player.critChance * 100)}% · урон ×2,5` },
+      { icon: '🌀', name: 'Уклонение', value: `${Math.round(player.dodge * 100)}%` },
+      { icon: '🩹', name: 'Регенерация', value: `${player.regen.toFixed(1)} HP/с` },
+      { icon: '⏱️', name: 'Перезарядка', value: `×${cooldown.toFixed(2)}` },
+      { icon: '🧲', name: 'Радиус сбора', value: `×${player.magnetMult.toFixed(2)}` },
+      { icon: '📈', name: 'Опыт', value: `×${(player.xpMult * player.xpEventMult * (player.xpBoostTimer > 0 ? 2 : 1)).toFixed(2)}` },
+      { icon: '🛡️', name: 'Защита', value: player.shieldTimer > 0 ? `Щит · ${Math.ceil(player.shieldTimer)}с` : 'Без щита' }
+    ];
+    if (statsContainer) statsContainer.innerHTML = section('Текущие параметры', currentStats);
+    const shopItems = (this.shopPassives || []).map(slot => ({
+      icon: STORE_PASSIVES_DEF[slot.key].icon, name: STORE_PASSIVES_DEF[slot.key].name,
+      value: 'пассивный', detail: STORE_PASSIVES_DEF[slot.key].desc
+    }));    const weapons = Object.entries(this.weapons).map(([key, weapon]) => ({
       icon: WEAPONS_DEF[key].icon, name: WEAPONS_DEF[key].name, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key].desc
     }));
     const passives = Object.entries(this.passives).map(([key, passive]) => ({
@@ -2489,6 +2605,7 @@ class Game {
     container.innerHTML = [
       section('Оружие', weapons),
       section('Пассивные улучшения', passives),
+      section(`Магазинные предметы · ${this.shopPassives.length}/6`, shopItems),
       section('Боевые модификаторы', combat),
       section('Активные умения · 1–4', active),
       section('Помощники на линии', this.summons.map(s => ({
@@ -2697,6 +2814,9 @@ class Game {
       while (this.nextBossMinute * 60 <= this.time) this.nextBossMinute++;
     }
 
+    if (this.time >= 900 && !this.enemies.some(enemy => enemy.is24hPursuer)) {
+      this.spawn24hPursuer();
+    }
     const megaBossAlive = this.enemies.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
     if (!megaBossAlive && this.spawnTimer <= 0) {
       const maxAllowedEnemies = Math.min(72, 38 + Math.floor(this.time / 12));
@@ -2729,6 +2849,19 @@ class Game {
     }
   }
 
+  spawn24hPursuer() {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 760;
+    const x = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, this.player.x + Math.cos(angle) * distance));
+    const y = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, this.player.y + Math.sin(angle) * distance));
+    const name = 'RuDesktop: исчерпан 24-ти часовой лимит';
+    this.enemies.push({ x, y, name, hp: Infinity, maxHp: Infinity, size: 25, speed: 1.05, dmg: 0,
+      icon: '🐢', col: '#8e44ad', xp: 0, isBoss: false, isMegaBoss: false,
+      is24hPursuer: true, freezeTimer: 0, slowTimer: 0, slowFactor: 1 });
+    this.showBanner(`🚨 ${name} — он не отстанет до конца сессии!`);
+    this.addPopup(x, y - 38, 'НЕУСТРАНИМЫЙ ПРЕСЛЕДОВАТЕЛЬ', '#e0aaff');
+    this.log(`На 15-й минуте появился ${name}. Он медленно идёт за вами, неуязвим и не отстанет до конца сессии.`);
+  }
   spawnEnemy() {
     const angle = Math.random() * Math.PI * 2;
     const dist = 640 + Math.random() * 80;
@@ -2785,7 +2918,7 @@ class Game {
 
   spawnMegaBoss() {
     // Очищение не проходит через смерть мобов: оно не даёт опыт, валюту, очки или лут.
-    this.enemies = [];
+    this.enemies = this.enemies.filter(enemy => enemy.is24hPursuer);
     this.enemyProjectiles = [];
     this.puddles = [];
     this.bossWarnings = [];
@@ -2827,6 +2960,21 @@ class Game {
     this.sound.boss();
   }
 
+  spawnMVBoss() {
+    if (!this.player || this.player.hp <= 0) return;
+    const angle = Math.random() * Math.PI * 2;
+    const x = Math.max(200, Math.min(3800, this.player.x + Math.cos(angle) * 560));
+    const y = Math.max(200, Math.min(3800, this.player.y + Math.sin(angle) * 560));
+    const hp = 22000 + this.time * 12;
+    const boss = { x, y, name: 'М.В. — «Я просто уточнить»', hp, maxHp: hp, size: 52,
+      speed: 3.6, dmg: 92, icon: '📞', col: '#ff4757', xp: 240, isBoss: true,
+      isMegaBoss: false, bossType: 'mv_chaser', freezeTimer: 0, bossTimer1: 0, bossTimer2: 0 };
+    this.enemies.push(boss);
+    this.showBanner('🚨 ТРИ ОТКАЗА — М.В. ВЫШЕЛ НА ЛИНИЮ!');
+    this.addPopup(x, y - boss.size - 20, '📞 М.В. НАГОНЯЕТ!', '#ff4757');
+    this.log('После трёх отказов от тикетов появился М.В. Он быстро догоняет героя и наносит большой урон.');
+    this.sound.boss();
+  }
   spawnBananaSupply() {
     const bananaCount = this.pickups.filter(item => item.type === 'banana').length;
     const supplyCount = Math.min(2, Math.max(0, 8 - bananaCount));
@@ -2892,6 +3040,20 @@ class Game {
       b.size = 54;
       this.showBanner(`🚨 БОСС: ${b.name}!`);
       this.log('Клиент просит настроить турникет через Rudesktop. Курсор ползёт к настройкам — обновление уже вышло.');
+    } else if (minute >= 10) {
+      const lateBosses = [
+        { type: 'late_audit', name: 'ВНЕПЛАНОВАЯ ПРОВЕРКА ВСЕХ ИНТЕГРАЦИЙ', icon: '🧾', col: '#f39c12', hp: 30000, dmg: 72 },
+        { type: 'late_overload', name: 'СЕРВЕР НА РЕСЕПШЕНЕ: ВСЕ СМЕНЫ ОДНОВРЕМЕННО', icon: '🖥️', col: '#e84393', hp: 34000, dmg: 78 },
+        { type: 'late_friday', name: 'ПЯТНИЧНЫЙ РЕЛИЗ ПОСЛЕ ДЕСЯТИ ВЕЧЕРА', icon: '💥', col: '#ff0055', hp: 38000, dmg: 84 }
+      ];
+      const variant = lateBosses[(minute - 10) % lateBosses.length];
+      b.bossType = variant.type;
+      b.name = variant.name;
+      b.hp = variant.hp + (minute - 10) * 4200; b.dmg = variant.dmg + (minute - 10) * 3;
+      b.icon = variant.icon; b.col = variant.col; b.size = 60;
+      b.speed = 1.65 + Math.min(0.65, (minute - 10) * 0.06);
+      this.showBanner(`🚨 СЛОЖНЫЙ МИНИ-БОСС: ${b.name}!`);
+      this.log(`После десятой минуты в кластер вошёл новый сложный мини-босс: ${b.name}.`);
     } else {
       b.bossType = 'friday_deploy';
       b.name = `ОБНОВЛЕНИЕ В ПЯТНИЦУ 18:00 БЕЗ БЭКАПА (ЭТАП ${minute})`;
@@ -3070,9 +3232,39 @@ class Game {
     }
     b.bossTimer1 += dt;
     b.bossTimer2 += dt;
-
+    if (b.bossType === 'mv_chaser') {
+      if (b.bossTimer1 >= 2.2) {
+        b.bossTimer1 = 0;
+        const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        for (const offset of [-0.22, 0, 0.22]) {
+          const angle = aim + offset;
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 5.2, vy: Math.sin(angle) * 5.2, dmg: 30, size: 10, life: 2.0, icon: '📞', color: '#ff4757' });
+        }
+      }
+    } else if (b.bossType === 'late_audit' || b.bossType === 'late_overload' || b.bossType === 'late_friday') {
+      const enraged = b.hp <= b.maxHp * 0.5;
+      if (b.bossTimer1 >= (enraged ? 1.7 : 2.5)) {
+        b.bossTimer1 = 0;
+        const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        const count = b.bossType === 'late_overload' ? 9 : 7;
+        for (let k = 0; k < count; k++) {
+          const angle = aim + (k - (count - 1) / 2) * 0.18;
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * (b.bossType === 'late_friday' ? 5.4 : 4.5), vy: Math.sin(angle) * (b.bossType === 'late_friday' ? 5.4 : 4.5), dmg: enraged ? 24 : 18, size: 10, life: 2.4, icon: b.icon, color: b.col });
+        }
+      }
+      if (b.bossTimer2 >= (enraged ? 5.0 : 7.0)) {
+        b.bossTimer2 = 0;
+        const count = b.bossType === 'late_audit' ? 12 : 16;
+        const phase = this.time * 0.7;
+        for (let k = 0; k < count; k++) {
+          const angle = phase + k * Math.PI * 2 / count;
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.5, vy: Math.sin(angle) * 3.5, dmg: enraged ? 22 : 16, size: 9, life: 3.1, icon: '⚠️', color: b.col });
+        }
+        if (b.bossType === 'late_friday') this.bossWarnings.push({ x: this.player.x, y: this.player.y, radius: 105, dmg: 48, life: 1.0, maxLife: 1.0 });
+      }
+    }
     // 1. DEADLOCK MSSQL
-    if (b.bossType === 'deadlock') {
+    else if (b.bossType === 'deadlock') {
       if (b.bossTimer1 > 3.8) {
         b.bossTimer1 = 0;
         // Кольцо замков
@@ -3461,6 +3653,7 @@ class Game {
     this.sound.explosion();
     this.log("ПРИМЕНЕН ДИСК ИТС: Полное тестирование и исправление базы!");
     for (let e of this.enemies) {
+      if (e.is24hPursuer) continue;
       if (!e.isBoss) {
         e.hp = 0;
         this.createHitFX(e.x, e.y, '#ffd200', 8);
@@ -3722,9 +3915,14 @@ class Game {
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
 
-      if (e.freezeTimer > 0) {
+      if (!e.is24hPursuer && e.freezeTimer > 0) {
         e.freezeTimer -= dt;
         continue;
+      }
+      if (e.is24hPursuer) {
+        e.freezeTimer = 0;
+        e.slowTimer = 0;
+        e.slowFactor = 1;
       }
 
       if (e.slowTimer > 0) {
@@ -3757,6 +3955,11 @@ class Game {
 
       // Касание
       if (Math.hypot(this.player.x - e.x, this.player.y - e.y) < e.size + 18) {
+        if (e.is24hPursuer) {
+          this.gameOver(`Сессия завершена: вас догнал ${e.name}.`);
+          return;
+        }
+        
         if (e.isCleaner && Math.random() < 0.08) {
           this.triggerGlitchScreen();
           this.addPopup(this.player.x, this.player.y - 20, "«КУДА ПО ПОМЫТОМУ?!» (Выдернут шнур)", "#00cec9");
@@ -4215,15 +4418,25 @@ class Game {
 
   updateInventoryHUD() {
     const box = document.getElementById('hud-inventory');
+    const passiveBox = document.getElementById('hud-shop-passives');
     box.innerHTML = '';
+    passiveBox.innerHTML = '';
     for (let k in this.weapons) {
       box.innerHTML += `<div class="inv-slot">${WEAPONS_DEF[k].icon}<span class="inv-lvl">${this.weapons[k].lvl}</span></div>`;
     }
     for (let k in this.passives) {
       box.innerHTML += `<div class="inv-slot" style="border-color:#55efc4;">${PASSIVES_DEF[k].icon}<span class="inv-lvl">${this.passives[k].lvl}</span></div>`;
     }
+    for (let i = 0; i < 6; i++) {
+      const slot = (this.shopPassives || [])[i];
+      const item = slot ? STORE_PASSIVES_DEF[slot.key] : null;
+      const entry = document.createElement('div');
+      entry.className = `inv-slot${item ? '' : ' empty'}`;
+      entry.title = item ? `${item.name}: ${item.desc}` : `Пустой слот пассивного инвентаря ${i + 1}/6`;
+      entry.innerHTML = item ? `${item.icon}<span class="inv-lvl">+</span>` : '<span>＋</span>';
+      passiveBox.appendChild(entry);
+    }
   }
-
   updateActiveHUD() {
     for (let i = 0; i < 4; i++) {
       const el = document.getElementById(`act-slot-${i}`);

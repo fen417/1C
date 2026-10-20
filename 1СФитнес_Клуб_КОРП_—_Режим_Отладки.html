@@ -222,7 +222,7 @@
   #hud-consumables {
     position: absolute;
     bottom: 14px;
-    right: 14px;
+    left: 14px;
     display: flex;
     gap: 6px;
     z-index: 10;
@@ -2538,6 +2538,15 @@ class Game {
         const generation = Number(snapshot.val());
         if (!Number.isInteger(generation) || generation < 1 || generation === Number(pvp.rtcGeneration || 1)) return;
         this.restartPvpRtc(generation);
+      }),
+      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/rtc/reconnectRequests`), snapshot => {
+        if (!pvp.host || !pvp.started || !pvp.opponentUid || pvp.connectionLost) return;
+        const request = snapshot.val()?.[pvp.opponentUid];
+        if (!request || request === pvp.lastReconnectRequestSeen) return;
+        pvp.lastReconnectRequestSeen = request;
+        if (pvp.rtc && !pvp.opponentLost) {
+          this.handlePvpRtcLost('Клиент запросил восстановление соединения.', pvp.rtc);
+        }
       })
     ];
     if (!pvp.host) watchOpponent(pvp.opponentUid);
@@ -2813,7 +2822,10 @@ class Game {
     }
     if (pvp.recoveryRequested) return;
     pvp.recoveryRequested = true;
-    if (!pvp.host) return; // Хост публикует новый номер сессии, клиент подключится по сигналу Firebase.
+    if (!pvp.host) {
+      this.requestPvpRtcRecovery(pvp);
+      return;
+    }
     const generation = Math.max(1, Number(pvp.rtcGeneration) || 1) + 1;
     this.restartPvpRtc(generation);
     pvp.fb.update(pvp.roomRef, { rtcGeneration: generation }).catch(err => {
@@ -2826,6 +2838,19 @@ class Game {
           this.pvpStatus(`Повторное подключение ожидает Firebase: ${retryErr.message}`, true));
       }, 1500);
     });
+  }
+
+  requestPvpRtcRecovery(pvp) {
+    if (this.pvp !== pvp || !pvp.connectionLost || pvp.host || pvp.opponentLost) return;
+    const requestRef = pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/rtc/reconnectRequests/${pvp.uid}`);
+    const requestId = pvp.lastReconnectRequestSent = Math.max(Date.now(), Number(pvp.lastReconnectRequestSent || 0) + 1);
+    pvp.fb.set(requestRef, requestId).catch(err => {
+      if (this.pvp === pvp && pvp.connectionLost) {
+        this.pvpStatus(`Не удалось запросить переподключение через Firebase: ${err.message}. Повторяем попытку…`, true);
+      }
+    });
+    clearTimeout(pvp.recoveryRequestTimer);
+    pvp.recoveryRequestTimer = setTimeout(() => this.requestPvpRtcRecovery(pvp), 2500);
   }
 
   restartPvpRtc(generation) {
@@ -2852,6 +2877,7 @@ class Game {
     pvp.rtc = null;
     pvp.rtcGeneration = Number(generation) || 1;
     pvp.recoveryRequested = false;
+    clearTimeout(pvp.recoveryRequestTimer);
     pvp.remoteStateSequence = 0;
     pvp.remoteWorldRevision = 0;
     pvp.pendingWorldSnapshot = null;
@@ -2866,6 +2892,7 @@ class Game {
     pvp.connectionLost = false;
     pvp.recoveryRequested = false;
     clearTimeout(pvp.recoveryRetryTimer);
+    clearTimeout(pvp.recoveryRequestTimer);
     this.pvpPausedByRemote = false;
     document.getElementById('modal-pvp-wait').style.display = 'none';
     this.paused = Boolean(pvp.wasPausedBeforeConnectionLost || pvp.choosing || pvp.manualPaused ||
@@ -3064,6 +3091,8 @@ class Game {
     if (!pvp?.started) return;
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
+    clearTimeout(pvp.recoveryRequestTimer);
+    clearTimeout(pvp.recoveryRetryTimer);
     const firstNotice = !pvp.opponentLost;
     pvp.opponentLost = true;
     pvp.remotePlayer = null;
@@ -3464,6 +3493,8 @@ class Game {
     if (!pvp) return;
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
+    clearTimeout(pvp.recoveryRequestTimer);
+    clearTimeout(pvp.recoveryRetryTimer);
     pvp.unsub?.();
     if (pvp.rtc) {
       pvp.rtc.unsubscribers.forEach(unsubscribe => unsubscribe());

@@ -2528,11 +2528,9 @@ class Game {
         rtc.connected = false;
         if (wasConnected && pvp.started) {
           pvp.connectionLost = true;
-          this.paused = true;
-          this.showBanner('ПРЯМОЕ СОЕДИНЕНИЕ ПОТЕРЯНО. ИГРА ПРИОСТАНОВЛЕНА; РЕЗЕРВНОЕ ПОДКЛЮЧЕНИЕ ОТКЛЮЧЕНО.');
           const reason = `DataChannel закрыт (ICE: ${pc.iceConnectionState}, соединение: ${pc.connectionState}, сигнализация: ${pc.signalingState})`;
           pvp.rtcFailure = reason;
-          this.pvpStatus(`WebRTC-соединение потеряно: ${reason}. Резервное подключение отключено.`, true);
+          this.handlePvpOpponentLost(`Связь с соперником потеряна. Вы продолжаете забег в одиночку. ${reason}`, !pvp.host);
         } else {
           this.failPvpRtc(`канал закрыт до запуска (состояние: ${pc.connectionState}, ICE: ${pc.iceConnectionState})`);
         }
@@ -2680,7 +2678,10 @@ class Game {
   getPvpRenderPosition(id, x, y) {
     const samples = this.pvp?.positionHistory?.[id];
     if (!samples?.length) return { x, y };
-    const targetTime = performance.now() - 250;
+    // Мобы и игроки должны отображаться почти в том же временном срезе,
+    // по которому хост проверяет столкновения. Большая задержка давала
+    // клиенту урон, когда на его экране моб ещё был далеко.
+    const targetTime = performance.now() - 20;
     let before = null;
     let after = null;
     let beforeIndex = -1;
@@ -2739,15 +2740,7 @@ class Game {
       if (!pvp.started) {
         this.pvpStatus('Комната закрыта или истёк срок ожидания.', true);
       } else if (!pvp.matchOver && !pvp.opponentLost) {
-        pvp.remotePlayer = null;
-        pvp.remoteState = null;
-        pvp.remoteShots = [];
-        pvp.remoteChoosing = null;
-        pvp.remotePaused = false;
-        pvp.opponentLost = true;
-        this.showBanner('СОПЕРНИК ПОКИНУЛ КОМНАТУ. НАЖМИТЕ L, ЧТОБЫ СОХРАНИТЬ ТЕКУЩИЙ СЧЁТ.');
-        this.addPopup(this.player?.x || 0, (this.player?.y || 0) - 38, 'СОПЕРНИК ВЫШЕЛ — ДОСТУПНА КЛАВИША L', '#55efc4');
-        this.syncPvpWait();
+        this.handlePvpOpponentLost('Комната соперника закрыта. Вы продолжаете забег в одиночку.', !pvp.host);
       }
       return;
     }
@@ -2766,17 +2759,8 @@ class Game {
         if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
       }
       this.syncPvpWait();
-    } else if (pvp.remotePlayer && !pvp.rtc?.connected) {
-      pvp.remotePlayer = null;
-      pvp.remoteState = null;
-      pvp.remoteShots = [];
-      pvp.remoteChoosing = null;
-      pvp.remotePaused = false;
-      if (pvp.started && !pvp.matchOver && !pvp.opponentLost) {
-        pvp.opponentLost = true;
-        this.showBanner('СОПЕРНИК ПОКИНУЛ КОМНАТУ. НАЖМИТЕ L, ЧТОБЫ СОХРАНИТЬ ТЕКУЩИЙ СЧЁТ.');
-      }
-      this.syncPvpWait();
+    } else if (pvp.remotePlayer && pvp.started) {
+      this.handlePvpOpponentLost('Соперник покинул комнату. Вы продолжаете забег в одиночку.', !pvp.host);
     }
     if (pvp.host && pvp.opponentUid && room.status === 'waiting' && pvp.rtc?.connected && !pvp.rtc.failed) {
       pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/status`), 'playing')
@@ -2792,6 +2776,38 @@ class Game {
       if (pvp.mode === 'pvp') this.showBanner('ВАЖНО: первые 2 минуты вы с соперником неуязвимы друг к другу.');
       this.log(`PvP матч начался. Комната ${pvp.code}.`);
     }
+  }
+
+  handlePvpOpponentLost(message, promoteToHost = false) {
+    const pvp = this.pvp;
+    if (!pvp?.started) return;
+    const firstNotice = !pvp.opponentLost;
+    pvp.opponentLost = true;
+    pvp.remotePlayer = null;
+    pvp.remoteState = null;
+    pvp.remoteShots = [];
+    pvp.remoteChoosing = null;
+    pvp.remotePaused = false;
+    if (promoteToHost && !pvp.host) {
+      // Если отключился хост, продолжаем уже полученный мир локально.
+      pvp.host = true;
+      pvp.takeoverAt = performance.now();
+    }
+    if (this.player?.hp > 0 && !pvp.matchOver) {
+      this.pvpPausedByRemote = false;
+      this.paused = Boolean(pvp.choosing || pvp.manualPaused ||
+        document.getElementById('modal-pause').style.display === 'flex' ||
+        document.getElementById('modal-shop').style.display === 'flex' ||
+        document.getElementById('modal-lvlup').style.display === 'flex');
+      if (!this.paused) this.lastTime = performance.now();
+      document.getElementById('modal-pvp-wait').style.display = 'none';
+    }
+    if (firstNotice && this.player?.hp > 0) {
+      this.showBanner('СОПЕРНИК ВЫБЫЛ ИЛИ ПОКИНУЛ КОМНАТУ. ВЫ МОЖЕТЕ ПРОДОЛЖИТЬ ЗАБЕГ. КЛАВИША L — ЗАВЕРШИТЬ ЕГО.');
+      this.addPopup(this.player.x, this.player.y - 38, 'СОПЕРНИК ВЫШЕЛ — МАТЧ ПРОДОЛЖАЕТСЯ', '#55efc4');
+    }
+    this.pvpStatus(message || 'Соперник отключился. Забег продолжается локально.');
+    this.syncPvpWait();
   }
 
   startPvpSync() {
@@ -2943,11 +2959,7 @@ class Game {
       }
     }
     if (state.over && !this.pvp.matchOver && !this.pvp.opponentLost) {
-      this.pvp.opponentLost = true;
-      if (this.player?.hp > 0) {
-        this.showBanner('СОПЕРНИК ВЫБЫЛ! НАЖМИТЕ L, ЧТОБЫ ЗАВЕРШИТЬ ЗАБЕГ С ТЕКУЩИМ СЧЁТОМ.');
-        this.addPopup(this.player.x, this.player.y - 38, 'НАЖМИТЕ L — СОХРАНИТЬ ТЕКУЩИЙ СЧЁТ', '#55efc4');
-      }
+      this.handlePvpOpponentLost('Соперник выбыл. Ваш забег продолжается.', !this.pvp.host);
     }
   }
 

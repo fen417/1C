@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.7.1</title>
+<title>1С:Фитнес Клуб КОРП 1.8.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -441,6 +441,7 @@
   #modal-settings, #modal-changelog { z-index: 280; }
   #modal-changelog .win-1c { width: min(760px, 94vw) !important; max-height: 90vh; overflow-y: auto; }
   #modal-main-menu { z-index: 300; }
+  #modal-pvp { z-index: 320; }
   .main-menu-window { width: min(900px, 94%); }
   .main-menu-layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; }
   .main-menu-actions { display: flex; flex-direction: column; gap: 9px; }
@@ -490,6 +491,7 @@
   #challenge-head { background: #ffd200; padding: 7px 10px; border-bottom: 1px solid #b99b00; font-size: 12px; font-weight: bold; }
   #challenge-body { padding: 10px; }
   #challenge-title { display: block; font-size: 12px; line-height: 1.4; margin-bottom: 7px; }
+  #challenge-description { font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 8px; }
   #challenge-progress { color: #555; font-size: 11px; margin-bottom: 8px; }
   #challenge-actions { display: flex; gap: 7px; }
   #challenge-actions .btn-1c { flex: 1; padding: 7px 5px; font-size: 11px; }
@@ -591,7 +593,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.7.1 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.8.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -688,6 +690,7 @@
       <div id="challenge-head">📩 У Вас новый тикет:</div>
       <div id="challenge-body">
         <strong id="challenge-title"></strong>
+        <div id="challenge-description"></div>
         <div id="challenge-progress"></div>
         <div id="challenge-actions">
           <button class="btn-1c" style="background:#55efc4;" onclick="game.acceptChallenge()">В работе</button>
@@ -709,7 +712,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.7.1</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -717,19 +720,50 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.7.1</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <button class="btn-1c" onclick="game.showPvpMenu()">🌐 Сетевая игра</button>
+            <div class="main-menu-version">Текущая версия: <b>1.8.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 1.7.0 — «Три отказа и М.В.»</h3>
-              <p>Новые умения, противники и боссы, пассивные предметы в магазине и отдельная настройка громкости. В паузе — характеристики героя. После трёх отказов приходит М.В., а с 15-й минуты за вами следует RuDesktop.</p>
+              <h3>Версия 1.8.0 — «Командный зачёт»</h3>
+              <p>Сражайтесь с другом онлайн: создавайте комнаты по коду, выбирайте PvP или PvE. В сетевой игре враги и добыча общие, пауза одного игрока приостанавливает матч, а мобов стало больше. В PvP первые две минуты действует защита от урона соперника. В магазине можно взять только один предмет каждого вида за предложение.</p>
             </div>
             <div class="release-notes" style="margin-bottom:0;">
-              <h3>Версия 1.6.0 — «Релиз без отката»</h3>
-              <p>Позовите отряд техподдержки, сразитесь с новыми боссами и мини-боссами, закройте особые тикеты и прокачивайте улучшения. В игре появились новые противники и способы передвижения.</p>
+              <h3>Версия 1.7.0 — «Три отказа и М.В.»</h3>
+              <p>Прокачивайте героя, покупайте пассивные предметы, встречайте новых боссов и остерегайтесь RuDesktop.</p>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сетевая игра PvP -->
+  <div id="modal-pvp" class="modal-overlay">
+    <div class="win-1c" style="width:min(460px,94vw);">
+      <div class="win-1c-head"><span>🌐 Сетевая игра</span><button class="win-close-btn" onclick="game.closePvpMenu()" aria-label="Закрыть">✕</button></div>
+      <div class="win-1c-body">
+        <p style="font-size:12px; margin-bottom:12px;">Создайте комнату и передайте код сопернику или введите код комнаты.</p>
+        <label style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #ccc; padding:9px; margin-bottom:12px; font-size:12px;"><input id="pvp-disable-attacks" type="checkbox" onchange="game.setPvpMode(this.checked ? 'pve' : 'pvp')"><span><b>Отключить PvP</b><br><span style="color:#666;">Кооперативный PvE: игроки не наносят урон друг другу</span></span></label>
+        <button class="btn-1c" style="width:100%; background:#55efc4; margin-bottom:12px;" onclick="game.createPvpRoom()">＋ Создать комнату</button>
+        <div style="display:flex; gap:8px;">
+          <input id="pvp-room-code" class="input-1c" maxlength="4" placeholder="КОД" autocomplete="off" style="text-transform:uppercase; letter-spacing:4px; text-align:center; width:120px;">
+          <button class="btn-1c" onclick="game.joinPvpRoom()">Подключиться</button>
+        </div>
+        <div id="pvp-room-status" class="release-notes" style="margin:12px 0 0; min-height:34px;">Firebase: проверяем подключение…</div>
+        <div id="pvp-room-code-display" style="display:none; text-align:center; font-size:24px; font-weight:bold; letter-spacing:6px; color:#900; padding:10px;"></div>
+        <button id="pvp-leave-button" class="btn-1c" style="display:none; width:100%; margin-top:8px;" onclick="game.leavePvpRoom()">Отменить / выйти из комнаты</button>
+        <div style="text-align:right; margin-top:12px;"><button class="btn-1c" onclick="game.closePvpMenu()">Назад</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-pvp-wait" class="modal-overlay" style="z-index:340;">
+    <div class="win-1c" style="width:min(420px,92vw);">
+      <div class="win-1c-head"><span id="pvp-wait-head">⏳ Соперник выбирает</span></div>
+      <div class="win-1c-body" style="text-align:center; padding:28px 18px;">
+        <div style="font-size:34px; margin-bottom:12px;">🧾</div>
+        <p id="pvp-wait-message">Второй игрок выбирает улучшение. Игра приостановлена.</p>
       </div>
     </div>
   </div>
@@ -751,8 +785,12 @@
           <input id="sfx-volume" type="range" min="0" max="100" value="70" oninput="game.sound.setVolume('sfx', this.value)" style="width:100%;">
         </div>
         <div class="release-notes">
-          <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 7, 8, 9, 0<br><b>Пауза:</b> Esc / P</p>
+          <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 7, 8, 9, 0<br><b>Пауза:</b> Esc / P<br><b>Завершить забег:</b> L (в одиночной игре в любое время; в сети после выбытия соперника)</p>
         </div>
+        <label class="release-notes" style="display:flex; align-items:center; gap:9px; margin-bottom:14px; font-size:12px;">
+          <input id="collapse-accepted-tickets" type="checkbox" checked onchange="game.setCollapseAcceptedTickets(this.checked)">
+          <span><b>Сворачивать принятые тикеты</b><br><span style="color:#666;">Скрывать описание, оставляя заголовок и цель</span></span>
+        </label>
         <div style="text-align:right;"><button class="btn-1c" onclick="game.closeSettings()">Назад в меню</button></div>
       </div>
     </div>
@@ -763,6 +801,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
+        <details class="release-notes" open><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
@@ -833,7 +872,7 @@
 
   <!-- Модалка Таблицы рекордов -->
   <div id="modal-lb" class="modal-overlay" tabindex="-1">
-    <div class="win-1c" style="width:650px;" onclick="event.stopPropagation()">
+    <div class="win-1c" style="width:min(920px, 94vw);" onclick="event.stopPropagation()">
       <div class="win-1c-head">
         <span>🏆 Регистр сведений: Таблица рекордов 1С-программистов</span>
         <button class="win-close-btn" onclick="game.closeLeaderboard()" title="Закрыть окно (Esc)" aria-label="Закрыть таблицу рекордов">✕</button>
@@ -845,12 +884,14 @@
               <tr>
                 <th style="width:40px;">#</th>
                 <th>Разработчик</th>
+                <th>Версия</th>
+                <th>Режим</th>
                 <th>Очки (Баги + Строки)</th>
                 <th>Аптайм</th>
               </tr>
             </thead>
             <tbody id="lb-body">
-              <tr><td colspan="4" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
+              <tr><td colspan="6" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
             </tbody>
           </table>
         </div>
@@ -882,7 +923,7 @@
         </div>
 
         <div style="display:flex; justify-content:space-around;">
-          <button class="btn-1c" onclick="game.start()">🔄 Сделать ТиИ и начать заново</button>
+          <button class="btn-1c" onclick="game.restartFromGameOver()">🔄 Сделать ТиИ и начать заново</button>
           <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Посмотреть таблицу</button>
         </div>
       </div>
@@ -893,7 +934,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
   import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-  import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
+  import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: 'AIzaSyDI54wAFmr2y_kHg1-wwcHgOwF8zWGK0L4',
@@ -912,13 +953,13 @@
     return {
       db: getDatabase(app),
       uid: credential.user.uid,
-      ref, get, query, orderByChild, limitToLast, push, set
+      ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect
     };
   })();
 </script>
 
 <script>
-const GAME_VERSION = '1.7.1';
+const GAME_VERSION = '1.8.0';
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -1882,6 +1923,8 @@ class Game {
     this.canvas = document.getElementById('canvas');
     this.ctx = this.canvas.getContext('2d');
     this.sound = new SoundEngine();
+    this.pvp = null;
+    this.pvpTimer = null;
 
     this.MAP_SIZE = 4000;
     this.BOUND_MIN = 90;
@@ -1911,6 +1954,10 @@ class Game {
         } else {
           this.togglePause();
         }
+        return;
+      }
+      if (e.key.toLowerCase() === 'l') {
+        this.finishRunWithCurrentScore();
         return;
       }
       if (e.target.tagName === 'INPUT') return;
@@ -1984,7 +2031,12 @@ class Game {
     });
 
     this.savedNick = localStorage.getItem('1c_nick') || 'Архитектор_1С';
+    this.pvpMode = localStorage.getItem('1c_pvp_mode') === 'pve' ? 'pve' : 'pvp';
+    this.collapseAcceptedTickets = localStorage.getItem('1c_collapse_accepted_tickets') !== 'false';
     document.getElementById('player-nickname').value = this.savedNick;
+    document.getElementById('pvp-room-code').addEventListener('input', (event) => {
+      event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    });
 
     this.start();
     this.paused = true;
@@ -2024,6 +2076,8 @@ class Game {
     }
     this.leaderboardReturnState = null;
     document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-pvp').style.display = 'none';
+    document.getElementById('modal-pvp-wait').style.display = 'none';
     document.getElementById('modal-settings').style.display = 'none';
     document.getElementById('modal-changelog').style.display = 'none';
     document.getElementById('modal-shop').style.display = 'none';
@@ -2042,7 +2096,7 @@ class Game {
     this.nextXp = 25;
 
     this.player = {
-      x: 2000,
+      x: this.pvp && !this.pvp.host ? 2180 : 1820,
       y: 2000,
       hp: 100,
       maxHp: 100,
@@ -2109,6 +2163,7 @@ class Game {
     this.currency = 0;
     this.consumables = Array(4).fill(null);
     this.shopPassives = [];
+    this.shopPurchased = new Set();
     this.nextShopTime = 180;
     this.shopVisit = 0;
     this.shopStock = {};
@@ -2149,6 +2204,417 @@ class Game {
     document.getElementById('modal-main-menu').style.display = 'flex';
   }
 
+  pvpStatus(message, isError = false) {
+    const box = document.getElementById('pvp-room-status');
+    if (!box) return;
+    box.textContent = message;
+    box.style.color = isError ? '#c0392b' : '#444';
+    box.style.borderColor = isError ? '#c0392b' : '#ccc';
+  }
+
+  showPvpMenu() {
+    document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-pvp').style.display = 'flex';
+    document.getElementById('pvp-leave-button').style.display = this.pvp ? 'block' : 'none';
+    const pvpToggle = document.getElementById('pvp-disable-attacks');
+    pvpToggle.checked = (this.pvp?.mode || this.pvpMode) === 'pve';
+    pvpToggle.disabled = Boolean(this.pvp);
+    document.getElementById('pvp-room-code-display').style.display = this.pvp?.host ? 'block' : 'none';
+    if (this.pvp?.host) document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${this.pvp.code}`;
+    this.pvpStatus(this.pvp ? 'Комната открыта. Ожидаем второго игрока…' : 'Подключение к Firebase…');
+    window.firebaseLeaderboardReady.then(() => {
+      if (!this.pvp) this.pvpStatus('Firebase подключён. Можно создать комнату или ввести код.');
+    }).catch(err => this.pvpStatus(`Firebase недоступен: ${err.message}`, true));
+  }
+
+  closePvpMenu() {
+    document.getElementById('modal-pvp').style.display = 'none';
+    document.getElementById('modal-main-menu').style.display = 'flex';
+  }
+
+  setPvpMode(mode) {
+    if (this.pvp) return;
+    this.pvpMode = mode === 'pve' ? 'pve' : 'pvp';
+    localStorage.setItem('1c_pvp_mode', this.pvpMode);
+    document.getElementById('pvp-disable-attacks').checked = this.pvpMode === 'pve';
+  }
+
+  async createPvpRoom() {
+    this.pvpStatus('Создаём комнату…');
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '', roomRef = null, exists = true;
+      for (let attempt = 0; attempt < 12 && exists; attempt++) {
+        code = Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
+        roomRef = fb.ref(fb.db, `pvpRooms/${code}`);
+        exists = (await fb.get(roomRef)).exists();
+      }
+      if (exists) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
+      const playerRef = fb.ref(fb.db, `pvpRooms/${code}/players/${fb.uid}`);
+      const nick = (this.savedNick || 'Архитектор 1С').slice(0, 20);
+      await fb.set(roomRef, {
+        hostUid: fb.uid, status: 'waiting', mode: this.pvpMode, createdAt: Date.now(),
+        players: { [fb.uid]: { uid: fb.uid, name: nick, online: true, choosing: null,
+          state: { x: 1820, y: 2000, hp: 100, maxHp: 100, level: 1, attackTotal: 0, over: false } } }
+      });
+      this.pvp = { fb, code, host: true, uid: fb.uid, roomRef, playerRef, started: false,
+        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null,
+        attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode, unsub: null };
+      await fb.onDisconnect(playerRef).remove();
+      this.attachPvpRoom();
+      document.getElementById('pvp-room-code-display').style.display = 'block';
+      document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;
+      document.getElementById('pvp-leave-button').style.display = 'block';
+      this.pvpStatus('Комната создана. Передайте код сопернику; матч начнётся после подключения.');
+    } catch (err) {
+      this.pvpStatus(`Не удалось создать комнату: ${err.message || 'ошибка Firebase'}`, true);
+    }
+  }
+
+  async joinPvpRoom() {
+    const code = document.getElementById('pvp-room-code').value.trim().toUpperCase();
+    if (!/^[A-Z0-9]{4}$/.test(code)) {
+      this.pvpStatus('Введите четырёхзначный код комнаты.', true);
+      return;
+    }
+    this.pvpStatus('Ищем комнату…');
+    let guestUidRef = null;
+    let playerRef = null;
+    let guestSlotClaimed = false;
+    let playerCreated = false;
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      const roomRef = fb.ref(fb.db, `pvpRooms/${code}`);
+      const snapshot = await fb.get(roomRef);
+      if (!snapshot.exists()) throw new Error('Комната с таким кодом не найдена.');
+      const room = snapshot.val();
+      if (room.status !== 'waiting') throw new Error('Матч в этой комнате уже начался.');
+      if (room.hostUid === fb.uid) throw new Error('Нельзя подключиться к собственной комнате.');
+      if (room.guestUid || Object.keys(room.players || {}).length >= 2) throw new Error('В комнате уже два игрока.');
+      guestUidRef = fb.ref(fb.db, `pvpRooms/${code}/guestUid`);
+      await fb.set(guestUidRef, fb.uid);
+      guestSlotClaimed = true;
+      playerRef = fb.ref(fb.db, `pvpRooms/${code}/players/${fb.uid}`);
+      const nick = (this.savedNick || 'Архитектор 1С').slice(0, 20);
+      await fb.set(playerRef, { uid: fb.uid, name: nick, online: true, choosing: null,
+        state: { x: 2180, y: 2000, hp: 100, maxHp: 100, level: 1, attackTotal: 0, over: false } });
+      playerCreated = true;
+      await fb.onDisconnect(playerRef).remove();
+      await fb.onDisconnect(guestUidRef).remove();
+      this.pvp = { fb, code, host: false, uid: fb.uid, roomRef, playerRef, started: false,
+        guestUidRef,
+        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null,
+        attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: room.mode === 'pve' ? 'pve' : 'pvp', unsub: null };
+      this.pvpMode = this.pvp.mode;
+      localStorage.setItem('1c_pvp_mode', this.pvpMode);
+      this.attachPvpRoom();
+      document.getElementById('pvp-leave-button').style.display = 'block';
+      this.pvpStatus('Подключились. Ждём запуска матча…');
+    } catch (err) {
+      if (playerCreated && playerRef) await (await window.firebaseLeaderboardReady).remove(playerRef).catch(() => {});
+      if (guestSlotClaimed && guestUidRef) await (await window.firebaseLeaderboardReady).remove(guestUidRef).catch(() => {});
+      this.pvpStatus(`Не удалось подключиться: ${err.message || 'ошибка Firebase'}`, true);
+    }
+  }
+
+  attachPvpRoom() {
+    const pvp = this.pvp;
+    if (!pvp) return;
+    pvp.unsub?.();
+    pvp.unsub = pvp.fb.onValue(pvp.roomRef, snapshot => this.handlePvpRoom(snapshot.val()));
+  }
+
+  handlePvpRoom(room) {
+    const pvp = this.pvp;
+    if (!pvp) return;
+    if (!room) {
+      if (!pvp.started) {
+        this.pvpStatus('Комната закрыта или истёк срок ожидания.', true);
+      } else if (!pvp.matchOver && !pvp.opponentLost) {
+        pvp.remotePlayer = null;
+        pvp.remoteState = null;
+        pvp.remoteChoosing = null;
+        pvp.remotePaused = false;
+        pvp.opponentLost = true;
+        this.showBanner('СОПЕРНИК ПОКИНУЛ КОМНАТУ. НАЖМИТЕ L, ЧТОБЫ СОХРАНИТЬ ТЕКУЩИЙ СЧЁТ.');
+        this.addPopup(this.player?.x || 0, (this.player?.y || 0) - 38, 'СОПЕРНИК ВЫШЕЛ — ДОСТУПНА КЛАВИША L', '#55efc4');
+        this.syncPvpWait();
+      }
+      return;
+    }
+    const players = Object.values(room.players || {});
+    const opponent = players.find(player => player.uid !== pvp.uid);
+    if (opponent) {
+      pvp.remotePlayer = opponent;
+      pvp.remoteState = opponent.state || null;
+      pvp.remoteChoosing = opponent.choosing || null;
+      pvp.remotePaused = Boolean(opponent.paused);
+      if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
+      if (room.world) this.applyPvpSharedWorld(room.world);
+      this.syncPvpWait();
+    } else if (pvp.remotePlayer) {
+      pvp.remotePlayer = null;
+      pvp.remoteState = null;
+      pvp.remoteChoosing = null;
+      pvp.remotePaused = false;
+      if (pvp.started && !pvp.matchOver && !pvp.opponentLost) {
+        pvp.opponentLost = true;
+        this.showBanner('СОПЕРНИК ПОКИНУЛ КОМНАТУ. НАЖМИТЕ L, ЧТОБЫ СОХРАНИТЬ ТЕКУЩИЙ СЧЁТ.');
+      }
+      this.syncPvpWait();
+    }
+    if (pvp.host && players.length === 2 && room.status === 'waiting') {
+      pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/status`), 'playing')
+        .catch(err => this.pvpStatus(`Не удалось запустить матч: ${err.message}`, true));
+      return;
+    }
+    if (room.status === 'playing' && !pvp.started) {
+      pvp.started = true;
+      document.getElementById('modal-pvp').style.display = 'none';
+      this.start();
+      this.startPvpSync();
+      this.pvpStatus('Матч начался! Побеждает тот, кто первым разрушит целостность соперника.');
+      if (pvp.mode === 'pvp') this.showBanner('ДУЭЛЬНЫЙ ЩИТ: первые 2 минуты игроки не наносят урон друг другу.');
+      this.log(`PvP матч начался. Комната ${pvp.code}.`);
+    }
+  }
+
+  startPvpSync() {
+    if (!this.pvp) return;
+    if (this.pvpTimer) clearInterval(this.pvpTimer);
+    const pvp = this.pvp;
+    pvp.attackTotal = 0;
+    pvp.lastRemoteAttackTotal = Number(pvp.remoteState?.attackTotal || 0);
+    pvp.enemyDamageTotals ||= {};
+    pvp.claimedDrops ||= {};
+    pvp.processedEnemyDamage ||= {};
+    pvp.nextEnemyId ||= 0;
+    pvp.nextDropId ||= 0;
+    pvp.worldRevision = Number(pvp.remoteWorldRevision || 0);
+    pvp.lastWorldSync = 0;
+    pvp.manualPaused = false;
+    this.pvpTimer = setInterval(() => {
+      if (!this.pvp || !this.player) return;
+      const p = this.player;
+      const state = {
+        x: Math.round(p.x), y: Math.round(p.y), hp: Math.max(0, Math.round(p.hp * 10) / 10),
+        maxHp: Math.round(p.maxHp), shield: p.shieldTimer > 0, level: this.level,
+        attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
+        over: this.pvp.matchOver || p.hp <= 0,
+        enemyDamage: this.pvp.enemyDamageTotals || {},
+        claimedDrops: this.pvp.claimedDrops || {}
+      };
+      this.pvp.fb.update(this.pvp.playerRef, { online: true, choosing: this.pvp.choosing || null, paused: Boolean(this.pvp.manualPaused), state })
+        .catch(err => this.pvpStatus(`Потеряна связь с комнатой: ${err.message}`, true));
+      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 350) {
+        this.pvp.lastWorldSync = performance.now();
+        this.publishPvpSharedWorld();
+      }
+    }, 180);
+  }
+
+  trackPvpSharedEntities() {
+    const pvp = this.pvp;
+    if (!pvp?.started) return;
+    const attachHpTracker = enemy => {
+      if (!enemy || enemy._pvpHpTracked) return;
+      if (pvp.host && !enemy.syncId) enemy.syncId = `m${++pvp.nextEnemyId}`;
+      let hp = enemy.hp;
+      Object.defineProperty(enemy, 'hp', {
+        configurable: true,
+        enumerable: true,
+        get: () => hp,
+        set: value => {
+          const before = hp;
+          hp = value;
+          if (!pvp.host && !enemy.is24hPursuer && enemy.syncId && Number.isFinite(before) && Number.isFinite(value) && value < before) {
+            pvp.enemyDamageTotals ||= {};
+            pvp.enemyDamageTotals[enemy.syncId] = (pvp.enemyDamageTotals[enemy.syncId] || 0) + before - value;
+          }
+        }
+      });
+      Object.defineProperty(enemy, '_pvpHpTracked', { value: true, configurable: true });
+    };
+    for (const enemy of this.enemies) attachHpTracker(enemy);
+    if (pvp.host) {
+      const assignDropId = (item, prefix) => { if (!item.syncId) item.syncId = `${prefix}${++pvp.nextDropId}`; };
+      for (const gem of this.gems) assignDropId(gem, 'g');
+      for (const item of this.pickups) assignDropId(item, 'd');
+      for (const projectile of this.enemyProjectiles) assignDropId(projectile, 'p');
+      for (const warning of this.bossWarnings) assignDropId(warning, 'w');
+    }
+  }
+
+  publishPvpSharedWorld() {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started) return;
+    this.trackPvpSharedEntities();
+    const safe = value => JSON.parse(JSON.stringify(value, (key, item) =>
+      typeof item === 'number' && !Number.isFinite(item) ? 1e12 : item));
+    const byId = items => Object.fromEntries(items.filter(item => item.syncId).map(item => [item.syncId, safe(item)]));
+    const world = {
+      revision: ++pvp.worldRevision,
+      enemies: byId(this.enemies),
+      gems: byId(this.gems),
+      pickups: byId(this.pickups),
+      enemyProjectiles: byId(this.enemyProjectiles),
+      bossWarnings: byId(this.bossWarnings)
+    };
+    pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/world`), world)
+      .catch(err => this.pvpStatus(`Не удалось синхронизировать общий мир: ${err.message}`, true));
+  }
+
+  applyPvpSharedWorld(world) {
+    const pvp = this.pvp;
+    if (!pvp || pvp.host || !world || Number(world.revision || 0) <= Number(pvp.remoteWorldRevision || 0)) return;
+    pvp.remoteWorldRevision = Number(world.revision || 0);
+    this.enemies = Object.values(world.enemies || {}).map(enemy => ({ ...enemy }));
+    this.gems = Object.values(world.gems || {}).map(gem => ({ ...gem }));
+    this.pickups = Object.values(world.pickups || {}).map(item => ({ ...item }));
+    this.enemyProjectiles = Object.values(world.enemyProjectiles || {}).map(projectile => ({ ...projectile }));
+    this.bossWarnings = Object.values(world.bossWarnings || {}).map(warning => ({ ...warning }));
+    const sharedIds = new Set([...this.enemies, ...this.gems, ...this.pickups].map(item => item.syncId).filter(Boolean));
+    for (const id of Object.keys(pvp.enemyDamageTotals || {})) {
+      if (!this.enemies.some(enemy => enemy.syncId === id)) delete pvp.enemyDamageTotals[id];
+    }
+    for (const id of Object.keys(pvp.claimedDrops || {})) {
+      if (!sharedIds.has(id)) delete pvp.claimedDrops[id];
+    }
+  }
+
+  applyPvpRemoteState(state) {
+    if (!this.pvp || !state) return;
+    const total = Number(state.attackTotal || 0);
+    const damage = total - this.pvp.lastRemoteAttackTotal;
+    if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage);
+    this.pvp.lastRemoteAttackTotal = Math.max(this.pvp.lastRemoteAttackTotal, total);
+    if (this.pvp.host) {
+      this.pvp.processedEnemyDamage ||= {};
+      for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
+        const amount = Math.max(0, Number(amountValue) || 0);
+        const previous = this.pvp.processedEnemyDamage[enemyId] || 0;
+        const delta = Math.max(0, amount - previous);
+        this.pvp.processedEnemyDamage[enemyId] = Math.max(previous, amount);
+        if (delta > 0) {
+          const enemy = this.enemies.find(item => item.syncId === enemyId);
+          if (enemy && !enemy.is24hPursuer) enemy.hp = Math.max(0, enemy.hp - delta);
+        }
+      }
+      const claimed = state.claimedDrops || {};
+      const claimedIds = new Set(Object.keys(claimed).filter(id => claimed[id]));
+      if (claimedIds.size) {
+        this.gems = this.gems.filter(item => !claimedIds.has(item.syncId));
+        this.pickups = this.pickups.filter(item => !claimedIds.has(item.syncId));
+      }
+    }
+    if (state.over && !this.pvp.matchOver && !this.pvp.opponentLost) {
+      this.pvp.opponentLost = true;
+      if (this.player?.hp > 0) {
+        this.showBanner('СОПЕРНИК ВЫБЫЛ! НАЖМИТЕ L, ЧТОБЫ ЗАВЕРШИТЬ ЗАБЕГ С ТЕКУЩИМ СЧЁТОМ.');
+        this.addPopup(this.player.x, this.player.y - 38, 'НАЖМИТЕ L — СОХРАНИТЬ ТЕКУЩИЙ СЧЁТ', '#55efc4');
+      }
+    }
+  }
+
+  receivePvpDamage(damage) {
+    if (!this.player || this.player.hp <= 0) return;
+    if (this.pvp?.mode === 'pvp' && this.time < 120) return;
+    if (this.player.shieldTimer > 0) {
+      this.addPopup(this.player.x, this.player.y - 22, 'PvP-УДАР ПОГЛОЩЁН ЩИТОМ', '#00cec9');
+      return;
+    }
+    if (Math.random() < this.player.dodge) {
+      this.addPopup(this.player.x, this.player.y - 22, 'PvP-ПРОМАХ!', '#f1c40f');
+      return;
+    }
+    const applied = Math.min(this.player.hp, damage);
+    this.player.hp -= applied;
+    this.sound.hit();
+    this.addPopup(this.player.x, this.player.y - 22, `PvP -${Math.ceil(applied)} HP`, '#ff4757');
+    this.updateHUD();
+    if (this.player.hp <= 0) this.gameOver(`ПОРАЖЕНИЕ! ${this.pvp.remotePlayer?.name || 'Соперник'} победил.`);
+  }
+
+  damagePvpOpponent(damage) {
+    if (!this.pvp?.remoteState || this.pvp.mode === 'pve' || this.pvp.remoteState.over || damage <= 0) return;
+    if (this.time < 120) return;
+    this.pvp.attackTotal += damage;
+  }
+
+  async restartFromGameOver() {
+    if (this.pvp) await this.leavePvpRoom();
+    this.start();
+  }
+
+  setPvpChoosing(kind) {
+    if (!this.pvp) return;
+    this.pvp.choosing = kind || null;
+    this.pvp.fb.update(this.pvp.playerRef, { choosing: this.pvp.choosing }).catch(() => {});
+    this.syncPvpWait();
+  }
+
+  setPvpManualPause(paused) {
+    if (!this.pvp?.started) return;
+    this.pvp.manualPaused = Boolean(paused);
+    this.pvp.fb.update(this.pvp.playerRef, { paused: this.pvp.manualPaused }).catch(() => {});
+    this.syncPvpWait();
+  }
+
+  claimPvpDrop(item) {
+    if (!this.pvp?.started || this.pvp.host || !item?.syncId) return;
+    this.pvp.claimedDrops ||= {};
+    this.pvp.claimedDrops[item.syncId] = true;
+  }
+
+  syncPvpWait() {
+    const pvp = this.pvp;
+    if (!pvp?.started) return;
+    const showWait = Boolean((pvp.remotePaused || (pvp.remoteChoosing && !pvp.choosing)) && !pvp.matchOver);
+    const modal = document.getElementById('modal-pvp-wait');
+    modal.style.display = showWait ? 'flex' : 'none';
+    if (showWait) {
+      document.getElementById('pvp-wait-head').textContent = pvp.remotePaused ? '⏸ Игра приостановлена' : '⏳ Соперник выбирает';
+      document.getElementById('pvp-wait-message').textContent = pvp.remotePaused
+        ? `${pvp.remotePlayer?.name || 'Второй игрок'} поставил игру на паузу. Ожидаем продолжения.`
+        : pvp.remoteChoosing === 'shop'
+          ? 'Второй игрок в магазине. Игра приостановлена, пока он выбирает предметы.'
+          : 'Второй игрок выбирает улучшение. Игра приостановлена.';
+      this.pvpPausedByRemote = true;
+      this.paused = true;
+    } else if (this.pvpPausedByRemote) {
+      this.pvpPausedByRemote = false;
+      this.paused = Boolean(pvp.choosing || pvp.manualPaused || document.getElementById('modal-pause').style.display === 'flex' || this.player?.hp <= 0);
+      this.lastTime = performance.now();
+    }
+  }
+
+  async leavePvpRoom() {
+    const pvp = this.pvp;
+    if (!pvp) return;
+    if (this.pvpTimer) clearInterval(this.pvpTimer);
+    this.pvpTimer = null;
+    pvp.unsub?.();
+    try {
+      if (pvp.host) await pvp.fb.remove(pvp.roomRef);
+      else {
+        await pvp.fb.remove(pvp.playerRef);
+        if (pvp.guestUidRef) await pvp.fb.remove(pvp.guestUidRef);
+      }
+    } catch (err) {
+      this.pvpStatus(`Не удалось закрыть комнату: ${err.message}`, true);
+    }
+    this.pvp = null;
+    this.pvpPausedByRemote = false;
+    document.getElementById('modal-pvp-wait').style.display = 'none';
+    document.getElementById('modal-pvp').style.display = 'none';
+    document.getElementById('pvp-leave-button').style.display = 'none';
+    document.getElementById('pvp-room-code-display').style.display = 'none';
+    document.getElementById('pvp-disable-attacks').disabled = false;
+    this.paused = true;
+    this.showMainMenu();
+  }
+
   showSettings() {
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-settings').style.display = 'flex';
@@ -2158,6 +2624,13 @@ class Game {
     document.getElementById('sfx-volume').value = Math.round(this.sound.sfxVolume * 100);
     document.getElementById('music-volume-value').textContent = `${Math.round(this.sound.musicVolume * 100)}%`;
     document.getElementById('sfx-volume-value').textContent = `${Math.round(this.sound.sfxVolume * 100)}%`;
+    document.getElementById('collapse-accepted-tickets').checked = this.collapseAcceptedTickets;
+  }
+
+  setCollapseAcceptedTickets(enabled) {
+    this.collapseAcceptedTickets = Boolean(enabled);
+    localStorage.setItem('1c_collapse_accepted_tickets', String(this.collapseAcceptedTickets));
+    this.updateChallengeUI();
   }
   closeSettings() {
     document.getElementById('modal-settings').style.display = 'none';
@@ -2177,10 +2650,12 @@ class Game {
   openShop() {
     this.closeSalesCall();
     this.paused = true;
+    this.setPvpChoosing('shop');
     this.keys = {};
     this.shopVisit++;
     this.shopStock = {};
     this.shopPrice = {};
+    this.shopPurchased = new Set();
     for (const [key, item] of Object.entries(CONSUMABLES_DEF)) {
       this.shopStock[key] = item.stock;
       this.shopPrice[key] = Math.round(item.cost * (1 + (this.shopVisit - 1) * 0.08));
@@ -2268,27 +2743,32 @@ class Game {
       {
         objectives: [{ type: 'kills', target: killsTarget, label: 'устранить багов' }], duration: 43,
         reward: 58 + difficulty * 4,
-        title: `После обновления конфигурации продакшен сыплет ошибками. Устранить ${killsTarget} за 43 секунды: клиент уже ждёт на линии.`
+        title: 'Продакшен сыплет ошибками',
+        description: 'После обновления конфигурации клиент ждёт на линии.'
       },
       {
         objectives: [{ type: 'gems', target: gemsTarget, label: 'собрать дискет опыта' }], duration: 48,
         reward: 60 + difficulty * 4,
-        title: `На сервере клиента свободного места на одну выгрузку. Собрать ${gemsTarget} дискет опыта за 48 секунд, пока он не прислал скриншот ошибки.`
+        title: 'На сервере осталось места на одну выгрузку',
+        description: 'Клиент готовит выгрузку и уже держит скриншот ошибки наготове.'
       },
       {
         objectives: [{ type: 'survive', target: 32, label: 'продержаться без урона, сек.' }], duration: 36,
         reward: 64 + difficulty * 4,
-        title: 'Подключение к серверу через Rudesktop: продержаться 32 секунды без урона. Клиент уже трижды спросил, виден ли его экран в Mango Talker.'
+        title: 'Rudesktop не отпускает',
+        description: 'Клиент подключился удалённо и трижды спросил в Mango Talker, виден ли его экран.'
       },
       {
         objectives: [{ type: 'surviveInverted', target: 45, label: 'пережить инверсию управления' }], duration: 45,
         reward: 76 + difficulty * 4, invertControls: true,
-        title: 'Тикет от Максима Воронина: всё управление инвертировано. Продержаться 45 секунд — Максим на линии и ждёт подтверждения.'
+        title: 'Тикет от Максима Воронина',
+        description: 'Управление инвертировано. Максим на линии и ждёт подтверждения.'
       },
       {
         objectives: [{ type: 'shooters', target: shooterTarget, label: 'нейтрализовать удалённых специалистов' }], duration: 55,
         reward: 68 + difficulty * 4,
-        title: `Интеграция не отвечает, а удалённая команда шлёт встречные запросы. Остановить ${shooterTarget} дальнобойных специалистов за 55 секунд.`
+        title: 'Удалённая команда шлёт запросы',
+        description: 'Интеграция не отвечает, а специалисты уже отправляют встречные запросы.'
       },
       {
         objectives: [
@@ -2296,7 +2776,8 @@ class Game {
           { type: 'gems', target: comboGems, label: 'собрать дискет опыта' }
         ], duration: 52,
         reward: 78 + difficulty * 5,
-        title: `После переноса базы на сервер: устранить ${comboKills} ошибок и собрать ${comboGems} дискет за 52 секунды. Окно обновления уже согласовано.`
+        title: 'Обновление базы без окна',
+        description: 'Базу уже перенесли на сервер, а окно обновления согласовали задним числом.'
       }
     ];
     const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
@@ -2318,10 +2799,13 @@ class Game {
     card.style.display = 'block';
     const head = document.getElementById('challenge-head');
     const title = document.getElementById('challenge-title');
+    const description = document.getElementById('challenge-description');
     const progress = document.getElementById('challenge-progress');
     const actions = document.getElementById('challenge-actions');
     const buttons = actions.querySelectorAll('button');
     title.textContent = challenge.title;
+    description.textContent = challenge.description || '';
+    description.style.display = challenge.status === 'active' && this.collapseAcceptedTickets ? 'none' : (challenge.description ? 'block' : 'none');
 
     if (challenge.status === 'pending') {
       head.textContent = '📩 У Вас новый тикет:';
@@ -2465,13 +2949,14 @@ class Game {
       const slotsFull = !owned && this.consumables.every(Boolean);
       const stock = this.shopStock[key] || 0;
       const price = this.shopPrice[key] || item.cost;
+      const purchased = this.shopPurchased.has(key);
       const card = document.createElement('div');
       card.className = 'shop-card';
       card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>Лицензии: ${stock}${owned ? ` · подключено: ${owned.count}` : ''}</b></p>`;
       const button = document.createElement('button');
       button.className = 'btn-1c';
-      button.innerText = `Подключить · ${price} 💰`;
-      button.disabled = stock <= 0 || this.currency < price || stackFull || slotsFull;
+      button.innerText = purchased ? 'Уже куплено' : `Подключить · ${price} 💰`;
+      button.disabled = purchased || stock <= 0 || this.currency < price || stackFull || slotsFull;
       button.onclick = () => this.buyConsumable(key);
       card.appendChild(button);
       grid.appendChild(card);
@@ -2480,13 +2965,14 @@ class Game {
       const stockKey = `passive_${key}`;
       const stock = this.shopStock[stockKey] || 0;
       const price = this.shopPrice[stockKey] || item.cost;
+      const purchased = this.shopPurchased.has(stockKey);
       const card = document.createElement('div');
       card.className = 'shop-card';
       card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>В инвентаре: ${this.shopPassives.filter(slot => slot.key === key).length} · Остаток: ${stock}</b></p>`;
       const button = document.createElement('button');
       button.className = 'btn-1c';
-      button.innerText = `Купить · ${price} 💰`;
-      button.disabled = stock <= 0 || this.currency < price || this.shopPassives.length >= 6;
+      button.innerText = purchased ? 'Уже куплено' : `Купить · ${price} 💰`;
+      button.disabled = purchased || stock <= 0 || this.currency < price || this.shopPassives.length >= 6;
       button.onclick = () => this.buyPassiveItem(key);
       card.appendChild(button);
       passiveGrid.appendChild(card);
@@ -2496,9 +2982,10 @@ class Game {
     const item = STORE_PASSIVES_DEF[key];
     const stockKey = `passive_${key}`;
     const price = this.shopPrice[stockKey] || item.cost;
-    if (!item || this.shopPassives.length >= 6 || (this.shopStock[stockKey] || 0) <= 0 || this.currency < price) return;
+    if (!item || this.shopPurchased.has(stockKey) || this.shopPassives.length >= 6 || (this.shopStock[stockKey] || 0) <= 0 || this.currency < price) return;
     this.currency -= price;
     this.shopStock[stockKey]--;
+    this.shopPurchased.add(stockKey);
     this.shopPassives.push({ key });
     item.apply(this.player);
     document.getElementById('shop-message').innerText = `${item.name}: улучшение добавлено в инвентарь и сразу действует.`;
@@ -2511,7 +2998,7 @@ class Game {
     const price = this.shopPrice[key] || item.cost;
     const stock = this.shopStock[key] || 0;
     let slot = this.consumables.find(entry => entry && entry.key === key);
-    if (stock <= 0 || this.currency < price) return;
+    if (this.shopPurchased.has(key) || stock <= 0 || this.currency < price) return;
     if (slot && slot.count >= item.maxStack) return;
     const freeSlot = this.consumables.findIndex(entry => !entry);
     if (!slot && freeSlot === -1) {
@@ -2520,6 +3007,7 @@ class Game {
     }
     this.currency -= price;
     this.shopStock[key]--;
+    this.shopPurchased.add(key);
     if (slot) slot.count++;
     else this.consumables[freeSlot] = { key, count: 1 };
     document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} подключена и добавлена в инвентарь. Отдел продаж благодарит за выбор.`;
@@ -2531,7 +3019,8 @@ class Game {
   closeShop() {
     if (document.getElementById('modal-shop').style.display !== 'flex') return;
     document.getElementById('modal-shop').style.display = 'none';
-    this.paused = false;
+    this.setPvpChoosing(null);
+    this.paused = Boolean(this.pvp?.remoteChoosing && !this.pvp.choosing);
     this.keys = {};
     this.lastTime = performance.now();
   }
@@ -2577,6 +3066,7 @@ class Game {
     this.mouseMovePointerId = null;
     this.renderPauseLoadout();
     document.getElementById('modal-pause').style.display = 'flex';
+    this.setPvpManualPause(true);
   }
 
   renderPauseLoadout() {
@@ -2667,6 +3157,7 @@ class Game {
     if (document.getElementById('modal-pause').style.display !== 'flex') return;
     document.getElementById('modal-pause').style.display = 'none';
     this.paused = false;
+    this.setPvpManualPause(false);
     this.keys = {};
     this.lastTime = performance.now();
   }
@@ -2803,6 +3294,8 @@ class Game {
       e.hp -= 95;
       this.createHitFX(e.x, e.y, '#ffd200', 6);
     }
+    const pvpTarget = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+    if (pvpTarget && Math.hypot(pvpTarget.x - this.player.x, pvpTarget.y - this.player.y) < 420) this.damagePvpOpponent(95);
     this.addPopup(this.player.x, this.player.y - 40, "СЕАНС РАЗОРВАН АДМИНИСТРАТОРОМ!", "#ffd200");
   }
 
@@ -2870,11 +3363,13 @@ class Game {
     }
     const megaBossAlive = this.enemies.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
     if (!megaBossAlive && this.spawnTimer <= 0) {
-      const maxAllowedEnemies = Math.min(72, 38 + Math.floor(this.time / 12));
+      const onlineMultiplier = this.pvp?.started ? 1.8 : 1;
+      const maxAllowedEnemies = Math.floor(Math.min(72, 38 + Math.floor(this.time / 12)) * onlineMultiplier);
 
       if (this.enemies.length < maxAllowedEnemies) {
         const wave = 1 + Math.floor(this.time / 22);
-        const toSpawn = Math.min(8, 1 + Math.floor(wave * 0.8));
+        const baseSpawnCount = Math.min(8, 1 + Math.floor(wave * 0.8));
+        const toSpawn = Math.min(15, Math.ceil(baseSpawnCount * onlineMultiplier));
 
         for (let i = 0; i < toSpawn; i++) {
           if (this.enemies.length >= maxAllowedEnemies) break;
@@ -3536,6 +4031,11 @@ class Game {
             }
           }
         }
+        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+        if (remote && Math.hypot(remote.x - bx, remote.y - by) < 33) {
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
+          this.damagePvpOpponent(hit.dmg * dt * 3.8);
+        }
       }
     }
 
@@ -3565,12 +4065,17 @@ class Game {
     if (this.weapons.syntax) {
       const w = this.weapons.syntax;
       w.timer -= dt;
-      if (w.timer <= 0 && this.enemies.length > 0) {
+      if (w.timer <= 0 && (this.enemies.length > 0 || (this.pvp?.mode === 'pvp' && this.pvp.remoteState && !this.pvp.remoteState.over))) {
         w.timer = WEAPONS_DEF.syntax.baseCooldown * cdFactor;
         let target = null, minDist = 500;
         for (let e of this.enemies) {
           const d = Math.hypot(e.x - this.player.x, e.y - this.player.y);
           if (d < minDist) { minDist = d; target = e; }
+        }
+        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+        if (remote && !remote.over) {
+          const d = Math.hypot(remote.x - this.player.x, remote.y - this.player.y);
+          if (d < minDist) target = remote;
         }
         if (target) {
           const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
@@ -3641,6 +4146,11 @@ class Game {
           e.hp -= hit.dmg * dt;
         }
       }
+      const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+      if (remote && Math.hypot(remote.x - this.player.x, remote.y - this.player.y) < rad + 18) {
+        const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
+        this.damagePvpOpponent(hit.dmg * dt);
+      }
     }
 
     // Хлыст IronLogic
@@ -3674,6 +4184,16 @@ class Game {
             }
           }
         }
+        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+        if (remote && !remote.over && Math.hypot(remote.x - this.player.x, remote.y - this.player.y) < slashRange) {
+          const eAngle = Math.atan2(remote.y - this.player.y, remote.x - this.player.x);
+          let diff = Math.abs(ang - eAngle);
+          if (diff > Math.PI) diff = Math.PI * 2 - diff;
+          if (diff < 0.8) {
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.iron_logic.baseDmg + w.lvl * 12);
+            this.damagePvpOpponent(hit.dmg);
+          }
+        }
         this.sound.playTone(320, 'triangle', 0.12, 0.15);
       }
     }
@@ -3682,11 +4202,13 @@ class Game {
     if (this.weapons.egais_laser) {
       const w = this.weapons.egais_laser;
       w.timer -= dt;
-      if (w.timer <= 0 && this.enemies.length > 0) {
+      if (w.timer <= 0 && (this.enemies.length > 0 || (this.pvp?.mode === 'pvp' && this.pvp.remoteState && !this.pvp.remoteState.over))) {
         w.timer = WEAPONS_DEF.egais_laser.baseCooldown * cdFactor;
         let chain = [];
         let currX = this.player.x, currY = this.player.y;
         let available = [...this.enemies];
+        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+        if (remote && !remote.over) available.push({ ...remote, isPvpTarget: true });
 
         for (let c = 0; c < 3 + Math.floor(w.lvl / 2); c++) {
           if (available.length === 0) break;
@@ -3694,7 +4216,8 @@ class Game {
           let tgt = available.shift();
           if (tgt && Math.hypot(tgt.x - currX, tgt.y - currY) < 380) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.egais_laser.baseDmg + w.lvl * 8);
-            tgt.hp -= hit.dmg;
+            if (tgt.isPvpTarget) this.damagePvpOpponent(hit.dmg);
+            else tgt.hp -= hit.dmg;
             chain.push({ x1: currX, y1: currY, x2: tgt.x, y2: tgt.y });
             currX = tgt.x; currY = tgt.y;
             this.createHitFX(tgt.x, tgt.y, '#ff4757', 4);
@@ -3725,6 +4248,7 @@ class Game {
   }
 
   update(dt) {
+    this.trackPvpSharedEntities();
     let aliveBosses = 0;
     let aliveMegaBosses = 0;
     for (const enemy of this.enemies) {
@@ -3736,7 +4260,7 @@ class Game {
     this.sound.updateBossMusic(dt, aliveBosses, aliveMegaBosses);
     this.time += dt;
     this.updateChallenge(dt);
-    if (this.time >= this.nextBananaSupplyTime) {
+    if ((!this.pvp || this.pvp.host) && this.time >= this.nextBananaSupplyTime) {
       this.spawnBananaSupply();
       this.nextBananaSupplyTime += 75;
     }
@@ -3856,7 +4380,15 @@ class Game {
       if (p.type !== 'laser_visual') {
         p.x += p.vx * frameScale; p.y += p.vy * frameScale;
 
-        if (p.piercing) {
+        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+        if (!p.hitOpponent && remote && !remote.over && Math.hypot(remote.x - p.x, remote.y - p.y) < 19 + p.size) {
+          this.damagePvpOpponent(p.dmg);
+          p.hitOpponent = true;
+          p.life = 0;
+          this.createHitFX(p.x, p.y, '#ff7675', 4);
+        }
+
+        if (p.life > 0 && p.piercing) {
           for (let e of this.enemies) {
             if (!p.hits.includes(e) && Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
               e.hp -= p.dmg;
@@ -3867,7 +4399,7 @@ class Game {
               this.addPopup(e.x, e.y - 12, `7.7: -${Math.round(p.dmg)}`, '#0984e3');
             }
           }
-        } else {
+        } else if (p.life > 0) {
           for (let e of this.enemies) {
             if (p.hitTargets?.includes(e)) continue;
             if (Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
@@ -3959,6 +4491,10 @@ class Game {
           if (pud.isTrail) e.x -= (e.x - this.player.x) * 0.01 * frameScale;
         }
       }
+      const pvpTarget = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+      if (pvpTarget && !pvpTarget.over && Math.hypot(pvpTarget.x - pud.x, pvpTarget.y - pud.y) < pud.radius + 18) {
+        this.damagePvpOpponent(pud.dmg * dt);
+      }
       if (pud.life <= 0) this.puddles.splice(i, 1);
     }
 
@@ -3968,7 +4504,7 @@ class Game {
       if (this.whipSlashes[i].life <= 0) this.whipSlashes.splice(i, 1);
     }
 
-    this.spawnDirector(dt);
+    if (!this.pvp || this.pvp.host) this.spawnDirector(dt);
 
     // Логика врагов
     for (let i = this.enemies.length - 1; i >= 0; i--) {
@@ -4010,11 +4546,11 @@ class Game {
         e.y += Math.sin(ang) * moveSpeed * frameScale;
       }
 
-      if (e.isBoss) {
+      if (e.isBoss && (!this.pvp || this.pvp.host)) {
         this.updateBossAI(e, dt);
       }
 
-      if (e.shooter) {
+      if (e.shooter && (!this.pvp || this.pvp.host)) {
         e.shootTimer -= dt;
         if (e.shootTimer <= 0 && Math.hypot(this.player.x - e.x, this.player.y - e.y) < 520) {
           e.shootTimer = e.burstShooter ? 3.4 : 2.4;
@@ -4066,6 +4602,10 @@ class Game {
       }
 
       // Смерть моба
+      if (this.pvp?.started && !this.pvp.host && e.hp <= 0 && !e.is24hPursuer) {
+        e.hp = 1;
+        continue;
+      }
       if (e.hp <= 0) {
         if (e.isBoss && !e.isMegaBoss) {
           this.nextMiniBossAllowedTime = this.time + 40 + Math.random() * 10;
@@ -4115,6 +4655,7 @@ class Game {
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const item = this.pickups[i];
       if (Math.hypot(this.player.x - item.x, this.player.y - item.y) < 32) {
+        this.claimPvpDrop(item);
         if (item.type === 'its_box') {
           this.triggerNukeITS();
         } else if (item.type === 'coffee') {
@@ -4142,6 +4683,7 @@ class Game {
         g.y += Math.sin(a) * 9.8 * frameScale;
       }
       if (d < 22) {
+        this.claimPvpDrop(g);
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
@@ -4184,6 +4726,7 @@ class Game {
     this.nextXp = Math.floor(this.nextXp * 1.34);
     this.sound.levelUp();
     this.paused = true;
+    this.setPvpChoosing('levelup');
 
     // ПАССИВНЫЙ РОСТ СИЛЫ ПРОГРАММИСТА С КАЖДЫМ РЕЛИЗОМ:
     this.player.maxHp += 10;
@@ -4280,6 +4823,7 @@ class Game {
           this.levelUp();
         } else {
           this.paused = false;
+          this.setPvpChoosing(null);
         }
       };
       box.appendChild(card);
@@ -4328,6 +4872,14 @@ class Game {
     this.closeSalesCall();
     this.clearChallenge();
     this.paused = true;
+    document.getElementById('modal-pause').style.display = 'none';
+    document.getElementById('modal-lvlup').style.display = 'none';
+    document.getElementById('modal-shop').style.display = 'none';
+    document.getElementById('modal-pvp-wait').style.display = 'none';
+    if (this.pvp) {
+      this.pvp.matchOver = true;
+      this.pvp.choosing = null;
+    }
     this.sound.playTone(60, 'sawtooth', 0.7, 0.45);
 
     const totalScore = this.calcScore();
@@ -4347,6 +4899,15 @@ class Game {
     document.getElementById('modal-gameover').style.display = 'flex';
   }
 
+  finishRunWithCurrentScore() {
+    if (!this.player || this.player.hp <= 0 || document.getElementById('modal-main-menu').style.display === 'flex' || document.getElementById('modal-gameover').style.display === 'flex') return;
+    if (this.pvp && (!this.pvp.started || !this.pvp.opponentLost)) {
+      this.addPopup(this.player.x, this.player.y - 34, 'В PvP завершить забег клавишей L можно после выбытия соперника', '#ffd200');
+      return;
+    }
+    this.gameOver(`Забег завершён клавишей L. Текущий счёт: ${this.calcScore()}.`);
+  }
+
   async submitScore() {
     const nickInput = document.getElementById('player-nickname');
     let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '') || 'Архитектор_1С';
@@ -4363,7 +4924,8 @@ class Game {
       const fb = await window.firebaseLeaderboardReady;
       const recordsRef = fb.ref(fb.db, 'leaderboard');
       const recordRef = fb.push(recordsRef);
-      await fb.set(recordRef, { uid: fb.uid, name: nick, score, seconds, createdAt: Date.now() });
+      const mode = this.pvp ? (this.pvp.mode === 'pve' ? 'pve' : 'pvp') : 'solo';
+      await fb.set(recordRef, { uid: fb.uid, name: nick, score, seconds, version: GAME_VERSION, mode, createdAt: Date.now() });
       status.innerHTML = '<b style="color:#27ae60">Результат этого забега добавлен в таблицу!</b>';
       if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
       this.leaderboardOpenTimer = setTimeout(() => {
@@ -4378,7 +4940,7 @@ class Game {
 
   async fetchLeaderboard() {
     const tbody = document.getElementById('lb-body');
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Загружаем рейтинг Firebase...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Загружаем рейтинг Firebase...</td></tr>';
 
     try {
       const fb = await window.firebaseLeaderboardReady;
@@ -4388,7 +4950,7 @@ class Game {
       scores.sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
       tbody.innerHTML = '';
       if (!scores.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Таблица пока пуста. Запишите первый результат!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Таблица пока пуста. Запишите первый результат!</td></tr>';
         return;
       }
 
@@ -4396,17 +4958,22 @@ class Game {
         const seconds = Math.max(0, Number(entry.seconds) || 0);
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
         const s = (seconds % 60).toString().padStart(2, '0');
+        const entryMode = entry.mode || 'solo';
+        const modeLabel = entryMode === 'pvp' ? 'Сетевая · PvP'
+          : entryMode === 'pve' ? 'Сетевая · PvE' : 'Одиночная';
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><b>${idx + 1}</b></td>
           <td><b>${this.escapeHtml(String(entry.name || 'Архитектор_1С'))}</b></td>
+          <td>${this.escapeHtml(String(entry.version || '1.7.1'))}</td>
+          <td>${modeLabel}</td>
           <td style="color:#b33939; font-weight:bold;">${Math.max(0, Number(entry.score) || 0)}</td>
           <td>${m}:${s}</td>
         `;
         tbody.appendChild(tr);
       });
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Firebase недоступен: ${this.escapeHtml(err.message || 'проверьте настройки')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Firebase недоступен: ${this.escapeHtml(err.message || 'проверьте настройки')}</td></tr>`;
     }
   }
 
@@ -4787,6 +5354,35 @@ class Game {
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       this.ctx.fillText(ep.icon, ep.x, ep.y);
+    }
+
+    // Соперник в сетевой игре.
+    const remote = this.pvp?.remoteState;
+    if (remote && Number.isFinite(remote.x) && Number.isFinite(remote.y)) {
+      this.ctx.save();
+      this.ctx.translate(remote.x, remote.y);
+      this.ctx.globalAlpha = remote.over ? 0.42 : 1;
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, 20, 0, Math.PI * 2);
+      this.ctx.fillStyle = '#74b9ff';
+      this.ctx.fill();
+      this.ctx.strokeStyle = '#dff2ff';
+      this.ctx.lineWidth = 3;
+      this.ctx.stroke();
+      this.ctx.fillStyle = '#102a43';
+      this.ctx.font = 'bold 12px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(this.pvp?.mode === 'pve' ? 'PvE' : 'PvP', 0, 0);
+      this.ctx.globalAlpha = 1;
+      this.ctx.fillStyle = '#fff';
+      this.ctx.font = 'bold 11px sans-serif';
+      this.ctx.fillText(`${this.pvp.remotePlayer?.name || 'Соперник'} · ур. ${remote.level || 1}`, 0, -34);
+      this.ctx.fillStyle = '#333';
+      this.ctx.fillRect(-24, -28, 48, 5);
+      this.ctx.fillStyle = '#55efc4';
+      this.ctx.fillRect(-24, -28, 48 * Math.max(0, Math.min(1, (remote.hp || 0) / Math.max(1, remote.maxHp || 100))), 5);
+      this.ctx.restore();
     }
 
     // Игрок

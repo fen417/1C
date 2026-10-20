@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.8.2</title>
+<title>1С:Фитнес Клуб КОРП 1.8.3</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -593,7 +593,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.8.2 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.8.3 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -712,7 +712,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.2</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.3</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -721,7 +721,7 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.8.2</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.8.3</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
@@ -964,7 +964,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '1.8.2';
+const GAME_VERSION = '1.8.3';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -2809,6 +2809,8 @@ class Game {
   handlePvpRtcLost(reason, rtc = this.pvp?.rtc) {
     const pvp = this.pvp;
     if (!pvp?.started || !rtc || pvp.rtc !== rtc || rtc.restarting || pvp.opponentLost) return;
+    const diagnostic = this.describePvpRtcFailure(reason, rtc);
+    pvp.connectionLostReason = diagnostic;
     if (!pvp.connectionLost) {
       pvp.wasPausedBeforeConnectionLost = Boolean(this.paused);
       pvp.connectionLost = true;
@@ -2817,8 +2819,8 @@ class Game {
       const modal = document.getElementById('modal-pvp-wait');
       modal.style.display = 'flex';
       document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
-      document.getElementById('pvp-wait-message').textContent = 'Игра приостановлена. Восстанавливаем прямое соединение; прогресс матча сохранён.';
-      this.pvpStatus(`Связь WebRTC потеряна. Игра приостановлена, пробуем восстановить соединение. ${reason}`, true);
+      document.getElementById('pvp-wait-message').textContent = `Игра приостановлена. ${diagnostic}. Восстанавливаем соединение.`;
+      this.pvpStatus(`Связь WebRTC потеряна. ${diagnostic}`, true);
     }
     if (pvp.recoveryRequested) return;
     pvp.recoveryRequested = true;
@@ -2827,16 +2829,37 @@ class Game {
       return;
     }
     const generation = Math.max(1, Number(pvp.rtcGeneration) || 1) + 1;
-    this.restartPvpRtc(generation);
-    pvp.fb.update(pvp.roomRef, { rtcGeneration: generation }).catch(err => {
-      pvp.recoveryRequested = false;
-      this.pvpStatus(`Не удалось сообщить о восстановлении через Firebase: ${err.message}. Повторяем попытку…`, true);
+    const generationRef = pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/rtcGeneration`);
+    pvp.recoveryTargetGeneration = generation;
+    this.publishPvpRtcGeneration(pvp, generation, generationRef);
+  }
+
+  describePvpRtcFailure(reason, rtc) {
+    const pc = rtc?.pc;
+    const secondsSinceMessage = rtc?.lastMessageAt
+      ? Math.max(0, (performance.now() - rtc.lastMessageAt) / 1000).toFixed(1)
+      : 'нет данных';
+    const channelStates = [rtc?.channel, rtc?.worldChannel]
+      .map(channel => channel ? `${channel.label}: ${channel.readyState}` : null)
+      .filter(Boolean).join(', ') || 'каналы не созданы';
+    return `${reason} Состояние: ICE ${pc?.iceConnectionState || 'неизвестно'}, соединение ${pc?.connectionState || 'неизвестно'}, сигнализация ${pc?.signalingState || 'неизвестно'}; ${channelStates}; последнее сообщение ${secondsSinceMessage} с назад`;
+  }
+
+  publishPvpRtcGeneration(pvp, generation, generationRef) {
+    if (this.pvp !== pvp || !pvp.connectionLost || pvp.recoveryTargetGeneration !== generation) return;
+    pvp.fb.set(generationRef, generation).then(() => {
+      if (this.pvp === pvp && pvp.connectionLost && Number(pvp.rtcGeneration) !== generation) {
+        this.restartPvpRtc(generation);
+      }
+    }).catch(err => {
+      if (this.pvp !== pvp || !pvp.connectionLost || pvp.recoveryTargetGeneration !== generation) return;
+      const message = `Firebase не разрешил объявить новую RTC-сессию: ${err.message}. Проверьте правила RTDB; повторяем попытку.`;
+      this.pvpStatus(message, true);
+      pvp.connectionLostReason = message;
+      document.getElementById('pvp-wait-message').textContent = message;
       clearTimeout(pvp.recoveryRetryTimer);
-      pvp.recoveryRetryTimer = setTimeout(() => {
-        if (this.pvp !== pvp || !pvp.connectionLost || pvp.rtcGeneration !== generation) return;
-        pvp.fb.update(pvp.roomRef, { rtcGeneration: generation }).catch(retryErr =>
-          this.pvpStatus(`Повторное подключение ожидает Firebase: ${retryErr.message}`, true));
-      }, 1500);
+      pvp.recoveryRetryTimer = setTimeout(() =>
+        this.publishPvpRtcGeneration(pvp, generation, generationRef), 2500);
     });
   }
 
@@ -2846,7 +2869,10 @@ class Game {
     const requestId = pvp.lastReconnectRequestSent = Math.max(Date.now(), Number(pvp.lastReconnectRequestSent || 0) + 1);
     pvp.fb.set(requestRef, requestId).catch(err => {
       if (this.pvp === pvp && pvp.connectionLost) {
-        this.pvpStatus(`Не удалось запросить переподключение через Firebase: ${err.message}. Повторяем попытку…`, true);
+        const message = `Firebase отклонил запрос на переподключение: ${err.message}. Проверьте правила RTDB; повторяем попытку.`;
+        this.pvpStatus(message, true);
+        pvp.connectionLostReason = message;
+        document.getElementById('pvp-wait-message').textContent = message;
       }
     });
     clearTimeout(pvp.recoveryRequestTimer);
@@ -2863,7 +2889,9 @@ class Game {
       this.pvpPausedByRemote = true;
       document.getElementById('modal-pvp-wait').style.display = 'flex';
       document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
-      document.getElementById('pvp-wait-message').textContent = 'Второй игрок восстанавливает соединение. Игра приостановлена; прогресс матча сохранён.';
+      const diagnostic = this.describePvpRtcFailure('Второй игрок запросил переподключение.', pvp.rtc);
+      pvp.connectionLostReason = diagnostic;
+      document.getElementById('pvp-wait-message').textContent = `Игра приостановлена. ${diagnostic}`;
     }
     const oldRtc = pvp.rtc;
     if (oldRtc) {
@@ -2877,7 +2905,9 @@ class Game {
     pvp.rtc = null;
     pvp.rtcGeneration = Number(generation) || 1;
     pvp.recoveryRequested = false;
+    pvp.recoveryTargetGeneration = null;
     clearTimeout(pvp.recoveryRequestTimer);
+    clearTimeout(pvp.recoveryRetryTimer);
     pvp.remoteStateSequence = 0;
     pvp.remoteWorldRevision = 0;
     pvp.pendingWorldSnapshot = null;
@@ -3473,7 +3503,7 @@ class Game {
         ? '🔄 Связь потеряна — переподключаемся'
         : pvp.remotePaused ? '⏸ Игра приостановлена' : '⏳ Соперник выбирает';
       document.getElementById('pvp-wait-message').textContent = pvp.connectionLost
-        ? 'Игра приостановлена. Восстанавливаем прямое соединение; прогресс матча сохранён.'
+        ? `Игра приостановлена. ${pvp.connectionLostReason || 'Восстанавливаем прямое соединение; прогресс матча сохранён.'}`
         : pvp.remotePaused
         ? `${pvp.remotePlayer?.name || 'Второй игрок'} поставил игру на паузу. Ожидаем продолжения.`
         : pvp.remoteChoosing === 'shop'

@@ -2364,7 +2364,7 @@ class Game {
       localStorage.setItem('1c_pvp_mode', this.pvpMode);
       this.attachPvpRoom();
       document.getElementById('pvp-leave-button').style.display = 'block';
-      this.pvpStatus('Подключились. Ждём запуска матча…');
+      this.pvpStatus('Подключились. Устанавливаем обязательное WebRTC-соединение…');
     } catch (err) {
       if (playerCreated && playerRef) await (await window.firebaseLeaderboardReady).remove(playerRef).catch(() => {});
       if (guestSlotClaimed && guestUidRef) await (await window.firebaseLeaderboardReady).remove(guestUidRef).catch(() => {});
@@ -2393,6 +2393,7 @@ class Game {
         updateRoom();
         return;
       }
+      pvp.opponentUid = uid;
       opponentUnsubscribe = pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/players/${uid}`), snapshot => {
         cache.players = snapshot.exists() ? { [uid]: snapshot.val() } : {};
         updateRoom();
@@ -2409,10 +2410,6 @@ class Game {
       }),
       pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guestUid`), snapshot => {
         if (pvp.host) watchOpponent(snapshot.val());
-      }),
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/world`), snapshot => {
-        const world = snapshot.val();
-        if (world) this.applyPvpSharedWorld(world);
       })
     ];
     if (!pvp.host) watchOpponent(pvp.opponentUid);
@@ -2425,28 +2422,51 @@ class Game {
 
   setupPvpRtc() {
     const pvp = this.pvp;
-    if (!pvp || pvp.rtc || typeof RTCPeerConnection === 'undefined') return;
+    if (!pvp || pvp.rtc) return;
+    if (typeof RTCPeerConnection === 'undefined') {
+      this.failPvpRtc('браузер не поддерживает WebRTC');
+      return;
+    }
+    if (window.isSecureContext === false) {
+      this.failPvpRtc('WebRTC требует безопасную страницу HTTPS или localhost');
+      return;
+    }
     const roomRoot = `pvpRooms/${pvp.code}`;
     const rtcRoot = `${roomRoot}/rtc`;
     const refAt = path => pvp.fb.ref(pvp.fb.db, `${rtcRoot}/${path}`);
-    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    const listenAt = (path, callback) => pvp.fb.onValue(refAt(path), callback, err =>
+      this.failPvpRtc(`Firebase запретил читать ${path}: ${err.message}`));
+    let pc;
+    try {
+      pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    } catch (err) {
+      this.failPvpRtc(`браузер не смог создать RTCPeerConnection: ${err.message}`);
+      return;
+    }
     const rtc = pvp.rtc = {
       pc, channel: null, connected: false, offerStarted: false, answerStarted: false,
       seenHostCandidates: new Set(), seenGuestCandidates: new Set(), pendingCandidates: [],
       unsubscribers: []
     };
+    const startConnectTimer = () => {
+      clearTimeout(rtc.connectTimer);
+      rtc.connectTimer = setTimeout(() => {
+        this.failPvpRtc(`истекло время ожидания прямого канала (ICE: ${pc.iceConnectionState}, соединение: ${pc.connectionState})`);
+      }, 20000);
+    };
+    if (!pvp.host) startConnectTimer();
     const candidatePath = pvp.host ? 'hostCandidates' : 'guestCandidates';
     pc.onicecandidate = event => {
       if (!event.candidate) return;
       pvp.fb.set(pvp.fb.push(refAt(candidatePath)), event.candidate.toJSON())
-        .catch(err => this.pvpStatus(`Не удалось передать параметры прямого соединения: ${err.message}`, true));
+        .catch(err => this.failPvpRtc(`Firebase отклонил передачу ICE-параметров: ${err.message}`));
     };
     const flushCandidates = async () => {
       if (!pc.remoteDescription || !rtc.pendingCandidates.length) return;
       const pending = rtc.pendingCandidates.splice(0);
       for (const candidate of pending) {
         try { await pc.addIceCandidate(candidate); }
-        catch (err) { console.warn('Не удалось применить ICE-кандидат:', err); }
+        catch (err) { this.failPvpRtc(`не удалось применить ICE-кандидат: ${err.message}`); }
       }
     };
     const addRemoteCandidates = (snapshot, key, seen) => {
@@ -2455,18 +2475,22 @@ class Game {
       for (const [id, candidate] of Object.entries(incoming)) {
         if (seen.has(id)) continue;
         seen.add(id);
-        if (pc.remoteDescription) pc.addIceCandidate(candidate).catch(err => console.warn('ICE-кандидат пропущен:', err));
+        if (pc.remoteDescription) pc.addIceCandidate(candidate).catch(err => this.failPvpRtc(`ICE-кандидат отклонён: ${err.message}`));
         else rtc.pendingCandidates.push(candidate);
       }
     };
     const setChannel = channel => {
       rtc.channel = channel;
       channel.onopen = () => {
+        if (rtc.failed) { channel.close(); return; }
         rtc.connected = true;
+        clearTimeout(rtc.connectTimer);
         this.pvpStatus('Прямое соединение между игроками установлено.');
         if (pvp.started) {
           this.publishPvpSharedWorld();
           this.sendPvpRtcState();
+        } else {
+          this.handlePvpRoom({ status: pvp.roomCache?.status, players: pvp.roomCache?.players || {} });
         }
       };
       channel.onmessage = event => {
@@ -2495,54 +2519,76 @@ class Game {
         }
       };
       channel.onclose = () => {
+        const wasConnected = rtc.connected;
         rtc.connected = false;
-        this.pvpStatus('Прямой канал закрыт. Используется резервное соединение Firebase.', true);
+        if (wasConnected && pvp.started) {
+          pvp.connectionLost = true;
+          this.paused = true;
+          this.showBanner('ПРЯМОЕ СОЕДИНЕНИЕ ПОТЕРЯНО. ИГРА ПРИОСТАНОВЛЕНА; РЕЗЕРВНОЕ ПОДКЛЮЧЕНИЕ ОТКЛЮЧЕНО.');
+          const reason = `DataChannel закрыт (ICE: ${pc.iceConnectionState}, соединение: ${pc.connectionState}, сигнализация: ${pc.signalingState})`;
+          pvp.rtcFailure = reason;
+          this.pvpStatus(`WebRTC-соединение потеряно: ${reason}. Резервное подключение отключено.`, true);
+        } else {
+          this.failPvpRtc(`канал закрыт до запуска (состояние: ${pc.connectionState}, ICE: ${pc.iceConnectionState})`);
+        }
       };
       channel.onerror = () => {
-        if (!rtc.connected) this.pvpStatus('Прямой канал недоступен. Продолжаем через резервное соединение Firebase.', true);
+        if (!rtc.connected) this.failPvpRtc('ошибка DataChannel при прямом соединении');
       };
     };
     pc.ondatachannel = event => setChannel(event.channel);
     pc.onconnectionstatechange = () => {
       if (pc.connectionState === 'failed' && !rtc.connected) {
-        this.pvpStatus('Не удалось открыть прямой канал; матч продолжится через Firebase.', true);
+        this.failPvpRtc(`соединение отклонено сетью (ICE: ${pc.iceConnectionState}, состояние: ${pc.connectionState})`);
+      }
+    };
+    pc.oniceconnectionstatechange = () => {
+      if (pc.iceConnectionState === 'failed' && !rtc.connected) {
+        this.failPvpRtc('ICE не нашёл прямой маршрут между сетями; возможно, роутер или провайдер блокирует соединение и нужен TURN');
+      }
+    };
+    pc.onicecandidateerror = event => {
+      if (!rtc.connected && event.errorCode) {
+        this.pvpStatus(`WebRTC ICE: ошибка ${event.errorCode}${event.errorText ? ` — ${event.errorText}` : ''}.`, true);
       }
     };
 
     const remoteCandidatePath = pvp.host ? 'guestCandidates' : 'hostCandidates';
     const remoteSeen = pvp.host ? rtc.seenGuestCandidates : rtc.seenHostCandidates;
-    rtc.unsubscribers.push(pvp.fb.onValue(refAt(remoteCandidatePath), snapshot =>
+    rtc.unsubscribers.push(listenAt(remoteCandidatePath, snapshot =>
       addRemoteCandidates(snapshot, remoteCandidatePath, remoteSeen)));
 
     if (pvp.host) {
-      rtc.unsubscribers.push(pvp.fb.onValue(refAt('answer'), async snapshot => {
+      rtc.unsubscribers.push(listenAt('answer', async snapshot => {
         const answer = snapshot.val();
         if (!answer || pc.currentRemoteDescription) return;
         try {
           await pc.setRemoteDescription(answer);
           await flushCandidates();
         } catch (err) {
-          this.pvpStatus(`Не удалось принять ответ WebRTC: ${err.message}`, true);
+          this.failPvpRtc(`не удалось принять ответ WebRTC: ${err.message}`);
         }
       }));
       rtc.unsubscribers.push(pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guestUid`), snapshot => {
         if (!snapshot.exists() || rtc.offerStarted) return;
         pvp.opponentUid = snapshot.val();
         rtc.offerStarted = true;
+        startConnectTimer();
         const channel = pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 0 });
         setChannel(channel);
         pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() =>
           pvp.fb.set(refAt('offer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp })
         ).catch(err => {
           rtc.offerStarted = false;
-          this.pvpStatus(`Не удалось создать прямое соединение: ${err.message}`, true);
+          this.failPvpRtc(`не удалось создать offer: ${err.message}`);
         });
-      }));
+      }, err => this.failPvpRtc(`Firebase запретил читать guestUid: ${err.message}`)));
     } else {
-      rtc.unsubscribers.push(pvp.fb.onValue(refAt('offer'), async snapshot => {
+      rtc.unsubscribers.push(listenAt('offer', async snapshot => {
         const offer = snapshot.val();
         if (!offer || rtc.answerStarted) return;
         rtc.answerStarted = true;
+        startConnectTimer();
         try {
           await pc.setRemoteDescription(offer);
           await flushCandidates();
@@ -2551,9 +2597,26 @@ class Game {
           await pvp.fb.set(refAt('answer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp });
         } catch (err) {
           rtc.answerStarted = false;
-          this.pvpStatus(`Не удалось принять приглашение WebRTC: ${err.message}`, true);
+          this.failPvpRtc(`не удалось принять offer или отправить answer: ${err.message}`);
         }
       }));
+    }
+  }
+
+  failPvpRtc(reason) {
+    const pvp = this.pvp;
+    if (!pvp || pvp.rtc?.connected || pvp.rtc?.failed) return;
+    if (pvp.rtc) {
+      pvp.rtc.failed = true;
+      clearTimeout(pvp.rtc.connectTimer);
+    }
+    const message = `Не удалось установить обязательное WebRTC-соединение: ${reason}. Firebase-резерв отключён.`;
+    pvp.rtcFailure = reason;
+    this.pvpStatus(message, true);
+    if (pvp.started) {
+      pvp.connectionLost = true;
+      this.paused = true;
+      this.showBanner('WEBRTC НЕ ПОДКЛЮЧЁН. ИГРА ПРИОСТАНОВЛЕНА; ПРОВЕРЬТЕ СЕТЬ И ПОДКЛЮЧИТЕСЬ ЗАНОВО.');
     }
   }
 
@@ -2685,17 +2748,19 @@ class Game {
     const players = Object.values(room.players || {});
     const opponent = players.find(player => player.uid !== pvp.uid);
     if (opponent) {
-      pvp.remotePlayer = opponent;
-      pvp.remoteState = opponent.state || null;
-      if (pvp.remoteState) this.recordPvpPosition('@remote', Number(pvp.remoteState.x), Number(pvp.remoteState.y));
-      pvp.remoteChoosing = opponent.choosing || null;
-      pvp.remotePaused = Boolean(opponent.paused);
       pvp.opponentUid = opponent.uid;
-      pvp.remoteShots = Array.isArray(pvp.remoteState?.shots) ? pvp.remoteState.shots : [];
-      pvp.remoteShotsAt = performance.now();
-      if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
+      if (!pvp.rtc?.connected) {
+        pvp.remotePlayer = opponent;
+        pvp.remoteState = opponent.state || null;
+        if (pvp.remoteState) this.recordPvpPosition('@remote', Number(pvp.remoteState.x), Number(pvp.remoteState.y));
+        pvp.remoteChoosing = opponent.choosing || null;
+        pvp.remotePaused = Boolean(opponent.paused);
+        pvp.remoteShots = Array.isArray(pvp.remoteState?.shots) ? pvp.remoteState.shots : [];
+        pvp.remoteShotsAt = performance.now();
+        if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
+      }
       this.syncPvpWait();
-    } else if (pvp.remotePlayer) {
+    } else if (pvp.remotePlayer && !pvp.rtc?.connected) {
       pvp.remotePlayer = null;
       pvp.remoteState = null;
       pvp.remoteShots = [];
@@ -2707,12 +2772,12 @@ class Game {
       }
       this.syncPvpWait();
     }
-    if (pvp.host && opponent && room.status === 'waiting') {
+    if (pvp.host && pvp.opponentUid && room.status === 'waiting' && pvp.rtc?.connected && !pvp.rtc.failed) {
       pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/status`), 'playing')
         .catch(err => this.pvpStatus(`Не удалось запустить матч: ${err.message}`, true));
       return;
     }
-    if (room.status === 'playing' && !pvp.started) {
+    if (room.status === 'playing' && !pvp.started && pvp.rtc?.connected && !pvp.rtc.failed) {
       pvp.started = true;
       document.getElementById('modal-pvp').style.display = 'none';
       this.start();
@@ -2725,6 +2790,10 @@ class Game {
 
   startPvpSync() {
     if (!this.pvp) return;
+    if (!this.pvp.rtc?.connected) {
+      this.failPvpRtc('игра не запускается без открытого DataChannel');
+      return;
+    }
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     const pvp = this.pvp;
     pvp.attackTotal = 0;
@@ -2750,15 +2819,9 @@ class Game {
         enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
         over: this.pvp.matchOver || p.hp <= 0,
         enemyDamage: this.pvp.enemyDamageTotals || {},
-        claimedDrops: this.pvp.claimedDrops || {},
-        shots: this.serializePvpShots()
+        claimedDrops: this.pvp.claimedDrops || {}
       };
-      if (this.pvp.rtc?.connected) {
-        this.sendPvpRtcState(state);
-      } else {
-        this.pvp.fb.update(this.pvp.playerRef, { online: true, choosing: this.pvp.choosing || null, paused: Boolean(this.pvp.manualPaused), state })
-          .catch(err => this.pvpStatus(`Потеряна связь с комнатой: ${err.message}`, true));
-      }
+      this.sendPvpRtcState(state);
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 100) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
@@ -2813,12 +2876,8 @@ class Game {
       enemyProjectiles: byId(this.enemyProjectiles),
       bossWarnings: byId(this.bossWarnings)
     };
-    if (pvp.rtc?.connected) {
-      this.sendPvpRtcMessage({ type: 'world', world });
-    } else {
-      pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/world`), world)
-        .catch(err => this.pvpStatus(`Не удалось синхронизировать общий мир: ${err.message}`, true));
-    }
+    if (!pvp.rtc?.connected || pvp.rtc.failed) return;
+    this.sendPvpRtcMessage({ type: 'world', world });
   }
 
   applyPvpSharedWorld(world) {
@@ -2939,14 +2998,14 @@ class Game {
   setPvpChoosing(kind) {
     if (!this.pvp) return;
     this.pvp.choosing = kind || null;
-    this.pvp.fb.update(this.pvp.playerRef, { choosing: this.pvp.choosing }).catch(() => {});
+    this.sendPvpRtcState();
     this.syncPvpWait();
   }
 
   setPvpManualPause(paused) {
     if (!this.pvp?.started) return;
     this.pvp.manualPaused = Boolean(paused);
-    this.pvp.fb.update(this.pvp.playerRef, { paused: this.pvp.manualPaused }).catch(() => {});
+    this.sendPvpRtcState();
     this.syncPvpWait();
   }
 

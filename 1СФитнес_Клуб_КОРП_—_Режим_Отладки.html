@@ -2435,8 +2435,10 @@ class Game {
         choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
         remoteShots: [],
         attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode, unsub: null };
-      createStep = 'настройка очистки комнаты при отключении';
-      await fb.onDisconnect(roomRef).remove();
+      createStep = 'настройка статуса игрока при отключении';
+      // Keep the room and host identity alive during a transient Firebase
+      // disconnect so the host can still authorize WebRTC recovery.
+      await fb.onDisconnect(playerRef).update({ online: false });
       this.attachPvpRoom();
       document.getElementById('pvp-room-code-display').style.display = 'block';
       document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;
@@ -2476,8 +2478,10 @@ class Game {
       await fb.set(playerRef, { uid: fb.uid, name: nick, online: true, choosing: null,
         state: { x: 2180, y: 2000, hp: 100, maxHp: 100, level: 1, attackTotal: 0, over: false } });
       playerCreated = true;
-      await fb.onDisconnect(playerRef).remove();
-      await fb.onDisconnect(guestUidRef).remove();
+      // Preserve the guest slot on transient Firebase disconnects. Reconnect
+      // requests are authorized against guestUid, so deleting it here makes
+      // recovery impossible after even a brief network interruption.
+      await fb.onDisconnect(playerRef).update({ online: false });
       this.pvp = { fb, code, host: false, uid: fb.uid, name: nick, roomRef, playerRef, started: false, rtcGeneration: Number(room.rtcGeneration) || 1,
         guestUidRef,
         choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: room.hostUid,

@@ -965,6 +965,7 @@
 
 <script>
 const GAME_VERSION = '1.8.1';
+const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -5634,14 +5635,24 @@ class Game {
     const status = document.getElementById('submit-status');
     const btn = document.getElementById('btn-submit-score');
 
-    status.innerText = 'Подключаемся к Firebase...';
+    const maxPlausibleScore = Math.min(26000000, seconds * 300 + 300);
+    if (!Number.isFinite(score) || score < 0 || score > maxPlausibleScore) {
+      status.innerHTML = '<span style="color:#c0392b">Рекорд не сохранён: счёт превышает допустимый предел для этой длительности забега.</span>';
+      return;
+    }
+
+    status.innerText = 'Подключаемся к защищённой таблице рекордов...';
     btn.disabled = true;
     try {
-      const fb = await window.firebaseLeaderboardReady;
-      const recordsRef = fb.ref(fb.db, 'leaderboard');
-      const recordRef = fb.push(recordsRef);
       const mode = this.pvp ? (this.pvp.mode === 'pve' ? 'pve' : 'pvp') : 'solo';
-      await fb.set(recordRef, { uid: fb.uid, name: nick, score, seconds, version: GAME_VERSION, mode, createdAt: Date.now() });
+      if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён. После публикации Worker укажите его адрес в игре.');
+      const response = await fetch(LEADERBOARD_API_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: nick, score, seconds, version: GAME_VERSION, mode })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `сервер ответил ${response.status}`);
       status.innerHTML = '<b style="color:#27ae60">Результат этого забега добавлен в таблицу!</b>';
       if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
       this.leaderboardOpenTimer = setTimeout(() => {
@@ -5656,13 +5667,20 @@ class Game {
 
   async fetchLeaderboard() {
     const tbody = document.getElementById('lb-body');
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Загружаем рейтинг Firebase...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
 
     try {
+      if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён.');
+      const apiResponse = await fetch(LEADERBOARD_API_URL, { method: 'GET' });
+      const apiResult = await apiResponse.json().catch(() => ({}));
+      if (!apiResponse.ok) throw new Error(apiResult.error || `сервер ответил ${apiResponse.status}`);
+      const scores = Array.isArray(apiResult.scores) ? apiResult.scores : [];
+
+      // Старые записи остаются доступны из Firebase; новые записываются только через Worker.
       const fb = await window.firebaseLeaderboardReady;
       const scoresQuery = fb.query(fb.ref(fb.db, 'leaderboard'), fb.orderByChild('score'), fb.limitToLast(100));
       const snapshot = await fb.get(scoresQuery);
-      const scores = snapshot.exists() ? Object.values(snapshot.val()) : [];
+      if (snapshot.exists()) scores.push(...Object.values(snapshot.val()));
       scores.sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
       tbody.innerHTML = '';
       if (!scores.length) {
@@ -5689,7 +5707,7 @@ class Game {
         tbody.appendChild(tr);
       });
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Firebase недоступен: ${this.escapeHtml(err.message || 'проверьте настройки')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
     }
   }
 

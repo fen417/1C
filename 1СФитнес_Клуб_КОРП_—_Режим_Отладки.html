@@ -2145,6 +2145,7 @@ class Game {
 
     // 4 слота активных умений
     this.activeSkills = [null, null, null, null];
+    this.pvpControlTimer = 0;
 
     this.enemies = [];
     this.summons = [];
@@ -2516,6 +2517,10 @@ class Game {
           this.syncPvpWait();
         } else if (message.type === 'world' && message.world) {
           this.applyPvpSharedWorld(message.world);
+        } else if (message.type === 'sales-call' && !pvp.host) {
+          this.showSalesCall();
+        } else if (message.type === 'active-skill' && message.skill) {
+          this.receivePvpActiveSkill(message.skill);
         }
       };
       channel.onclose = () => {
@@ -2648,6 +2653,7 @@ class Game {
     state ||= {
       x: player.x, y: player.y, hp: Math.max(0, Math.round(player.hp * 10) / 10),
       maxHp: Math.round(player.maxHp), shield: player.shieldTimer > 0, level: this.level,
+      time: Number(this.time) || 0,
       attackTotal: Math.round(pvp.attackTotal * 100) / 100,
       enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
       over: pvp.matchOver || player.hp <= 0,
@@ -2815,6 +2821,7 @@ class Game {
       const state = {
         x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
         maxHp: Math.round(p.maxHp), shield: p.shieldTimer > 0, level: this.level,
+        time: Number(this.time) || 0,
         attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
         enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
         over: this.pvp.matchOver || p.hp <= 0,
@@ -2905,6 +2912,8 @@ class Game {
 
   applyPvpRemoteState(state) {
     if (!this.pvp || !state) return;
+    // Хост задаёт единый ход времени: клиентские таймеры не отстают из-за пауз.
+    if (!this.pvp.host && Number.isFinite(Number(state.time))) this.time = Number(state.time);
     const total = Number(state.attackTotal || 0);
     const damage = total - this.pvp.lastRemoteAttackTotal;
     if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage);
@@ -2987,7 +2996,32 @@ class Game {
   damagePvpOpponent(damage) {
     if (!this.pvp?.remoteState || this.pvp.mode === 'pve' || this.pvp.remoteState.over || damage <= 0) return;
     if (this.time < 120) return;
-    this.pvp.attackTotal += damage;
+    this.pvp.attackTotal += damage * 0.14;
+  }
+
+  receivePvpActiveSkill(skill) {
+    if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !skill || this.time < 120 || this.player?.hp <= 0) return;
+    const damage = Math.max(0, Math.min(100, Number(skill.damage) || 0));
+    if (damage > 0) this.receivePvpDamage(damage * 0.14);
+    const control = Number(skill.control) || 0;
+    if (control > 0 && this.player?.hp > 0) {
+      this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(2, control));
+      this.addPopup(this.player.x, this.player.y - 24, '⚠️ НАВЫК СОПЕРНИКА: СБОЙ УПРАВЛЕНИЯ', '#f1c40f');
+    }
+  }
+
+  sendPvpActiveSkill(key, level) {
+    if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !this.pvp.rtc?.connected || this.time < 120) return;
+    const offensive = {
+      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.8],
+      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 1.2],
+      act_sigur_lockdown: [100, 30, 1.5], act_atol_receipt_rain: [90, 25, 0],
+      act_shtrikh_reconciliation: [115, 30, 0.6], act_cache_purge: [150, 40, 0.8],
+      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0]
+    }[key];
+    if (!offensive) return; // Поддерживающие умения усиливают PvP-атаки игрока.
+    const [base, perLevel, control] = offensive;
+    this.sendPvpRtcMessage({ type: 'active-skill', skill: { key, level, damage: base + Math.max(0, level - 1) * perLevel, control } });
   }
 
   async restartFromGameOver() {
@@ -3127,6 +3161,7 @@ class Game {
 
   showSalesCall() {
     if (this.salesCallActive || this.player.hp <= 0) return;
+    if (this.pvp?.started && this.pvp.host) this.sendPvpRtcMessage({ type: 'sales-call' });
     this.salesCallActive = true;
     this.salesCallX = 12;
     this.salesCallY = 12;
@@ -3676,6 +3711,7 @@ class Game {
       const def = ACTIVE_SKILLS_DEF[skill.key];
       if (def) {
         def.cast(this, skill.lvl);
+        this.sendPvpActiveSkill(skill.key, skill.lvl);
         skill.cdTimer = def.baseCd * this.player.cdMult;
         this.updateActiveHUD();
       }
@@ -4735,7 +4771,7 @@ class Game {
       this.spawnBananaSupply();
       this.nextBananaSupplyTime += 75;
     }
-    if (this.time >= this.nextShopTime) {
+    if ((!this.pvp || this.pvp.host) && this.time >= this.nextShopTime) {
       this.nextShopTime += 180;
       this.showSalesCall();
     }
@@ -4800,6 +4836,8 @@ class Game {
       this.player.speedBuffTimer -= dt;
       effectiveSpeedMult += 0.50;
     }
+    if (this.pvpControlTimer > 0) this.pvpControlTimer = Math.max(0, this.pvpControlTimer - dt);
+    if (this.pvpControlTimer > 0) effectiveSpeedMult *= 0.35;
     this.updateBuffHUD();
 
     // Движение
@@ -4819,7 +4857,7 @@ class Game {
       my *= -1;
     }
 
-    if (mx !== 0 || my !== 0) {
+    if (this.pvpControlTimer <= 0 && (mx !== 0 || my !== 0)) {
       const len = Math.hypot(mx, my);
       this.player.facingX = mx / len;
       this.player.facingY = my / len;

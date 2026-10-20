@@ -2265,7 +2265,7 @@ class Game {
         choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null,
         attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode, unsub: null };
       createStep = 'настройка очистки комнаты при отключении';
-      await fb.onDisconnect(playerRef).remove();
+      await fb.onDisconnect(roomRef).remove();
       this.attachPvpRoom();
       document.getElementById('pvp-room-code-display').style.display = 'block';
       document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;

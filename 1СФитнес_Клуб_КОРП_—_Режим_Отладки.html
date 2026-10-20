@@ -755,6 +755,7 @@
         </div>
         <div id="pvp-room-status" class="release-notes" style="margin:12px 0 0; min-height:34px;">Firebase: проверяем подключение…</div>
         <div id="pvp-room-code-display" style="display:none; text-align:center; font-size:24px; font-weight:bold; letter-spacing:6px; color:#900; padding:10px;"></div>
+        <button id="pvp-copy-room-code" class="btn-1c" style="display:none; width:100%;" onclick="game.copyPvpRoomCode()">📋 Скопировать код</button>
         <button id="pvp-leave-button" class="btn-1c" style="display:none; width:100%; margin-top:8px;" onclick="game.leavePvpRoom()">Отменить / выйти из комнаты</button>
         <div style="text-align:right; margin-top:12px;"><button class="btn-1c" onclick="game.closePvpMenu()">Назад</button></div>
       </div>
@@ -2223,6 +2224,7 @@ class Game {
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-pvp').style.display = 'flex';
     document.getElementById('pvp-leave-button').style.display = this.pvp ? 'block' : 'none';
+    document.getElementById('pvp-copy-room-code').style.display = this.pvp?.host ? 'block' : 'none';
     const pvpToggle = document.getElementById('pvp-disable-attacks');
     pvpToggle.checked = (this.pvp?.mode || this.pvpMode) === 'pve';
     pvpToggle.disabled = Boolean(this.pvp);
@@ -2240,6 +2242,34 @@ class Game {
   closePvpMenu() {
     document.getElementById('modal-pvp').style.display = 'none';
     document.getElementById('modal-main-menu').style.display = 'flex';
+  }
+
+  async copyPvpRoomCode() {
+    if (!this.pvp?.host || !this.pvp.code) return;
+    const code = this.pvp.code;
+    try {
+      let copied = false;
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(code);
+          copied = true;
+        } catch (_) {}
+      }
+      if (!copied) {
+        const input = document.createElement('textarea');
+        input.value = code;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        const copied = document.execCommand('copy');
+        input.remove();
+        if (!copied) throw new Error('Браузер не разрешил копирование');
+      }
+      this.pvpStatus(`Код комнаты ${code} скопирован.`);
+    } catch (err) {
+      this.pvpStatus(`Не удалось скопировать код. Выделите его вручную: ${code}`, true);
+    }
   }
 
   setPvpMode(mode) {
@@ -2286,6 +2316,7 @@ class Game {
       this.attachPvpRoom();
       document.getElementById('pvp-room-code-display').style.display = 'block';
       document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;
+      document.getElementById('pvp-copy-room-code').style.display = 'block';
       document.getElementById('pvp-leave-button').style.display = 'block';
       this.pvpStatus('Комната создана. Передайте код сопернику; матч начнётся после подключения.');
     } catch (err) {
@@ -2681,6 +2712,7 @@ class Game {
     document.getElementById('modal-pvp').style.display = 'none';
     document.getElementById('pvp-leave-button').style.display = 'none';
     document.getElementById('pvp-room-code-display').style.display = 'none';
+    document.getElementById('pvp-copy-room-code').style.display = 'none';
     document.getElementById('pvp-disable-attacks').disabled = false;
     this.paused = true;
     this.showMainMenu();

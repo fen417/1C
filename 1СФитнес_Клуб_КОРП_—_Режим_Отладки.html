@@ -2308,8 +2308,9 @@ class Game {
         players: { [fb.uid]: { uid: fb.uid, name: nick, online: true, choosing: null,
           state: { x: 1820, y: 2000, hp: 100, maxHp: 100, level: 1, attackTotal: 0, over: false } } }
       });
-      this.pvp = { fb, code, host: true, uid: fb.uid, roomRef, playerRef, started: false,
-        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null,
+      this.pvp = { fb, code, host: true, uid: fb.uid, name: nick, roomRef, playerRef, started: false,
+        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
+        remoteShots: [],
         attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode, unsub: null };
       createStep = 'настройка очистки комнаты при отключении';
       await fb.onDisconnect(roomRef).remove();
@@ -2354,9 +2355,10 @@ class Game {
       playerCreated = true;
       await fb.onDisconnect(playerRef).remove();
       await fb.onDisconnect(guestUidRef).remove();
-      this.pvp = { fb, code, host: false, uid: fb.uid, roomRef, playerRef, started: false,
+      this.pvp = { fb, code, host: false, uid: fb.uid, name: nick, roomRef, playerRef, started: false,
         guestUidRef,
-        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null,
+        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: room.hostUid,
+        remoteShots: [],
         attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: room.mode === 'pve' ? 'pve' : 'pvp', unsub: null };
       this.pvpMode = this.pvp.mode;
       localStorage.setItem('1c_pvp_mode', this.pvpMode);
@@ -2374,7 +2376,225 @@ class Game {
     const pvp = this.pvp;
     if (!pvp) return;
     pvp.unsub?.();
-    pvp.unsub = pvp.fb.onValue(pvp.roomRef, snapshot => this.handlePvpRoom(snapshot.val()));
+    // Keep high-frequency player/world traffic on separate branches. Listening to
+    // the room root re-downloads the full world snapshot for every player update.
+    const roomRoot = `pvpRooms/${pvp.code}`;
+    const cache = pvp.roomCache = { status: null, players: {} };
+    const updateRoom = () => this.handlePvpRoom({ status: cache.status, players: cache.players });
+    let opponentUnsubscribe = null;
+    let watchedOpponentUid = null;
+    const watchOpponent = uid => {
+      if (uid === watchedOpponentUid) return;
+      opponentUnsubscribe?.();
+      opponentUnsubscribe = null;
+      watchedOpponentUid = uid || null;
+      cache.players = {};
+      if (!uid || uid === pvp.uid) {
+        updateRoom();
+        return;
+      }
+      opponentUnsubscribe = pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/players/${uid}`), snapshot => {
+        cache.players = snapshot.exists() ? { [uid]: snapshot.val() } : {};
+        updateRoom();
+      });
+    };
+    const unsubscribers = [
+      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/status`), snapshot => {
+        cache.status = snapshot.val();
+        if (!snapshot.exists()) {
+          this.handlePvpRoom(null);
+          return;
+        }
+        updateRoom();
+      }),
+      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guestUid`), snapshot => {
+        if (pvp.host) watchOpponent(snapshot.val());
+      }),
+      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/world`), snapshot => {
+        const world = snapshot.val();
+        if (world) this.applyPvpSharedWorld(world);
+      })
+    ];
+    if (!pvp.host) watchOpponent(pvp.opponentUid);
+    pvp.unsub = () => {
+      opponentUnsubscribe?.();
+      unsubscribers.forEach(unsubscribe => unsubscribe());
+    };
+    this.setupPvpRtc();
+  }
+
+  setupPvpRtc() {
+    const pvp = this.pvp;
+    if (!pvp || pvp.rtc || typeof RTCPeerConnection === 'undefined') return;
+    const roomRoot = `pvpRooms/${pvp.code}`;
+    const rtcRoot = `${roomRoot}/rtc`;
+    const refAt = path => pvp.fb.ref(pvp.fb.db, `${rtcRoot}/${path}`);
+    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    const rtc = pvp.rtc = {
+      pc, channel: null, connected: false, offerStarted: false, answerStarted: false,
+      seenHostCandidates: new Set(), seenGuestCandidates: new Set(), pendingCandidates: [],
+      unsubscribers: []
+    };
+    const candidatePath = pvp.host ? 'hostCandidates' : 'guestCandidates';
+    pc.onicecandidate = event => {
+      if (!event.candidate) return;
+      pvp.fb.set(pvp.fb.push(refAt(candidatePath)), event.candidate.toJSON())
+        .catch(err => this.pvpStatus(`Не удалось передать параметры прямого соединения: ${err.message}`, true));
+    };
+    const flushCandidates = async () => {
+      if (!pc.remoteDescription || !rtc.pendingCandidates.length) return;
+      const pending = rtc.pendingCandidates.splice(0);
+      for (const candidate of pending) {
+        try { await pc.addIceCandidate(candidate); }
+        catch (err) { console.warn('Не удалось применить ICE-кандидат:', err); }
+      }
+    };
+    const addRemoteCandidates = (snapshot, key, seen) => {
+      if (!snapshot.exists()) return;
+      const incoming = snapshot.val() || {};
+      for (const [id, candidate] of Object.entries(incoming)) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+        if (pc.remoteDescription) pc.addIceCandidate(candidate).catch(err => console.warn('ICE-кандидат пропущен:', err));
+        else rtc.pendingCandidates.push(candidate);
+      }
+    };
+    const setChannel = channel => {
+      rtc.channel = channel;
+      channel.onopen = () => {
+        rtc.connected = true;
+        this.pvpStatus('Прямое соединение между игроками установлено.');
+        if (pvp.started) {
+          this.publishPvpSharedWorld();
+          this.sendPvpRtcState();
+        }
+      };
+      channel.onmessage = event => {
+        let message;
+        try { message = JSON.parse(event.data); } catch { return; }
+        if (message.type === 'state' && message.state) {
+          const sequence = Number(message.sequence || 0);
+          if (sequence && sequence <= Number(pvp.remoteStateSequence || 0)) return;
+          pvp.remoteStateSequence = sequence || Number(pvp.remoteStateSequence || 0) + 1;
+          if (message.uid) pvp.opponentUid = message.uid;
+          pvp.remoteState = message.state;
+          pvp.remotePlayer = {
+            ...(pvp.remotePlayer || {}), uid: pvp.opponentUid || (pvp.host ? 'guest' : 'host'),
+            name: message.name || pvp.remotePlayer?.name || 'Соперник', online: true,
+            choosing: message.choosing || null, paused: Boolean(message.paused), state: message.state
+          };
+          pvp.remoteChoosing = message.choosing || null;
+          pvp.remotePaused = Boolean(message.paused);
+          pvp.remoteShots = Array.isArray(message.shots) ? message.shots : [];
+          pvp.remoteShotsAt = performance.now();
+          this.recordPvpPosition('@remote', Number(message.state.x), Number(message.state.y));
+          this.applyPvpRemoteState(message.state);
+          this.syncPvpWait();
+        } else if (message.type === 'world' && message.world) {
+          this.applyPvpSharedWorld(message.world);
+        }
+      };
+      channel.onclose = () => {
+        rtc.connected = false;
+        this.pvpStatus('Прямой канал закрыт. Используется резервное соединение Firebase.', true);
+      };
+      channel.onerror = () => {
+        if (!rtc.connected) this.pvpStatus('Прямой канал недоступен. Продолжаем через резервное соединение Firebase.', true);
+      };
+    };
+    pc.ondatachannel = event => setChannel(event.channel);
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'failed' && !rtc.connected) {
+        this.pvpStatus('Не удалось открыть прямой канал; матч продолжится через Firebase.', true);
+      }
+    };
+
+    const remoteCandidatePath = pvp.host ? 'guestCandidates' : 'hostCandidates';
+    const remoteSeen = pvp.host ? rtc.seenGuestCandidates : rtc.seenHostCandidates;
+    rtc.unsubscribers.push(pvp.fb.onValue(refAt(remoteCandidatePath), snapshot =>
+      addRemoteCandidates(snapshot, remoteCandidatePath, remoteSeen)));
+
+    if (pvp.host) {
+      rtc.unsubscribers.push(pvp.fb.onValue(refAt('answer'), async snapshot => {
+        const answer = snapshot.val();
+        if (!answer || pc.currentRemoteDescription) return;
+        try {
+          await pc.setRemoteDescription(answer);
+          await flushCandidates();
+        } catch (err) {
+          this.pvpStatus(`Не удалось принять ответ WebRTC: ${err.message}`, true);
+        }
+      }));
+      rtc.unsubscribers.push(pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guestUid`), snapshot => {
+        if (!snapshot.exists() || rtc.offerStarted) return;
+        pvp.opponentUid = snapshot.val();
+        rtc.offerStarted = true;
+        const channel = pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 0 });
+        setChannel(channel);
+        pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() =>
+          pvp.fb.set(refAt('offer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp })
+        ).catch(err => {
+          rtc.offerStarted = false;
+          this.pvpStatus(`Не удалось создать прямое соединение: ${err.message}`, true);
+        });
+      }));
+    } else {
+      rtc.unsubscribers.push(pvp.fb.onValue(refAt('offer'), async snapshot => {
+        const offer = snapshot.val();
+        if (!offer || rtc.answerStarted) return;
+        rtc.answerStarted = true;
+        try {
+          await pc.setRemoteDescription(offer);
+          await flushCandidates();
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          await pvp.fb.set(refAt('answer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp });
+        } catch (err) {
+          rtc.answerStarted = false;
+          this.pvpStatus(`Не удалось принять приглашение WebRTC: ${err.message}`, true);
+        }
+      }));
+    }
+  }
+
+  sendPvpRtcMessage(message) {
+    const channel = this.pvp?.rtc?.channel;
+    if (!this.pvp?.rtc?.connected || channel?.readyState !== 'open' || channel.bufferedAmount > 262144) return false;
+    try { channel.send(JSON.stringify(message)); return true; }
+    catch (err) { console.warn('Не удалось отправить сообщение WebRTC:', err); return false; }
+  }
+
+  serializePvpShots() {
+    return this.projectiles.slice(-80).filter(projectile => projectile.life > 0).map(projectile => {
+      if (projectile.type === 'laser_visual') {
+        return { type: 'laser_visual', lines: (projectile.lines || []).slice(0, 12), life: projectile.life };
+      }
+      return {
+        x: projectile.x, y: projectile.y, vx: projectile.vx, vy: projectile.vy,
+        life: projectile.life, icon: projectile.icon, color: projectile.color,
+        size: projectile.size, isCrit: Boolean(projectile.isCrit)
+      };
+    });
+  }
+
+  sendPvpRtcState(state = null) {
+    const pvp = this.pvp;
+    if (!pvp?.started || !pvp.rtc?.connected) return false;
+    const player = this.player;
+    if (!player) return false;
+    state ||= {
+      x: player.x, y: player.y, hp: Math.max(0, Math.round(player.hp * 10) / 10),
+      maxHp: Math.round(player.maxHp), shield: player.shieldTimer > 0, level: this.level,
+      attackTotal: Math.round(pvp.attackTotal * 100) / 100,
+      enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
+      over: pvp.matchOver || player.hp <= 0,
+      enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}
+    };
+    return this.sendPvpRtcMessage({
+      type: 'state', sequence: pvp.rtcStateSequence = (pvp.rtcStateSequence || 0) + 1,
+      uid: pvp.uid, name: pvp.name || 'Соперник', state,
+      choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), shots: this.serializePvpShots()
+    });
   }
 
   recordPvpPosition(id, x, y) {
@@ -2452,6 +2672,7 @@ class Game {
       } else if (!pvp.matchOver && !pvp.opponentLost) {
         pvp.remotePlayer = null;
         pvp.remoteState = null;
+        pvp.remoteShots = [];
         pvp.remoteChoosing = null;
         pvp.remotePaused = false;
         pvp.opponentLost = true;
@@ -2469,12 +2690,15 @@ class Game {
       if (pvp.remoteState) this.recordPvpPosition('@remote', Number(pvp.remoteState.x), Number(pvp.remoteState.y));
       pvp.remoteChoosing = opponent.choosing || null;
       pvp.remotePaused = Boolean(opponent.paused);
+      pvp.opponentUid = opponent.uid;
+      pvp.remoteShots = Array.isArray(pvp.remoteState?.shots) ? pvp.remoteState.shots : [];
+      pvp.remoteShotsAt = performance.now();
       if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
-      if (room.world) this.applyPvpSharedWorld(room.world);
       this.syncPvpWait();
     } else if (pvp.remotePlayer) {
       pvp.remotePlayer = null;
       pvp.remoteState = null;
+      pvp.remoteShots = [];
       pvp.remoteChoosing = null;
       pvp.remotePaused = false;
       if (pvp.started && !pvp.matchOver && !pvp.opponentLost) {
@@ -2483,7 +2707,7 @@ class Game {
       }
       this.syncPvpWait();
     }
-    if (pvp.host && players.length === 2 && room.status === 'waiting') {
+    if (pvp.host && opponent && room.status === 'waiting') {
       pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/status`), 'playing')
         .catch(err => this.pvpStatus(`Не удалось запустить матч: ${err.message}`, true));
       return;
@@ -2526,11 +2750,16 @@ class Game {
         enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
         over: this.pvp.matchOver || p.hp <= 0,
         enemyDamage: this.pvp.enemyDamageTotals || {},
-        claimedDrops: this.pvp.claimedDrops || {}
+        claimedDrops: this.pvp.claimedDrops || {},
+        shots: this.serializePvpShots()
       };
-      this.pvp.fb.update(this.pvp.playerRef, { online: true, choosing: this.pvp.choosing || null, paused: Boolean(this.pvp.manualPaused), state })
-        .catch(err => this.pvpStatus(`Потеряна связь с комнатой: ${err.message}`, true));
-      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 50) {
+      if (this.pvp.rtc?.connected) {
+        this.sendPvpRtcState(state);
+      } else {
+        this.pvp.fb.update(this.pvp.playerRef, { online: true, choosing: this.pvp.choosing || null, paused: Boolean(this.pvp.manualPaused), state })
+          .catch(err => this.pvpStatus(`Потеряна связь с комнатой: ${err.message}`, true));
+      }
+      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 100) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
       }
@@ -2584,8 +2813,12 @@ class Game {
       enemyProjectiles: byId(this.enemyProjectiles),
       bossWarnings: byId(this.bossWarnings)
     };
-    pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/world`), world)
-      .catch(err => this.pvpStatus(`Не удалось синхронизировать общий мир: ${err.message}`, true));
+    if (pvp.rtc?.connected) {
+      this.sendPvpRtcMessage({ type: 'world', world });
+    } else {
+      pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/world`), world)
+        .catch(err => this.pvpStatus(`Не удалось синхронизировать общий мир: ${err.message}`, true));
+    }
   }
 
   applyPvpSharedWorld(world) {
@@ -2751,6 +2984,11 @@ class Game {
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
     pvp.unsub?.();
+    if (pvp.rtc) {
+      pvp.rtc.unsubscribers.forEach(unsubscribe => unsubscribe());
+      pvp.rtc.pc.close();
+      pvp.rtc.connected = false;
+    }
     try {
       if (pvp.host) await pvp.fb.remove(pvp.roomRef);
       else {
@@ -5540,6 +5778,35 @@ class Game {
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText(p.icon, p.x, p.y);
       }
+    }
+
+    // Снаряды второго игрока передаются как визуальные копии: урон по-прежнему
+    // рассчитывается игровым симулятором, поэтому отображение не удваивает попадания.
+    if (this.pvp?.remoteShots?.length) {
+      const elapsed = Math.max(0, Math.min(0.12, (performance.now() - (this.pvp.remoteShotsAt || performance.now())) / 1000));
+      this.ctx.save();
+      this.ctx.globalAlpha = 0.78;
+      for (const shot of this.pvp.remoteShots) {
+        if (shot.type === 'laser_visual') {
+          this.ctx.strokeStyle = '#ff7675';
+          this.ctx.lineWidth = 3;
+          for (const line of shot.lines || []) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(line.x1, line.y1);
+            this.ctx.lineTo(line.x2, line.y2);
+            this.ctx.stroke();
+          }
+          continue;
+        }
+        const x = Number(shot.x) + Number(shot.vx || 0) * 60 * elapsed;
+        const y = Number(shot.y) + Number(shot.vy || 0) * 60 * elapsed;
+        this.ctx.font = `${Math.max(8, Number(shot.size) || 10) * 1.5}px monospace`;
+        this.ctx.fillStyle = shot.color || '#fff';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(shot.icon || '•', x, y);
+      }
+      this.ctx.restore();
     }
 
     // Пули врагов

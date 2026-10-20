@@ -745,6 +745,9 @@
       <div class="win-1c-body">
         <p style="font-size:12px; margin-bottom:12px;">Создайте комнату и передайте код сопернику или введите код комнаты.</p>
         <label style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #ccc; padding:9px; margin-bottom:12px; font-size:12px;"><input id="pvp-disable-attacks" type="checkbox" onchange="game.setPvpMode(this.checked ? 'pve' : 'pvp')"><span><b>Отключить PvP</b><br><span style="color:#666;">Кооперативный PvE: игроки не наносят урон друг другу</span></span></label>
+        <label style="display:block; margin-bottom:12px; font-size:12px;">Ваш ник в сети
+          <input id="pvp-player-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="width:100%; margin-top:5px;" placeholder="Архитектор_1С">
+        </label>
         <button class="btn-1c" style="width:100%; background:#55efc4; margin-bottom:12px;" onclick="game.createPvpRoom()">＋ Создать комнату</button>
         <div style="display:flex; gap:8px;">
           <input id="pvp-room-code" class="input-1c" maxlength="4" placeholder="КОД" autocomplete="off" style="text-transform:uppercase; letter-spacing:4px; text-align:center; width:120px;">
@@ -844,6 +847,7 @@
           <button class="btn-1c" style="width:100%; text-align:left; background:#55efc4;" onclick="game.resume()">▶ Продолжить</button>
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.start()">🔄 Начать заново</button>
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showMainMenu()">⌂ Главное меню</button>
+          <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             </div>
             <h2 style="font-size:14px; margin:14px 0 8px;">Характеристики героя</h2>
             <div id="pause-stats" class="pause-loadout" style="margin-bottom:12px;"></div>
@@ -2030,10 +2034,13 @@ class Game {
       }
     });
 
-    this.savedNick = localStorage.getItem('1c_nick') || 'Архитектор_1С';
+    this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
     this.pvpMode = localStorage.getItem('1c_pvp_mode') === 'pve' ? 'pve' : 'pvp';
     this.collapseAcceptedTickets = localStorage.getItem('1c_collapse_accepted_tickets') !== 'false';
     document.getElementById('player-nickname').value = this.savedNick;
+    document.getElementById('pvp-player-nickname').value = this.savedNick;
+    document.getElementById('player-nickname').addEventListener('input', event => this.setPlayerNickname(event.target.value));
+    document.getElementById('pvp-player-nickname').addEventListener('input', event => this.setPlayerNickname(event.target.value));
     document.getElementById('pvp-room-code').addEventListener('input', (event) => {
       event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
     });
@@ -2219,6 +2226,9 @@ class Game {
     const pvpToggle = document.getElementById('pvp-disable-attacks');
     pvpToggle.checked = (this.pvp?.mode || this.pvpMode) === 'pve';
     pvpToggle.disabled = Boolean(this.pvp);
+    const nicknameInput = document.getElementById('pvp-player-nickname');
+    nicknameInput.value = this.savedNick;
+    nicknameInput.disabled = Boolean(this.pvp);
     document.getElementById('pvp-room-code-display').style.display = this.pvp?.host ? 'block' : 'none';
     if (this.pvp?.host) document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${this.pvp.code}`;
     this.pvpStatus(this.pvp ? 'Комната открыта. Ожидаем второго игрока…' : 'Подключение к Firebase…');
@@ -2237,6 +2247,13 @@ class Game {
     this.pvpMode = mode === 'pve' ? 'pve' : 'pvp';
     localStorage.setItem('1c_pvp_mode', this.pvpMode);
     document.getElementById('pvp-disable-attacks').checked = this.pvpMode === 'pve';
+  }
+
+  setPlayerNickname(value) {
+    this.savedNick = String(value || '').replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15);
+    localStorage.setItem('1c_nick', this.savedNick);
+    document.getElementById('player-nickname').value = this.savedNick;
+    document.getElementById('pvp-player-nickname').value = this.savedNick;
   }
 
   async createPvpRoom() {
@@ -2329,28 +2346,47 @@ class Game {
     pvp.unsub = pvp.fb.onValue(pvp.roomRef, snapshot => this.handlePvpRoom(snapshot.val()));
   }
 
-  getRemoteRenderState(dt) {
+  recordPvpPosition(id, x, y) {
     const pvp = this.pvp;
-    const target = pvp?.remoteState;
-    if (!target || !Number.isFinite(target.x) || !Number.isFinite(target.y)) {
-      if (pvp) pvp.remoteRenderState = null;
-      return null;
+    if (!pvp || !id || !Number.isFinite(x) || !Number.isFinite(y)) return;
+    pvp.positionHistory ||= {};
+    const samples = pvp.positionHistory[id] ||= [];
+    const last = samples[samples.length - 1];
+    if (last && last.x === x && last.y === y) return;
+    samples.push({ x, y, at: performance.now() });
+    if (samples.length > 12) samples.splice(0, samples.length - 12);
+  }
+
+  getPvpRenderPosition(id, x, y) {
+    const samples = this.pvp?.positionHistory?.[id];
+    if (!samples?.length) return { x, y };
+    const targetTime = performance.now() - 200;
+    let before = null;
+    let after = null;
+    let beforeIndex = -1;
+    for (let i = 0; i < samples.length; i++) {
+      if (samples[i].at <= targetTime) {
+        before = samples[i];
+        beforeIndex = i;
+      } else {
+        after = samples[i];
+        break;
+      }
     }
-    if (!pvp.remoteRenderState) {
-      pvp.remoteRenderState = { ...target };
-      return pvp.remoteRenderState;
+    if (!before) return { x: samples[0].x, y: samples[0].y };
+    if (after && after.at > before.at) {
+      const ratio = Math.max(0, Math.min(1, (targetTime - before.at) / (after.at - before.at)));
+      return { x: before.x + (after.x - before.x) * ratio, y: before.y + (after.y - before.y) * ratio };
     }
-    const visual = pvp.remoteRenderState;
-    const currentX = visual.x;
-    const currentY = visual.y;
-    const dx = target.x - visual.x;
-    const dy = target.y - visual.y;
-    const distance = Math.hypot(dx, dy);
-    const blend = distance > 260 ? 1 : 1 - Math.exp(-Math.max(0, dt) * 17);
-    Object.assign(visual, target);
-    visual.x = currentX + dx * blend;
-    visual.y = currentY + dy * blend;
-    return visual;
+    const previous = samples[beforeIndex - 1];
+    if (previous && before.at > previous.at) {
+      const extrapolate = Math.max(0, Math.min(0.16, (targetTime - before.at) / 1000));
+      const elapsed = (before.at - previous.at) / 1000;
+      const vx = Math.max(-700, Math.min(700, (before.x - previous.x) / elapsed));
+      const vy = Math.max(-700, Math.min(700, (before.y - previous.y) / elapsed));
+      return { x: before.x + vx * extrapolate, y: before.y + vy * extrapolate };
+    }
+    return { x: before.x, y: before.y };
   }
 
   handlePvpRoom(room) {
@@ -2376,6 +2412,7 @@ class Game {
     if (opponent) {
       pvp.remotePlayer = opponent;
       pvp.remoteState = opponent.state || null;
+      if (pvp.remoteState) this.recordPvpPosition('@remote', Number(pvp.remoteState.x), Number(pvp.remoteState.y));
       pvp.remoteChoosing = opponent.choosing || null;
       pvp.remotePaused = Boolean(opponent.paused);
       if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
@@ -2417,6 +2454,7 @@ class Game {
     pvp.enemyDamageTotals ||= {};
     pvp.claimedDrops ||= {};
     pvp.processedEnemyDamage ||= {};
+    pvp.positionHistory ||= {};
     pvp.nextEnemyId ||= 0;
     pvp.nextDropId ||= 0;
     pvp.worldRevision = Number(pvp.remoteWorldRevision || 0);
@@ -2426,7 +2464,7 @@ class Game {
       if (!this.pvp || !this.player) return;
       const p = this.player;
       const state = {
-        x: Math.round(p.x), y: Math.round(p.y), hp: Math.max(0, Math.round(p.hp * 10) / 10),
+        x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
         maxHp: Math.round(p.maxHp), shield: p.shieldTimer > 0, level: this.level,
         attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
         over: this.pvp.matchOver || p.hp <= 0,
@@ -2435,11 +2473,11 @@ class Game {
       };
       this.pvp.fb.update(this.pvp.playerRef, { online: true, choosing: this.pvp.choosing || null, paused: Boolean(this.pvp.manualPaused), state })
         .catch(err => this.pvpStatus(`Потеряна связь с комнатой: ${err.message}`, true));
-      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 350) {
+      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 50) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
       }
-    }, 180);
+    }, 50);
   }
 
   trackPvpSharedEntities() {
@@ -2497,6 +2535,11 @@ class Game {
     const pvp = this.pvp;
     if (!pvp || pvp.host || !world || Number(world.revision || 0) <= Number(pvp.remoteWorldRevision || 0)) return;
     pvp.remoteWorldRevision = Number(world.revision || 0);
+    for (const collection of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings']) {
+      for (const item of Object.values(world[collection] || {})) {
+        this.recordPvpPosition(item.syncId, Number(item.x), Number(item.y));
+      }
+    }
     this.enemies = Object.values(world.enemies || {}).map(enemy => ({ ...enemy }));
     this.gems = Object.values(world.gems || {}).map(gem => ({ ...gem }));
     this.pickups = Object.values(world.pickups || {}).map(item => ({ ...item }));
@@ -4938,8 +4981,8 @@ class Game {
 
   async submitScore() {
     const nickInput = document.getElementById('player-nickname');
-    let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '') || 'Архитектор_1С';
-    localStorage.setItem('1c_nick', nick);
+    let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15) || 'Архитектор_1С';
+    this.setPlayerNickname(nick);
 
     const score = this.calcScore();
     const seconds = Math.floor(this.time);
@@ -5211,11 +5254,12 @@ class Game {
 
     // Красные телеграфируемые зоны атак центрального босса.
     for (const warning of this.bossWarnings) {
+      const pos = this.getPvpRenderPosition(warning.syncId, warning.x, warning.y);
       const urgency = 1 - warning.life / warning.maxLife;
       this.ctx.save();
       this.ctx.globalAlpha = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(urgency * Math.PI * 12));
       this.ctx.beginPath();
-      this.ctx.arc(warning.x, warning.y, warning.radius, 0, Math.PI * 2);
+      this.ctx.arc(pos.x, pos.y, warning.radius, 0, Math.PI * 2);
       this.ctx.fillStyle = '#ff1744';
       this.ctx.fill();
       this.ctx.setLineDash([10, 7]);
@@ -5227,7 +5271,7 @@ class Game {
       this.ctx.fillStyle = '#fff';
       this.ctx.font = 'bold 12px sans-serif';
       this.ctx.textAlign = 'center';
-      this.ctx.fillText('УКЛОНИТЕСЬ', warning.x, warning.y + 4);
+      this.ctx.fillText('УКЛОНИТЕСЬ', pos.x, pos.y + 4);
       this.ctx.restore();
     }
 
@@ -5244,22 +5288,25 @@ class Game {
 
     // Дискеты
     for (let g of this.gems) {
+      const pos = this.getPvpRenderPosition(g.syncId, g.x, g.y);
       this.ctx.fillStyle = g.col;
-      this.ctx.fillRect(g.x - 4, g.y - 4, 8, 8);
+      this.ctx.fillRect(pos.x - 4, pos.y - 4, 8, 8);
     }
 
     // Лут
     for (let item of this.pickups) {
+      const pos = this.getPvpRenderPosition(item.syncId, item.x, item.y);
       this.ctx.font = '22px sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(item.icon, item.x, item.y);
+      this.ctx.fillText(item.icon, pos.x, pos.y);
     }
 
     // Враги и боссы
     for (let e of this.enemies) {
+      const pos = this.getPvpRenderPosition(e.syncId, e.x, e.y);
       this.ctx.save();
-      this.ctx.translate(e.x, e.y);
+      this.ctx.translate(pos.x, pos.y);
 
       // Особая аура для ярости или боссов
       if (e.isBoss) {
@@ -5377,18 +5424,20 @@ class Game {
 
     // Пули врагов
     for (let ep of this.enemyProjectiles) {
+      const pos = this.getPvpRenderPosition(ep.syncId, ep.x, ep.y);
       this.ctx.font = '16px monospace';
       this.ctx.fillStyle = ep.color;
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(ep.icon, ep.x, ep.y);
+      this.ctx.fillText(ep.icon, pos.x, pos.y);
     }
 
     // Соперник в сетевой игре.
-    const remote = this.getRemoteRenderState(dt);
+    const remote = this.pvp?.remoteState;
     if (remote && Number.isFinite(remote.x) && Number.isFinite(remote.y)) {
+      const remotePos = this.getPvpRenderPosition('@remote', remote.x, remote.y);
       this.ctx.save();
-      this.ctx.translate(remote.x, remote.y);
+      this.ctx.translate(remotePos.x, remotePos.y);
       this.ctx.globalAlpha = remote.over ? 0.42 : 1;
       this.ctx.beginPath();
       this.ctx.arc(0, 0, 20, 0, Math.PI * 2);

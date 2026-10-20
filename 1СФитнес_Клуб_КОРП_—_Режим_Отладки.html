@@ -716,11 +716,11 @@
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
-            <button class="btn-1c" style="background:#55efc4;" onclick="game.start()">▶ Начать игру</button>
+            <button class="btn-1c" style="background:#55efc4;" onclick="game.start()">▶ Одиночная игра</button>
+            <button class="btn-1c" onclick="game.showPvpMenu()">🌐 Сетевая игра</button>
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <button class="btn-1c" onclick="game.showPvpMenu()">🌐 Сетевая игра</button>
             <div class="main-menu-version">Текущая версия: <b>1.8.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
@@ -2241,11 +2241,13 @@ class Game {
 
   async createPvpRoom() {
     this.pvpStatus('Создаём комнату…');
+    let createStep = 'подключение к Firebase';
     try {
       const fb = await window.firebaseLeaderboardReady;
       const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let code = '', roomRef = null, exists = true;
       for (let attempt = 0; attempt < 12 && exists; attempt++) {
+        createStep = 'проверка свободного кода комнаты';
         code = Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
         roomRef = fb.ref(fb.db, `pvpRooms/${code}`);
         exists = (await fb.get(roomRef)).exists();
@@ -2253,6 +2255,7 @@ class Game {
       if (exists) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
       const playerRef = fb.ref(fb.db, `pvpRooms/${code}/players/${fb.uid}`);
       const nick = (this.savedNick || 'Архитектор 1С').slice(0, 20);
+      createStep = 'запись комнаты';
       await fb.set(roomRef, {
         hostUid: fb.uid, status: 'waiting', mode: this.pvpMode, createdAt: Date.now(),
         players: { [fb.uid]: { uid: fb.uid, name: nick, online: true, choosing: null,
@@ -2261,6 +2264,7 @@ class Game {
       this.pvp = { fb, code, host: true, uid: fb.uid, roomRef, playerRef, started: false,
         choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null,
         attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode, unsub: null };
+      createStep = 'настройка очистки комнаты при отключении';
       await fb.onDisconnect(playerRef).remove();
       this.attachPvpRoom();
       document.getElementById('pvp-room-code-display').style.display = 'block';
@@ -2268,7 +2272,7 @@ class Game {
       document.getElementById('pvp-leave-button').style.display = 'block';
       this.pvpStatus('Комната создана. Передайте код сопернику; матч начнётся после подключения.');
     } catch (err) {
-      this.pvpStatus(`Не удалось создать комнату: ${err.message || 'ошибка Firebase'}`, true);
+      this.pvpStatus(`Не удалось создать комнату (${createStep}): ${err.message || 'ошибка Firebase'}`, true);
     }
   }
 

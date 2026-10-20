@@ -966,6 +966,7 @@
 <script>
 const GAME_VERSION = '1.8.1';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
+const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -1931,6 +1932,16 @@ class Game {
     this.sound = new SoundEngine();
     this.pvp = null;
     this.pvpTimer = null;
+    this.scoreRunId = null;
+    this.scoreRunGeneration = 0;
+    this.scoreRunStartPromise = null;
+    this.scoreRunCheckpointNo = 0;
+    this.scoreRunNextCheckpointAt = 10;
+    this.scoreRunCheckpointQueue = [];
+    this.scoreRunCheckpointPromise = null;
+    this.scoreRunRetryAt = 0;
+    this.scoreRunError = '';
+    this.scoreRunRetryable = false;
 
     this.MAP_SIZE = 4000;
     this.BOUND_MIN = 90;
@@ -2047,7 +2058,7 @@ class Game {
       event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
     });
 
-    this.start();
+    this.start({ skipScoreSession: true });
     this.paused = true;
     document.getElementById('menu-version').innerText = `v${GAME_VERSION}`;
     document.title = `1С:Фитнес Клуб КОРП ${GAME_VERSION}`;
@@ -2070,7 +2081,8 @@ class Game {
     };
   }
 
-  start() {
+  start(options = {}) {
+    this.scoreRunGeneration++;
     this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     this.closeSalesCall();
@@ -2097,6 +2109,15 @@ class Game {
 
     this.paused = false;
     this.time = 0;
+    this.scoreRunId = null;
+    this.scoreRunStartPromise = null;
+    this.scoreRunCheckpointNo = 0;
+    this.scoreRunNextCheckpointAt = 10;
+    this.scoreRunCheckpointQueue = [];
+    this.scoreRunCheckpointPromise = null;
+    this.scoreRunRetryAt = 0;
+    this.scoreRunError = '';
+    this.scoreRunRetryable = false;
     this.challengeDeclines = 0;
     this.kills = 0;
     this.gemsCollected = 0;
@@ -2193,6 +2214,106 @@ class Game {
     this.updateActiveHUD();
     this.updateConsumableHUD();
     this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
+    if (!options.skipScoreSession) this.beginScoreRun();
+  }
+
+  async beginScoreRun() {
+    const generation = this.scoreRunGeneration;
+    const mode = this.pvp ? (this.pvp.mode === 'pve' ? 'pve' : 'pvp') : 'solo';
+    this.scoreRunStartPromise = (async () => {
+      const response = await fetch(`${SCORE_RUN_API_BASE}/start`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ version: GAME_VERSION, mode })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || typeof result.runId !== 'string') {
+        throw new Error(result.error || `сервер ответил ${response.status}`);
+      }
+      if (generation !== this.scoreRunGeneration) throw new Error('Забег уже перезапущен.');
+      this.scoreRunId = result.runId;
+      return result.runId;
+    })();
+    this.scoreRunStartPromise.catch(error => {
+      if (generation === this.scoreRunGeneration) this.scoreRunError = error.message || 'Не удалось открыть проверяемый забег.';
+    });
+    return this.scoreRunStartPromise;
+  }
+
+  queueScoreRunCheckpoints() {
+    if (!this.scoreRunStartPromise || (this.scoreRunError && !this.scoreRunRetryable)) return;
+    while (this.time >= this.scoreRunNextCheckpointAt) {
+      this.scoreRunCheckpointQueue.push({
+        seconds: Math.floor(this.time),
+        score: this.calcScore()
+      });
+      this.scoreRunNextCheckpointAt += 10;
+      if (this.scoreRunCheckpointQueue.length > 12) {
+        this.scoreRunError = 'Не удалось вовремя отправить контрольные точки забега.';
+        this.scoreRunCheckpointQueue = [];
+        return;
+      }
+    }
+    this.sendNextScoreRunCheckpoint();
+  }
+
+  sendNextScoreRunCheckpoint(force = false) {
+    if (this.scoreRunCheckpointPromise) return this.scoreRunCheckpointPromise;
+    if (!this.scoreRunId || !this.scoreRunCheckpointQueue.length || (this.scoreRunError && !this.scoreRunRetryable)) return null;
+    if (!force && performance.now() < this.scoreRunRetryAt) return null;
+
+    const sample = this.scoreRunCheckpointQueue[0];
+    const sequence = this.scoreRunCheckpointNo + 1;
+    const generation = this.scoreRunGeneration;
+    this.scoreRunCheckpointPromise = (async () => {
+      try {
+        const response = await fetch(`${SCORE_RUN_API_BASE}/checkpoint`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ runId: this.scoreRunId, sequence, ...sample })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (generation !== this.scoreRunGeneration) return false;
+        if (!response.ok) {
+          const message = result.error || `сервер ответил ${response.status}`;
+          if (response.status === 429 || response.status >= 500) {
+            this.scoreRunRetryAt = performance.now() + 5000;
+            this.scoreRunError = `Контрольная точка временно не отправлена: ${message}`;
+            this.scoreRunRetryable = true;
+          } else {
+            this.scoreRunError = `Забег не прошёл проверку: ${message}`;
+            this.scoreRunRetryable = false;
+            this.scoreRunCheckpointQueue = [];
+          }
+          return false;
+        }
+        this.scoreRunCheckpointNo = result.sequence;
+        this.scoreRunCheckpointQueue.shift();
+        this.scoreRunRetryAt = 0;
+        this.scoreRunError = '';
+        this.scoreRunRetryable = false;
+        return true;
+      } catch (error) {
+        if (generation !== this.scoreRunGeneration) return false;
+        this.scoreRunRetryAt = performance.now() + 5000;
+        this.scoreRunError = `Нет связи для проверки забега: ${error.message || 'ошибка сети'}`;
+        this.scoreRunRetryable = true;
+        return false;
+      } finally {
+        if (generation === this.scoreRunGeneration) this.scoreRunCheckpointPromise = null;
+      }
+    })();
+    return this.scoreRunCheckpointPromise;
+  }
+
+  async flushScoreRunCheckpoints() {
+    if (!this.scoreRunStartPromise) throw new Error('Сервер не зарегистрировал начало забега.');
+    await this.scoreRunStartPromise;
+    while (this.scoreRunCheckpointQueue.length) {
+      const sent = await this.sendNextScoreRunCheckpoint(true);
+      if (!sent) throw new Error(this.scoreRunError || 'Не удалось отправить контрольную точку.');
+    }
+    if (this.scoreRunError) throw new Error(this.scoreRunError);
   }
 
   calcScore() {
@@ -4940,6 +5061,7 @@ class Game {
     }
     this.sound.updateBossMusic(dt, aliveBosses, aliveMegaBosses);
     this.time += dt;
+    this.queueScoreRunCheckpoints();
     this.updateChallenge(dt);
     if ((!this.pvp || this.pvp.host) && this.time >= this.nextBananaSupplyTime) {
       this.spawnBananaSupply();
@@ -5641,15 +5763,15 @@ class Game {
       return;
     }
 
-    status.innerText = 'Подключаемся к защищённой таблице рекордов...';
+    status.innerText = 'Проверяем контрольные точки забега...';
     btn.disabled = true;
     try {
-      const mode = this.pvp ? (this.pvp.mode === 'pve' ? 'pve' : 'pvp') : 'solo';
-      if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён. После публикации Worker укажите его адрес в игре.');
-      const response = await fetch(LEADERBOARD_API_URL, {
+      await this.flushScoreRunCheckpoints();
+      if (!this.scoreRunId) throw new Error('Сервер не зарегистрировал начало забега.');
+      const response = await fetch(`${SCORE_RUN_API_BASE}/finish`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ name: nick, score, seconds, version: GAME_VERSION, mode })
+        body: JSON.stringify({ runId: this.scoreRunId, name: nick, score, seconds })
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || `сервер ответил ${response.status}`);

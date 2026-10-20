@@ -2753,7 +2753,6 @@ class Game {
         if ((message.type === 'state' || message.type === 'match-over') && message.state) {
           const sequence = Number(message.sequence || 0);
           if (sequence && sequence <= Number(pvp.remoteStateSequence || 0)) return;
-          pvp.remoteStateSequence = sequence || Number(pvp.remoteStateSequence || 0) + 1;
           const validation = this.validatePvpRemoteState(message.state);
           if (!validation.ok) {
             const now = Date.now();
@@ -2763,6 +2762,7 @@ class Game {
             }
             return;
           }
+          pvp.remoteStateSequence = sequence || Number(pvp.remoteStateSequence || 0) + 1;
           const state = validation.state;
           if (message.uid) pvp.opponentUid = message.uid;
           pvp.remoteState = state;

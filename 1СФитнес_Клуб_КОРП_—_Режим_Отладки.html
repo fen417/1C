@@ -2391,7 +2391,7 @@ class Game {
   getPvpRenderPosition(id, x, y) {
     const samples = this.pvp?.positionHistory?.[id];
     if (!samples?.length) return { x, y };
-    const targetTime = performance.now() - 200;
+    const targetTime = performance.now() - 250;
     let before = null;
     let after = null;
     let beforeIndex = -1;
@@ -2411,13 +2411,36 @@ class Game {
     }
     const previous = samples[beforeIndex - 1];
     if (previous && before.at > previous.at) {
-      const extrapolate = Math.max(0, Math.min(0.16, (targetTime - before.at) / 1000));
+      const extrapolate = Math.max(0, Math.min(0.1, (targetTime - before.at) / 1000));
       const elapsed = (before.at - previous.at) / 1000;
       const vx = Math.max(-700, Math.min(700, (before.x - previous.x) / elapsed));
       const vy = Math.max(-700, Math.min(700, (before.y - previous.y) / elapsed));
       return { x: before.x + vx * extrapolate, y: before.y + vy * extrapolate };
     }
     return { x: before.x, y: before.y };
+  }
+
+  getPvpEnemyTarget(enemy = null) {
+    const local = { x: this.player.x, y: this.player.y, isRemote: false };
+    const remote = this.pvp?.host && this.pvp.started ? this.pvp.remoteState : null;
+    if (!remote || remote.over || !Number.isFinite(remote.x) || !Number.isFinite(remote.y)) {
+      if (enemy) enemy.aggroTarget = 'local';
+      return local;
+    }
+    const localDistance = enemy ? Math.hypot(local.x - enemy.x, local.y - enemy.y) : 0;
+    const remoteDistance = enemy ? Math.hypot(remote.x - enemy.x, remote.y - enemy.y) : Infinity;
+    const wasRemote = enemy?.aggroTarget === 'remote';
+    const targetRemote = wasRemote ? remoteDistance <= localDistance + 80 : remoteDistance + 80 < localDistance;
+    if (enemy) enemy.aggroTarget = targetRemote ? 'remote' : 'local';
+    return targetRemote ? { x: remote.x, y: remote.y, isRemote: true } : local;
+  }
+
+  getPvpSpawnCenter() {
+    const remote = this.pvp?.host && this.pvp.started ? this.pvp.remoteState : null;
+    if (remote && !remote.over && Number.isFinite(remote.x) && Number.isFinite(remote.y) && Math.random() < 0.5) {
+      return { x: remote.x, y: remote.y };
+    }
+    return { x: this.player.x, y: this.player.y };
   }
 
   handlePvpRoom(room) {
@@ -2481,7 +2504,9 @@ class Game {
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     const pvp = this.pvp;
     pvp.attackTotal = 0;
+    pvp.enemyAttackTotal = 0;
     pvp.lastRemoteAttackTotal = Number(pvp.remoteState?.attackTotal || 0);
+    pvp.lastRemoteEnemyAttackTotal = Number(pvp.remoteState?.enemyAttackTotal || 0);
     pvp.enemyDamageTotals ||= {};
     pvp.claimedDrops ||= {};
     pvp.processedEnemyDamage ||= {};
@@ -2498,6 +2523,7 @@ class Game {
         x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
         maxHp: Math.round(p.maxHp), shield: p.shieldTimer > 0, level: this.level,
         attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
+        enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
         over: this.pvp.matchOver || p.hp <= 0,
         enemyDamage: this.pvp.enemyDamageTotals || {},
         claimedDrops: this.pvp.claimedDrops || {}
@@ -2591,6 +2617,11 @@ class Game {
     const damage = total - this.pvp.lastRemoteAttackTotal;
     if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage);
     this.pvp.lastRemoteAttackTotal = Math.max(this.pvp.lastRemoteAttackTotal, total);
+    const enemyAttackTotal = Number(state.enemyAttackTotal || 0);
+    const previousEnemyAttackTotal = Number(this.pvp.lastRemoteEnemyAttackTotal || 0);
+    const enemyDamage = enemyAttackTotal - previousEnemyAttackTotal;
+    if (enemyDamage > 0.01 && this.player && !this.pvp.matchOver) this.receiveEnemyDamage(enemyDamage);
+    this.pvp.lastRemoteEnemyAttackTotal = Math.max(previousEnemyAttackTotal, enemyAttackTotal);
     if (this.pvp.host) {
       this.pvp.processedEnemyDamage ||= {};
       for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
@@ -2636,6 +2667,29 @@ class Game {
     this.addPopup(this.player.x, this.player.y - 22, `PvP -${Math.ceil(applied)} HP`, '#ff4757');
     this.updateHUD();
     if (this.player.hp <= 0) this.gameOver(`ПОРАЖЕНИЕ! ${this.pvp.remotePlayer?.name || 'Соперник'} победил.`);
+  }
+
+  receiveEnemyDamage(damage) {
+    if (!this.player || this.player.hp <= 0 || damage <= 0) return;
+    if (this.player.shieldTimer > 0) {
+      this.addPopup(this.player.x, this.player.y - 22, 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
+      return;
+    }
+    if (Math.random() < this.player.dodge) {
+      this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
+      return;
+    }
+    const applied = Math.min(this.player.hp, damage);
+    this.player.hp -= applied;
+    this.sound.hit();
+    this.addPopup(this.player.x, this.player.y - 22, `МОБЫ -${Math.ceil(applied)} HP`, '#ff4757');
+    this.updateHUD();
+    if (this.player.hp <= 0) this.gameOver('Противники уничтожили целостность базы!');
+  }
+
+  damageRemotePlayerFromEnemy(damage) {
+    if (!this.pvp?.host || !this.pvp.started || !this.pvp.remoteState || this.pvp.remoteState.over || damage <= 0) return;
+    this.pvp.enemyAttackTotal = (this.pvp.enemyAttackTotal || 0) + damage;
   }
 
   damagePvpOpponent(damage) {
@@ -3501,8 +3555,9 @@ class Game {
   spawn24hPursuer() {
     const angle = Math.random() * Math.PI * 2;
     const distance = 760;
-    const x = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, this.player.x + Math.cos(angle) * distance));
-    const y = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, this.player.y + Math.sin(angle) * distance));
+    const center = this.getPvpSpawnCenter();
+    const x = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, center.x + Math.cos(angle) * distance));
+    const y = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, center.y + Math.sin(angle) * distance));
     const name = 'RuDesktop: исчерпан 24-ти часовой лимит';
     this.enemies.push({ x, y, name, hp: Infinity, maxHp: Infinity, size: 25, speed: 1.05, dmg: 0,
       icon: '🐢', col: '#8e44ad', xp: 0, isBoss: false, isMegaBoss: false,
@@ -3514,8 +3569,9 @@ class Game {
   spawnEnemy() {
     const angle = Math.random() * Math.PI * 2;
     const dist = 640 + Math.random() * 80;
-    const x = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, this.player.x + Math.cos(angle) * dist));
-    const y = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, this.player.y + Math.sin(angle) * dist));
+    const center = this.getPvpSpawnCenter();
+    const x = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.x + Math.cos(angle) * dist));
+    const y = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.y + Math.sin(angle) * dist));
 
     const roll = Math.random();
     let type = 'gymbro';
@@ -3619,9 +3675,10 @@ class Game {
 
   spawnMVBoss() {
     if (!this.player || this.player.hp <= 0) return;
+    const center = this.getPvpSpawnCenter();
     const angle = Math.random() * Math.PI * 2;
-    const x = Math.max(200, Math.min(3800, this.player.x + Math.cos(angle) * 560));
-    const y = Math.max(200, Math.min(3800, this.player.y + Math.sin(angle) * 560));
+    const x = Math.max(200, Math.min(3800, center.x + Math.cos(angle) * 560));
+    const y = Math.max(200, Math.min(3800, center.y + Math.sin(angle) * 560));
     const hp = 22000 + this.time * 12;
     const boss = { x, y, name: 'М.В. — «Я просто уточнить»', hp, maxHp: hp, size: 52,
       speed: 3.6, dmg: 92, icon: '📞', col: '#ff4757', xp: 240, isBoss: true,
@@ -3650,8 +3707,9 @@ class Game {
      ============================================================ */
   spawn1CBoss(minute) {
     const angle = Math.random() * Math.PI * 2;
-    const x = Math.max(200, Math.min(3800, this.player.x + Math.cos(angle) * 480));
-    const y = Math.max(200, Math.min(3800, this.player.y + Math.sin(angle) * 480));
+    const center = this.getPvpSpawnCenter();
+    const x = Math.max(200, Math.min(3800, center.x + Math.cos(angle) * 480));
+    const y = Math.max(200, Math.min(3800, center.y + Math.sin(angle) * 480));
 
     let b = {
       x, y, size: 45, speed: 1.35, isBoss: true, xp: 30 + minute * 15,
@@ -3726,6 +3784,7 @@ class Game {
   }
 
   updateMegaBossAI(b, dt) {
+    const target = this.getPvpEnemyTarget(b);
     b.bossTimer1 += dt;
     b.bossTimer2 += dt;
     b.bossTimer3 += dt;
@@ -3734,7 +3793,7 @@ class Game {
     // Aimed fan of server alerts. Keep moving to slip between the lanes.
     if (b.bossTimer1 >= (enraged ? 1.9 : 2.7)) {
       b.bossTimer1 = 0;
-      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      const aim = Math.atan2(target.y - b.y, target.x - b.x);
       for (let k = -3; k <= 3; k++) {
         const angle = aim + k * 0.14;
         this.enemyProjectiles.push({
@@ -3766,24 +3825,25 @@ class Game {
     // Telegraph three floor zones around the player's current position.
     if (b.bossTimer3 >= (enraged ? 6.2 : 9.1)) {
       b.bossTimer3 = 0;
-      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      const aim = Math.atan2(target.y - b.y, target.x - b.x);
       for (const offset of [-0.8, 0, 0.8]) {
-        const x = Math.max(this.BOUND_MIN + 90, Math.min(this.BOUND_MAX - 90, this.player.x + Math.cos(aim + offset) * 150));
-        const y = Math.max(this.BOUND_MIN + 90, Math.min(this.BOUND_MAX - 90, this.player.y + Math.sin(aim + offset) * 150));
+        const x = Math.max(this.BOUND_MIN + 90, Math.min(this.BOUND_MAX - 90, target.x + Math.cos(aim + offset) * 150));
+        const y = Math.max(this.BOUND_MIN + 90, Math.min(this.BOUND_MAX - 90, target.y + Math.sin(aim + offset) * 150));
         this.bossWarnings.push({ x, y, radius: 86, dmg: enraged ? 42 : 34, life: 1.05, maxLife: 1.05, isMegaBossAttack: true });
       }
-      this.addPopup(this.player.x, this.player.y - 34, 'ЗОНЫ ПЕРЕГРУЗКИ — ВЫЙДИТЕ ИЗ КРУГА!', '#ff7675');
+      this.addPopup(target.x, target.y - 34, 'ЗОНЫ ПЕРЕГРУЗКИ — ВЫЙДИТЕ ИЗ КРУГА!', '#ff7675');
     }
   }
 
   updateReleaseMegaBossAI(b, dt) {
+    const target = this.getPvpEnemyTarget(b);
     b.bossTimer1 += dt;
     b.bossTimer2 += dt;
     b.bossTimer3 += dt;
     const enraged = b.hp <= b.maxHp * 0.5;
     if (b.bossTimer1 >= (enraged ? 2.2 : 3.1)) {
       b.bossTimer1 = 0;
-      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      const aim = Math.atan2(target.y - b.y, target.x - b.x);
       for (let k = -2; k <= 2; k++) {
         const angle = aim + k * 0.2;
         this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 4.7, vy: Math.sin(angle) * 4.7,
@@ -3793,7 +3853,7 @@ class Game {
     }
     if (b.bossTimer2 >= (enraged ? 5.4 : 7.2)) {
       b.bossTimer2 = 0;
-      const x = this.player.x, y = this.player.y;
+      const x = target.x, y = target.y;
       for (const offset of [-112, -56, 0, 56, 112]) {
         this.bossWarnings.push({ x: Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, x + offset)), y,
           radius: 31, dmg: enraged ? 34 : 28, life: 1.05, maxLife: 1.05, isMegaBossAttack: true });
@@ -3804,19 +3864,20 @@ class Game {
     }
     if (b.bossTimer3 >= (enraged ? 8.2 : 10.5)) {
       b.bossTimer3 = 0;
-      this.bossWarnings.push({ x: this.player.x, y: this.player.y, radius: 128, dmg: enraged ? 58 : 46, life: 1.35, maxLife: 1.35, isMegaBossAttack: true });
-      this.addPopup(this.player.x, this.player.y - 36, 'ПЕРЕЗАПУСК СЕРВЕРА — СРОЧНО ОТОЙДИТЕ!', '#ff7675');
+      this.bossWarnings.push({ x: target.x, y: target.y, radius: 128, dmg: enraged ? 58 : 46, life: 1.35, maxLife: 1.35, isMegaBossAttack: true });
+      this.addPopup(target.x, target.y - 36, 'ПЕРЕЗАПУСК СЕРВЕРА — СРОЧНО ОТОЙДИТЕ!', '#ff7675');
     }
   }
 
   updateBackupMegaBossAI(b, dt) {
+    const target = this.getPvpEnemyTarget(b);
     b.bossTimer1 += dt;
     b.bossTimer2 += dt;
     b.bossTimer3 += dt;
     const enraged = b.hp <= b.maxHp * 0.5;
     if (b.bossTimer1 >= (enraged ? 2.4 : 3.3)) {
       b.bossTimer1 = 0;
-      const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+      const aim = Math.atan2(target.y - b.y, target.x - b.x);
       for (let k = -2; k <= 2; k++) {
         const angle = aim + k * 0.32;
         this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.3, vy: Math.sin(angle) * 3.3,
@@ -3856,12 +3917,16 @@ class Game {
   }
 
   updateBossWarnings(dt) {
+    if (this.pvp?.started && !this.pvp.host) return false;
+    const remote = this.pvp?.started && this.pvp.host && !this.pvp.remoteState?.over ? this.pvp.remoteState : null;
     for (let i = this.bossWarnings.length - 1; i >= 0; i--) {
       const warning = this.bossWarnings[i];
       warning.life -= dt;
       if (warning.life > 0) continue;
 
-      if (Math.hypot(this.player.x - warning.x, this.player.y - warning.y) < warning.radius + 18) {
+      const localHit = Math.hypot(this.player.x - warning.x, this.player.y - warning.y) < warning.radius + 18;
+      const remoteHit = remote && Math.hypot(remote.x - warning.x, remote.y - warning.y) < warning.radius + 18;
+      if (localHit) {
         if (this.player.shieldTimer <= 0) {
           const damage = warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1);
           this.player.hp -= damage;
@@ -3871,6 +3936,7 @@ class Game {
           this.addPopup(this.player.x, this.player.y - 20, 'ЗОНА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
         }
       }
+      if (remoteHit) this.damageRemotePlayerFromEnemy(warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1));
       this.createHitFX(warning.x, warning.y, '#ff4757', 10);
       this.bossWarnings.splice(i, 1);
       if (this.player.hp <= 0) {
@@ -3882,6 +3948,7 @@ class Game {
   }
 
   updateBossAI(b, dt) {
+    const target = this.getPvpEnemyTarget(b);
     if (b.isMegaBoss) {
       if (b.bossType === 'cluster_core') this.updateMegaBossAI(b, dt);
       else if (b.bossType === 'release_break') this.updateReleaseMegaBossAI(b, dt);
@@ -3893,7 +3960,7 @@ class Game {
     if (b.bossType === 'mv_chaser') {
       if (b.bossTimer1 >= 2.2) {
         b.bossTimer1 = 0;
-        const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        const aim = Math.atan2(target.y - b.y, target.x - b.x);
         for (const offset of [-0.22, 0, 0.22]) {
           const angle = aim + offset;
           this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 5.2, vy: Math.sin(angle) * 5.2, dmg: 30, size: 10, life: 2.0, icon: '📞', color: '#ff4757' });
@@ -3903,7 +3970,7 @@ class Game {
       const enraged = b.hp <= b.maxHp * 0.5;
       if (b.bossTimer1 >= (enraged ? 1.7 : 2.5)) {
         b.bossTimer1 = 0;
-        const aim = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        const aim = Math.atan2(target.y - b.y, target.x - b.x);
         const count = b.bossType === 'late_overload' ? 9 : 7;
         for (let k = 0; k < count; k++) {
           const angle = aim + (k - (count - 1) / 2) * 0.18;
@@ -3918,7 +3985,7 @@ class Game {
           const angle = phase + k * Math.PI * 2 / count;
           this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.5, vy: Math.sin(angle) * 3.5, dmg: enraged ? 22 : 16, size: 9, life: 3.1, icon: '⚠️', color: b.col });
         }
-        if (b.bossType === 'late_friday') this.bossWarnings.push({ x: this.player.x, y: this.player.y, radius: 105, dmg: 48, life: 1.0, maxLife: 1.0 });
+        if (b.bossType === 'late_friday') this.bossWarnings.push({ x: target.x, y: target.y, radius: 105, dmg: 48, life: 1.0, maxLife: 1.0 });
       }
     }
     // 1. DEADLOCK MSSQL
@@ -3952,7 +4019,7 @@ class Game {
       if (b.bossTimer1 > 2.6) {
         b.bossTimer1 = 0;
         // Залп уведомлений о конфликтующих записях
-        const a = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        const a = Math.atan2(target.y - b.y, target.x - b.x);
         for (let k = -2; k <= 2; k++) {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
@@ -3984,7 +4051,7 @@ class Game {
       if (b.bossTimer1 > 3.0) {
         b.bossTimer1 = 0;
         // Бросок тяжёлых гирь
-        const a = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        const a = Math.atan2(target.y - b.y, target.x - b.x);
         this.enemyProjectiles.push({
           x: b.x, y: b.y,
           vx: Math.cos(a) * 5.2, vy: Math.sin(a) * 5.2,
@@ -3994,11 +4061,14 @@ class Game {
       if (b.bossTimer2 > 6.5) {
         b.bossTimer2 = 0;
         // Воронка незакрытых заявок (подтягивает игрока)
-        const d = Math.hypot(this.player.x - b.x, this.player.y - b.y);
+        const d = Math.hypot(target.x - b.x, target.y - b.y);
         if (d < 450) {
-          this.player.x -= (this.player.x - b.x) * 0.25;
-          this.player.y -= (this.player.y - b.y) * 0.25;
-          this.addPopup(this.player.x, this.player.y - 20, 'НЕУДЕРЖИМЫЙ ПОТОК НА РЕСЕПШЕН!', '#d35400');
+          if (target.isRemote) this.bossWarnings.push({ x: target.x, y: target.y, radius: 90, dmg: 25, life: 0.8, maxLife: 0.8 });
+          else {
+            this.player.x -= (this.player.x - b.x) * 0.25;
+            this.player.y -= (this.player.y - b.y) * 0.25;
+          }
+          this.addPopup(target.x, target.y - 20, 'НЕУДЕРЖИМЫЙ ПОТОК НА РЕСЕПШЕН!', '#d35400');
         }
       }
     }
@@ -4041,8 +4111,8 @@ class Game {
         b.bossTimer2 = 0;
         // Рывок за спину
         const a = Math.random() * Math.PI * 2;
-        b.x = this.player.x + Math.cos(a) * 140;
-        b.y = this.player.y + Math.sin(a) * 140;
+        b.x = target.x + Math.cos(a) * 140;
+        b.y = target.y + Math.sin(a) * 140;
         this.addPopup(b.x, b.y - 25, 'ВНЕЗАПНАЯ ПЛАНЁРКА!', '#b71540');
       }
     }
@@ -4052,7 +4122,7 @@ class Game {
       if (b.bossTimer1 > 3.0) {
         b.bossTimer1 = 0;
         // Бросок стопки заявок
-        const a = Math.atan2(this.player.y - b.y, this.player.x - b.x);
+        const a = Math.atan2(target.y - b.y, target.x - b.x);
         for (let k = -1; k <= 1; k++) {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
@@ -4550,6 +4620,7 @@ class Game {
 
     // Вражеские пули
     for (let i = this.enemyProjectiles.length - 1; i >= 0; i--) {
+      if (this.pvp?.started && !this.pvp.host) continue;
       const ep = this.enemyProjectiles[i];
       ep.life -= dt;
       ep.x += ep.vx * frameScale; ep.y += ep.vy * frameScale;
@@ -4567,7 +4638,14 @@ class Game {
         if (summonHit.hp <= 0) this.addPopup(summonHit.x, summonHit.y - 18, 'Помощник выбыл', '#ff7675');
       }
 
-      if (!summonHit && Math.hypot(this.player.x - ep.x, this.player.y - ep.y) < 18 + ep.size) {
+      const localDistance = Math.hypot(this.player.x - ep.x, this.player.y - ep.y);
+      const remoteTarget = this.pvp?.started && this.pvp.host && !this.pvp.remoteState?.over ? this.pvp.remoteState : null;
+      const remoteDistance = remoteTarget ? Math.hypot(remoteTarget.x - ep.x, remoteTarget.y - ep.y) : Infinity;
+      if (!summonHit && remoteTarget && remoteDistance < 18 + ep.size && remoteDistance <= localDistance) {
+        this.damageRemotePlayerFromEnemy(ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1));
+        this.createHitFX(remoteTarget.x, remoteTarget.y, '#ff7675', 3);
+        ep.life = 0;
+      } else if (!summonHit && localDistance < 18 + ep.size) {
         if (this.player.shieldTimer <= 0) {
           const damage = ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1);
           this.player.hp -= damage;
@@ -4614,25 +4692,27 @@ class Game {
     // Логика врагов
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
+      const worldAuthority = !this.pvp?.started || this.pvp.host;
 
-      if (!e.is24hPursuer && e.freezeTimer > 0) {
+      if (worldAuthority && !e.is24hPursuer && e.freezeTimer > 0) {
         e.freezeTimer -= dt;
         continue;
       }
-      if (e.is24hPursuer) {
+      if (worldAuthority && e.is24hPursuer) {
         e.freezeTimer = 0;
         e.slowTimer = 0;
         e.slowFactor = 1;
       }
 
-      if (e.slowTimer > 0) {
+      if (worldAuthority && e.slowTimer > 0) {
         e.slowTimer = Math.max(0, e.slowTimer - dt);
         if (e.slowTimer === 0) e.slowFactor = 1;
       }
 
-      const ang = Math.atan2(this.player.y - e.y, this.player.x - e.x);
+      const target = this.getPvpEnemyTarget(e);
+      const ang = Math.atan2(target.y - e.y, target.x - e.x);
       let moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1);
-      if (e.isRefreshClient) {
+      if (worldAuthority && e.isRefreshClient) {
         e.dashTimer = (e.dashTimer ?? 3.8) - dt;
         if (e.dashTimer <= 0) {
           e.dashTimer = 5.2;
@@ -4646,20 +4726,20 @@ class Game {
           moveSpeed *= 0.62;
         }
       }
-      if (!e.isMegaBoss) {
+      if (worldAuthority && !e.isMegaBoss) {
         e.x += Math.cos(ang) * moveSpeed * frameScale;
         e.y += Math.sin(ang) * moveSpeed * frameScale;
       }
 
-      if (e.isBoss && (!this.pvp || this.pvp.host)) {
+      if (e.isBoss && worldAuthority) {
         this.updateBossAI(e, dt);
       }
 
-      if (e.shooter && (!this.pvp || this.pvp.host)) {
+      if (e.shooter && worldAuthority) {
         e.shootTimer -= dt;
-        if (e.shootTimer <= 0 && Math.hypot(this.player.x - e.x, this.player.y - e.y) < 520) {
+        if (e.shootTimer <= 0 && Math.hypot(target.x - e.x, target.y - e.y) < 520) {
           e.shootTimer = e.burstShooter ? 3.4 : 2.4;
-          const aim = Math.atan2(this.player.y - e.y, this.player.x - e.x);
+          const aim = Math.atan2(target.y - e.y, target.x - e.x);
           const offsets = e.burstShooter ? [-0.2, 0, 0.2] : [0];
           for (const offset of offsets) {
             const angle = aim + offset;
@@ -4675,18 +4755,23 @@ class Game {
         }
       }
       // Касание
-      if (Math.hypot(this.player.x - e.x, this.player.y - e.y) < e.size + 18) {
-        if (e.is24hPursuer) {
+      const targetDistance = Math.hypot(target.x - e.x, target.y - e.y);
+      if (worldAuthority && targetDistance < e.size + 18) {
+        if (e.is24hPursuer && target.isRemote) {
+          this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1);
+        } else if (e.is24hPursuer) {
           this.gameOver(`Сессия завершена: вас догнал ${e.name}.`);
           return;
         }
-        
-        if (e.isCleaner && Math.random() < 0.08) {
+
+        if (!target.isRemote && e.isCleaner && Math.random() < 0.08) {
           this.triggerGlitchScreen();
           this.addPopup(this.player.x, this.player.y - 20, "«КУДА ПО ПОМЫТОМУ?!» (Выдернут шнур)", "#00cec9");
         }
 
-        if (this.player.shieldTimer <= 0) {
+        if (target.isRemote) {
+          this.damageRemotePlayerFromEnemy(e.dmg * dt);
+        } else if (this.player.shieldTimer <= 0) {
           if (Math.random() > this.player.dodge) {
             const damage = e.dmg * dt;
             this.player.hp -= damage;

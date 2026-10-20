@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.8.3</title>
+<title>1С:Фитнес Клуб КОРП 1.8.4</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -593,7 +593,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.8.3 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.8.4 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -712,7 +712,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.3</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.4</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -721,7 +721,7 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.8.3</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.8.4</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
@@ -969,7 +969,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '1.8.3';
+const GAME_VERSION = '1.8.4';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -2114,6 +2114,7 @@ class Game {
 
     this.paused = false;
     this.time = 0;
+    this.lastPlayerDamage = null;
     this.scoreRunId = null;
     this.scoreRunStartPromise = null;
     this.scoreRunCheckpointNo = 0;
@@ -2753,19 +2754,29 @@ class Game {
           const sequence = Number(message.sequence || 0);
           if (sequence && sequence <= Number(pvp.remoteStateSequence || 0)) return;
           pvp.remoteStateSequence = sequence || Number(pvp.remoteStateSequence || 0) + 1;
+          const validation = this.validatePvpRemoteState(message.state);
+          if (!validation.ok) {
+            const now = Date.now();
+            if (now - Number(pvp.lastInvalidRemoteStateLogAt || 0) > 3000) {
+              pvp.lastInvalidRemoteStateLogAt = now;
+              this.logPvpDiagnostic(pvp, 'Проверка статов', 'отклонено некорректное состояние соперника', { reason: validation.reason });
+            }
+            return;
+          }
+          const state = validation.state;
           if (message.uid) pvp.opponentUid = message.uid;
-          pvp.remoteState = message.state;
+          pvp.remoteState = state;
           pvp.remotePlayer = {
             ...(pvp.remotePlayer || {}), uid: pvp.opponentUid || (pvp.host ? 'guest' : 'host'),
             name: message.name || pvp.remotePlayer?.name || 'Соперник', online: true,
-            choosing: message.choosing || null, paused: Boolean(message.paused), state: message.state
+            choosing: message.choosing || null, paused: Boolean(message.paused), state
           };
           pvp.remoteChoosing = message.choosing || null;
           pvp.remotePaused = Boolean(message.paused);
           pvp.remoteShots = Array.isArray(message.shots) ? message.shots : [];
           pvp.remoteShotsAt = performance.now();
-          this.recordPvpPosition('@remote', Number(message.state.x), Number(message.state.y));
-          this.applyPvpRemoteState(message.state);
+          this.recordPvpPosition('@remote', state.x, state.y);
+          this.applyPvpRemoteState(state);
           this.syncPvpWait();
         } else if (message.type === 'world' && message.world) {
           this.applyPvpSharedWorld(message.world);
@@ -2779,6 +2790,7 @@ class Game {
       };
       channel.onclose = () => {
         if (pvp.rtc !== rtc || rtc.restarting) return;
+        if (pvp.matchOver || pvp.opponentLost) { rtc.connected = false; return; }
         rtc.connected = false;
         this.logPvpDiagnostic(pvp, 'WebRTC', `DataChannel ${channel.label} закрыт`, {
           ice: pc.iceConnectionState, connection: pc.connectionState, signaling: pc.signalingState
@@ -2793,6 +2805,7 @@ class Game {
       };
       channel.onerror = event => {
         if (pvp.rtc !== rtc || rtc.restarting) return;
+        if (pvp.matchOver || pvp.opponentLost) { rtc.connected = false; return; }
         const error = event?.error;
         this.logPvpDiagnostic(pvp, 'WebRTC', `ошибка DataChannel ${channel.label}`, {
           readyState: channel.readyState,
@@ -2916,7 +2929,7 @@ class Game {
 
   handlePvpRtcLost(reason, rtc = this.pvp?.rtc) {
     const pvp = this.pvp;
-    if (!pvp?.started || !rtc || pvp.rtc !== rtc || rtc.restarting || pvp.opponentLost) return;
+    if (!pvp?.started || !rtc || pvp.rtc !== rtc || rtc.restarting || pvp.opponentLost || pvp.matchOver) return;
     const diagnostic = this.describePvpRtcFailure(reason, rtc);
     if (!pvp.connectionLost) {
       pvp.connectionLostReason = diagnostic;
@@ -3036,8 +3049,8 @@ class Game {
 
   restartPvpRtc(generation) {
     const pvp = this.pvp;
-    if (!pvp || pvp.opponentLost || Number(generation) === Number(pvp.rtcGeneration) && pvp.rtc?.connected) return;
-    if (pvp.started && !pvp.connectionLost) {
+    if (!pvp || pvp.opponentLost || pvp.matchOver || Number(generation) === Number(pvp.rtcGeneration) && pvp.rtc?.connected) return;
+    if (pvp.started && !pvp.connectionLost && !pvp.matchOver) {
       pvp.wasPausedBeforeConnectionLost = Boolean(this.paused);
       pvp.connectionLost = true;
       this.paused = true;
@@ -3150,6 +3163,7 @@ class Game {
       time: Number(this.time) || 0,
       attackTotal: Math.round(pvp.attackTotal * 100) / 100,
       enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
+      enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
       killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0) },
       over: pvp.matchOver || player.hp <= 0,
       enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}
@@ -3159,6 +3173,57 @@ class Game {
       uid: pvp.uid, name: pvp.name || 'Соперник', state,
       choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), shots: this.serializePvpShots()
     }, channelOverride, Boolean(channelOverride));
+  }
+
+  validatePvpRemoteState(state) {
+    if (!state || typeof state !== 'object' || Array.isArray(state)) return { ok: false, reason: 'ожидался объект состояния' };
+    const numeric = ['x', 'y', 'hp', 'maxHp', 'level', 'time', 'attackTotal', 'enemyAttackTotal'];
+    if (numeric.some(key => !Number.isFinite(Number(state[key])))) return { ok: false, reason: 'числовой стат отсутствует или не является конечным числом' };
+    const x = Number(state.x), y = Number(state.y), hp = Number(state.hp), maxHp = Number(state.maxHp);
+    const level = Number(state.level), time = Number(state.time);
+    const attackTotal = Number(state.attackTotal), enemyAttackTotal = Number(state.enemyAttackTotal);
+    if (x < this.BOUND_MIN || x > this.BOUND_MAX || y < this.BOUND_MIN || y > this.BOUND_MAX) return { ok: false, reason: 'позиция за пределами карты' };
+    if (hp < 0 || maxHp < 1 || hp > maxHp || maxHp > 100000) return { ok: false, reason: 'HP или максимальное HP вне допустимого диапазона' };
+    if (!Number.isInteger(level) || level < 1 || level > 10000 || time < 0 || time > 86400 || level > 11 + Math.floor(time * 3)) return { ok: false, reason: 'уровень или время вне допустимого диапазона' };
+    if (maxHp > 400 + (level - 1) * 25) return { ok: false, reason: 'максимальное HP слишком велико для текущего уровня' };
+    if (attackTotal < 0 || enemyAttackTotal < 0 || attackTotal > 1000 + time * 12000 || enemyAttackTotal > 1000 + time * 12000 ||
+        typeof state.over !== 'boolean' || typeof state.shield !== 'boolean') return { ok: false, reason: 'счётчики урона или флаги состояния некорректны' };
+    if (state.killCredits != null && (typeof state.killCredits !== 'object' || Array.isArray(state.killCredits) ||
+        ['host', 'guest'].some(key => !Number.isInteger(Number(state.killCredits[key])) || Number(state.killCredits[key]) < 0 || Number(state.killCredits[key]) > 1000000))) {
+      return { ok: false, reason: 'счётчик уничтоженных противников некорректен' };
+    }
+    if (state.enemyDamage != null && (typeof state.enemyDamage !== 'object' || Array.isArray(state.enemyDamage) ||
+        Object.values(state.enemyDamage).some(value => !Number.isFinite(Number(value)) || Number(value) < 0 || Number(value) > 100000000))) {
+      return { ok: false, reason: 'счётчик урона по противникам некорректен' };
+    }
+    const previous = this.pvp?.remoteState;
+    if (previous) {
+      if (Number(previous.level || 1) > level) return { ok: false, reason: 'уровень соперника неожиданно уменьшился' };
+      if (Number(previous.maxHp || 1) > maxHp) return { ok: false, reason: 'максимальное HP соперника неожиданно уменьшилось' };
+      if (Number(previous.time || 0) > time + 0.25) return { ok: false, reason: 'игровое время пошло назад' };
+      if (previous.over && !state.over) return { ok: false, reason: 'соперник продолжил игру после завершения матча' };
+      const elapsedPosition = Math.max(0.05, Math.min(3, (performance.now() - Number(this.pvp.remoteStateAt || performance.now())) / 1000));
+      const distance = Math.hypot(x - Number(previous.x), y - Number(previous.y));
+      if (distance > 800 * elapsedPosition + 180) return { ok: false, reason: 'позиция соперника переместилась быстрее допустимой скорости' };
+      if (previous.killCredits && state.killCredits && ['host', 'guest'].some(key => Number(state.killCredits[key]) < Number(previous.killCredits[key] || 0))) {
+        return { ok: false, reason: 'счётчик уничтоженных противников уменьшился' };
+      }
+      for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
+        const amount = Number(amountValue);
+        const oldAmount = Number(previous.enemyDamage?.[enemyId] || 0);
+        if (amount < oldAmount) return { ok: false, reason: 'счётчик урона по противнику уменьшился' };
+        const enemy = this.enemies.find(item => item.syncId === enemyId);
+        if (enemy && Number.isFinite(enemy.maxHp) && amount > Math.max(1000, enemy.maxHp * 4)) {
+          return { ok: false, reason: 'урон по противнику выше его возможного запаса HP' };
+        }
+      }
+      const elapsed = elapsedPosition;
+      const maxDamageDelta = 250 + elapsed * 10000;
+      if (attackTotal < Number(previous.attackTotal || 0) || attackTotal - Number(previous.attackTotal || 0) > maxDamageDelta) return { ok: false, reason: 'счётчик PvP-урона уменьшился или резко вырос' };
+      if (enemyAttackTotal < Number(previous.enemyAttackTotal || 0) || enemyAttackTotal - Number(previous.enemyAttackTotal || 0) > maxDamageDelta) return { ok: false, reason: 'счётчик урона противников уменьшился или резко вырос' };
+    }
+    this.pvp.remoteStateAt = performance.now();
+    return { ok: true, state: { ...state, x, y, hp, maxHp, level, time, attackTotal, enemyAttackTotal } };
   }
 
   recordPvpPosition(id, x, y) {
@@ -3412,6 +3477,7 @@ class Game {
         time: Number(this.time) || 0,
         attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
         enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
+        enemyAttackSource: this.pvp.enemyAttackSource || 'Атака противника',
         killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0) },
         over: this.pvp.matchOver || p.hp <= 0,
         enemyDamage: this.pvp.enemyDamageTotals || {},
@@ -3577,7 +3643,9 @@ class Game {
     const enemyAttackTotal = Number(state.enemyAttackTotal || 0);
     const previousEnemyAttackTotal = Number(this.pvp.lastRemoteEnemyAttackTotal || 0);
     const enemyDamage = enemyAttackTotal - previousEnemyAttackTotal;
-    if (enemyDamage > 0.01 && this.player && !this.pvp.matchOver) this.receiveEnemyDamage(enemyDamage);
+    if (enemyDamage > 0.01 && this.player && !this.pvp.matchOver) {
+      this.receiveEnemyDamage(enemyDamage, state.enemyAttackSource || 'Атака противника');
+    }
     this.pvp.lastRemoteEnemyAttackTotal = Math.max(previousEnemyAttackTotal, enemyAttackTotal);
     if (this.pvp.host) {
       this.pvp.processedEnemyDamage ||= {};
@@ -3607,7 +3675,19 @@ class Game {
     }
   }
 
-  receivePvpDamage(damage) {
+  recordPlayerDamage(damage, source) {
+    const incoming = Math.max(0, Number(damage) || 0);
+    if (!this.player || incoming <= 0) return 0;
+    const hpBefore = Math.max(0, Number(this.player.hp) || 0);
+    const applied = Math.min(hpBefore, incoming);
+    this.player.hp = Math.max(0, hpBefore - applied);
+    if (applied > 0) {
+      this.lastPlayerDamage = { source: String(source || 'Неизвестная атака'), damage: incoming, applied };
+    }
+    return applied;
+  }
+
+  receivePvpDamage(damage, source = `${this.pvp?.remotePlayer?.name || 'Соперник'} · атака PvP`) {
     if (!this.player || this.player.hp <= 0) return;
     if (this.pvp?.mode === 'pvp' && this.time < 120) return;
     if (this.player.shieldTimer > 0) {
@@ -3618,15 +3698,14 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, 'PvP-ПРОМАХ!', '#f1c40f');
       return;
     }
-    const applied = Math.min(this.player.hp, damage);
-    this.player.hp -= applied;
+    const applied = this.recordPlayerDamage(damage, source);
     this.sound.hit();
     this.addPopup(this.player.x, this.player.y - 22, `PvP -${Math.ceil(applied)} HP`, '#ff4757');
     this.updateHUD();
     if (this.player.hp <= 0) this.gameOver(`ПОРАЖЕНИЕ! ${this.pvp.remotePlayer?.name || 'Соперник'} победил.`);
   }
 
-  receiveEnemyDamage(damage) {
+  receiveEnemyDamage(damage, source = 'Атака противника') {
     if (!this.player || this.player.hp <= 0 || damage <= 0) return;
     if (this.player.shieldTimer > 0) {
       this.addPopup(this.player.x, this.player.y - 22, 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
@@ -3636,17 +3715,17 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
       return;
     }
-    const applied = Math.min(this.player.hp, damage);
-    this.player.hp -= applied;
+    const applied = this.recordPlayerDamage(damage, source);
     this.sound.hit();
     this.addPopup(this.player.x, this.player.y - 22, `МОБЫ -${Math.ceil(applied)} HP`, '#ff4757');
     this.updateHUD();
     if (this.player.hp <= 0) this.gameOver('Противники уничтожили целостность базы!');
   }
 
-  damageRemotePlayerFromEnemy(damage) {
+  damageRemotePlayerFromEnemy(damage, source = 'Атака противника') {
     if (!this.pvp?.host || !this.pvp.started || !this.pvp.remoteState || this.pvp.remoteState.over || damage <= 0) return;
     this.pvp.enemyAttackTotal = (this.pvp.enemyAttackTotal || 0) + damage;
+    this.pvp.enemyAttackSource = source;
   }
 
   damagePvpOpponent(damage) {
@@ -3657,9 +3736,19 @@ class Game {
 
   receivePvpActiveSkill(skill) {
     if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !skill || this.time < 120 || this.player?.hp <= 0) return;
-    const damage = Math.max(0, Math.min(100, Number(skill.damage) || 0));
-    if (damage > 0) this.receivePvpDamage(damage * 0.14);
-    const control = Number(skill.control) || 0;
+    const offensive = {
+      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.8],
+      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 1.2],
+      act_sigur_lockdown: [100, 30, 1.5], act_atol_receipt_rain: [90, 25, 0],
+      act_shtrikh_reconciliation: [115, 30, 0.6], act_cache_purge: [150, 40, 0.8],
+      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0]
+    }[skill.key];
+    const level = Number(skill.level);
+    if (!offensive || !Number.isInteger(level) || level < 1 || level > 5) return;
+    const [base, perLevel, control] = offensive;
+    const damage = base + (level - 1) * perLevel;
+    const skillName = ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key;
+    this.receivePvpDamage(damage * 0.14, `${this.pvp.remotePlayer?.name || 'Соперник'} · ${skillName}`);
     if (control > 0 && this.player?.hp > 0) {
       this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(2, control));
       this.addPopup(this.player.x, this.player.y - 24, '⚠️ НАВЫК СОПЕРНИКА: СБОЙ УПРАВЛЕНИЯ', '#f1c40f');
@@ -3677,7 +3766,7 @@ class Game {
     }[key];
     if (!offensive) return; // Поддерживающие умения усиливают PvP-атаки игрока.
     const [base, perLevel, control] = offensive;
-    this.sendPvpRtcMessage({ type: 'active-skill', skill: { key, level, damage: base + Math.max(0, level - 1) * perLevel, control } });
+    this.sendPvpRtcMessage({ type: 'active-skill', skill: { key, name: ACTIVE_SKILLS_DEF[key]?.name || key, level, damage: base + Math.max(0, level - 1) * perLevel, control } });
   }
 
   async restartFromGameOver() {
@@ -4924,14 +5013,17 @@ class Game {
       if (localHit) {
         if (this.player.shieldTimer <= 0) {
           const damage = warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1);
-          this.player.hp -= damage;
+          this.recordPlayerDamage(damage, warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса');
           this.sound.hit();
           this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(damage)} HP`, '#ff4757');
         } else {
           this.addPopup(this.player.x, this.player.y - 20, 'ЗОНА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
         }
       }
-      if (remoteHit) this.damageRemotePlayerFromEnemy(warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1));
+      if (remoteHit) this.damageRemotePlayerFromEnemy(
+        warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1),
+        warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса'
+      );
       this.createHitFX(warning.x, warning.y, '#ff4757', 10);
       this.bossWarnings.splice(i, 1);
       if (this.player.hp <= 0) {
@@ -5640,13 +5732,16 @@ class Game {
       const remoteTarget = this.pvp?.started && this.pvp.host && !this.pvp.remoteState?.over ? this.pvp.remoteState : null;
       const remoteDistance = remoteTarget ? Math.hypot(remoteTarget.x - ep.x, remoteTarget.y - ep.y) : Infinity;
       if (!summonHit && remoteTarget && remoteDistance < 18 + ep.size && remoteDistance <= localDistance) {
-        this.damageRemotePlayerFromEnemy(ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1));
+        this.damageRemotePlayerFromEnemy(
+          ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1),
+          ep.isMegaBossAttack ? 'Снаряд большого босса' : `Снаряд ${ep.icon || 'противника'}`
+        );
         this.createHitFX(remoteTarget.x, remoteTarget.y, '#ff7675', 3);
         ep.life = 0;
       } else if (!summonHit && localDistance < 18 + ep.size) {
         if (this.player.shieldTimer <= 0) {
           const damage = ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1);
-          this.player.hp -= damage;
+          this.recordPlayerDamage(damage, ep.isMegaBossAttack ? 'Снаряд большого босса' : `Снаряд ${ep.icon || 'противника'}`);
           this.sound.hit();
           this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(damage)}`, '#ff4757');
         } else {
@@ -5756,8 +5851,9 @@ class Game {
       const targetDistance = Math.hypot(target.x - e.x, target.y - e.y);
       if (worldAuthority && targetDistance < e.size + 18) {
         if (e.is24hPursuer && target.isRemote) {
-          this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1);
+          this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1, e.name);
         } else if (e.is24hPursuer) {
+          this.recordPlayerDamage((this.player.hp || 0) + 1, e.name);
           this.gameOver(`Сессия завершена: вас догнал ${e.name}.`);
           return;
         }
@@ -5768,11 +5864,11 @@ class Game {
         }
 
         if (target.isRemote) {
-          this.damageRemotePlayerFromEnemy(e.dmg * dt);
+          this.damageRemotePlayerFromEnemy(e.dmg * dt, e.name);
         } else if (this.player.shieldTimer <= 0) {
           if (Math.random() > this.player.dodge) {
             const damage = e.dmg * dt;
-            this.player.hp -= damage;
+            this.recordPlayerDamage(damage, e.name);
             if (Math.random() < 0.08) {
               this.sound.hit();
               this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(e.dmg)}`, '#e74c3c');
@@ -6090,8 +6186,13 @@ class Game {
 
     const totalScore = this.calcScore();
     const statsBox = document.getElementById('gameover-stats');
+    const finalHit = this.player?.hp <= 0 ? this.lastPlayerDamage : null;
+    const finalHitMarkup = finalHit
+      ? `• Добивающий удар: <b>${this.escapeHtml(finalHit.source)}</b><br>• Урон удара: <b>${Number(finalHit.damage).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} HP</b> (снято ${Number(finalHit.applied).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} HP)<br><br>`
+      : '';
     statsBox.innerHTML = `
       <b>Причина сбоя:</b> ${reason}<br><br>
+      ${finalHitMarkup}
       • Время аптайма: <b>${Math.floor(this.time)} сек</b><br>
       • Закрыто инцидентов (багов): <b>${this.kills}</b> (x12 = ${this.kills * 12} очк.)<br>
       • Написано строк кода: <b>${this.gemsCollected}</b> (x3 = ${this.gemsCollected * 3} очк.)<br>

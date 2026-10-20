@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.8.0</title>
+<title>1С:Фитнес Клуб КОРП 1.8.1</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -593,7 +593,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.8.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.8.1 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -712,7 +712,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.1</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -721,7 +721,7 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.8.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.8.1</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
             <div class="release-notes">
@@ -964,7 +964,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '1.8.0';
+const GAME_VERSION = '1.8.1';
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -2485,6 +2485,8 @@ class Game {
       channel.onopen = () => {
         if (rtc.failed) { channel.close(); return; }
         rtc.connected = true;
+        rtc.lastMessageAt = performance.now();
+        channel.bufferedAmountLowThreshold = 16384;
         clearTimeout(rtc.connectTimer);
         this.pvpStatus('Прямое соединение между игроками установлено.');
         if (pvp.started) {
@@ -2495,8 +2497,10 @@ class Game {
         }
       };
       channel.onmessage = event => {
+        rtc.lastMessageAt = performance.now();
         let message;
         try { message = JSON.parse(event.data); } catch { return; }
+        if (pvp.opponentLost) return;
         if (message.type === 'state' && message.state) {
           const sequence = Number(message.sequence || 0);
           if (sequence && sequence <= Number(pvp.remoteStateSequence || 0)) return;
@@ -2517,6 +2521,8 @@ class Game {
           this.syncPvpWait();
         } else if (message.type === 'world' && message.world) {
           this.applyPvpSharedWorld(message.world);
+        } else if (message.type === 'world-chunk') {
+          this.receivePvpWorldChunk(message);
         } else if (message.type === 'sales-call' && !pvp.host) {
           this.showSalesCall();
         } else if (message.type === 'active-skill' && message.skill) {
@@ -2531,6 +2537,9 @@ class Game {
           const reason = `DataChannel закрыт (ICE: ${pc.iceConnectionState}, соединение: ${pc.connectionState}, сигнализация: ${pc.signalingState})`;
           pvp.rtcFailure = reason;
           this.handlePvpOpponentLost(`Связь с соперником потеряна. Вы продолжаете забег в одиночку. ${reason}`, !pvp.host);
+        } else if (pvp.started && pvp.opponentLost) {
+          // Watchdog уже перевёл матч в локальный режим; не ставим его на паузу повторно.
+          return;
         } else {
           this.failPvpRtc(`канал закрыт до запуска (состояние: ${pc.connectionState}, ICE: ${pc.iceConnectionState})`);
         }
@@ -2577,7 +2586,7 @@ class Game {
         pvp.opponentUid = snapshot.val();
         rtc.offerStarted = true;
         startConnectTimer();
-        const channel = pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 0 });
+        const channel = pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 1 });
         setChannel(channel);
         pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() =>
           pvp.fb.set(refAt('offer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp })
@@ -2625,8 +2634,11 @@ class Game {
 
   sendPvpRtcMessage(message) {
     const channel = this.pvp?.rtc?.channel;
-    if (!this.pvp?.rtc?.connected || channel?.readyState !== 'open' || channel.bufferedAmount > 262144) return false;
-    try { channel.send(JSON.stringify(message)); return true; }
+    if (!this.pvp?.rtc?.connected || channel?.readyState !== 'open') return false;
+    const limit = message.type === 'state' ? 98304 : 65536;
+    if (channel.bufferedAmount > limit) return false;
+    const payload = JSON.stringify(message);
+    try { channel.send(payload); return true; }
     catch (err) { console.warn('Не удалось отправить сообщение WebRTC:', err); return false; }
   }
 
@@ -2654,6 +2666,7 @@ class Game {
       time: Number(this.time) || 0,
       attackTotal: Math.round(pvp.attackTotal * 100) / 100,
       enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
+      killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0) },
       over: pvp.matchOver || player.hp <= 0,
       enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}
     };
@@ -2788,6 +2801,10 @@ class Game {
     pvp.remoteShots = [];
     pvp.remoteChoosing = null;
     pvp.remotePaused = false;
+    if (pvp.rtc?.connected) {
+      pvp.rtc.connected = false;
+      pvp.rtc.pc?.close();
+    }
     if (promoteToHost && !pvp.host) {
       // Если отключился хост, продолжаем уже полученный мир локально.
       pvp.host = true;
@@ -2823,6 +2840,10 @@ class Game {
     pvp.lastRemoteAttackTotal = Number(pvp.remoteState?.attackTotal || 0);
     pvp.lastRemoteEnemyAttackTotal = Number(pvp.remoteState?.enemyAttackTotal || 0);
     pvp.enemyDamageTotals ||= {};
+    pvp.enemyDamageAt ||= {};
+    pvp.hostDamageTotals ||= {};
+    pvp.hostKillCount = Number(pvp.hostKillCount || 0);
+    pvp.guestKillCount = Number(pvp.guestKillCount || 0);
     pvp.claimedDrops ||= {};
     pvp.processedEnemyDamage ||= {};
     pvp.positionHistory ||= {};
@@ -2833,6 +2854,14 @@ class Game {
     pvp.manualPaused = false;
     this.pvpTimer = setInterval(() => {
       if (!this.pvp || !this.player) return;
+      if (this.pvp.rtc?.connected && performance.now() - Number(this.pvp.rtc.lastMessageAt || 0) > 2500) {
+        const rtc = this.pvp.rtc;
+        rtc.connected = false;
+        this.pvp.connectionLost = true;
+        rtc.pc?.close();
+        this.handlePvpOpponentLost('Нет данных от соперника более 2,5 секунды. Связь WebRTC потеряна; забег продолжается локально.', !this.pvp.host);
+        return;
+      }
       const p = this.player;
       const state = {
         x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
@@ -2840,6 +2869,7 @@ class Game {
         time: Number(this.time) || 0,
         attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
         enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
+        killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0) },
         over: this.pvp.matchOver || p.hp <= 0,
         enemyDamage: this.pvp.enemyDamageTotals || {},
         claimedDrops: this.pvp.claimedDrops || {}
@@ -2869,6 +2899,11 @@ class Game {
           if (!pvp.host && !enemy.is24hPursuer && enemy.syncId && Number.isFinite(before) && Number.isFinite(value) && value < before) {
             pvp.enemyDamageTotals ||= {};
             pvp.enemyDamageTotals[enemy.syncId] = (pvp.enemyDamageTotals[enemy.syncId] || 0) + before - value;
+            pvp.enemyDamageAt ||= {};
+            pvp.enemyDamageAt[enemy.syncId] = performance.now();
+          } else if (pvp.host && !pvp.applyingRemoteEnemyDamage && !enemy.is24hPursuer && enemy.syncId && Number.isFinite(before) && Number.isFinite(value) && value < before) {
+            pvp.hostDamageTotals ||= {};
+            pvp.hostDamageTotals[enemy.syncId] = (pvp.hostDamageTotals[enemy.syncId] || 0) + before - value;
           }
         }
       });
@@ -2886,7 +2921,7 @@ class Game {
 
   publishPvpSharedWorld() {
     const pvp = this.pvp;
-    if (!pvp?.host || !pvp.started) return;
+    if (!pvp?.host || !pvp.started || pvp.opponentLost || !pvp.rtc?.connected) return false;
     this.trackPvpSharedEntities();
     const safe = value => JSON.parse(JSON.stringify(value, (key, item) =>
       typeof item === 'number' && !Number.isFinite(item) ? 1e12 : item));
@@ -2899,8 +2934,65 @@ class Game {
       enemyProjectiles: byId(this.enemyProjectiles),
       bossWarnings: byId(this.bossWarnings)
     };
-    if (!pvp.rtc?.connected || pvp.rtc.failed) return;
-    this.sendPvpRtcMessage({ type: 'world', world });
+    if (!pvp.rtc?.connected || pvp.rtc.failed) return false;
+    return this.sendPvpWorldSnapshot(world);
+  }
+
+  sendPvpWorldSnapshot(world) {
+    const channel = this.pvp?.rtc?.channel;
+    if (!this.pvp?.rtc?.connected || channel?.readyState !== 'open') return false;
+    const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings'];
+    const chunks = [];
+    const chunkLimit = 12000;
+    for (const collection of collectionNames) {
+      let items = {};
+      for (const [id, item] of Object.entries(world[collection] || {})) {
+        items[id] = item;
+        const sample = JSON.stringify({ type: 'world-chunk', revision: world.revision, index: 0, total: 1, collection, items });
+        if (sample.length > chunkLimit && Object.keys(items).length > 1) {
+          delete items[id];
+          chunks.push({ collection, items });
+          items = { [id]: item };
+        }
+      }
+      chunks.push({ collection, items });
+    }
+    const packets = chunks.map((chunk, index) => JSON.stringify({
+      type: 'world-chunk', revision: world.revision, index, total: chunks.length,
+      collection: chunk.collection, items: chunk.items
+    }));
+    const encodedBytes = packets.reduce((sum, packet) => sum + new TextEncoder().encode(packet).byteLength, 0);
+    if (channel.bufferedAmount + encodedBytes > 196608) return false;
+    try {
+      for (const packet of packets) channel.send(packet);
+      this.pvp.lastWorldPayloadBytes = encodedBytes;
+      return true;
+    } catch (err) {
+      console.warn('Не удалось отправить снимок мира WebRTC:', err);
+      return false;
+    }
+  }
+
+  receivePvpWorldChunk(message) {
+    const pvp = this.pvp;
+    const revision = Number(message.revision) || 0;
+    const total = Math.max(1, Number(message.total) || 1);
+    const index = Number(message.index);
+    if (!pvp || pvp.host || revision <= Number(pvp.remoteWorldRevision || 0) ||
+        !Number.isInteger(index) || index < 0 || index >= total) return;
+    let pending = pvp.pendingWorldSnapshot;
+    if (!pending || revision > pending.revision) {
+      pending = pvp.pendingWorldSnapshot = { revision, total, received: new Set(), world: { revision } };
+      for (const name of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings']) pending.world[name] = {};
+    }
+    if (revision !== pending.revision || total !== pending.total) return;
+    if (!Object.prototype.hasOwnProperty.call(pending.world, message.collection)) return;
+    Object.assign(pending.world[message.collection], message.items || {});
+    pending.received.add(index);
+    if (pending.received.size === pending.total) {
+      pvp.pendingWorldSnapshot = null;
+      this.applyPvpSharedWorld(pending.world);
+    }
   }
 
   applyPvpSharedWorld(world) {
@@ -2917,10 +3009,14 @@ class Game {
     this.pickups = Object.values(world.pickups || {}).map(item => ({ ...item }));
     this.enemyProjectiles = Object.values(world.enemyProjectiles || {}).map(projectile => ({ ...projectile }));
     this.bossWarnings = Object.values(world.bossWarnings || {}).map(warning => ({ ...warning }));
-    const sharedIds = new Set([...this.enemies, ...this.gems, ...this.pickups].map(item => item.syncId).filter(Boolean));
+    const activeEnemyIds = new Set(this.enemies.map(enemy => enemy.syncId).filter(Boolean));
     for (const id of Object.keys(pvp.enemyDamageTotals || {})) {
-      if (!this.enemies.some(enemy => enemy.syncId === id)) delete pvp.enemyDamageTotals[id];
+      if (!activeEnemyIds.has(id) && performance.now() - Number(pvp.enemyDamageAt?.[id] || 0) > 2000) {
+        delete pvp.enemyDamageTotals[id];
+        delete pvp.enemyDamageAt[id];
+      }
     }
+    const sharedIds = new Set([...this.enemies, ...this.gems, ...this.pickups].map(item => item.syncId).filter(Boolean));
     for (const id of Object.keys(pvp.claimedDrops || {})) {
       if (!sharedIds.has(id)) delete pvp.claimedDrops[id];
     }
@@ -2930,6 +3026,7 @@ class Game {
     if (!this.pvp || !state) return;
     // Хост задаёт единый ход времени: клиентские таймеры не отстают из-за пауз.
     if (!this.pvp.host && Number.isFinite(Number(state.time))) this.time = Number(state.time);
+    if (!this.pvp.host && state.killCredits) this.kills = Math.max(0, Number(state.killCredits.guest) || 0);
     const total = Number(state.attackTotal || 0);
     const damage = total - this.pvp.lastRemoteAttackTotal;
     if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage);
@@ -2948,7 +3045,11 @@ class Game {
         this.pvp.processedEnemyDamage[enemyId] = Math.max(previous, amount);
         if (delta > 0) {
           const enemy = this.enemies.find(item => item.syncId === enemyId);
-          if (enemy && !enemy.is24hPursuer) enemy.hp = Math.max(0, enemy.hp - delta);
+          if (enemy && !enemy.is24hPursuer) {
+            this.pvp.applyingRemoteEnemyDamage = true;
+            try { enemy.hp = Math.max(0, enemy.hp - delta); }
+            finally { this.pvp.applyingRemoteEnemyDamage = false; }
+          }
         }
       }
       const claimed = state.claimedDrops || {};
@@ -5152,9 +5253,22 @@ class Game {
           this.bossWarnings = [];
           this.enemyProjectiles = [];
         }
-        this.kills++;
-        this.recordChallengeProgress('kills');
-        if (e.shooter) this.recordChallengeProgress('shooters');
+        let guestGotKillCredit = false;
+        if (this.pvp?.started && this.pvp.host && e.syncId && !this.pvp.opponentLost) {
+          const guestDamage = Number(this.pvp.processedEnemyDamage?.[e.syncId] || 0);
+          const hostDamage = Number(this.pvp.hostDamageTotals?.[e.syncId] || 0);
+          if (guestDamage > hostDamage) {
+            this.pvp.guestKillCount = (this.pvp.guestKillCount || 0) + 1;
+            guestGotKillCredit = true;
+          } else {
+            this.pvp.hostKillCount = (this.pvp.hostKillCount || 0) + 1;
+          }
+        }
+        if (!guestGotKillCredit) {
+          this.kills++;
+          this.recordChallengeProgress('kills');
+          if (e.shooter) this.recordChallengeProgress('shooters');
+        }
         this.createHitFX(e.x, e.y, e.col, 10);
 
         if (e.explodes) {

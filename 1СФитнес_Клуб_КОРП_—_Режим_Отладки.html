@@ -2329,6 +2329,30 @@ class Game {
     pvp.unsub = pvp.fb.onValue(pvp.roomRef, snapshot => this.handlePvpRoom(snapshot.val()));
   }
 
+  getRemoteRenderState(dt) {
+    const pvp = this.pvp;
+    const target = pvp?.remoteState;
+    if (!target || !Number.isFinite(target.x) || !Number.isFinite(target.y)) {
+      if (pvp) pvp.remoteRenderState = null;
+      return null;
+    }
+    if (!pvp.remoteRenderState) {
+      pvp.remoteRenderState = { ...target };
+      return pvp.remoteRenderState;
+    }
+    const visual = pvp.remoteRenderState;
+    const currentX = visual.x;
+    const currentY = visual.y;
+    const dx = target.x - visual.x;
+    const dy = target.y - visual.y;
+    const distance = Math.hypot(dx, dy);
+    const blend = distance > 260 ? 1 : 1 - Math.exp(-Math.max(0, dt) * 17);
+    Object.assign(visual, target);
+    visual.x = currentX + dx * blend;
+    visual.y = currentY + dy * blend;
+    return visual;
+  }
+
   handlePvpRoom(room) {
     const pvp = this.pvp;
     if (!pvp) return;
@@ -2379,7 +2403,7 @@ class Game {
       this.start();
       this.startPvpSync();
       this.pvpStatus('Матч начался! Побеждает тот, кто первым разрушит целостность соперника.');
-      if (pvp.mode === 'pvp') this.showBanner('ДУЭЛЬНЫЙ ЩИТ: первые 2 минуты игроки не наносят урон друг другу.');
+      if (pvp.mode === 'pvp') this.showBanner('ВАЖНО: первые 2 минуты вы с соперником неуязвимы друг к другу.');
       this.log(`PvP матч начался. Комната ${pvp.code}.`);
     }
   }
@@ -5117,7 +5141,7 @@ class Game {
     }
   }
 
-  render() {
+  render(dt = 1 / 60) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     const camX = this.player.x - this.canvas.width / 2;
@@ -5361,7 +5385,7 @@ class Game {
     }
 
     // Соперник в сетевой игре.
-    const remote = this.pvp?.remoteState;
+    const remote = this.getRemoteRenderState(dt);
     if (remote && Number.isFinite(remote.x) && Number.isFinite(remote.y)) {
       this.ctx.save();
       this.ctx.translate(remote.x, remote.y);
@@ -5445,6 +5469,24 @@ class Game {
     }
 
     this.ctx.restore();
+
+    if (this.pvp?.mode === 'pvp' && this.time < 120) {
+      const remaining = Math.max(0, Math.ceil(120 - this.time));
+      const timer = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')}`;
+      const label = `ЗАЩИТА ОТ УРОНА СОПЕРНИКА · ${timer}`;
+      this.ctx.save();
+      this.ctx.font = 'bold 13px sans-serif';
+      this.ctx.textAlign = 'center';
+      const width = this.ctx.measureText(label).width + 28;
+      this.ctx.fillStyle = 'rgba(18, 32, 48, 0.88)';
+      this.ctx.fillRect((this.canvas.width - width) / 2, 12, width, 30);
+      this.ctx.strokeStyle = '#74b9ff';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect((this.canvas.width - width) / 2, 12, width, 30);
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fillText(label, this.canvas.width / 2, 32);
+      this.ctx.restore();
+    }
   }
 
   loop(currentTime) {
@@ -5454,7 +5496,7 @@ class Game {
     if (!this.paused) {
       this.update(dt);
     }
-    this.render();
+    this.render(dt);
 
     requestAnimationFrame((t) => this.loop(t));
   }

@@ -2806,8 +2806,22 @@ class Game {
 
   updatePvpPeerConnected(peer) {
     peer.connected = peer.channel?.readyState === 'open' && peer.worldChannel?.readyState === 'open';
-    if (this.pvp?.rtc === peer) this.pvp.serverConnected = peer.connected;
-    if (peer.connected && this.pvp?.started) this.handlePvpRtcRecovered(peer);
+    const pvp = this.pvp;
+    if (pvp?.rtc === peer) pvp.serverConnected = peer.connected;
+    if (peer.connected && pvp?.started) {
+      this.handlePvpRtcRecovered(peer);
+      if (!pvp.host && pvp.rtc === peer) {
+        pvp.opponentVisible = true;
+        this.cancelPvpOpponentWait(pvp);
+      } else if (pvp.host && pvp.mode !== 'battle_royale') {
+        const participantUids = (pvp.matchPlayerUids || Object.keys(pvp.peerConnections || {})).filter(uid => uid !== pvp.uid);
+        const allConnected = participantUids.every(uid => pvp.peerConnections?.[uid]?.connected);
+        if (allConnected) {
+          pvp.opponentVisible = true;
+          this.cancelPvpOpponentWait(pvp);
+        }
+      }
+    }
     if (this.pvp?.host) this.maybeStartPvpRoom(this.pvp.roomCache);
   }
 
@@ -3197,7 +3211,9 @@ class Game {
   }
 
   waitForPvpOpponent(pvp, reason) {
-    if (!pvp?.started || pvp.opponentLost || pvp.opponentMissingTimer) return;
+    if (!pvp?.started || pvp.opponentLost) return;
+    pvp.opponentVisible = false;
+    if (pvp.opponentMissingTimer) return;
     pvp.opponentMissingReason = reason;
     pvp.wasPausedBeforeOpponentMissing = Boolean(this.paused);
     if (!this.isBattleRoyale) {
@@ -3282,10 +3298,10 @@ class Game {
     }
     const players = Object.values(room.players || {});
     const opponents = players.filter(player => player.uid !== pvp.uid);
-    const opponent = pvp.host ? opponents[0] : (pvp.mode === 'battle_royale'
-      ? opponents.find(player => player.uid === room.hostUid)
-      : (opponents.find(player => player.uid === room.hostUid) || opponents[0]));
-    const allOpponentsOnline = players.length >= 2 && opponents.every(player => player.online);
+    const opponent = pvp.host ? opponents[0] : opponents.find(player => player.uid === room.hostUid);
+    const allOpponentsOnline = pvp.host
+      ? opponents.length > 0 && opponents.every(player => player.online)
+      : Boolean(room.players?.[room.hostUid]?.online);
     if (pvp.started && pvp.host && pvp.mode === 'battle_royale') {
       const participantUids = pvp.matchPlayerUids || Object.keys(room.players || {});
       for (const uid of participantUids) {
@@ -3294,13 +3310,16 @@ class Game {
         if (!participant || participant.online === false) this.markBattleRoyalePlayerEliminated(uid, 'Игрок покинул комнату или потерял соединение.');
       }
     }
+    const directOpponentConnected = pvp.host
+      ? opponents.filter(player => player.online).every(player => pvp.peerConnections?.[player.uid]?.connected)
+      : Boolean(pvp.rtc?.connected);
     const opponentVisible = pvp.mode === 'battle_royale'
-      ? (pvp.host || Boolean(room.players?.[room.hostUid]?.online))
-      : allOpponentsOnline;
+      ? (pvp.host || Boolean(room.players?.[room.hostUid]?.online && pvp.rtc?.connected))
+      : Boolean(allOpponentsOnline && directOpponentConnected);
     if (!pvp.started) this.updatePvpLobby(room);
     if (opponent) {
       pvp.opponentVisible = opponentVisible;
-      this.cancelPvpOpponentWait(pvp);
+      if (opponentVisible) this.cancelPvpOpponentWait(pvp);
       pvp.opponentUid = opponent.uid;
       if (!pvp.rtc?.connected && !(pvp.host && pvp.mode === 'battle_royale')) {
         pvp.remotePlayer = opponent;

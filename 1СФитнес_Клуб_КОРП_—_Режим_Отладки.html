@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.8.5</title>
+<title>1С:Фитнес Клуб КОРП 1.9.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -484,7 +484,7 @@
   #sales-call-actions .btn-1c { flex: 1; padding: 6px 4px; font-size: 10px; }
   #challenge-notification {
     position: absolute; display: none; right: 14px; bottom: 14px;
-    width: min(350px, calc(100% - 28px)); z-index: 50;
+    width: min(390px, calc(100% - 28px)); z-index: 50;
     background: #f0f0f0; border: 2px solid #555;
     box-shadow: 0 8px 24px rgba(0,0,0,.7); color: #222;
   }
@@ -493,8 +493,8 @@
   #challenge-title { display: block; font-size: 12px; line-height: 1.4; margin-bottom: 7px; }
   #challenge-description { font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 8px; }
   #challenge-progress { color: #555; font-size: 11px; margin-bottom: 8px; }
-  #challenge-actions { display: flex; gap: 7px; }
-  #challenge-actions .btn-1c { flex: 1; padding: 7px 5px; font-size: 11px; }
+  #challenge-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+  #challenge-actions .btn-1c { flex: 1 1 105px; padding: 7px 5px; font-size: 11px; }
 
   .win-1c {
     background: #f0f0f0;
@@ -593,7 +593,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.8.5 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v1.9.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -692,10 +692,7 @@
         <strong id="challenge-title"></strong>
         <div id="challenge-description"></div>
         <div id="challenge-progress"></div>
-        <div id="challenge-actions">
-          <button class="btn-1c" style="background:#55efc4;" onclick="game.acceptChallenge()">В работе</button>
-          <button class="btn-1c" onclick="game.declineChallenge()">В Отказ</button>
-        </div>
+        <div id="challenge-actions"></div>
       </div>
     </div>
     <canvas id="canvas"></canvas>
@@ -712,7 +709,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.8.5</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.9.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -721,9 +718,13 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.8.5</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>1.9.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
           </div>
           <div>
+            <div class="release-notes">
+              <h3>Версия 1.9.0 — «Новый подход»</h3>
+              <p>Появился выбор испытаний и награды за их выполнение. Перки и PvP-баланс стали ровнее, а контроль соперника — короче.</p>
+            </div>
             <div class="release-notes">
               <h3>Версия 1.8.0 — «Командный зачёт»</h3>
               <p>Сражайтесь с другом онлайн: создавайте комнаты по коду, выбирайте PvP или PvE. В сетевой игре враги и добыча общие, пауза одного игрока приостанавливает матч, а мобов стало больше. В PvP первые две минуты действует защита от урона соперника. В магазине можно взять только один предмет каждого вида за предложение. Большие боссы стали менее выносливыми, но их атаки опаснее.</p>
@@ -811,7 +812,8 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
+        <details class="release-notes" open><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Появился выбор испытаний и награды за их выполнение. Перки и PvP-баланс стали ровнее, а контроль соперника — короче.</p></details>
+        <details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
@@ -970,7 +972,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '1.8.5';
+const GAME_VERSION = '1.9.0';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -1382,11 +1384,11 @@ const PASSIVES_DEF = {
   coffee_machine: {
     name: 'Кофе из 308 кабинета',
     icon: '☕',
-    desc: 'Очередь на ресепшене подождёт: оружие и умения перезаряжаются на 12% быстрее.',
+    desc: 'Очередь на ресепшене подождёт: оружие и умения перезаряжаются быстрее.',
     levels: [
-      { cdMult: 0.94 }, { cdMult: 0.88 }, { cdMult: 0.82 }, { cdMult: 0.76 }, { cdMult: 0.70 }
+      { cdMult: 0.95 }, { cdMult: 0.90 }, { cdMult: 0.85 }, { cdMult: 0.80 }, { cdMult: 0.75 }
     ],
-    levelDescriptions: ['Перезарядка быстрее на 6%.', 'Перезарядка быстрее на 12%.', 'Перезарядка быстрее на 18%.', 'Перезарядка быстрее на 24%.', 'Перезарядка быстрее на 30%.']
+    levelDescriptions: ['Перезарядка быстрее на 5%.', 'Перезарядка быстрее на 10%.', 'Перезарядка быстрее на 15%.', 'Перезарядка быстрее на 20%.', 'Перезарядка быстрее на 25%.']
   },
   backup_cron: {
     name: 'Авто-Бэкап в Облако',
@@ -1414,12 +1416,12 @@ const PASSIVES_DEF = {
   overtime_pizza: {
     name: 'Овертайм за Пиццу',
     icon: '🍕',
-    desc: '+35% к общему урону, но программист тяжелеет (-8% скорости).',
+    desc: 'Увеличивает общий урон, но немного замедляет программиста.',
     levels: [
-      { dmgMult: 0.25, speedMult: -0.05 }, { dmgMult: 0.35, speedMult: -0.08 },
-      { dmgMult: 0.45, speedMult: -0.09 }, { dmgMult: 0.56, speedMult: -0.11 }, { dmgMult: 0.68, speedMult: -0.13 }
+      { dmgMult: 0.20, speedMult: -0.04 }, { dmgMult: 0.28, speedMult: -0.06 },
+      { dmgMult: 0.36, speedMult: -0.08 }, { dmgMult: 0.43, speedMult: -0.10 }, { dmgMult: 0.50, speedMult: -0.12 }
     ],
-    levelDescriptions: ['+25% урона, −5% скорости.', '+35% урона, −8% скорости.', '+45% урона, −9% скорости.', '+56% урона, −11% скорости.', '+68% урона, −13% скорости.']
+    levelDescriptions: ['+20% урона, −4% скорости.', '+28% урона, −6% скорости.', '+36% урона, −8% скорости.', '+43% урона, −10% скорости.', '+50% урона, −12% скорости.']
   },
   shoe_covers: {
     name: 'Одноразовые Бахилы',
@@ -1434,7 +1436,7 @@ const PASSIVES_DEF = {
   hasp_emu: {
     name: 'HASP Эмулятор 2008',
     icon: '🗝️',
-    desc: '+14% шанс увернуться от претензий клиента.',
+    desc: 'Повышает шанс увернуться от претензий клиента.',
     levels: [{ dodge: 0.10 }, { dodge: 0.14 }, { dodge: 0.18 }, { dodge: 0.22 }, { dodge: 0.26 }],
     levelDescriptions: ['+10% к шансу уклонения.', '+14% к шансу уклонения.', '+18% к шансу уклонения.', '+22% к шансу уклонения.', '+26% к шансу уклонения.']
   },
@@ -1461,19 +1463,19 @@ const PASSIVES_DEF = {
   evotor_paid: {
     name: 'Эвотор: платная интеграция',
     icon: '💸',
-    desc: 'Техспец подключил платный модуль Эвотор, настроил обмен и объяснил, почему оплата не равна интеграции. +22% к урону, откат дольше на 8%.',
+    desc: 'Техспец подключил платный модуль Эвотор и настроил обмен. Урон выше, перезарядка дольше.',
     levels: [
-      { dmgMult: 0.15, cdMult: 1.05 }, { dmgMult: 0.22, cdMult: 1.08 },
-      { dmgMult: 0.29, cdMult: 1.11 }, { dmgMult: 0.36, cdMult: 1.15 }, { dmgMult: 0.43, cdMult: 1.19 }
+      { dmgMult: 0.12, cdMult: 1.04 }, { dmgMult: 0.18, cdMult: 1.07 },
+      { dmgMult: 0.24, cdMult: 1.10 }, { dmgMult: 0.30, cdMult: 1.13 }, { dmgMult: 0.36, cdMult: 1.16 }
     ],
-    levelDescriptions: ['+15% урона, перезарядка ×1,05.', '+22% урона, перезарядка ×1,08.', '+29% урона, перезарядка ×1,11.', '+36% урона, перезарядка ×1,15.', '+43% урона, перезарядка ×1,19.']
+    levelDescriptions: ['+12% урона, перезарядка ×1,04.', '+18% урона, перезарядка ×1,07.', '+24% урона, перезарядка ×1,10.', '+30% урона, перезарядка ×1,13.', '+36% урона, перезарядка ×1,16.']
   },
   try_except: {
     name: 'Попытка...Исключение',
     icon: '🩹',
-    desc: 'Регенерация целостности базы (+2.5 HP в секунду).',
-    levels: [{ regen: 1.5 }, { regen: 2.5 }, { regen: 3.2 }, { regen: 4.0 }, { regen: 5.0 }],
-    levelDescriptions: ['+1,5 HP регенерации в секунду.', '+2,5 HP регенерации в секунду.', '+3,2 HP регенерации в секунду.', '+4 HP регенерации в секунду.', '+5 HP регенерации в секунду.']
+    desc: 'Постепенно восстанавливает целостность базы.',
+    levels: [{ regen: 1.5 }, { regen: 2.2 }, { regen: 2.8 }, { regen: 3.4 }, { regen: 4.0 }],
+    levelDescriptions: ['+1,5 HP регенерации в секунду.', '+2,2 HP регенерации в секунду.', '+2,8 HP регенерации в секунду.', '+3,4 HP регенерации в секунду.', '+4 HP регенерации в секунду.']
   },
   mango_hold: {
     name: 'Клиент ищет кнопку «Разрешить»',
@@ -1500,13 +1502,25 @@ const PASSIVES_DEF = {
 const PASSIVE_MULTIPLIERS = new Set(['cdMult']);
 const PASSIVE_FIXED_STATS = new Set(['hasBackupShield', 'hasShoeTrail', 'backupInterval', 'backupDuration']);
 
-function applyPassiveLevel(player, key, fromLevel, toLevel) {
+function applyPassiveLevel(player, key, fromLevel, toLevel, mode = 'solo') {
   const definition = PASSIVES_DEF[key];
   const previous = definition.levels[fromLevel - 1] || {};
   const current = definition.levels[toLevel - 1];
+  const profile = (stat, value, level) => {
+    if (mode !== 'pvp') return value;
+    if (key === 'backup_cron' && stat === 'backupInterval') return [44, 42, 40, 38, 36][level - 1];
+    if (key === 'backup_cron' && stat === 'backupDuration') return 2;
+    if (stat === 'dodge') return value * 0.6;
+    if (stat === 'regen') return value * 0.4;
+    if (stat === 'xpMult') return value * 0.5;
+    if (stat === 'magnetMult') return value * 0.7;
+    if (stat === 'dmgMult' && (key === 'overtime_pizza' || key === 'evotor_paid')) return value * 0.5;
+    if (stat === 'cdMult' && key === 'coffee_machine') return 1 + (value - 1) * 0.65;
+    return value;
+  };
   for (const stat of new Set([...Object.keys(previous), ...Object.keys(current)])) {
-    const before = previous[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0);
-    const after = current[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0);
+    const before = profile(stat, previous[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0), fromLevel);
+    const after = profile(stat, current[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0), toLevel);
     if (PASSIVE_FIXED_STATS.has(stat)) player[stat] = after;
     else if (PASSIVE_MULTIPLIERS.has(stat)) player[stat] *= after / before;
     else player[stat] += after - before;
@@ -3989,7 +4003,8 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, 'PvP-УДАР ПОГЛОЩЁН ЩИТОМ', '#00cec9');
       return;
     }
-    if (Math.random() < this.player.dodge) {
+    const dodgeChance = this.pvp?.mode === 'pvp' ? Math.min(0.30, this.player.dodge) : this.player.dodge;
+    if (Math.random() < dodgeChance) {
       this.addPopup(this.player.x, this.player.y - 22, 'PvP-ПРОМАХ!', '#f1c40f');
       return;
     }
@@ -4006,7 +4021,8 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
       return;
     }
-    if (Math.random() < this.player.dodge) {
+    const dodgeChance = this.pvp?.mode === 'pvp' ? Math.min(0.30, this.player.dodge) : this.player.dodge;
+    if (Math.random() < dodgeChance) {
       this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
       return;
     }
@@ -4032,10 +4048,10 @@ class Game {
   receivePvpActiveSkill(skill) {
     if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !skill || this.time < 120 || this.player?.hp <= 0) return;
     const offensive = {
-      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.8],
-      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 1.2],
-      act_sigur_lockdown: [100, 30, 1.5], act_atol_receipt_rain: [90, 25, 0],
-      act_shtrikh_reconciliation: [115, 30, 0.6], act_cache_purge: [150, 40, 0.8],
+      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.45],
+      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
+      act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
+      act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
       act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0]
     }[skill.key];
     const level = Number(skill.level);
@@ -4045,7 +4061,7 @@ class Game {
     const skillName = ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key;
     this.receivePvpDamage(damage * 0.14, `${this.pvp.remotePlayer?.name || 'Соперник'} · ${skillName}`);
     if (control > 0 && this.player?.hp > 0) {
-      this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(2, control));
+      this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(0.65, control));
       this.addPopup(this.player.x, this.player.y - 24, '⚠️ НАВЫК СОПЕРНИКА: СБОЙ УПРАВЛЕНИЯ', '#f1c40f');
     }
   }
@@ -4053,10 +4069,10 @@ class Game {
   sendPvpActiveSkill(key, level) {
     if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !this.pvp.rtc?.connected || this.time < 120) return;
     const offensive = {
-      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.8],
-      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 1.2],
-      act_sigur_lockdown: [100, 30, 1.5], act_atol_receipt_rain: [90, 25, 0],
-      act_shtrikh_reconciliation: [115, 30, 0.6], act_cache_purge: [150, 40, 0.8],
+      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.45],
+      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
+      act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
+      act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
       act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0]
     }[key];
     if (!offensive) return; // Поддерживающие умения усиливают PvP-атаки игрока.
@@ -4322,12 +4338,13 @@ class Game {
       }
     ];
     const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
-    const selected = available[Math.floor(Math.random() * available.length)];
-    const challenge = { ...selected, objectives: selected.objectives.map(objective => ({ ...objective, progress: 0 })), remaining: 0, status: 'pending' };
+    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    const choices = shuffled.slice(0, Math.min(3, shuffled.length));
+    const challenge = { choices, remaining: 0, status: 'choosing' };
     this.activeChallenge = challenge;
     this.challengeNoticeUntil = 0;
     this.updateChallengeUI();
-    this.log(`У Вас новый тикет: ${challenge.title}`);
+    this.log('Поступили новые тикеты: выберите испытание.');
   }
 
   updateChallengeUI() {
@@ -4343,19 +4360,33 @@ class Game {
     const description = document.getElementById('challenge-description');
     const progress = document.getElementById('challenge-progress');
     const actions = document.getElementById('challenge-actions');
-    const buttons = actions.querySelectorAll('button');
-    title.textContent = challenge.title;
+    actions.replaceChildren();
+    title.textContent = challenge.title || '';
     description.textContent = challenge.description || '';
     description.style.display = challenge.status === 'active' && this.collapseAcceptedTickets ? 'none' : (challenge.description ? 'block' : 'none');
+    const addAction = (label, callback, color = '') => {
+      const button = document.createElement('button');
+      button.className = 'btn-1c';
+      button.textContent = label;
+      if (color) button.style.background = color;
+      button.onclick = callback;
+      actions.appendChild(button);
+    };
 
-    if (challenge.status === 'pending') {
+    if (challenge.status === 'choosing') {
+      head.textContent = '📩 Выберите тикет';
+      progress.textContent = 'Выберите одно из трёх испытаний:';
+      title.textContent = 'Какой вызов принимаете?';
+      description.textContent = 'Успешное выполнение даст возможность выбрать награду.';
+      actions.style.display = 'flex';
+      challenge.choices.forEach((choice, index) => addAction(`${choice.title} · ${choice.reward} XP`, () => this.acceptChallenge(index), '#e4f7ee'));
+      addAction('В Отказ', () => this.declineChallenge());
+    } else if (challenge.status === 'pending') {
       head.textContent = '📩 У Вас новый тикет:';
       progress.textContent = 'Беритесь за задачу или вежливо откажитесь.';
       actions.style.display = 'flex';
-      buttons[0].disabled = false;
-      buttons[0].textContent = 'В работе';
-      buttons[1].disabled = false;
-      buttons[1].textContent = 'В Отказ';
+      addAction('В работе', () => this.acceptChallenge(0), '#55efc4');
+      addAction('В Отказ', () => this.declineChallenge());
     } else if (challenge.status === 'active') {
       head.textContent = '📩 Тикет в работе';
       actions.style.display = 'none';
@@ -4365,27 +4396,40 @@ class Game {
         return `${objective.label}: ${Math.min(objective.target, current)}/${objective.target}${isTimed ? ' сек.' : ''}`;
       });
       progress.textContent = `${challenge.invertControls ? '🔀 Управление инвертировано · ' : ''}${amounts.join(' · ')} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
+    } else if (challenge.status === 'reward') {
+      head.textContent = '🎁 Выберите награду';
+      progress.textContent = 'Испытание завершено. Выберите один бонус:';
+      actions.style.display = 'flex';
+      addAction(`Опыт · +${challenge.reward} XP`, () => this.claimChallengeReward('xp'), '#55efc4');
+      addAction('Восстановление · +25% HP', () => this.claimChallengeReward('heal'), '#e4f7ee');
+      addAction('Щит · 5 сек.', () => this.claimChallengeReward('shield'), '#dff6ff');
     } else {
       head.textContent = challenge.status === 'success' ? '✅ Тикет закрыт' : '⌛ Тикет просрочен';
       progress.textContent = challenge.status === 'success'
-        ? `Отличная работа! Получено ${challenge.reward} опыта.`
+        ? 'Отличная работа! Награда получена.'
         : 'Срок вышел. Клиент уже перезвонил.';
       actions.style.display = 'none';
     }
   }
 
-  acceptChallenge() {
+  acceptChallenge(index = 0) {
     const challenge = this.activeChallenge;
-    if (!challenge || challenge.status !== 'pending') return;
-    challenge.status = 'active';
-    challenge.remaining = challenge.duration;
-    challenge.lastHp = this.player.hp;
+    if (!challenge || !['pending', 'choosing'].includes(challenge.status)) return;
+    const selected = challenge.status === 'choosing' ? challenge.choices?.[index] : challenge;
+    if (!selected) return;
+    Object.assign(challenge, selected, {
+      objectives: selected.objectives.map(objective => ({ ...objective, progress: 0 })),
+      remaining: selected.duration,
+      status: 'active',
+      lastHp: this.player.hp
+    });
+    delete challenge.choices;
     this.updateChallengeUI();
     this.log(`Тикет принят: ${challenge.title}`);
   }
 
   declineChallenge() {
-    if (!this.activeChallenge || this.activeChallenge.status !== 'pending') return;
+    if (!this.activeChallenge || !['pending', 'choosing'].includes(this.activeChallenge.status)) return;
     this.log('Тикет отклонён. Клиент сказал, что «там дел на пять минут» и попробует сам.');
     this.challengeDeclines = (this.challengeDeclines || 0) + 1;
     if (this.challengeDeclines >= 3) {
@@ -4459,15 +4503,36 @@ class Game {
   closeChallenge(success) {
     const challenge = this.activeChallenge;
     if (!challenge || challenge.status !== 'active') return;
-    challenge.status = success ? 'success' : 'failed';
+    challenge.status = success ? 'reward' : 'failed';
     this.challengeNoticeUntil = this.time + 4;
     if (success) {
-      this.log(`Тикет закрыт. Клиент подтвердил результат (опыт +${challenge.reward}).`);
-      this.addPopup(this.player.x, this.player.y - 32, `✅ ТИКЕТ ЗАКРЫТ · +${challenge.reward} XP`, '#55efc4');
-      this.addXP(challenge.reward);
+      this.challengeNoticeUntil = 0;
+      this.log('Тикет закрыт. Выберите награду.');
+      this.addPopup(this.player.x, this.player.y - 32, '✅ ТИКЕТ ЗАКРЫТ · ВЫБЕРИТЕ НАГРАДУ', '#55efc4');
     } else {
       this.log('Тикет просрочен. Клиент прислал «напоминаю» через четыре секунды.');
     }
+    this.updateChallengeUI();
+  }
+
+  claimChallengeReward(type) {
+    const challenge = this.activeChallenge;
+    if (!challenge || challenge.status !== 'reward') return;
+    if (type === 'xp') this.addXP(challenge.reward);
+    else if (type === 'heal') {
+      const before = { hp: this.player.hp, shield: this.player.shieldTimer };
+      const gain = Math.round(this.player.maxHp * 0.25);
+      this.player.hp = Math.min(this.player.maxHp, this.player.hp + gain);
+      this.scalePvpDefenseGain(before);
+    } else if (type === 'shield') {
+      const before = { hp: this.player.hp, shield: this.player.shieldTimer };
+      this.player.shieldTimer = Math.max(this.player.shieldTimer, 5);
+      this.scalePvpDefenseGain(before);
+    }
+    challenge.status = 'success';
+    challenge.rewardType = type;
+    this.challengeNoticeUntil = this.time + 4;
+    this.log('Награда за тикет получена.');
     this.updateChallengeUI();
   }
 
@@ -4528,7 +4593,15 @@ class Game {
     this.shopStock[stockKey]--;
     this.shopPurchased.add(stockKey);
     this.shopPassives.push({ key });
+    const before = { hp: this.player.hp, regen: this.player.regen, dmgMult: this.player.dmgMult, magnetMult: this.player.magnetMult, cdMult: this.player.cdMult };
     item.apply(this.player);
+    if (this.pvp?.mode === 'pvp') {
+      this.player.hp = before.hp + (this.player.hp - before.hp) * 0.5;
+      this.player.regen = before.regen + (this.player.regen - before.regen) * 0.4;
+      this.player.dmgMult = before.dmgMult + (this.player.dmgMult - before.dmgMult) * 0.5;
+      this.player.magnetMult = before.magnetMult + (this.player.magnetMult - before.magnetMult) * 0.7;
+      this.player.cdMult = before.cdMult + (this.player.cdMult - before.cdMult) * 0.8;
+    }
     document.getElementById('shop-message').innerText = `${item.name}: улучшение добавлено в инвентарь и сразу действует.`;
     this.updateInventoryHUD();
     this.updateHUD();
@@ -4571,10 +4644,12 @@ class Game {
     const slot = this.consumables[slotIndex];
     if (!slot) return;
     const item = CONSUMABLES_DEF[slot.key];
+    const beforeDefense = { hp: this.player.hp, shield: this.player.shieldTimer };
     if (!item.use(this)) {
       this.log('Расходник не сработал: проверьте здоровье и условия применения.');
       return;
     }
+    this.scalePvpDefenseGain(beforeDefense);
     slot.count--;
     if (slot.count <= 0) this.consumables[slotIndex] = null;
     this.sound.playTone(620, 'sine', 0.13, 0.14);
@@ -4762,7 +4837,9 @@ class Game {
     if (skill.cdTimer <= 0) {
       const def = ACTIVE_SKILLS_DEF[skill.key];
       if (def) {
+        const beforeDefense = { hp: this.player.hp, shield: this.player.shieldTimer };
         def.cast(this, skill.lvl);
+        this.scalePvpDefenseGain(beforeDefense);
         this.sendPvpActiveSkill(skill.key, skill.lvl);
         skill.cdTimer = def.baseCd * this.player.cdMult;
         this.updateActiveHUD();
@@ -4770,6 +4847,12 @@ class Game {
     } else {
       this.sound.playTone(180, 'square', 0.06, 0.05);
     }
+  }
+
+  scalePvpDefenseGain(before) {
+    if (this.pvp?.mode !== 'pvp' || !before) return;
+    if (this.player.hp > before.hp) this.player.hp = before.hp + (this.player.hp - before.hp) * 0.5;
+    if (this.player.shieldTimer > before.shield) this.player.shieldTimer = before.shield + (this.player.shieldTimer - before.shield) * 0.5;
   }
 
   updateSummons(dt, frameScale) {
@@ -4886,7 +4969,7 @@ class Game {
       for (let i = 0; i < 7; i++) this.gems.push({ x: this.player.x + (Math.random() - 0.5) * 280, y: this.player.y + (Math.random() - 0.5) * 280, xp: 11, col: '#55efc4' });
     } else if (roll === 6) {
       this.showBanner('📞 «Алло, вы меня слышите?» — «Да». — «Тогда почему молчите?» За терпение: защитный щит на 3 секунды.');
-      this.player.shieldTimer = Math.max(this.player.shieldTimer, 3);
+      this.player.shieldTimer = Math.max(this.player.shieldTimer, this.pvp?.mode === 'pvp' ? 1.5 : 3);
     } else {
       this.showBanner('🧪 «У нас на тестовой базе работало». Клиент подключил её к продакшену. В зал зашли три тестировщика.');
       for (let i = 0; i < 3; i++) this.spawnEnemy();
@@ -6263,7 +6346,7 @@ class Game {
           this.sound.playTone(660, 'sine', 0.2, 0.15);
           this.addPopup(this.player.x, this.player.y - 25, "⚡ КОФЕИНОВЫЙ СПРИНТ!", "#e67e22");
         } else if (item.type === 'banana') {
-          this.player.hp = Math.min(this.player.maxHp, this.player.hp + 20);
+          this.player.hp = Math.min(this.player.maxHp, this.player.hp + (this.pvp?.mode === 'pvp' ? 10 : 20));
           this.sound.playTone(520, 'triangle', 0.15, 0.12);
           this.addPopup(this.player.x, this.player.y - 25, "+20 HP (Банан)", "#2ecc71");
         }
@@ -6329,7 +6412,7 @@ class Game {
 
     // ПАССИВНЫЙ РОСТ СИЛЫ ПРОГРАММИСТА С КАЖДЫМ РЕЛИЗОМ:
     this.player.maxHp += 10;
-    this.player.hp = Math.min(this.player.maxHp, this.player.hp + 15);
+    this.player.hp = Math.min(this.player.maxHp, this.player.hp + (this.pvp?.mode === 'pvp' ? 7.5 : 15));
     this.player.dmgMult += 0.02;
     this.player.baseSpeed += 0.02;
 
@@ -6438,12 +6521,12 @@ class Game {
       this.weapons[ch.key].lvl++;
     } else if (ch.type === 'pass_new') {
       this.passives[ch.key] = { lvl: 1 };
-      applyPassiveLevel(this.player, ch.key, 0, 1);
+      applyPassiveLevel(this.player, ch.key, 0, 1, this.pvp?.mode);
       if (ch.key === 'backup_cron') this.backupTimer = this.player.backupInterval;
     } else if (ch.type === 'pass_up') {
       const previousLevel = this.passives[ch.key].lvl;
       this.passives[ch.key].lvl++;
-      applyPassiveLevel(this.player, ch.key, previousLevel, this.passives[ch.key].lvl);
+      applyPassiveLevel(this.player, ch.key, previousLevel, this.passives[ch.key].lvl, this.pvp?.mode);
       if (ch.key === 'backup_cron') this.backupTimer = this.player.backupInterval;
     } else if (ch.type === 'active_new') {
       const freeIdx = this.activeSkills.findIndex(s => s === null);

@@ -2774,7 +2774,10 @@ class Game {
     pvp.signalingCleanups.push(unsub);
     const offer = await peer.pc.createOffer();
     await peer.pc.setLocalDescription(offer);
-    await fb.set(fb.ref(fb.db, `${path}/offer`), offer.toJSON());
+    await fb.set(fb.ref(fb.db, `${path}/offer`), {
+      type: peer.pc.localDescription.type,
+      sdp: peer.pc.localDescription.sdp
+    });
     this.addPvpIceCandidates(peer, path, 'guestCandidates', fb);
   }
 
@@ -2798,7 +2801,10 @@ class Game {
         this.addPvpIceCandidates(peer, path, 'hostCandidates', fb);
         const answer = await peer.pc.createAnswer();
         await peer.pc.setLocalDescription(answer);
-        await fb.set(fb.ref(fb.db, `${path}/answer`), answer.toJSON());
+        await fb.set(fb.ref(fb.db, `${path}/answer`), {
+          type: peer.pc.localDescription.type,
+          sdp: peer.pc.localDescription.sdp
+        });
         this.addPvpIceCandidates(peer, path, 'hostCandidates', fb);
       } catch (error) { this.logPvpDiagnostic(pvp, 'WebRTC', 'не удалось ответить на offer', { message: error.message }); }
     });

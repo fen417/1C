@@ -768,6 +768,11 @@
         </div>
         <div id="pvp-room-status" class="release-notes" style="margin:12px 0 0; min-height:34px;">Firebase: проверяем подключение…</div>
         <div id="pvp-lobby-players" class="release-notes" style="display:none; margin:8px 0; font-size:12px;"></div>
+        <details id="pvp-diagnostics-details" style="display:none; margin-top:10px; text-align:left;">
+          <summary style="cursor:pointer;">Журнал соединения</summary>
+          <pre id="pvp-diagnostics-log" style="max-height:160px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.4 monospace; background:#f7f7f7; border:1px solid #ccc; padding:8px; margin:8px 0;"></pre>
+          <button class="btn-1c" style="width:100%;" onclick="game.copyPvpDiagnostics()">📋 Скопировать журнал</button>
+        </details>
         <button id="pvp-start-button" class="btn-1c" style="display:none; width:100%; background:#55efc4;" onclick="game.startPvpMatch()">▶ Запустить матч</button>
         <div id="pvp-room-code-display" style="display:none; text-align:center; font-size:24px; font-weight:bold; letter-spacing:6px; color:#900; padding:10px;"></div>
         <button id="pvp-copy-room-code" class="btn-1c" style="display:none; width:100%;" onclick="game.copyPvpRoomCode()">📋 Скопировать код</button>
@@ -783,11 +788,6 @@
       <div class="win-1c-body" style="text-align:center; padding:22px 18px;">
         <div style="font-size:34px; margin-bottom:12px;">🧾</div>
         <p id="pvp-wait-message">Второй игрок выбирает улучшение. Игра приостановлена.</p>
-        <details id="pvp-diagnostics-details" style="display:none; margin-top:14px; text-align:left;">
-          <summary style="cursor:pointer;">Журнал соединения</summary>
-          <pre id="pvp-diagnostics-log" style="max-height:220px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.4 monospace; background:#f7f7f7; border:1px solid #ccc; padding:8px; margin:8px 0;"></pre>
-          <button class="btn-1c" style="width:100%;" onclick="game.copyPvpDiagnostics()">📋 Скопировать журнал</button>
-        </details>
       </div>
     </div>
   </div>
@@ -2528,10 +2528,12 @@ class Game {
   async copyPvpDiagnostics() {
     const pvp = this.pvp;
     const rtc = pvp?.rtc;
+    const peers = pvp?.host
+      ? Object.values(pvp.peerConnections || {})
+      : rtc ? [rtc] : [];
     const report = [
       `Игра ${GAME_VERSION}; сторона при входе: ${pvp?.initialRole || (pvp?.host ? 'хост' : 'клиент')}; текущая роль: ${pvp?.host ? 'хост' : 'клиент'}; комната: ${pvp?.code || 'неизвестно'}`,
-      `Прямое соединение: ${rtc?.connected ?? false}`,
-      `WebRTC: ICE=${rtc?.pc?.iceConnectionState || 'нет'}, connection=${rtc?.pc?.connectionState || 'нет'}, state=${rtc?.channel?.readyState || 'нет'}, world=${rtc?.worldChannel?.readyState || 'нет'}`,
+      ...peers.map(peer => `Peer ${peer.uid}: connected=${peer.connected}; ICE=${peer.pc?.iceConnectionState || 'нет'}, connection=${peer.pc?.connectionState || 'нет'}, state=${peer.channel?.readyState || 'нет'}, world=${peer.worldChannel?.readyState || 'нет'}`),
       `Исходная причина: ${pvp?.connectionLostReason || pvp?.rtcFailure || 'обрыв не зафиксирован'}`,
       `Ошибка восстановления: ${pvp?.recoveryError || 'нет'}`,
       ...(pvp?.diagnostics?.entries || [])
@@ -2758,7 +2760,11 @@ class Game {
     pvp.peerConnections[member.uid] = peer;
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: true }));
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: true }));
-    peer.pc.onicecandidate = event => { if (event.candidate) fb.push(fb.ref(fb.db, `${path}/hostCandidates`), event.candidate.toJSON()); };
+    peer.pc.onicecandidate = event => {
+      if (!event.candidate) return;
+      fb.push(fb.ref(fb.db, `${path}/hostCandidates`), event.candidate.toJSON())
+        .catch(error => this.logPvpDiagnostic(pvp, 'Firebase', 'не удалось отправить ICE-кандидат хоста', { message: error.message }));
+    };
     const unsub = fb.onValue(fb.ref(fb.db, `${path}/answer`), async snapshot => {
       const answer = snapshot.val();
       if (!answer?.sdp || peer.pc.remoteDescription) return;
@@ -2782,7 +2788,11 @@ class Game {
       const peer = this.makePvpPeer(host.uid, 0, fb);
       pvp.peerConnections[host.uid] = peer;
       peer.pc.ondatachannel = event => this.attachPvpDataChannel(peer, event.channel);
-      peer.pc.onicecandidate = event => { if (event.candidate) fb.push(fb.ref(fb.db, `${path}/guestCandidates`), event.candidate.toJSON()); };
+      peer.pc.onicecandidate = event => {
+        if (!event.candidate) return;
+        fb.push(fb.ref(fb.db, `${path}/guestCandidates`), event.candidate.toJSON())
+          .catch(error => this.logPvpDiagnostic(pvp, 'Firebase', 'не удалось отправить ICE-кандидат клиента', { message: error.message }));
+      };
       try {
         await peer.pc.setRemoteDescription(offer);
         this.addPvpIceCandidates(peer, path, 'hostCandidates', fb);
@@ -2801,7 +2811,11 @@ class Game {
     const peer = { uid, slot, pc, channel: null, worldChannel: null, connected: false, seenCandidates: new Set() };
     if (pvp.host && pvp.rtc) pvp.threePeers[uid] = peer;
     else pvp.rtc = peer;
+    this.logPvpDiagnostic(pvp, 'WebRTC', 'создано соединение с игроком', { uid, slot });
+    pc.oniceconnectionstatechange = () => this.logPvpDiagnostic(pvp, 'ICE', 'изменилось состояние ICE', { uid, state: pc.iceConnectionState });
+    pc.onsignalingstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC', 'изменилось состояние сигнализации', { uid, state: pc.signalingState });
     pc.onconnectionstatechange = () => {
+      this.logPvpDiagnostic(pvp, 'WebRTC', 'изменилось состояние соединения', { uid, state: pc.connectionState });
       if (pc.connectionState === 'connected') this.updatePvpPeerConnected(peer);
       if (['failed', 'closed'].includes(pc.connectionState)) {
         peer.connected = false;
@@ -2832,7 +2846,7 @@ class Game {
       snapshot.forEach(child => {
         if (peer.seenCandidates.has(child.key)) return;
         peer.seenCandidates.add(child.key);
-        peer.pc.addIceCandidate(child.val()).catch(() => {});
+        peer.pc.addIceCandidate(child.val()).catch(error => this.logPvpDiagnostic(this.pvp, 'ICE', 'не принят ICE-кандидат', { uid: peer.uid, candidate: child.key, message: error.message }));
       });
     });
     this.pvp?.signalingCleanups?.push(unsub);
@@ -4584,10 +4598,6 @@ class Game {
   }
 
   showLeaderboard() {
-    if (this.isBattleRoyale && this.pvp?.started && !this.pvp.matchOver) {
-      this.addPopup(this.player?.x || 0, this.player?.y || 0, 'Таблица рекордов откроется после матча · F9 — общая пауза', '#ffd166');
-      return;
-    }
     if (document.getElementById('modal-lb').style.display === 'flex') {
       this.fetchLeaderboard();
       return;
@@ -4601,7 +4611,8 @@ class Game {
       settings: document.getElementById('modal-settings').style.display === 'flex',
       changelog: document.getElementById('modal-changelog').style.display === 'flex'
     };
-    this.paused = true;
+    const battleRoyaleLive = this.isBattleRoyale && this.pvp?.started && !this.pvp.matchOver;
+    this.paused = battleRoyaleLive ? false : true;
     document.getElementById('modal-gameover').style.display = 'none';
     document.getElementById('modal-pause').style.display = 'none';
     document.getElementById('modal-lvlup').style.display = 'none';

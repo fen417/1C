@@ -2948,10 +2948,23 @@ class Game {
         this.log(winnerName ? `${winnerName} остался последним в Battle Royale.` : 'В Battle Royale не осталось выживших.');
       }
     }
+    else if (message.type === 'br-damage' && this.isBattleRoyale && pvp.host) {
+      const attackerUid = String(message.uid || '');
+      const targetUid = String(message.targetUid || '');
+      const attacker = pvp.remotePlayers?.[attackerUid];
+      const target = targetUid === pvp.uid ? { state: this.currentPvpState() } : pvp.remotePlayers?.[targetUid];
+      const damage = Math.min(1000, Math.max(0, Number(message.damage) || 0));
+      if (!attacker?.state || attacker.state.over || !target?.state || target.state.over || target.state.hp <= 0 ||
+          !damage || attackerUid === targetUid || Math.hypot(attacker.state.x - target.state.x, attacker.state.y - target.state.y) > 1800) return;
+      const source = `${String(attacker.name || 'Игрок').slice(0, 20)} · PvP`;
+      if (targetUid === pvp.uid) this.receiveBattleRoyaleDamage(damage, source);
+      else {
+        const peer = pvp.peerConnections?.[targetUid];
+        if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source }, peer.channel, true);
+      }
+    }
     else if (message.type === 'br-damage' && this.isBattleRoyale && message.targetUid === pvp.uid) {
-      this.recordPlayerDamage(Number(message.damage) || 0, message.source || 'Атака моба');
-      this.updateHUD();
-      if (this.player.hp <= 0) this.gameOver(`Battle Royale: вас выбил ${message.source || 'моб'}.`);
+      this.receiveBattleRoyaleDamage(Number(message.damage) || 0, message.source || 'Атака моба');
     }
     else if (message.type === 'br-pause-request' && this.isBattleRoyale && pvp.host && typeof message.paused === 'boolean') {
       if (pvp.hostInactivePause && !message.paused) return;
@@ -3168,6 +3181,65 @@ class Game {
       return { x: before.x + vx * extrapolate, y: before.y + vy * extrapolate };
     }
     return { x: before.x, y: before.y };
+  }
+
+  getPvpWeaponTargets() {
+    const pvp = this.pvp;
+    if (!pvp?.started || !this.player) return [];
+    if (this.isBattleRoyale) {
+      const targets = Object.values(pvp.remotePlayers || [])
+        .filter(player => player?.uid && player.uid !== pvp.uid && player.state && !player.state.over && player.state.hp > 0)
+        .map(player => ({ ...player.state, uid: player.uid, name: player.name, isPvpTarget: true }));
+      if (!pvp.host && pvp.remoteState && !pvp.remoteState.over && pvp.remoteState.hp > 0 &&
+          !targets.some(target => target.uid === (pvp.remotePlayer?.uid || pvp.opponentUid))) {
+        targets.push({ ...pvp.remoteState, uid: pvp.remotePlayer?.uid || pvp.opponentUid, name: pvp.remotePlayer?.name, isPvpTarget: true });
+      }
+      return targets;
+    }
+    const remote = pvp.mode === 'pvp' ? pvp.remoteState : null;
+    return remote && !remote.over && remote.hp > 0
+      ? [{ ...remote, uid: pvp.remotePlayer?.uid || pvp.opponentUid, name: pvp.remotePlayer?.name, isPvpTarget: true }]
+      : [];
+  }
+
+  getNearestWeaponTarget(maxDistance, x = this.player.x, y = this.player.y) {
+    let target = null;
+    let closest = maxDistance;
+    for (const enemy of this.enemies) {
+      if (enemy.hp <= 0) continue;
+      const distance = Math.hypot(enemy.x - x, enemy.y - y);
+      if (distance < closest) { closest = distance; target = { ...enemy, ref: enemy }; }
+    }
+    for (const player of this.getPvpWeaponTargets()) {
+      const distance = Math.hypot(player.x - x, player.y - y);
+      if (distance < closest) { closest = distance; target = player; }
+    }
+    return target;
+  }
+
+  dealWeaponTargetDamage(target, damage, source = 'Атака игрока') {
+    if (!target || damage <= 0) return;
+    if (target.isPvpTarget) {
+      if (this.isBattleRoyale) this.damageBattleRoyalePlayer(target.uid, damage, source);
+      else this.damagePvpOpponent(damage);
+    } else if (target.ref) target.ref.hp -= damage;
+  }
+
+  damageBattleRoyalePlayer(targetUid, damage, source = 'Атака игрока') {
+    const pvp = this.pvp;
+    const amount = Math.max(0, Number(damage) || 0);
+    if (!this.isBattleRoyale || !pvp?.started || !targetUid || targetUid === pvp.uid || amount <= 0) return;
+    if (pvp.host) this.damageRemotePlayerFromEnemy(amount, source, targetUid);
+    else this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage: amount, source }, null, true);
+  }
+
+  receiveBattleRoyaleDamage(damage, source = 'Атака противника') {
+    const applied = this.recordPlayerDamage(damage, source);
+    if (applied <= 0) return;
+    this.sound.hit();
+    this.addPopup(this.player.x, this.player.y - 22, `-${Math.ceil(applied)} HP`, '#ff4757');
+    this.updateHUD();
+    if (this.player.hp <= 0) this.gameOver(`Battle Royale: вас выбил ${source}.`);
   }
 
   getPvpEnemyTarget(enemy = null) {
@@ -4800,15 +4872,16 @@ class Game {
           this.createHitFX(enemy.x, enemy.y, '#f1c40f', 3);
           hits++;
         }
+        for (const target of this.getPvpWeaponTargets()) {
+          if (Math.hypot(target.x - summon.x, target.y - summon.y) > 145) continue;
+          this.dealWeaponTargetDamage(target, summon.dmg, 'Эскалация во вторую линию');
+          this.createHitFX(target.x, target.y, '#f1c40f', 3);
+          hits++;
+        }
         if (hits) this.addPopup(summon.x, summon.y - 22, `Вторая линия: ${hits} обращ.`, '#f1c40f');
       } else {
         summon.attackTimer = 1.55;
-        let target = null, closest = 470;
-        for (const enemy of this.enemies) {
-          if (enemy.hp <= 0) continue;
-          const distance = Math.hypot(enemy.x - summon.x, enemy.y - summon.y);
-          if (distance < closest) { closest = distance; target = enemy; }
-        }
+        const target = this.getNearestWeaponTarget(470, summon.x, summon.y);
         if (target) {
           const angle = Math.atan2(target.y - summon.y, target.x - summon.x);
           this.projectiles.push({ x: summon.x, y: summon.y,
@@ -5620,10 +5693,11 @@ class Game {
             }
           }
         }
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && Math.hypot(remote.x - bx, remote.y - by) < 33) {
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
-          this.damagePvpOpponent(hit.dmg * dt * 3.8);
+        for (const target of this.getPvpWeaponTargets()) {
+          if (Math.hypot(target.x - bx, target.y - by) < 33) {
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
+            this.dealWeaponTargetDamage(target, hit.dmg * dt * 3.8, 'Турникет');
+          }
         }
       }
     }
@@ -5654,18 +5728,9 @@ class Game {
     if (this.weapons.syntax) {
       const w = this.weapons.syntax;
       w.timer -= dt;
-      if (w.timer <= 0 && (this.enemies.length > 0 || (this.pvp?.mode === 'pvp' && this.pvp.remoteState && !this.pvp.remoteState.over))) {
+      if (w.timer <= 0 && (this.enemies.length > 0 || this.getPvpWeaponTargets().length > 0)) {
         w.timer = WEAPONS_DEF.syntax.baseCooldown * cdFactor;
-        let target = null, minDist = 500;
-        for (let e of this.enemies) {
-          const d = Math.hypot(e.x - this.player.x, e.y - this.player.y);
-          if (d < minDist) { minDist = d; target = e; }
-        }
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && !remote.over) {
-          const d = Math.hypot(remote.x - this.player.x, remote.y - this.player.y);
-          if (d < minDist) target = remote;
-        }
+        const target = this.getNearestWeaponTarget(500);
         if (target) {
           const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
           const extraShots = this.player.multishotLevel;
@@ -5735,10 +5800,11 @@ class Game {
           e.hp -= hit.dmg * dt;
         }
       }
-      const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-      if (remote && Math.hypot(remote.x - this.player.x, remote.y - this.player.y) < rad + 18) {
-        const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
-        this.damagePvpOpponent(hit.dmg * dt);
+      for (const target of this.getPvpWeaponTargets()) {
+        if (Math.hypot(target.x - this.player.x, target.y - this.player.y) < rad + 18) {
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
+          this.dealWeaponTargetDamage(target, hit.dmg * dt, 'Аура кэша');
+        }
       }
     }
 
@@ -5773,14 +5839,14 @@ class Game {
             }
           }
         }
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && !remote.over && Math.hypot(remote.x - this.player.x, remote.y - this.player.y) < slashRange) {
-          const eAngle = Math.atan2(remote.y - this.player.y, remote.x - this.player.x);
+        for (const target of this.getPvpWeaponTargets()) {
+          if (Math.hypot(target.x - this.player.x, target.y - this.player.y) >= slashRange) continue;
+          const eAngle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
           let diff = Math.abs(ang - eAngle);
           if (diff > Math.PI) diff = Math.PI * 2 - diff;
           if (diff < 0.8) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.iron_logic.baseDmg + w.lvl * 12);
-            this.damagePvpOpponent(hit.dmg);
+            this.dealWeaponTargetDamage(target, hit.dmg, 'Хлыст IronLogic');
           }
         }
         this.sound.playTone(320, 'triangle', 0.12, 0.15);
@@ -5791,13 +5857,12 @@ class Game {
     if (this.weapons.egais_laser) {
       const w = this.weapons.egais_laser;
       w.timer -= dt;
-      if (w.timer <= 0 && (this.enemies.length > 0 || (this.pvp?.mode === 'pvp' && this.pvp.remoteState && !this.pvp.remoteState.over))) {
+      if (w.timer <= 0 && (this.enemies.length > 0 || this.getPvpWeaponTargets().length > 0)) {
         w.timer = WEAPONS_DEF.egais_laser.baseCooldown * cdFactor;
         let chain = [];
         let currX = this.player.x, currY = this.player.y;
-        let available = [...this.enemies];
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && !remote.over) available.push({ ...remote, isPvpTarget: true });
+        let available = this.enemies.filter(enemy => enemy.hp > 0).map(enemy => ({ ...enemy, ref: enemy }));
+        available.push(...this.getPvpWeaponTargets());
 
         for (let c = 0; c < 3 + Math.floor(w.lvl / 2); c++) {
           if (available.length === 0) break;
@@ -5805,8 +5870,7 @@ class Game {
           let tgt = available.shift();
           if (tgt && Math.hypot(tgt.x - currX, tgt.y - currY) < 380) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.egais_laser.baseDmg + w.lvl * 8);
-            if (tgt.isPvpTarget) this.damagePvpOpponent(hit.dmg);
-            else tgt.hp -= hit.dmg;
+            this.dealWeaponTargetDamage(tgt, hit.dmg, 'Лазер ЕГАИС');
             chain.push({ x1: currX, y1: currY, x2: tgt.x, y2: tgt.y });
             currX = tgt.x; currY = tgt.y;
             this.createHitFX(tgt.x, tgt.y, '#ff4757', 4);
@@ -5829,10 +5893,9 @@ class Game {
           const distance = Math.hypot(enemy.x - this.player.x, enemy.y - this.player.y);
           if (distance < closest) { closest = distance; target = enemy; }
         }
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && !remote.over) {
+        for (const remote of this.getPvpWeaponTargets()) {
           const distance = Math.hypot(remote.x - this.player.x, remote.y - this.player.y);
-          if (distance < closest) target = remote;
+          if (distance < closest) { closest = distance; target = remote; }
         }
         if (target) {
           w.timer = WEAPONS_DEF.fusion_audit.baseCooldown * cdFactor;
@@ -5852,8 +5915,7 @@ class Game {
       w.timer -= dt;
       if (w.timer <= 0) {
         const available = this.enemies.filter(enemy => enemy.hp > 0).map(enemy => ({ ...enemy, ref: enemy }));
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && !remote.over) available.push({ ...remote, isPvpTarget: true });
+        available.push(...this.getPvpWeaponTargets());
         const lines = [];
         let x = this.player.x, y = this.player.y;
         const maxTargets = 2 + Math.floor(w.lvl / 2);
@@ -5862,8 +5924,7 @@ class Game {
           const target = available.shift();
           if (Math.hypot(target.x - x, target.y - y) > 400) break;
           const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_ledger.baseDmg + w.lvl * 14);
-          if (target.isPvpTarget) this.damagePvpOpponent(hit.dmg);
-          else target.ref.hp -= hit.dmg;
+          this.dealWeaponTargetDamage(target, hit.dmg, 'Фискальный реестр');
           lines.push({ x1: x, y1: y, x2: target.x, y2: target.y });
           this.createHitFX(target.x, target.y, '#9b59b6', 4);
           x = target.x; y = target.y;
@@ -5890,10 +5951,11 @@ class Game {
           enemy.y += Math.sin(angle) * 42;
           this.createHitFX(enemy.x, enemy.y, '#55efc4', 4);
         }
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (remote && !remote.over && Math.hypot(remote.x - this.player.x, remote.y - this.player.y) <= radius) {
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16);
-          this.damagePvpOpponent(hit.dmg);
+        for (const target of this.getPvpWeaponTargets()) {
+          if (Math.hypot(target.x - this.player.x, target.y - this.player.y) <= radius) {
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16);
+            this.dealWeaponTargetDamage(target, hit.dmg, 'Контроль доступа');
+          }
         }
         this.createHitFX(this.player.x, this.player.y, '#55efc4', 8);
       }
@@ -6064,11 +6126,13 @@ class Game {
       if (p.type !== 'laser_visual') {
         p.x += p.vx * frameScale; p.y += p.vy * frameScale;
 
-        const remote = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-        if (!p.hitOpponent && remote && !remote.over && Math.hypot(remote.x - p.x, remote.y - p.y) < 19 + p.size) {
-          this.damagePvpOpponent(p.dmg);
-          p.hitOpponent = true;
-          p.life = 0;
+        const pvpTarget = !p.hitOpponent && this.getPvpWeaponTargets().find(target =>
+          !p.hitPlayers?.includes(target.uid) && Math.hypot(target.x - p.x, target.y - p.y) < 19 + p.size);
+        if (pvpTarget) {
+          this.dealWeaponTargetDamage(pvpTarget, p.dmg, 'Попадание снаряда');
+          p.hitPlayers ||= [];
+          p.hitPlayers.push(pvpTarget.uid);
+          if (!p.piercing) { p.hitOpponent = true; p.life = 0; }
           this.createHitFX(p.x, p.y, '#ff7675', 4);
         }
 

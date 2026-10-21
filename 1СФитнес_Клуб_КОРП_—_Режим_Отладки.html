@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.0.0</title>
+<title>1С:Фитнес Клуб КОРП 2.0.1</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -606,7 +606,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.0.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.0.1 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -725,7 +725,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.0.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.0.1</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -734,12 +734,12 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.0.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.0.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 2.0.0 — «Переход на 8.5»</h3>
-              <p>После первого большого босса выбирайте одну из трёх легендарных миграций. Комнаты поддерживают до восьми игроков и ручной запуск хостом; состав отряда усиливает волну мобов. В классическом PvP звонок магазина ждёт решения всей команды, а при 4+ игроках прокачка не останавливает матч и карта растёт на 15% за каждого участника сверх трёх. Battle Royale приносит большую карту, указатель к центру, лут с мобов и прокачку без паузы; общая пауза включается и снимается клавишей F9, а окно хоста на фоне автоматически ставит матч на паузу. Зона Battle Royale медленно сжимается к центру и наносит урон снаружи. В рекордах видны режим и число игроков.</p>
+              <p>После первого большого босса выбирайте одну из трёх легендарных миграций. Комнаты поддерживают до восьми игроков и ручной запуск хостом; состав отряда усиливает волну мобов. В классическом PvP звонок магазина ждёт решения всей команды, а при 4+ игроках прокачка не останавливает матч и карта растёт на 15% за каждого участника сверх трёх. Battle Royale приносит большую карту, указатель к центру, лут с мобов и прокачку без паузы; общая пауза включается и снимается клавишей F9, а окно хоста на фоне автоматически ставит матч на паузу. Зона Battle Royale медленно сжимается к центру и наносит урон снаружи. Победитель получает зелёный экран итогов и может записать результат. В рекордах видны режим и число игроков.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 1.9.0 — «Новый подход»</h3>
@@ -768,11 +768,6 @@
         </div>
         <div id="pvp-room-status" class="release-notes" style="margin:12px 0 0; min-height:34px;">Firebase: проверяем подключение…</div>
         <div id="pvp-lobby-players" class="release-notes" style="display:none; margin:8px 0; font-size:12px;"></div>
-        <details id="pvp-diagnostics-details" style="display:none; margin-top:10px; text-align:left;">
-          <summary style="cursor:pointer;">Журнал соединения</summary>
-          <pre id="pvp-diagnostics-log" style="max-height:160px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.4 monospace; background:#f7f7f7; border:1px solid #ccc; padding:8px; margin:8px 0;"></pre>
-          <button class="btn-1c" style="width:100%;" onclick="game.copyPvpDiagnostics()">📋 Скопировать журнал</button>
-        </details>
         <button id="pvp-start-button" class="btn-1c" style="display:none; width:100%; background:#55efc4;" onclick="game.startPvpMatch()">▶ Запустить матч</button>
         <div id="pvp-room-code-display" style="display:none; text-align:center; font-size:24px; font-weight:bold; letter-spacing:6px; color:#900; padding:10px;"></div>
         <button id="pvp-copy-room-code" class="btn-1c" style="display:none; width:100%;" onclick="game.copyPvpRoomCode()">📋 Скопировать код</button>
@@ -825,7 +820,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Таблица рекордов показывает режим и число игроков.</p></details>
+        <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд. Тикеты выдаются случайно из общего пула, без выбора игроком. Таблица рекордов показывает режим и число игроков.</p></details>
         <details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды с пятью уровнями. На каждом забеге доступно три переброса набора карточек. Совместимые оружия 5-го уровня можно объединить в эволюции: «Аудит доступа», «Фискальный реестр» и «Контроль доступа». В магазине ассортимент можно обновить за фиткоины до двух раз за предложение. Добавлен рывок с половиной секунды неуязвимости: перезарядка 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрен баланс перков, лечения, щитов и контроля в PvP.</p></details><details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
@@ -951,12 +946,12 @@
 
   <!-- Модалка Game Over -->
   <div id="modal-gameover" class="modal-overlay">
-    <div class="win-1c" style="border-color:#c0392b; width:530px;" onclick="event.stopPropagation()">
-      <div class="win-1c-head" style="background:#ff7675; color:#fff;">
+    <div id="gameover-window" class="win-1c" style="border-color:#c0392b; width:530px;" onclick="event.stopPropagation()">
+      <div id="gameover-head" class="win-1c-head" style="background:#ff7675; color:#fff;">
         <span>⛔ АВАРИЯ: СУБД упала с кодом ошибки 0xDEAD</span>
       </div>
       <div class="win-1c-body" style="text-align:center;">
-        <h2 style="color:#c0392b; margin-bottom:8px;">СЕАНС ПРЕРВАН!</h2>
+        <h2 id="gameover-title" style="color:#c0392b; margin-bottom:8px;">СЕАНС ПРЕРВАН!</h2>
         <div id="gameover-stats" style="font-size:12px; font-family:Courier New; background:#f8f9fa; border:1px solid #ccc; padding:10px; text-align:left; margin-bottom:12px;"></div>
 
         <div style="background:#fffbe6; border:1px solid #ffeaa7; padding:10px; border-radius:4px; margin-bottom:12px; text-align:left;">
@@ -1005,7 +1000,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.0.0';
+const GAME_VERSION = '2.0.1';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -2515,47 +2510,6 @@ class Game {
     const suffix = details == null ? '' : ` ${JSON.stringify(details)}`;
     pvp.diagnostics.entries.push(`${timestamp} [${role}] [${area}] ${event}${suffix}`);
     if (pvp.diagnostics.entries.length > 180) pvp.diagnostics.entries.splice(0, pvp.diagnostics.entries.length - 180);
-    this.refreshPvpDiagnostics(pvp);
-  }
-
-  refreshPvpDiagnostics(pvp = this.pvp) {
-    if (!pvp || this.pvp !== pvp) return;
-    const details = document.getElementById('pvp-diagnostics-details');
-    const output = document.getElementById('pvp-diagnostics-log');
-    if (!details || !output) return;
-    details.style.display = pvp.connectionLost || pvp.rtcFailure || pvp.diagnostics?.entries?.length ? 'block' : 'none';
-    output.textContent = (pvp.diagnostics?.entries || []).join('\n');
-    output.scrollTop = output.scrollHeight;
-  }
-
-  async copyPvpDiagnostics() {
-    const pvp = this.pvp;
-    const rtc = pvp?.rtc;
-    const peers = pvp?.host
-      ? Object.values(pvp.peerConnections || {})
-      : rtc ? [rtc] : [];
-    const report = [
-      `Игра ${GAME_VERSION}; сторона при входе: ${pvp?.initialRole || (pvp?.host ? 'хост' : 'клиент')}; текущая роль: ${pvp?.host ? 'хост' : 'клиент'}; комната: ${pvp?.code || 'неизвестно'}`,
-      ...peers.map(peer => `Peer ${peer.uid}: connected=${peer.connected}; ICE=${peer.pc?.iceConnectionState || 'нет'}, connection=${peer.pc?.connectionState || 'нет'}, state=${peer.channel?.readyState || 'нет'}, world=${peer.worldChannel?.readyState || 'нет'}`),
-      `Исходная причина: ${pvp?.connectionLostReason || pvp?.rtcFailure || 'обрыв не зафиксирован'}`,
-      `Ошибка восстановления: ${pvp?.recoveryError || 'нет'}`,
-      ...(pvp?.diagnostics?.entries || [])
-    ].join('\n');
-    try {
-      await navigator.clipboard.writeText(report);
-      this.pvpStatus('Журнал диагностики скопирован.');
-    } catch (err) {
-      const input = document.createElement('textarea');
-      input.value = report;
-      input.style.position = 'fixed';
-      input.style.opacity = '0';
-      document.body.appendChild(input);
-      input.select();
-      const copied = document.execCommand('copy');
-      input.remove();
-      if (copied) this.pvpStatus('Журнал диагностики скопирован.');
-      else this.pvpStatus('Не удалось скопировать журнал. Разверните список и скопируйте текст вручную.', true);
-    }
   }
 
   showPvpMenu() {
@@ -2953,10 +2907,24 @@ class Game {
     else if (message.type === 'integration-shop-resume' && pvp.mode === 'pvp') this.resumeIntegrationShop(message);
     else if (message.type === 'legendary-offer') this.offerLegendaryMigrations(false);
     else if (message.type === 'br-winner' && this.isBattleRoyale) {
-      pvp.matchOver = true;
-      this.paused = true;
-      this.showBanner(message.winner ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(message.winner)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
-      this.log(message.winner ? `${message.winner} остался последним в Battle Royale.` : 'В Battle Royale не осталось выживших.');
+      const winnerName = String(message.winner || '');
+      const localWinner = message.winnerUid ? message.winnerUid === pvp.uid : winnerName && winnerName === pvp.name;
+      pvp.brWinnerUid = message.winnerUid || null;
+      pvp.brWinnerName = winnerName;
+      if (localWinner) {
+        this.gameOver(`Вы победили: ${winnerName || 'последний соперник выбыл'}.`, { victory: true });
+      } else {
+        pvp.matchOver = true;
+        this.paused = true;
+        if (document.getElementById('modal-gameover').style.display !== 'flex') {
+          this.gameOver(winnerName ? `Battle Royale завершён. Победитель: ${winnerName}.` : 'В Battle Royale не осталось выживших.');
+        } else {
+          this.showBanner(winnerName ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(winnerName)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
+        }
+        if (this.pvpTimer) clearInterval(this.pvpTimer);
+        this.pvpTimer = null;
+        this.log(winnerName ? `${winnerName} остался последним в Battle Royale.` : 'В Battle Royale не осталось выживших.');
+      }
     }
     else if (message.type === 'br-damage' && this.isBattleRoyale && message.targetUid === pvp.uid) {
       this.recordPlayerDamage(Number(message.damage) || 0, message.source || 'Атака моба');
@@ -3416,11 +3384,17 @@ class Game {
         const survivors = alive.filter(member => !member.over);
         if (alive.length >= this.pvp.actualPlayerCount && survivors.length <= 1) {
           this.pvp.brWinnerSent = true;
-          const winner = survivors[0]?.name || '';
-          this.sendPvpNetworkMessage({ type: 'br-winner', winner });
+          const winner = survivors[0] || null;
+          this.sendPvpNetworkMessage({ type: 'br-winner', winner: winner?.name || '', winnerUid: winner?.uid || null });
+          if (winner?.uid === this.pvp.uid) {
+            this.gameOver('Вы победили: все соперники выбыли.', { victory: true });
+            return;
+          }
           this.pvp.matchOver = true;
           this.paused = true;
-          this.showBanner(winner ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(winner)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
+          this.showBanner(winner ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(winner.name)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
+          if (this.pvpTimer) clearInterval(this.pvpTimer);
+          this.pvpTimer = null;
         }
       }
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 100) {
@@ -4080,13 +4054,16 @@ class Game {
       }
     ];
     const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
-    const choices = shuffled.slice(0, Math.min(3, shuffled.length));
-    const challenge = { choices, remaining: 0, status: 'choosing' };
+    const challengeTemplate = available[Math.floor(Math.random() * available.length)];
+    const challenge = {
+      ...challengeTemplate,
+      objectives: challengeTemplate.objectives.map(objective => ({ ...objective, progress: 0 })),
+      status: 'pending'
+    };
     this.activeChallenge = challenge;
     this.challengeNoticeUntil = 0;
     this.updateChallengeUI();
-    this.log('Поступили новые тикеты: выберите испытание.');
+    this.log(`Поступил случайный тикет из пула: ${challenge.title}.`);
   }
 
   updateChallengeUI() {
@@ -4115,19 +4092,11 @@ class Game {
       actions.appendChild(button);
     };
 
-    if (challenge.status === 'choosing') {
-      head.textContent = '📩 Выберите тикет';
-      progress.textContent = 'Выберите одно из трёх испытаний:';
-      title.textContent = 'Какой вызов принимаете?';
-      description.textContent = 'Успешное выполнение даст возможность выбрать награду.';
-      actions.style.display = 'flex';
-      challenge.choices.forEach((choice, index) => addAction(`${choice.title} · ${choice.reward} XP`, () => this.acceptChallenge(index), '#e4f7ee'));
-      addAction('В Отказ', () => this.declineChallenge());
-    } else if (challenge.status === 'pending') {
+    if (challenge.status === 'pending') {
       head.textContent = '📩 У Вас новый тикет:';
       progress.textContent = 'Беритесь за задачу или вежливо откажитесь.';
       actions.style.display = 'flex';
-      addAction('В работе', () => this.acceptChallenge(0), '#55efc4');
+      addAction('В работе', () => this.acceptChallenge(), '#55efc4');
       addAction('В Отказ', () => this.declineChallenge());
     } else if (challenge.status === 'active') {
       head.textContent = '📩 Тикет в работе';
@@ -4154,25 +4123,22 @@ class Game {
     }
   }
 
-  acceptChallenge(index = 0) {
+  acceptChallenge() {
     const challenge = this.activeChallenge;
-    if (!challenge || !['pending', 'choosing'].includes(challenge.status)) return;
-    const selected = challenge.status === 'choosing' ? challenge.choices?.[index] : challenge;
-    if (!selected) return;
-    Object.assign(challenge, selected, {
-      objectives: selected.objectives.map(objective => ({ ...objective, progress: 0 })),
-      remaining: selected.duration,
+    if (!challenge || challenge.status !== 'pending') return;
+    Object.assign(challenge, {
+      objectives: challenge.objectives.map(objective => ({ ...objective, progress: 0 })),
+      remaining: challenge.duration,
       status: 'active',
       lastHp: this.player.hp
     });
     if (challenge.missingButton) document.getElementById('btn-dyn-update').style.visibility = 'hidden';
-    delete challenge.choices;
     this.updateChallengeUI();
     this.log(`Тикет принят: ${challenge.title}`);
   }
 
   declineChallenge() {
-    if (!this.activeChallenge || !['pending', 'choosing'].includes(this.activeChallenge.status)) return;
+    if (!this.activeChallenge || this.activeChallenge.status !== 'pending') return;
     this.log('Тикет отклонён. Клиент сказал, что «там дел на пять минут» и попробует сам.');
     this.challengeDeclines = (this.challengeDeclines || 0) + 1;
     if (this.challengeDeclines >= 3) {
@@ -6653,7 +6619,7 @@ class Game {
     this.log(`Успешно внедрена доработка: ${ch.def.name}`);
   }
 
-  gameOver(reason) {
+  gameOver(reason, { victory = false } = {}) {
     const battleRoyaleElimination = Boolean(this.isBattleRoyale && this.pvp?.started && this.player?.hp <= 0);
     if (battleRoyaleElimination && this.pvp.eliminated) return;
     this.closeSalesCall();
@@ -6675,7 +6641,16 @@ class Game {
       if (this.pvpTimer) clearInterval(this.pvpTimer);
       this.pvpTimer = null;
     }
-    this.sound.playTone(60, 'sawtooth', 0.7, 0.45);
+    const gameoverWindow = document.getElementById('gameover-window');
+    const gameoverHead = document.getElementById('gameover-head');
+    gameoverWindow.style.borderColor = victory ? '#27ae60' : '#c0392b';
+    gameoverHead.style.background = victory ? '#55efc4' : '#ff7675';
+    gameoverHead.style.color = victory ? '#123' : '#fff';
+    gameoverHead.querySelector('span').textContent = victory ? '🏆 BATTLE ROYALE · ПОБЕДА' : '⛔ АВАРИЯ: СУБД упала с кодом ошибки 0xDEAD';
+    const gameoverTitle = document.getElementById('gameover-title');
+    gameoverTitle.textContent = victory ? 'ВЫ ОСТАЛИСЬ ПОСЛЕДНИМ!' : 'СЕАНС ПРЕРВАН!';
+    gameoverTitle.style.color = victory ? '#27ae60' : '#c0392b';
+    this.sound.playTone(victory ? 660 : 60, victory ? 'sine' : 'sawtooth', 0.7, 0.45);
 
     const totalScore = this.calcScore();
     const statsBox = document.getElementById('gameover-stats');
@@ -6684,7 +6659,7 @@ class Game {
       ? `• Добивающий удар: <b>${this.escapeHtml(finalHit.source)}</b><br>• Урон удара: <b>${Number(finalHit.damage).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} HP</b> (снято ${Number(finalHit.applied).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} HP)<br><br>`
       : '';
     statsBox.innerHTML = `
-      <b>Причина сбоя:</b> ${reason}<br><br>
+      <b>${victory ? 'Итог матча' : 'Причина сбоя'}:</b> ${this.escapeHtml(String(reason))}<br><br>
       ${finalHitMarkup}
       • Время аптайма: <b>${Math.floor(this.time)} сек</b><br>
       • Закрыто инцидентов (багов): <b>${this.kills}</b> (x12 = ${this.kills * 12} очк.)<br>

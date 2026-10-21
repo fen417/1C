@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 1.9.0</title>
+<title>1С:Фитнес Клуб КОРП 2.0.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -219,6 +219,8 @@
     gap: 8px;
     z-index: 10;
   }
+  #br-center-marker { position:absolute; bottom:78px; left:50%; transform:translateX(-50%); z-index:11; display:none; padding:4px 9px; border:1px solid #ffd166; border-radius:12px; background:rgba(20,20,28,.84); color:#ffe08a; font:bold 11px sans-serif; white-space:nowrap; }
+  #br-center-arrow { display:inline-block; margin-right:5px; color:#ffb347; transform-origin:50% 55%; font-size:15px; }
   #hud-consumables {
     position: absolute;
     bottom: 14px;
@@ -453,6 +455,11 @@
   .main-menu-actions { display: flex; flex-direction: column; gap: 9px; }
   .main-menu-actions .btn-1c { padding: 11px 14px; text-align: left; }
   .main-menu-version { color: #777; font-size: 11px; margin-top: 4px; }
+  .legendary-card { border: 3px solid #c87524 !important; background: linear-gradient(145deg,#fff8e8,#f3c47b) !important; box-shadow: 0 0 12px rgba(200,117,36,.42); }
+  .legendary-card h4 { color: #8a4310; }
+  #br-upgrade-button { display:none; position:absolute; z-index:80; left:14px; top:150px; width:44px; height:44px; border:3px solid #f39c12; border-radius:50%; background:#fff4d6; color:#8a4310; font-size:27px; font-weight:bold; cursor:pointer; box-shadow:0 0 14px #f39c12; }
+  #br-upgrade-button.available { display:block; animation: br-pulse 1.1s infinite; }
+  @keyframes br-pulse { 50% { transform:scale(1.12); box-shadow:0 0 22px #ffb52e; } }
   @media (max-width: 640px) {
     .main-menu-layout { grid-template-columns: 1fr; gap: 12px; }
     .main-menu-actions .btn-1c { padding: 9px 11px; }
@@ -599,7 +606,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v1.9.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.0.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -633,6 +640,7 @@
     <div id="hud-top-left">
       <div id="hud-inventory"></div>
       <div id="hud-buffs"><div class="inv-slot" id="coffee-buff-icon"><span id="coffee-buff-symbol">☕</span><span class="inv-lvl" id="coffee-buff-timer"></span></div><span id="buff-indicator"></span></div>
+      <button id="br-upgrade-button" onclick="game.openBattleRoyaleUpgrade()" aria-label="Открыть доступное улучшение">+</button>
       <div id="hud-shop-passives" aria-label="Пассивные предметы" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;"></div>
     </div>
     <div id="hud-health">
@@ -677,6 +685,7 @@
         <div class="act-cd-overlay"></div>
       </div>
     </div>
+    <div id="br-center-marker" aria-label="Направление к центру карты"><span id="br-center-arrow">▲</span> ЦЕНТР · <span id="br-center-distance">0</span> м</div>
     <div id="hud-consumables"></div>
     <div id="dash-hud">💨 Рывок · ПКМ / Shift</div>
 
@@ -716,7 +725,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v1.9.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.0.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -725,12 +734,12 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>1.9.0</b><br>Сборка фитнес-кластера: 8.3.27.1936</div>
+            <div class="main-menu-version">Текущая версия: <b>2.0.0</b><br>Сборка фитнес-кластера: 8.5.0</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 1.9.0 — «Новый подход»</h3>
-              <p>В тикетах можно выбрать испытание и награду. Появились поджигающие снаряды, рывок и эволюции оружия; прокачка и магазин получили новые варианты.</p>
+              <h3>Версия 2.0.0 — «Переход на 8.5»</h3>
+              <p>После первого большого босса выбирайте одну из трёх легендарных миграций. Комнаты поддерживают до восьми игроков и ручной запуск хостом; состав отряда усиливает волну мобов. В классическом PvP звонок магазина ждёт решения всей команды, а при 4+ игроках прокачка не останавливает матч и карта растёт на 15% за каждого участника сверх трёх. Battle Royale приносит большую карту, указатель к центру, лут с мобов и прокачку без паузы; общая пауза для всех включается и снимается клавишей F9. В рекордах видны режим и число игроков.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 1.8.0 — «Командный зачёт»</h3>
@@ -748,8 +757,7 @@
       <div class="win-1c-head"><span>🌐 Сетевая игра</span><button class="win-close-btn" onclick="game.closePvpMenu()" aria-label="Закрыть">✕</button></div>
       <div class="win-1c-body">
         <p style="font-size:12px; margin-bottom:12px;">Создайте комнату и передайте код сопернику или введите код комнаты.</p>
-        <label style="display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff; border:1px solid #ccc; padding:9px; margin-bottom:12px; font-size:12px;"><b>Игроков в матче</b><select id="pvp-player-count" class="input-1c" style="width:120px;"><option value="2">2 игрока</option><option value="3">3 игрока</option></select></label>
-        <label style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #ccc; padding:9px; margin-bottom:12px; font-size:12px;"><input id="pvp-disable-attacks" type="checkbox" onchange="game.setPvpMode(this.checked ? 'pve' : 'pvp')"><span><b>Отключить PvP</b><br><span style="color:#666;">Кооперативный PvE: игроки не наносят урон друг другу</span></span></label>
+        <label id="pvp-mode-label" style="display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff; border:1px solid #ccc; padding:9px; margin-bottom:12px; font-size:12px;"><b>Режим</b><select id="pvp-mode-select" class="input-1c" style="width:190px;" onchange="game.setPvpMode(this.value)"><option value="pvp">PvP · командный хаос</option><option value="pve">PvE · вместе против мобов</option><option value="battle_royale">Battle Royale · каждый сам за себя</option></select></label>
         <label style="display:block; margin-bottom:12px; font-size:12px;">Ваш ник в сети
           <input id="pvp-player-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="width:100%; margin-top:5px;" placeholder="Архитектор_1С">
         </label>
@@ -759,6 +767,8 @@
           <button class="btn-1c" onclick="game.joinPvpRoom()">Подключиться</button>
         </div>
         <div id="pvp-room-status" class="release-notes" style="margin:12px 0 0; min-height:34px;">Firebase: проверяем подключение…</div>
+        <div id="pvp-lobby-players" class="release-notes" style="display:none; margin:8px 0; font-size:12px;"></div>
+        <button id="pvp-start-button" class="btn-1c" style="display:none; width:100%; background:#55efc4;" onclick="game.startPvpMatch()">▶ Запустить матч</button>
         <div id="pvp-room-code-display" style="display:none; text-align:center; font-size:24px; font-weight:bold; letter-spacing:6px; color:#900; padding:10px;"></div>
         <button id="pvp-copy-room-code" class="btn-1c" style="display:none; width:100%;" onclick="game.copyPvpRoomCode()">📋 Скопировать код</button>
         <button id="pvp-leave-button" class="btn-1c" style="display:none; width:100%; margin-top:8px;" onclick="game.leavePvpRoom()">Отменить / выйти из комнаты</button>
@@ -815,7 +825,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды: у улучшения пять уровней, шанс поджога растёт с каждым уровнем, а горение наносит врагам дополнительный периодический урон. На каждом забеге доступно три переброса полного набора карточек после повышения уровня. Если два совместимых оружия достигли 5-го уровня, при следующем выборе прокачки может появиться их эволюция: «Аудит доступа» для Синтаксис-Контроля и считывателя IronLogic, «Фискальный реестр» для ККТ Атол и фискального сканера, «Контроль доступа» для СКУД Sigur и IronLogic; выбранная комбинация заменяет оба исходных оружия. В магазине ассортимент можно обновить за фиткоины до двух раз за одно предложение. Добавлен короткий рывок на ПКМ или Shift с половиной секунды неуязвимости; перезарядка составляет 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрена сила перков на урон, опыт, регенерацию и уклонение, а также лечения и щитов в PvP. Эффекты контроля соперника стали короче.</p></details>
+        <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник. На HUD активных умений есть указатель к центру карты. Таблица рекордов показывает режим и число игроков.</p></details><details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды: у улучшения пять уровней, шанс поджога растёт с каждым уровнем, а горение наносит врагам дополнительный периодический урон. На каждом забеге доступно три переброса полного набора карточек после повышения уровня. Если два совместимых оружия достигли 5-го уровня, при следующем выборе прокачки может появиться их эволюция: «Аудит доступа» для Синтаксис-Контроля и считывателя IronLogic, «Фискальный реестр» для ККТ Атол и фискального сканера, «Контроль доступа» для СКУД Sigur и IronLogic; выбранная комбинация заменяет оба исходных оружия. В магазине ассортимент можно обновить за фиткоины до двух раз за одно предложение. Добавлен короткий рывок на ПКМ или Shift с половиной секунды неуязвимости; перезарядка составляет 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрена сила перков на урон, опыт, регенерацию и уклонение, а также лечения и щитов в PvP. Эффекты контроля соперника стали короче.</p></details>
         <details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
@@ -842,7 +852,7 @@
         <div id="shop-passive-products" class="shop-grid"></div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
           <span id="shop-message" style="font-size:11px; color:#555;">Предложение действует до завершения звонка.</span>
-          <button class="btn-1c" style="background:#55efc4;" onclick="game.closeShop()">Завершить звонок и продолжить</button>
+          <button id="shop-close-button" class="btn-1c" style="background:#55efc4;" onclick="game.closeShop()">Завершить звонок и продолжить</button>
         </div>
       </div>
     </div>
@@ -888,6 +898,23 @@
     </div>
   </div>
 
+  <div id="modal-legendary" class="modal-overlay" style="z-index:360;">
+    <div class="win-1c" style="width:min(900px,94vw);">
+      <div class="win-1c-head"><span>🟠 ЛЕГЕНДАРНЫЙ РЕЛИЗ · ВЫБЕРИТЕ ОДНУ МИГРАЦИЮ</span></div>
+      <div class="win-1c-body"><p id="legendary-subtitle" class="release-notes">Первый большой босс побеждён. Откат, конечно, не проверяли.</p><div id="legendary-items" class="upgrade-grid"></div></div>
+    </div>
+  </div>
+
+  <div id="modal-br-pause" class="modal-overlay" style="z-index:520; display:none;">
+    <div class="win-1c" style="width:min(440px,92vw);">
+      <div class="win-1c-head"><span>⏸ Battle Royale приостановлен</span><span>F9 · паузу может снять любой игрок</span></div>
+      <div class="win-1c-body" style="text-align:center;">
+        <p>Все участники ждут. Нажмите F9 или кнопку ниже, чтобы продолжить матч.</p>
+        <button class="btn-1c" style="background:#55efc4; margin-top:10px;" onclick="game.toggleBattleRoyalePause()">▶ Возобновить матч для всех</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Модалка Таблицы рекордов -->
   <div id="modal-lb" class="modal-overlay" tabindex="-1">
     <div class="win-1c" style="width:min(920px, 94vw);" onclick="event.stopPropagation()">
@@ -904,12 +931,13 @@
                 <th>Разработчик</th>
                 <th>Версия</th>
                 <th>Режим</th>
+                <th>Игроки</th>
                 <th>Очки (Баги + Строки)</th>
                 <th>Аптайм</th>
               </tr>
             </thead>
             <tbody id="lb-body">
-              <tr><td colspan="6" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
+              <tr><td colspan="7" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
             </tbody>
           </table>
         </div>
@@ -977,7 +1005,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '1.9.0';
+const GAME_VERSION = '2.0.0';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -1963,14 +1991,37 @@ const REPEATABLE_UPGRADES = [
     key: 'rep_salary_index',
     name: '📈 Конверсия заявок в записи',
     icon: '📊',
-    desc: '+15% к опыту и очкам, шанс крита +5%; каждое такое улучшение немного снижает скорость (до 20 раз).',
+    desc: '+15% к опыту и +5% к шансу крита; каждое такое улучшение немного снижает скорость (не более 8 раз).',
     apply: (g) => {
       g.player.xpMult += 0.15;
       g.player.critChance += 0.05;
-      if ((g.repeatableUpgradeCounts["rep_salary_index"] || 0) < 20) g.player.speedMult -= 0.01;
+      if ((g.repeatableUpgradeCounts["rep_salary_index"] || 0) < 8) g.player.speedMult -= 0.01;
       g.addPopup(g.player.x, g.player.y - 35, '+15% ОПЫТ & +5% КРИТ!', '#ffd200');
     }
   }
+];
+
+const LEGENDARY_MIGRATIONS = [
+  { key: 'migration_85', name: 'Переход на 8.5', icon: '🟠', description: 'Новая платформа: герой становится плиткой со скруглёнными углами. +20% к урону и +20% к максимальному HP. Совместимость с привычками: −10% к скорости и −15% к получаемому опыту.', apply: g => {
+    g.player.migration85 = true;
+    g.player.dmgMult *= 1.20;
+    g.player.maxHp = Math.round(g.player.maxHp * 1.20);
+    g.player.hp = Math.min(g.player.maxHp, g.player.hp + Math.round(g.player.maxHp * 0.20));
+    g.player.speedMult *= 0.90;
+    g.player.xpMult *= 0.85;
+  } },
+  { key: 'legacy_cluster', name: 'Оставить старый кластер', icon: '🗄️', description: 'Ничего не мигрируем, просто выделяем ещё сервер. +25% к скорости и +20% к перезарядке. Старый сервер: −20% к максимальному HP.', apply: g => {
+    g.player.speedMult *= 1.25;
+    g.player.cdMult *= 0.80;
+    g.player.maxHp = Math.max(60, Math.round(g.player.maxHp * 0.80));
+    g.player.hp = Math.min(g.player.hp, g.player.maxHp);
+  } },
+  { key: 'thin_client', name: 'Тонкий клиент на вайфае', icon: '📶', description: '+35% к опыту и +20% к радиусу сбора. Соединение нестабильно: −20% к урону и −10% к скорости.', apply: g => {
+    g.player.xpMult *= 1.35;
+    g.player.magnetMult *= 1.20;
+    g.player.dmgMult *= 0.80;
+    g.player.speedMult *= 0.90;
+  } }
 ];
 
 /* ============================================================
@@ -2006,6 +2057,11 @@ class Game {
     this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     window.addEventListener('keydown', (e) => {
+      if (e.code === 'F9' && this.isBattleRoyale && this.pvp?.started) {
+        e.preventDefault();
+        this.toggleBattleRoyalePause();
+        return;
+      }
       if (e.code === 'Escape') {
         if (document.getElementById('modal-lb').style.display === 'flex') {
           this.closeLeaderboard();
@@ -2110,7 +2166,7 @@ class Game {
     });
 
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
-    this.pvpMode = localStorage.getItem('1c_pvp_mode') === 'pve' ? 'pve' : 'pvp';
+    this.pvpMode = ['pvp', 'pve', 'battle_royale'].includes(localStorage.getItem('1c_pvp_mode')) ? localStorage.getItem('1c_pvp_mode') : 'pvp';
     this.collapseAcceptedTickets = localStorage.getItem('1c_collapse_accepted_tickets') !== 'false';
     document.getElementById('player-nickname').value = this.savedNick;
     document.getElementById('pvp-player-nickname').value = this.savedNick;
@@ -2145,6 +2201,24 @@ class Game {
 
   start(options = {}) {
     this.scoreRunGeneration++;
+    this.isBattleRoyale = this.pvp?.mode === 'battle_royale';
+    this.isPvpMassUpgradeMode = () => Boolean(this.pvp?.started && this.pvp.mode === 'pvp' && Number(this.pvp.actualPlayerCount) > 3);
+    const classicPvpExtraPlayers = this.pvp?.started && this.pvp.mode === 'pvp'
+      ? Math.max(0, Math.min(8, Number(this.pvp.actualPlayerCount) || 1) - 3) : 0;
+    this.MAP_SIZE = this.isBattleRoyale ? 4000 * Math.sqrt(8) : 4000 * (1 + 0.15 * classicPvpExtraPlayers);
+    this.BOUND_MIN = this.isBattleRoyale ? 90 : 90;
+    this.BOUND_MAX = this.MAP_SIZE - 90;
+    this.pendingBattleRoyaleUpgrades = [];
+    this.legendaryMigrationChosen = false;
+    this.firstMegaBossDefeated = false;
+    this.legendaryOffered = false;
+    if (this.pvp) this.pvp.brPaused = false;
+    document.getElementById('modal-br-pause').style.display = 'none';
+    document.getElementById('btn-pause').textContent = this.isBattleRoyale ? '⏸ Общая пауза · F9' : '⏸ Пауза [Esc / P]';
+    document.getElementById('br-center-marker').style.display = this.isBattleRoyale ? 'block' : 'none';
+    document.getElementById('shop-timer').style.display = this.isBattleRoyale ? 'none' : '';
+    document.getElementById('currency-display').parentElement.style.display = this.isBattleRoyale ? 'none' : '';
+    this.updateBattleRoyaleUpgradeButton();
     this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     this.closeSalesCall();
@@ -2161,6 +2235,7 @@ class Game {
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-pvp').style.display = 'none';
     document.getElementById('modal-pvp-wait').style.display = 'none';
+    document.getElementById('modal-legendary').style.display = 'none';
     document.getElementById('modal-settings').style.display = 'none';
     document.getElementById('modal-changelog').style.display = 'none';
     document.getElementById('modal-shop').style.display = 'none';
@@ -2189,9 +2264,20 @@ class Game {
     this.xp = 0;
     this.nextXp = 25;
 
+    const arenaCorners = [
+      { x: this.BOUND_MIN + 300, y: this.BOUND_MIN + 300 },
+      { x: this.BOUND_MAX - 300, y: this.BOUND_MIN + 300 },
+      { x: this.BOUND_MAX - 300, y: this.BOUND_MAX - 300 },
+      { x: this.BOUND_MIN + 300, y: this.BOUND_MAX - 300 },
+      { x: this.MAP_SIZE / 2, y: this.BOUND_MIN + 300 },
+      { x: this.BOUND_MAX - 300, y: this.MAP_SIZE / 2 },
+      { x: this.MAP_SIZE / 2, y: this.BOUND_MAX - 300 },
+      { x: this.BOUND_MIN + 300, y: this.MAP_SIZE / 2 }
+    ];
+    const spawnPoint = arenaCorners[(Number(this.pvp?.slot) || 0) % arenaCorners.length];
     this.player = {
-      x: this.pvp && !this.pvp.host ? 2180 : 1820,
-      y: 2000,
+      x: this.isBattleRoyale ? spawnPoint.x : (this.pvp && !this.pvp.host ? 2180 : 1820),
+      y: this.isBattleRoyale ? spawnPoint.y : 2000,
       hp: 100,
       maxHp: 100,
       baseSpeed: 3.2,
@@ -2293,12 +2379,13 @@ class Game {
 
   async beginScoreRun() {
     const generation = this.scoreRunGeneration;
-    const mode = this.pvp ? (this.pvp.mode === 'pve' ? 'pve' : 'pvp') : 'solo';
+    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
+    const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
     this.scoreRunStartPromise = (async () => {
       const response = await fetch(`${SCORE_RUN_API_BASE}/start`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ version: GAME_VERSION, mode })
+        body: JSON.stringify({ version: GAME_VERSION, mode, players })
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || typeof result.runId !== 'string') {
@@ -2471,15 +2558,15 @@ class Game {
     document.getElementById('modal-pvp').style.display = 'flex';
     document.getElementById('pvp-leave-button').style.display = this.pvp ? 'block' : 'none';
     document.getElementById('pvp-copy-room-code').style.display = this.pvp?.host ? 'block' : 'none';
-    const pvpToggle = document.getElementById('pvp-disable-attacks');
-    pvpToggle.checked = (this.pvp?.mode || this.pvpMode) === 'pve';
-    pvpToggle.disabled = Boolean(this.pvp);
+    const modeSelect = document.getElementById('pvp-mode-select');
+    modeSelect.value = this.pvp?.mode || this.pvpMode;
+    modeSelect.disabled = Boolean(this.pvp);
     const nicknameInput = document.getElementById('pvp-player-nickname');
     nicknameInput.value = this.savedNick;
     nicknameInput.disabled = Boolean(this.pvp);
     document.getElementById('pvp-room-code-display').style.display = this.pvp?.host ? 'block' : 'none';
     if (this.pvp?.host) document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${this.pvp.code}`;
-    this.pvpStatus(this.pvp ? 'Комната открыта. Ожидаем игроков…' : 'Комнаты работают через Firebase и прямое WebRTC-соединение.');
+    this.pvpStatus(this.pvp ? 'Лобби открыто. Подключайте игроков и запускайте матч, когда будете готовы.' : 'Создайте лобби, отправьте код друзьям и запустите матч вручную.');
   }
 
   closePvpMenu() {
@@ -2517,9 +2604,9 @@ class Game {
 
   setPvpMode(mode) {
     if (this.pvp) return;
-    this.pvpMode = mode === 'pve' ? 'pve' : 'pvp';
+    this.pvpMode = ['pve', 'battle_royale'].includes(mode) ? mode : 'pvp';
     localStorage.setItem('1c_pvp_mode', this.pvpMode);
-    document.getElementById('pvp-disable-attacks').checked = this.pvpMode === 'pve';
+    document.getElementById('pvp-mode-select').value = this.pvpMode;
   }
 
   setPlayerNickname(value) {
@@ -2531,7 +2618,7 @@ class Game {
 
   async createPvpRoom() {
     this.pvpStatus('Создаём комнату…');
-    const maxPlayers = Math.max(2, Math.min(3, Number(document.getElementById('pvp-player-count')?.value) || 2));
+    const maxPlayers = 8;
     const name = (this.savedNick || 'Архитектор 1С').slice(0, 20);
     try {
       const fb = await window.firebaseLeaderboardReady;
@@ -2543,14 +2630,14 @@ class Game {
         if (!existing.exists()) { code = candidate; break; }
       }
       if (!code) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
-      const state = { x: 2000, y: 2000, hp: 400, maxHp: 400, level: 1, attackTotal: 0, over: false, shield: false };
+      const state = { x: 2000, y: 2000, hp: 100, maxHp: 100, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
       await set(ref(db, `pvpRooms/${code}`), { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt: Date.now(), rtcGeneration: 1, maxPlayers,
-        players: { [uid]: { uid, name, online: true, state } } });
+        players: { [uid]: { uid, name, slot: 0, online: true, state } } });
       await onDisconnect(ref(db, `pvpRooms/${code}`)).remove();
       this.pvp = { code, host: true, initialRole: 'host', uid, name, started: false,
         maxPlayers, slot: 0, choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
         remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode,
-        roomCache: { status: 'waiting', players: { [uid]: { uid, name, online: true, state } } },
+        roomCache: { status: 'waiting', hostUid: uid, players: { [uid]: { uid, name, slot: 0, online: true, state } } },
         threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
       await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
       this.logPvpDiagnostic(this.pvp, 'WebRTC', 'комната создана через Firebase-сигнализацию', { mode: this.pvpMode, maxPlayers });
@@ -2559,7 +2646,8 @@ class Game {
       document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;
       document.getElementById('pvp-copy-room-code').style.display = 'block';
       document.getElementById('pvp-leave-button').style.display = 'block';
-      this.pvpStatus(`Комната на ${maxPlayers} игрока создана. Матч начнётся после прямого подключения всех участников.`);
+      this.pvpStatus('Лобби создано. Подключайте до семи игроков; матч запускает хост вручную.');
+      this.updatePvpLobby();
     } catch (err) { this.pvpStatus(`Не удалось создать комнату: ${err.message || 'ошибка сервера'}`, true); }
   }
 
@@ -2577,12 +2665,12 @@ class Game {
       const room = snapshot.val();
       if (room.status !== 'waiting') throw new Error('Матч уже начался.');
       if (uid === room.hostUid || room.players?.[uid]) throw new Error('Вы уже подключены к этой комнате.');
-      const slot = !room.guestUid ? 1 : (!room.guest2Uid && Number(room.maxPlayers) === 3 ? 2 : 0);
-      if (!slot) throw new Error('Комната уже заполнена.');
-      const state = { x: 2000, y: 2000, hp: 400, maxHp: 400, level: 1, attackTotal: 0, over: false, shield: false };
-      await set(ref(db, `pvpRooms/${code}/${slot === 1 ? 'guestUid' : 'guest2Uid'}`), uid);
-      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, online: true, state });
-      this.pvp = { code, host: false, initialRole: slot === 2 ? 'client-2' : 'client', uid, name, started: false,
+      const currentPlayers = Object.values(room.players || {});
+      if (currentPlayers.length >= 8) throw new Error('Лобби заполнено (максимум 8 игроков).');
+      const slot = currentPlayers.length;
+      const state = { x: 2000, y: 2000, hp: 100, maxHp: 100, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
+      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, slot, online: true, state });
+      this.pvp = { code, host: false, initialRole: 'client', uid, name, started: false,
         maxPlayers: Number(room.maxPlayers), slot, choosing: null, remoteChoosing: null, remoteState: null,
         remotePlayer: null, opponentUid: null, remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0,
         matchOver: false, opponentLost: false, mode: room.mode, roomCache: room,
@@ -2592,8 +2680,41 @@ class Game {
       this.logPvpDiagnostic(this.pvp, 'WebRTC', 'подключение к Firebase-комнате', { mode: this.pvp.mode, slot });
       this.attachPvpRoom();
       document.getElementById('pvp-leave-button').style.display = 'block';
-      this.pvpStatus('Подключились к комнате. Устанавливаем прямое соединение…');
+      this.pvpStatus('Подключились к лобби. Ожидаем запуска хоста…');
     } catch (err) { this.pvpStatus(`Не удалось подключиться: ${err.message || 'ошибка сервера'}`, true); }
+  }
+
+  updatePvpLobby(room = this.pvp?.roomCache) {
+    const pvp = this.pvp;
+    const list = document.getElementById('pvp-lobby-players');
+    const startButton = document.getElementById('pvp-start-button');
+    if (!pvp || !room || pvp.started) {
+      list.style.display = 'none'; startButton.style.display = 'none'; return;
+    }
+    const players = Object.values(room.players || {}).sort((a, b) => Number(a.slot || 0) - Number(b.slot || 0));
+    list.style.display = 'block';
+    list.innerHTML = `<b>Игроки в лобби · ${players.length}/8</b><br>${players.map(player => `${player.online ? '🟢' : '⚪'} ${this.escapeHtml(String(player.name || 'Игрок'))}${player.uid === room.hostUid ? ' · хост' : ''}`).join('<br>')}`;
+    startButton.style.display = pvp.host ? 'block' : 'none';
+    const connected = Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length;
+    const ready = players.length >= 2 && players.every(player => player.online) && connected >= players.length - 1;
+    startButton.disabled = !ready || room.status !== 'waiting';
+    startButton.textContent = ready ? `▶ Запустить матч · ${players.length} игроков` : `Ожидаем соединения · ${connected + 1}/${players.length}`;
+  }
+
+  async startPvpMatch() {
+    const pvp = this.pvp;
+    if (!pvp?.host || pvp.started) return;
+    const players = Object.values(pvp.roomCache?.players || {});
+    const connected = Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length;
+    if (players.length < 2 || players.length > 8 || players.some(player => !player.online) || connected < players.length - 1) {
+      this.pvpStatus('Все игроки должны быть подключены. Проверяем соединения…', true);
+      return;
+    }
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      await fb.set(fb.ref(fb.db, `pvpRooms/${pvp.code}/status`), 'playing');
+      this.pvpStatus('Матч запускается…');
+    } catch (error) { this.pvpStatus(`Не удалось запустить матч: ${error.message}`, true); }
   }
 
   attachPvpRoom() {
@@ -2622,20 +2743,18 @@ class Game {
       if (pvp.host) await this.createPvpOffer(member, fb);
       else if (member.uid === room.hostUid) this.watchPvpOffer(member, room, fb);
     }
-    if (pvp.host) this.maybeStartPvpRoom(room, fb);
+    if (pvp.host) { this.maybeStartPvpRoom(room, fb); this.updatePvpLobby(room); }
   }
 
   pvpSignalPath(room, peerUid) {
-    return room.guest2Uid === peerUid
-      ? `pvpRooms/${this.pvp.code}/rtc/peers/${peerUid}`
-      : `pvpRooms/${this.pvp.code}/rtc/sessions/${peerUid}`;
+    return `pvpRooms/${this.pvp.code}/rtc/sessions/${peerUid}`;
   }
 
   async createPvpOffer(member, fb) {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.peerConnections[member.uid]) return;
     const path = this.pvpSignalPath(pvp.roomCache, member.uid);
-    const peer = this.makePvpPeer(member.uid, pvp.roomCache.guest2Uid === member.uid ? 2 : 1, fb);
+    const peer = this.makePvpPeer(member.uid, Number(member.slot) || 1, fb);
     pvp.peerConnections[member.uid] = peer;
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: true }));
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: true }));
@@ -2680,7 +2799,7 @@ class Game {
     const pvp = this.pvp;
     const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
     const peer = { uid, slot, pc, channel: null, worldChannel: null, connected: false, seenCandidates: new Set() };
-    if (pvp.host && slot === 2) pvp.threePeers[uid] = peer;
+    if (pvp.host && pvp.rtc) pvp.threePeers[uid] = peer;
     else pvp.rtc = peer;
     pc.onconnectionstatechange = () => {
       if (pc.connectionState === 'connected') this.updatePvpPeerConnected(peer);
@@ -2722,19 +2841,13 @@ class Game {
   async maybeStartPvpRoom(room = this.pvp?.roomCache, fb = null) {
     const pvp = this.pvp;
     if (!pvp?.host || !room || room.status !== 'waiting') return;
-    const members = Object.values(room.players || {});
-    if (members.length !== pvp.maxPlayers || members.some(member => !member.online)) return;
-    if (Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length !== pvp.maxPlayers - 1) return;
-    try {
-      fb ||= await window.firebaseLeaderboardReady;
-      await fb.update(fb.ref(fb.db, `pvpRooms/${pvp.code}`), { status: 'playing' });
-    } catch (error) { this.logPvpDiagnostic(pvp, 'Firebase', 'не удалось отметить запуск комнаты', { message: error.message }); }
+    this.updatePvpLobby(room);
   }
 
   handlePvpSocketPacket(message) {
     const pvp = this.pvp;
     if (!pvp || pvp.opponentLost || !message) return;
-    if (message.type === 'roster' && pvp.maxPlayers >= 3) {
+    if (message.type === 'roster' && pvp.maxPlayers >= 2) {
       this.applyThreePlayerRoster(message.players || []);
     } else if ((message.type === 'state' || message.type === 'match-over') && message.state) {
       const uid = String(message.uid || 'opponent');
@@ -2810,6 +2923,30 @@ class Game {
     } else if (message.type === 'world' && message.world) this.applyPvpSharedWorld(message.world);
     else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
     else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
+    else if (message.type === 'integration-shop-start' && !pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopStart(message);
+    else if (message.type === 'integration-shop-vote' && pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopVote(message);
+    else if (message.type === 'integration-shop-result' && pvp.mode === 'pvp') this.receiveIntegrationShopResult(message);
+    else if (message.type === 'integration-shop-done' && pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopDone(message);
+    else if (message.type === 'integration-shop-resume' && pvp.mode === 'pvp') this.resumeIntegrationShop(message);
+    else if (message.type === 'legendary-offer') this.offerLegendaryMigrations(false);
+    else if (message.type === 'br-winner' && this.isBattleRoyale) {
+      pvp.matchOver = true;
+      this.paused = true;
+      this.showBanner(message.winner ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(message.winner)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
+      this.log(message.winner ? `${message.winner} остался последним в Battle Royale.` : 'В Battle Royale не осталось выживших.');
+    }
+    else if (message.type === 'br-damage' && this.isBattleRoyale && message.targetUid === pvp.uid) {
+      this.recordPlayerDamage(Number(message.damage) || 0, message.source || 'Атака моба');
+      this.updateHUD();
+      if (this.player.hp <= 0) this.gameOver(`Battle Royale: вас выбил ${message.source || 'моб'}.`);
+    }
+    else if (message.type === 'br-pause-request' && this.isBattleRoyale && pvp.host && typeof message.paused === 'boolean') {
+      this.applyBattleRoyalePause(message.paused);
+      this.sendPvpNetworkMessage({ type: 'br-pause', paused: message.paused });
+    }
+    else if (message.type === 'br-pause' && this.isBattleRoyale && typeof message.paused === 'boolean') {
+      this.applyBattleRoyalePause(message.paused);
+    }
     else if (message.type === 'active-skill' && message.skill) this.receivePvpActiveSkill(message.skill);
   }
   applyThreePlayerRoster(players) {
@@ -2834,15 +2971,14 @@ class Game {
 
   publishThreePlayerRoster() {
     const pvp = this.pvp;
-    if (!pvp?.host || pvp.maxPlayers < 3) return;
+    if (!pvp?.host || pvp.maxPlayers < 2) return;
     const players = [{ uid: pvp.uid, name: pvp.name, state: this.currentPvpState() }];
     for (const player of Object.values(pvp.remotePlayers || {})) {
       if (player?.uid && player.state) players.push({ uid: player.uid, name: player.name || 'Соперник', state: player.state });
     }
     for (const peer of Object.values(pvp.threePeers || {})) if (peer.state) players.push({ uid: peer.uid, name: peer.name || 'Соперник', state: peer.state });
     const payload = JSON.stringify({ type: 'roster', players });
-    for (const peer of Object.values(pvp.threePeers || {})) if (peer.channel?.readyState === 'open') peer.channel.send(payload);
-    if (pvp.rtc?.channel?.readyState === 'open') pvp.rtc.channel.send(payload);
+    for (const peer of [pvp.rtc, ...Object.values(pvp.threePeers || {})]) if (peer?.channel?.readyState === 'open') peer.channel.send(payload);
   }
 
   currentPvpState() {
@@ -2850,7 +2986,7 @@ class Game {
     if (!p) return null;
     return { x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10), maxHp: Math.round(p.maxHp), level: this.level,
       time: Number(this.time) || 0, attackTotal: Number(this.pvp?.attackTotal || 0), enemyAttackTotal: Number(this.pvp?.enemyAttackTotal || 0),
-      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0) }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0 };
+      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0) }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85) };
   }
 
   handlePvpRtcRecovered(rtc) {
@@ -2863,7 +2999,7 @@ class Game {
     clearTimeout(pvp.recoveryRequestTimer);
     this.pvpPausedByRemote = false;
     document.getElementById('modal-pvp-wait').style.display = 'none';
-    this.paused = Boolean(pvp.wasPausedBeforeConnectionLost || pvp.choosing || pvp.manualPaused ||
+    this.paused = this.isBattleRoyale ? Boolean(pvp.brPaused) : Boolean(pvp.wasPausedBeforeConnectionLost || pvp.choosing || pvp.manualPaused ||
       document.getElementById('modal-pause').style.display === 'flex' ||
       document.getElementById('modal-shop').style.display === 'flex' ||
       document.getElementById('modal-lvlup').style.display === 'flex');
@@ -2873,11 +3009,12 @@ class Game {
   }
   sendPvpNetworkMessage(message, channelOverride = null, force = false) {
     const pvp = this.pvp;
-    if (!pvp?.rtc?.connected) return false;
+    if (!pvp?.started || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
     const limit = message.type === 'state' ? 98304 : 65536;
     const payload = JSON.stringify(message);
-    const channels = channelOverride ? [channelOverride] : [pvp.rtc.channel,
-      ...(pvp.host && pvp.maxPlayers >= 3 ? Object.values(pvp.threePeers || {}).map(peer => peer.channel) : [])];
+    const channels = channelOverride ? [channelOverride] : (pvp.host
+      ? Object.values(pvp.peerConnections || {}).map(peer => peer.channel)
+      : [pvp.rtc?.channel]);
     let sent = false;
     for (const channel of channels) {
       if (channel?.readyState !== 'open' || (!force && channel.bufferedAmount > limit)) continue;
@@ -2902,7 +3039,7 @@ class Game {
 
   sendPvpNetworkState(state = null, channelOverride = null, type = 'state') {
     const pvp = this.pvp;
-    if (!pvp?.started || !pvp.rtc?.connected) return false;
+    if (!pvp?.started || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
     const player = this.player;
     if (!player) return false;
     state ||= {
@@ -2914,7 +3051,7 @@ class Game {
       enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
       killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0) },
       over: pvp.matchOver || player.hp <= 0,
-      enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}
+      enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}, migration85: Boolean(player.migration85)
     };
     return this.sendPvpNetworkMessage({
       type, sequence: pvp.rtcStateSequence = (pvp.rtcStateSequence || 0) + 1,
@@ -3021,6 +3158,18 @@ class Game {
 
   getPvpEnemyTarget(enemy = null) {
     const local = { x: this.player.x, y: this.player.y, isRemote: false };
+    if (this.isPvpMassUpgradeMode?.() && this.pvp?.choosing === 'levelup' && !this.pvp.host) return { ...local, untargetable: true };
+    if ((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && this.pvp?.host && this.pvp.started) {
+      const targets = [];
+      if (this.player.hp > 0 && this.pvp.choosing !== 'levelup') targets.push({ ...local, uid: this.pvp.uid });
+      for (const player of Object.values(this.pvp.remotePlayers || {})) {
+        if (player.state && !player.state.over && player.choosing !== 'levelup') targets.push({ x: player.state.x, y: player.state.y, isRemote: true, uid: player.uid });
+      }
+      if (!targets.length) return { ...local, untargetable: true };
+      const target = targets.sort((a, b) => Math.hypot(a.x - (enemy?.x || 0), a.y - (enemy?.y || 0)) - Math.hypot(b.x - (enemy?.x || 0), b.y - (enemy?.y || 0)))[0];
+      if (enemy) enemy.aggroTarget = target.uid;
+      return target;
+    }
     const remote = this.pvp?.host && this.pvp.started ? this.pvp.remoteState : null;
     if (!remote || remote.over || !Number.isFinite(remote.x) || !Number.isFinite(remote.y)) {
       if (enemy) enemy.aggroTarget = 'local';
@@ -3035,6 +3184,11 @@ class Game {
   }
 
   getPvpSpawnCenter() {
+    if (this.isBattleRoyale && this.pvp?.host && this.pvp.started) {
+      const alive = Object.values(this.pvp.remotePlayers || {}).filter(player => player.state && !player.state.over && !player.choosing);
+      const targets = [{ x: this.player.x, y: this.player.y }, ...alive.map(player => ({ x: player.state.x, y: player.state.y }))];
+      return targets[Math.floor(Math.random() * targets.length)];
+    }
     const remote = this.pvp?.host && this.pvp.started ? this.pvp.remoteState : null;
     if (remote && !remote.over && Number.isFinite(remote.x) && Number.isFinite(remote.y) && Math.random() < 0.5) {
       return { x: remote.x, y: remote.y };
@@ -3046,10 +3200,12 @@ class Game {
     if (!pvp?.started || pvp.opponentLost || pvp.opponentMissingTimer) return;
     pvp.opponentMissingReason = reason;
     pvp.wasPausedBeforeOpponentMissing = Boolean(this.paused);
-    this.paused = true;
-    document.getElementById('modal-pvp-wait').style.display = 'flex';
-    document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
-    document.getElementById('pvp-wait-message').textContent = 'Не видим состояние соперника. Игра приостановлена; ждём восстановления связи до 20 секунд.';
+    if (!this.isBattleRoyale) {
+      this.paused = true;
+      document.getElementById('modal-pvp-wait').style.display = 'flex';
+      document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
+      document.getElementById('pvp-wait-message').textContent = 'Не видим состояние соперника. Игра приостановлена; ждём восстановления связи до 20 секунд.';
+    }
       this.logPvpDiagnostic(pvp, 'Комната', 'временно не виден игрок соперника; запущено ожидание', { reason, timeoutSeconds: 20 });
     pvp.opponentMissingTimer = setTimeout(() => {
       pvp.opponentMissingTimer = null;
@@ -3064,7 +3220,7 @@ class Game {
     pvp.opponentMissingTimer = null;
     this.logPvpDiagnostic(pvp, 'Комната', 'игрок соперника снова виден');
     if (pvp.connectionLost) return;
-    this.paused = Boolean(pvp.wasPausedBeforeOpponentMissing || pvp.choosing || pvp.manualPaused ||
+    this.paused = this.isBattleRoyale ? Boolean(pvp.brPaused) : Boolean(pvp.wasPausedBeforeOpponentMissing || pvp.choosing || pvp.manualPaused ||
       document.getElementById('modal-pause').style.display === 'flex' ||
       document.getElementById('modal-shop').style.display === 'flex' ||
       document.getElementById('modal-lvlup').style.display === 'flex');
@@ -3086,8 +3242,9 @@ class Game {
     }
     const players = Object.values(room.players || {});
     const opponents = players.filter(player => player.uid !== pvp.uid);
-    const opponent = opponents[0];
-    const allOpponentsOnline = opponents.length === pvp.maxPlayers - 1 && opponents.every(player => player.online);
+    const opponent = pvp.host ? opponents[0] : (opponents.find(player => player.uid === room.hostUid) || opponents[0]);
+    const allOpponentsOnline = players.length >= 2 && opponents.every(player => player.online);
+    if (!pvp.started) this.updatePvpLobby(room);
     if (opponent) {
       pvp.opponentVisible = allOpponentsOnline;
       this.cancelPvpOpponentWait(pvp);
@@ -3110,14 +3267,15 @@ class Game {
     }
     if (room.status === 'waiting' && pvp.host) {
       const connectedCount = players.filter(player => player.online).length;
-      this.pvpStatus(`Ожидаем игроков на сервере: ${connectedCount}/${pvp.maxPlayers}.`);
+      this.pvpStatus(`Лобби: ${connectedCount}/8 игроков. Хост запускает матч вручную.`);
     }
-    if (room.status === 'playing' && !pvp.started && pvp.rtc?.connected && !pvp.rtc.failed) {
+    if (room.status === 'playing' && !pvp.started && (pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected && !pvp.rtc?.failed)) {
       pvp.started = true;
+      pvp.actualPlayerCount = players.length;
       document.getElementById('modal-pvp').style.display = 'none';
       this.start();
       this.startPvpSync();
-      this.pvpStatus('Матч начался! Побеждает тот, кто первым разрушит целостность соперника.');
+      this.pvpStatus(pvp.mode === 'battle_royale' ? 'Battle Royale начался. Последний оставшийся в живых — победитель.' : 'Матч начался!');
       if (pvp.mode === 'pvp') this.showBanner('ВАЖНО: первые 2 минуты вы с соперником неуязвимы друг к другу.');
       this.log(`PvP матч начался. Комната ${pvp.code}.`);
     }
@@ -3165,7 +3323,7 @@ class Game {
     }
     if (this.player?.hp > 0 && !pvp.matchOver) {
       this.pvpPausedByRemote = false;
-      this.paused = Boolean(pvp.choosing || pvp.manualPaused ||
+      this.paused = this.isBattleRoyale ? Boolean(pvp.brPaused) : Boolean(pvp.choosing || pvp.manualPaused ||
         document.getElementById('modal-pause').style.display === 'flex' ||
         document.getElementById('modal-shop').style.display === 'flex' ||
         document.getElementById('modal-lvlup').style.display === 'flex');
@@ -3182,7 +3340,7 @@ class Game {
 
   startPvpSync() {
     if (!this.pvp) return;
-    if (!this.pvp.rtc?.connected) {
+    if (!(this.pvp.host ? Object.values(this.pvp.peerConnections || {}).some(peer => peer.connected) : this.pvp.rtc?.connected)) {
       this.pvpStatus('Матч не запускается: нет прямого WebRTC-соединения.', true);
       return;
     }
@@ -3222,11 +3380,25 @@ class Game {
         enemyAttackSource: this.pvp.enemyAttackSource || 'Атака противника',
         killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0) },
         over: this.pvp.matchOver || p.hp <= 0,
+        migration85: Boolean(p.migration85),
         enemyDamage: this.pvp.enemyDamageTotals || {},
         claimedDrops: this.pvp.claimedDrops || {}
       };
       this.sendPvpNetworkState(state);
-      if (this.pvp.host && this.pvp.maxPlayers >= 3) this.publishThreePlayerRoster();
+      if (this.pvp.host && this.pvp.maxPlayers >= 2) this.publishThreePlayerRoster();
+      if (this.pvp.host && this.isBattleRoyale && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
+        const alive = [{ uid: this.pvp.uid, name: this.pvp.name, over: p.hp <= 0 }];
+        for (const member of Object.values(this.pvp.remotePlayers || {})) alive.push({ uid: member.uid, name: member.name, over: !member.state || member.state.over || member.state.hp <= 0 });
+        const survivors = alive.filter(member => !member.over);
+        if (alive.length >= this.pvp.actualPlayerCount && survivors.length <= 1) {
+          this.pvp.brWinnerSent = true;
+          const winner = survivors[0]?.name || '';
+          this.sendPvpNetworkMessage({ type: 'br-winner', winner });
+          this.pvp.matchOver = true;
+          this.paused = true;
+          this.showBanner(winner ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(winner)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
+        }
+      }
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 100) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
@@ -3273,7 +3445,7 @@ class Game {
 
   publishPvpSharedWorld() {
     const pvp = this.pvp;
-    if (!pvp?.host || !pvp.started || pvp.matchOver || pvp.opponentLost || !pvp.rtc?.connected) return false;
+    if (!pvp?.host || !pvp.started || pvp.matchOver || pvp.opponentLost || !Object.values(pvp.peerConnections || {}).some(peer => peer.connected)) return false;
     this.trackPvpSharedEntities();
     const safe = value => JSON.parse(JSON.stringify(value, (key, item) =>
       typeof item === 'number' && !Number.isFinite(item) ? 1e12 : item));
@@ -3286,15 +3458,14 @@ class Game {
       enemyProjectiles: byId(this.enemyProjectiles),
       bossWarnings: byId(this.bossWarnings)
     };
-    if (!pvp.rtc?.connected || pvp.rtc.failed) return false;
+    if (pvp.host ? !Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : !pvp.rtc?.connected || pvp.rtc?.failed) return false;
     return this.sendPvpWorldSnapshot(world);
   }
 
   sendPvpWorldSnapshot(world) {
     const pvp = this.pvp;
-    if (!pvp?.rtc?.connected) return false;
-    const channels = [pvp.rtc.worldChannel,
-      ...(pvp.host && pvp.maxPlayers >= 3 ? Object.values(pvp.threePeers || {}).map(peer => peer.worldChannel) : [])]
+    if (!pvp || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
+    const channels = (pvp.host ? Object.values(pvp.peerConnections || {}).map(peer => peer.worldChannel) : [pvp.rtc?.worldChannel])
       .filter(channel => channel?.readyState === 'open');
     if (!channels.length) return false;
     const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings'];
@@ -3475,8 +3646,14 @@ class Game {
     if (this.player.hp <= 0) this.gameOver('Противники уничтожили целостность базы!');
   }
 
-  damageRemotePlayerFromEnemy(damage, source = 'Атака противника') {
-    if (!this.pvp?.host || !this.pvp.started || !this.pvp.remoteState || this.pvp.remoteState.over || damage <= 0) return;
+  damageRemotePlayerFromEnemy(damage, source = 'Атака противника', targetUid = null) {
+    if (!this.pvp?.host || !this.pvp.started || damage <= 0) return;
+    if (this.isBattleRoyale && targetUid) {
+      const peer = this.pvp.peerConnections?.[targetUid];
+      if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source }, peer.channel, true);
+      return;
+    }
+    if (!this.pvp.remoteState || this.pvp.remoteState.over) return;
     this.pvp.enemyAttackTotal = (this.pvp.enemyAttackTotal || 0) + damage;
     this.pvp.enemyAttackSource = source;
   }
@@ -3550,7 +3727,9 @@ class Game {
   syncPvpWait() {
     const pvp = this.pvp;
     if (!pvp?.started) return;
-    const showWait = Boolean((pvp.connectionLost || pvp.remotePaused || (pvp.remoteChoosing && !pvp.choosing)) && !pvp.matchOver);
+    if (this.integrationShopWait) return;
+    const remoteLevelChoice = (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && pvp.remoteChoosing === 'levelup';
+    const showWait = Boolean(!this.isBattleRoyale && (pvp.connectionLost || pvp.remotePaused || (pvp.remoteChoosing && !pvp.choosing && !remoteLevelChoice)) && !pvp.matchOver);
     const modal = document.getElementById('modal-pvp-wait');
     modal.style.display = showWait ? 'flex' : 'none';
     if (showWait) {
@@ -3568,7 +3747,7 @@ class Game {
       this.paused = true;
     } else if (this.pvpPausedByRemote) {
       this.pvpPausedByRemote = false;
-      this.paused = Boolean(pvp.choosing || pvp.manualPaused || document.getElementById('modal-pause').style.display === 'flex' || this.player?.hp <= 0);
+      this.paused = this.isBattleRoyale ? Boolean(pvp.brPaused) : Boolean(pvp.choosing || pvp.manualPaused || document.getElementById('modal-pause').style.display === 'flex' || this.player?.hp <= 0);
       this.lastTime = performance.now();
     }
   }
@@ -3586,7 +3765,6 @@ class Game {
       if (pvp.host) await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`));
       else {
         await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}/players/${pvp.uid}`));
-        await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}/${pvp.slot === 1 ? 'guestUid' : 'guest2Uid'}`));
       }
     } catch (error) { this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка очистки комнаты при выходе', { message: error.message }); }
     this.pvp = null;
@@ -3596,7 +3774,9 @@ class Game {
     document.getElementById('pvp-leave-button').style.display = 'none';
     document.getElementById('pvp-room-code-display').style.display = 'none';
     document.getElementById('pvp-copy-room-code').style.display = 'none';
-    document.getElementById('pvp-disable-attacks').disabled = false;
+    document.getElementById('pvp-mode-select').disabled = false;
+    document.getElementById('pvp-lobby-players').style.display = 'none';
+    document.getElementById('pvp-start-button').style.display = 'none';
     this.paused = true;
     this.showMainMenu();
   }
@@ -3632,10 +3812,14 @@ class Game {
     document.getElementById('modal-main-menu').style.display = 'flex';
   }
 
-  openShop() {
+  openShop(options = {}) {
+    if (this.isBattleRoyale) { this.closeSalesCall(); this.log('В Battle Royale магазин не работает: закупки запрещены регламентом выживания.'); return; }
     this.closeSalesCall();
+    const coordinatedCall = options.integrationCallId && this.pvp?.integrationShop?.id === options.integrationCallId;
+    document.getElementById('shop-close-button').textContent = coordinatedCall ? 'Завершить выбор' : 'Завершить звонок и продолжить';
     this.paused = true;
-    this.setPvpChoosing('shop');
+    if (coordinatedCall) this.pvp.choosing = 'shop';
+    else this.setPvpChoosing('shop');
     this.keys = {};
     this.shopVisit++;
     this.shopRefreshCount = 0;
@@ -3647,8 +3831,15 @@ class Game {
   }
 
   showSalesCall() {
-    if (this.salesCallActive || this.player.hp <= 0) return;
-    if (this.pvp?.started && this.pvp.host) this.sendPvpNetworkMessage({ type: 'sales-call' });
+    if (this.isBattleRoyale || this.salesCallActive || this.player.hp <= 0) return;
+    if (this.pvp?.started && this.pvp.host) {
+      if (this.pvp.mode === 'pvp') this.startIntegrationShopVote();
+      else this.sendPvpNetworkMessage({ type: 'sales-call' });
+    }
+    this.showSalesCallCard();
+  }
+
+  showSalesCallCard() {
     this.salesCallActive = true;
     this.salesCallX = 12;
     this.salesCallY = 12;
@@ -3699,13 +3890,115 @@ class Game {
 
   answerSalesCall() {
     if (!this.salesCallActive) return;
+    if (this.pvp?.started && this.pvp.mode === 'pvp' && this.pvp.integrationShop?.voting) {
+      this.submitIntegrationShopVote(true);
+      return;
+    }
     this.openShop();
   }
 
   declineSalesCall() {
     if (!this.salesCallActive) return;
+    if (this.pvp?.started && this.pvp.mode === 'pvp' && this.pvp.integrationShop?.voting) {
+      this.submitIntegrationShopVote(false);
+      return;
+    }
     this.closeSalesCall();
     this.log('Звонок сброшен. Отдел продаж перезвонит через три минуты — это уже согласовано с CRM.');
+  }
+
+  startIntegrationShopVote() {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started || pvp.mode !== 'pvp') return;
+    const participants = [pvp.uid, ...Object.entries(pvp.peerConnections || {}).filter(([, peer]) => peer.connected).map(([uid]) => uid)];
+    const call = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, participants, votes: {}, completed: {}, voting: true, resolved: false };
+    pvp.integrationShop = call;
+    this.sendPvpNetworkMessage({ type: 'integration-shop-start', callId: call.id, participants });
+  }
+
+  receiveIntegrationShopStart(message) {
+    if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !message.callId) return;
+    this.pvp.integrationShop = { id: String(message.callId), participants: (message.participants || []).map(String), votes: {}, completed: {}, voting: true, resolved: false };
+    this.showSalesCallCard();
+  }
+
+  submitIntegrationShopVote(accept) {
+    const call = this.pvp?.integrationShop;
+    if (!call?.voting || call.resolved || !call.participants.includes(this.pvp.uid)) return;
+    this.closeSalesCall();
+    const vote = { type: 'integration-shop-vote', callId: call.id, uid: this.pvp.uid, accept: Boolean(accept) };
+    if (this.pvp.host) this.receiveIntegrationShopVote(vote);
+    else this.sendPvpNetworkMessage(vote, null, true);
+    this.log(accept ? 'Вы согласились посмотреть интеграции. Ждём решения остальных игроков.' : 'Вы отказались от интеграций. Ожидаем, пока остальные закончат выбор.');
+  }
+
+  receiveIntegrationShopVote(message) {
+    const call = this.pvp?.integrationShop;
+    const uid = String(message.uid || '');
+    if (!this.pvp?.host || !call?.voting || call.id !== String(message.callId) || !call.participants.includes(uid) || Object.hasOwn(call.votes, uid)) return;
+    call.votes[uid] = Boolean(message.accept);
+    if (!call.participants.every(playerUid => Object.hasOwn(call.votes, playerUid))) return;
+    call.voting = false;
+    call.resolved = true;
+    const votes = { ...call.votes };
+    this.sendPvpNetworkMessage({ type: 'integration-shop-result', callId: call.id, votes }, null, true);
+    this.receiveIntegrationShopResult({ type: 'integration-shop-result', callId: call.id, votes });
+  }
+
+  receiveIntegrationShopResult(message) {
+    const pvp = this.pvp;
+    const call = pvp?.integrationShop;
+    if (!call || call.id !== String(message.callId) || !message.votes || !Object.hasOwn(message.votes, pvp.uid)) return;
+    call.voting = false;
+    call.resolved = true;
+    call.votes = { ...message.votes };
+    const accepted = Object.values(call.votes).filter(Boolean).length;
+    if (call.votes[pvp.uid]) {
+      this.openShop({ integrationCallId: call.id });
+    } else {
+      this.showIntegrationShopWait(accepted ? 'Вы отказались от магазина. Игра продолжится, когда остальные закончат выбор.' : 'Все отказались от магазина. Матч продолжается.');
+      if (!accepted && pvp.host) this.finishIntegrationShopCall(call);
+    }
+  }
+
+  showIntegrationShopWait(message) {
+    const modal = document.getElementById('modal-pvp-wait');
+    modal.style.display = 'flex';
+    document.getElementById('pvp-wait-head').textContent = '⏳ Ждём игроков';
+    document.getElementById('pvp-wait-message').textContent = message;
+    this.paused = true;
+    this.integrationShopWait = true;
+  }
+
+  receiveIntegrationShopDone(message) {
+    const call = this.pvp?.integrationShop;
+    const uid = String(message.uid || '');
+    if (!this.pvp?.host || !call?.resolved || call.id !== String(message.callId) || !call.votes[uid]) return;
+    call.completed[uid] = true;
+    if (Object.keys(call.votes).filter(playerUid => call.votes[playerUid]).every(playerUid => call.completed[playerUid])) this.finishIntegrationShopCall(call);
+  }
+
+  finishIntegrationShopCall(call) {
+    if (!this.pvp?.host || !call || call.resumed) return;
+    call.resumed = true;
+    this.sendPvpNetworkMessage({ type: 'integration-shop-resume', callId: call.id }, null, true);
+    this.resumeIntegrationShop({ callId: call.id });
+  }
+
+  resumeIntegrationShop(message) {
+    const pvp = this.pvp;
+    const call = pvp?.integrationShop;
+    if (!call || call.id !== String(message.callId)) return;
+    call.resumed = true;
+    call.voting = false;
+    call.completed ||= {};
+    this.integrationShopWait = false;
+    pvp.choosing = null;
+    document.getElementById('modal-pvp-wait').style.display = 'none';
+    document.getElementById('modal-shop').style.display = 'none';
+    this.paused = Boolean(pvp.brPaused || pvp.manualPaused || this.player?.hp <= 0);
+    this.keys = {};
+    this.lastTime = performance.now();
   }
 
   createChallenge() {
@@ -3754,6 +4047,12 @@ class Game {
         reward: 78 + difficulty * 5,
         title: 'Обновление базы без окна',
         description: 'Базу уже перенесли на сервер, а окно обновления согласовали задним числом.'
+      },
+      {
+        objectives: [{ type: 'survive', target: 24, label: 'искать пропавшую кнопку, сек.' }], duration: 30,
+        reward: 82 + difficulty * 4,
+        title: 'Клиент: «У меня пропала кнопка»',
+        description: 'Кнопка отключена на время диагностики. Клиент уверяет, что вчера она была «где-то здесь».' , missingButton: true
       }
     ];
     const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
@@ -3842,6 +4141,7 @@ class Game {
       status: 'active',
       lastHp: this.player.hp
     });
+    if (challenge.missingButton) document.getElementById('btn-dyn-update').style.visibility = 'hidden';
     delete challenge.choices;
     this.updateChallengeUI();
     this.log(`Тикет принят: ${challenge.title}`);
@@ -3923,6 +4223,7 @@ class Game {
     const challenge = this.activeChallenge;
     if (!challenge || challenge.status !== 'active') return;
     challenge.status = success ? 'reward' : 'failed';
+    if (challenge.missingButton) document.getElementById('btn-dyn-update').style.visibility = '';
     this.challengeNoticeUntil = this.time + 4;
     if (success) {
       this.challengeNoticeUntil = 0;
@@ -3956,6 +4257,7 @@ class Game {
   }
 
   clearChallenge() {
+    document.getElementById('btn-dyn-update').style.visibility = '';
     this.activeChallenge = null;
     this.challengeNoticeUntil = 0;
     this.updateChallengeUI();
@@ -4102,6 +4404,15 @@ class Game {
   closeShop() {
     if (document.getElementById('modal-shop').style.display !== 'flex') return;
     document.getElementById('modal-shop').style.display = 'none';
+    const call = this.pvp?.integrationShop;
+    if (call?.resolved && call.votes?.[this.pvp.uid] && !call.resumed) {
+      this.pvp.choosing = null;
+      this.showIntegrationShopWait('Магазин закрыт. Матч продолжится, когда остальные игроки завершат выбор.');
+      if (this.pvp.host) this.receiveIntegrationShopDone({ callId: call.id, uid: this.pvp.uid });
+      else this.sendPvpNetworkMessage({ type: 'integration-shop-done', callId: call.id, uid: this.pvp.uid }, null, true);
+      this.keys = {};
+      return;
+    }
     this.setPvpChoosing(null);
     this.paused = Boolean(this.pvp?.remoteChoosing && !this.pvp.choosing);
     this.keys = {};
@@ -4130,6 +4441,9 @@ class Game {
   updateConsumableHUD() {
     const hud = document.getElementById('hud-consumables');
     if (!hud) return;
+    hud.style.display = this.isBattleRoyale ? 'none' : '';
+    const passives = document.getElementById('hud-shop-passives');
+    if (passives) passives.style.display = this.isBattleRoyale ? 'none' : 'flex';
     const keys = ['7', '8', '9', '0'];
     hud.innerHTML = '';
     for (let i = 0; i < 4; i++) {
@@ -4144,6 +4458,7 @@ class Game {
   }
 
   togglePause() {
+    if (this.isBattleRoyale) return;
     if (this.paused || !this.player || this.player.hp <= 0) return;
     this.paused = true;
     this.keys = {};
@@ -4152,6 +4467,27 @@ class Game {
     this.renderPauseLoadout();
     document.getElementById('modal-pause').style.display = 'flex';
     this.setPvpManualPause(true);
+  }
+
+  toggleBattleRoyalePause() {
+    if (!this.isBattleRoyale || !this.pvp?.started || this.pvp.matchOver) return;
+    const paused = !this.pvp.brPaused;
+    if (this.pvp.host) {
+      this.applyBattleRoyalePause(paused);
+      this.sendPvpNetworkMessage({ type: 'br-pause', paused });
+    } else {
+      this.sendPvpNetworkMessage({ type: 'br-pause-request', paused }, null, true);
+    }
+  }
+
+  applyBattleRoyalePause(paused) {
+    if (!this.isBattleRoyale || !this.pvp) return;
+    this.pvp.brPaused = Boolean(paused);
+    this.paused = Boolean(paused);
+    if (paused) this.keys = {};
+    else this.lastTime = performance.now();
+    document.getElementById('modal-br-pause').style.display = paused ? 'flex' : 'none';
+    document.getElementById('btn-pause').textContent = paused ? '⏸ Матч на паузе · F9' : '⏸ Пауза отключена · F9';
   }
 
   renderPauseLoadout() {
@@ -4248,6 +4584,10 @@ class Game {
   }
 
   showLeaderboard() {
+    if (this.isBattleRoyale && this.pvp?.started && !this.pvp.matchOver) {
+      this.addPopup(this.player?.x || 0, this.player?.y || 0, 'Таблица рекордов откроется после матча · F9 — общая пауза', '#ffd166');
+      return;
+    }
     if (document.getElementById('modal-lb').style.display === 'flex') {
       this.fetchLeaderboard();
       return;
@@ -4376,6 +4716,7 @@ class Game {
   }
 
   triggerDynamicUpdate() {
+    if (this.activeChallenge?.missingButton && this.activeChallenge.status === 'active') return;
     if (this.dynUpdateCd > 0 || this.player.hp <= 0 || this.paused) return;
 
     this.dynUpdateCd = 35;
@@ -4457,7 +4798,7 @@ class Game {
     }
     const megaBossAlive = this.enemies.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
     if (!megaBossAlive && this.spawnTimer <= 0) {
-      const onlineMultiplier = this.pvp?.started ? 1.8 : 1;
+      const onlineMultiplier = this.getMobCountMultiplier();
       const maxAllowedEnemies = Math.floor(Math.min(72, 38 + Math.floor(this.time / 12)) * onlineMultiplier);
 
       if (this.enemies.length < maxAllowedEnemies) {
@@ -4503,6 +4844,12 @@ class Game {
     this.addPopup(x, y - 38, 'НЕУСТРАНИМЫЙ ПРЕСЛЕДОВАТЕЛЬ', '#e0aaff');
     this.log(`На 15-й минуте появился ${name}. Он медленно идёт за вами, неуязвим и не отстанет до конца сессии.`);
   }
+  getMobCountMultiplier() {
+    if (!this.pvp?.started) return 1;
+    const players = Math.max(1, Math.min(8, Number(this.pvp.actualPlayerCount) || 1));
+    return players === 1 ? 1 : 1.8 + (players - 2) * 0.25;
+  }
+
   spawnEnemy() {
     const angle = Math.random() * Math.PI * 2;
     const dist = 640 + Math.random() * 80;
@@ -5101,7 +5448,7 @@ class Game {
 
   dealPlayerDamage(baseDmg) {
     let dmg = baseDmg * this.player.dmgMult * (this.player.damageBuffMult || 1);
-    let isCrit = Math.random() < this.player.critChance;
+    let isCrit = Math.random() < Math.min(0.8, this.player.critChance);
     if (isCrit) {
       dmg *= 2.5;
       this.sound.crit();
@@ -5571,6 +5918,7 @@ class Game {
       mx *= -1;
       my *= -1;
     }
+    if ((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && this.pvp?.choosing === 'levelup') { mx = 0; my = 0; this.mouseMoveAim = null; }
 
     if (this.pvpControlTimer <= 0 && (mx !== 0 || my !== 0)) {
       const len = Math.hypot(mx, my);
@@ -5819,6 +6167,7 @@ class Game {
       // Касание
       const targetDistance = Math.hypot(target.x - e.x, target.y - e.y);
       if (worldAuthority && targetDistance < e.size + 18) {
+        if (target.untargetable) continue;
         if (e.is24hPursuer && target.isRemote) {
           this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1, e.name);
         } else if (e.is24hPursuer) {
@@ -5833,7 +6182,7 @@ class Game {
         }
 
         if (target.isRemote) {
-          this.damageRemotePlayerFromEnemy(e.dmg * dt, e.name);
+          this.damageRemotePlayerFromEnemy(e.dmg * dt, e.name, target.uid);
         } else if (this.player.shieldTimer <= 0) {
           if (Math.random() > this.player.dodge) {
             const damage = e.dmg * dt;
@@ -5867,6 +6216,8 @@ class Game {
         if (e.isMegaBoss) {
           this.bossWarnings = [];
           this.enemyProjectiles = [];
+          if (!this.legendaryOffered && !this.pvp?.started) this.offerLegendaryMigrations(false);
+          else if (!this.legendaryOffered && this.pvp?.host) this.offerLegendaryMigrations(true);
         }
         let guestGotKillCredit = false;
         if (this.pvp?.started && this.pvp.host && e.syncId && !this.pvp.opponentLost) {
@@ -5906,7 +6257,10 @@ class Game {
         const hasNukeOnMap = this.pickups.some(p => p.type === 'its_box');
         const dropRoll = Math.random();
 
-        if (!hasNukeOnMap && (e.xp >= 8 || e.isBoss) && dropRoll < 0.009) {
+        if (this.isBattleRoyale && dropRoll < 0.035) {
+          const consumableKey = Object.keys(CONSUMABLES_DEF)[Math.floor(Math.random() * Object.keys(CONSUMABLES_DEF).length)];
+          this.pickups.push({ x: e.x, y: e.y, type: 'consumable', consumableKey, icon: CONSUMABLES_DEF[consumableKey].icon });
+        } else if (!hasNukeOnMap && (e.xp >= 8 || e.isBoss) && dropRoll < 0.009) {
           this.pickups.push({ x: e.x, y: e.y, type: 'its_box', icon: '📦' });
         } else if (dropRoll < 0.04) {
           this.pickups.push({ x: e.x, y: e.y, type: 'coffee', icon: '☕' });
@@ -5934,6 +6288,13 @@ class Game {
           this.player.hp = Math.min(this.player.maxHp, this.player.hp + (this.pvp?.mode === 'pvp' ? 10 : 20));
           this.sound.playTone(520, 'triangle', 0.15, 0.12);
           this.addPopup(this.player.x, this.player.y - 25, "+20 HP (Банан)", "#2ecc71");
+        } else if (item.type === 'consumable') {
+          const freeSlot = this.consumables.findIndex(slot => !slot);
+          if (freeSlot >= 0) {
+            this.consumables[freeSlot] = { key: item.consumableKey, count: 1 };
+            this.addPopup(this.player.x, this.player.y - 25, `${CONSUMABLES_DEF[item.consumableKey].icon} Расходник найден`, '#ffcf70');
+            this.updateConsumableHUD();
+          } else this.addPopup(this.player.x, this.player.y - 25, 'Инвентарь забит', '#aaa');
         }
         this.pickups.splice(i, 1);
       }
@@ -5999,9 +6360,7 @@ class Game {
   addXP(val) {
     this.xp += val;
     this.sound.gemPickup();
-    if (this.xp >= this.nextXp && !this.paused) {
-      this.levelUp();
-    }
+    while (this.xp >= this.nextXp && !this.paused) this.levelUp();
   }
 
   /* ============================================================
@@ -6012,8 +6371,17 @@ class Game {
     this.xp -= this.nextXp;
     this.nextXp = Math.floor(this.nextXp * 1.34);
     this.sound.levelUp();
-    this.paused = true;
-    this.setPvpChoosing('levelup');
+    const nonPausingUpgrade = this.isBattleRoyale || this.isPvpMassUpgradeMode?.();
+    if (nonPausingUpgrade) {
+      this.pendingBattleRoyaleUpgrades ||= [];
+      this.pendingBattleRoyaleUpgrades.push(this.buildUpgradeChoices());
+      this.paused = false;
+      this.setPvpChoosing(null);
+      this.updateBattleRoyaleUpgradeButton();
+    } else {
+      this.paused = true;
+      this.setPvpChoosing('levelup');
+    }
 
     // ПАССИВНЫЙ РОСТ СИЛЫ ПРОГРАММИСТА С КАЖДЫМ РЕЛИЗОМ:
     this.player.maxHp += 10;
@@ -6023,9 +6391,64 @@ class Game {
 
     this.addPopup(this.player.x, this.player.y - 30, `РЕЛИЗ ${this.heroReleaseVersion()} УСТАНОВЛЕН!`, '#ffd200');
 
-    this.currentUpgradeChoices = this.buildUpgradeChoices();
+    if (!nonPausingUpgrade) {
+      this.currentUpgradeChoices = this.buildUpgradeChoices();
+      this.renderUpgradeChoices();
+      document.getElementById('modal-lvlup').style.display = 'flex';
+    }
+  }
+
+  updateBattleRoyaleUpgradeButton() {
+    const button = document.getElementById('br-upgrade-button');
+    if (!button) return;
+    const count = this.pendingBattleRoyaleUpgrades?.length || 0;
+    button.style.display = (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && count ? 'block' : 'none';
+    button.textContent = count > 1 ? `+${count}` : '+';
+    button.title = count ? `Доступно улучшений: ${count}` : '';
+  }
+
+  openBattleRoyaleUpgrade() {
+    if (!(this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) || !this.pendingBattleRoyaleUpgrades?.length || this.player.hp <= 0) return;
+    this.currentUpgradeChoices = this.pendingBattleRoyaleUpgrades[0];
     this.renderUpgradeChoices();
+    this.paused = false;
+    this.keys = {};
+    this.setPvpChoosing('levelup');
+    document.getElementById('lvlup-subtitle').textContent = 'Выберите улучшение. Матч продолжается, мобы временно теряют вас из виду.';
     document.getElementById('modal-lvlup').style.display = 'flex';
+  }
+
+  offerLegendaryMigrations(broadcast = true) {
+    if (this.legendaryOffered || !Array.isArray(LEGENDARY_MIGRATIONS) || LEGENDARY_MIGRATIONS.length < 3) return;
+    this.legendaryOffered = true;
+    if (broadcast && this.pvp?.started && this.pvp.host) this.sendPvpNetworkMessage({ type: 'legendary-offer' });
+    const choices = [...LEGENDARY_MIGRATIONS].sort(() => Math.random() - 0.5).slice(0, 3);
+    const container = document.getElementById('legendary-items');
+    container.replaceChildren();
+    document.getElementById('legendary-subtitle').textContent = 'Первый большой босс пал. Выберите одну легендарную миграцию; сила релиза приходит с побочным эффектом.';
+    for (const migration of choices) {
+      const card = document.createElement('button');
+      card.className = 'legendary-card';
+      card.innerHTML = `<div style="font-size:28px">${migration.icon}</div><b>${migration.name}</b><p>${migration.description}</p>`;
+      card.onclick = () => this.chooseLegendaryMigration(migration.key);
+      container.appendChild(card);
+    }
+    this.legendaryChoices = choices;
+    this.paused = !this.isBattleRoyale;
+    this.setPvpChoosing('legendary');
+    document.getElementById('modal-legendary').style.display = 'flex';
+  }
+
+  chooseLegendaryMigration(key) {
+    const migration = this.legendaryChoices?.find(item => item.key === key);
+    if (!migration) return;
+    migration.apply(this);
+    document.getElementById('modal-legendary').style.display = 'none';
+    this.legendaryChoices = null;
+    this.paused = false;
+    this.setPvpChoosing(null);
+    this.updateHUD();
+    this.addPopup(this.player.x, this.player.y - 34, `ЛЕГЕНДАРНАЯ МИГРАЦИЯ: ${migration.name}`, '#ffad42');
   }
 
   buildUpgradeChoices() {
@@ -6065,7 +6488,7 @@ class Game {
     }
     const choices = available.sort(() => 0.5 - Math.random()).slice(0, 3);
     if (choices.length < 3) {
-      const shuffledRep = [...REPEATABLE_UPGRADES].sort(() => 0.5 - Math.random());
+      const shuffledRep = REPEATABLE_UPGRADES.filter(rep => rep.key !== 'rep_salary_index' || (this.repeatableUpgradeCounts[rep.key] || 0) < 8).sort(() => 0.5 - Math.random());
       for (let i = 0; i < 3 - choices.length; i++) {
         const rep = shuffledRep[i % shuffledRep.length];
         choices.push({ type: 'repeatable', key: rep.key, def: rep, applyFn: rep.apply });
@@ -6097,13 +6520,20 @@ class Game {
         this.applyUpgrade(ch);
         document.getElementById('modal-lvlup').style.display = 'none';
         this.lastTime = performance.now();
-        if (this.xp >= this.nextXp) this.levelUp();
+        if (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) {
+          this.pendingBattleRoyaleUpgrades.shift();
+          this.updateBattleRoyaleUpgradeButton();
+          this.paused = false;
+          this.setPvpChoosing(null);
+          while (this.xp >= this.nextXp) this.levelUp();
+        } else if (this.xp >= this.nextXp) this.levelUp();
         else { this.paused = false; this.setPvpChoosing(null); }
       };
       box.appendChild(card);
     });
     const rerollButton = document.getElementById('upgrade-reroll');
     if (rerollButton) {
+      rerollButton.style.display = (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) ? 'none' : '';
       rerollButton.textContent = this.upgradeRerollsRemaining > 0
         ? `🔄 Перебросить выбор · ${this.upgradeRerollsRemaining}`
         : 'Перебросов не осталось';
@@ -6155,8 +6585,10 @@ class Game {
       const stat = statByKey[ch.key];
       if (stat) this.player[stat] = Math.min(5, this.player[stat] + 1);
     } else if (ch.type === 'repeatable') {
-      ch.applyFn(this);
-      this.repeatableUpgradeCounts[ch.key] = (this.repeatableUpgradeCounts[ch.key] || 0) + 1;
+      if (ch.key !== 'rep_salary_index' || (this.repeatableUpgradeCounts[ch.key] || 0) < 8) {
+        ch.applyFn(this);
+        this.repeatableUpgradeCounts[ch.key] = (this.repeatableUpgradeCounts[ch.key] || 0) + 1;
+      }
     }
 
     this.updateInventoryHUD();
@@ -6165,21 +6597,27 @@ class Game {
   }
 
   gameOver(reason) {
+    const battleRoyaleElimination = Boolean(this.isBattleRoyale && this.pvp?.started && this.player?.hp <= 0);
+    if (battleRoyaleElimination && this.pvp.eliminated) return;
     this.closeSalesCall();
     this.clearChallenge();
-    this.paused = true;
+    this.paused = !battleRoyaleElimination;
     document.getElementById('modal-pause').style.display = 'none';
     document.getElementById('modal-lvlup').style.display = 'none';
     document.getElementById('modal-shop').style.display = 'none';
     document.getElementById('modal-pvp-wait').style.display = 'none';
+    document.getElementById('modal-legendary').style.display = 'none';
     if (this.pvp) {
-      this.pvp.matchOver = true;
+      if (battleRoyaleElimination) this.pvp.eliminated = true;
+      else this.pvp.matchOver = true;
       this.pvp.choosing = null;
       this.sendPvpNetworkState();
       this.sendPvpNetworkState(null, this.pvp.rtc?.worldChannel, 'match-over');
     }
-    if (this.pvpTimer) clearInterval(this.pvpTimer);
-    this.pvpTimer = null;
+    if (!battleRoyaleElimination) {
+      if (this.pvpTimer) clearInterval(this.pvpTimer);
+      this.pvpTimer = null;
+    }
     this.sound.playTone(60, 'sawtooth', 0.7, 0.45);
 
     const totalScore = this.calcScore();
@@ -6255,7 +6693,7 @@ class Game {
 
   async fetchLeaderboard() {
     const tbody = document.getElementById('lb-body');
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
 
     try {
       if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён.');
@@ -6272,7 +6710,7 @@ class Game {
       scores.sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
       tbody.innerHTML = '';
       if (!scores.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Таблица пока пуста. Запишите первый результат!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Таблица пока пуста. Запишите первый результат!</td></tr>';
         return;
       }
 
@@ -6281,8 +6719,10 @@ class Game {
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
         const s = (seconds % 60).toString().padStart(2, '0');
         const entryMode = entry.mode || 'solo';
-        const modeLabel = entryMode === 'pvp' ? 'Сетевая · PvP'
+        const modeLabel = entryMode === 'battle_royale' ? 'Battle Royale'
+          : entryMode === 'pvp' ? 'Сетевая · PvP'
           : entryMode === 'pve' ? 'Сетевая · PvE' : 'Одиночная';
+        const playerCount = Math.max(1, Math.min(8, Number(entry.playerCount) || (entryMode === 'solo' ? 1 : 2)));
         const displayName = this.escapeHtml(String(entry.name || 'Архитектор_1С'));
         const usernameTag = String(entry.name || '').toLowerCase() === 'username'
           ? ' <span style="color:#c0392b;">(читерок)</span>' : '';
@@ -6292,13 +6732,14 @@ class Game {
           <td><b>${displayName}</b>${usernameTag}</td>
           <td>${this.escapeHtml(String(entry.version || '1.7.1'))}</td>
           <td>${modeLabel}</td>
+          <td>${playerCount}</td>
           <td style="color:#b33939; font-weight:bold;">${Math.max(0, Number(entry.score) || 0)}</td>
           <td>${m}:${s}</td>
         `;
         tbody.appendChild(tr);
       });
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
     }
   }
 
@@ -6325,6 +6766,7 @@ class Game {
   }
 
   updateHUD() {
+    this.updateBattleRoyaleCenterMarker();
     const pct = Math.min(100, (this.xp / this.nextXp) * 100);
     document.getElementById('xp-bar-fill').style.width = pct + '%';
     document.getElementById('xp-bar-text').innerText = `РЕЛИЗ ${this.heroReleaseVersion()} [${this.xp} / ${this.nextXp} СТРОК КОДА]`;
@@ -6370,6 +6812,18 @@ class Game {
     else if (this.level >= 5) grade = "Ведущий Разработчик КОРП";
     document.getElementById('arch-grade').innerText = grade;
     this.updateBuffHUD();
+  }
+
+  updateBattleRoyaleCenterMarker() {
+    const marker = document.getElementById('br-center-marker');
+    if (!marker) return;
+    marker.style.display = this.isBattleRoyale && this.player ? 'block' : 'none';
+    if (!this.isBattleRoyale || !this.player) return;
+    const dx = this.MAP_SIZE / 2 - this.player.x;
+    const dy = this.MAP_SIZE / 2 - this.player.y;
+    const arrow = document.getElementById('br-center-arrow');
+    arrow.style.transform = `rotate(${Math.atan2(dy, dx) * 180 / Math.PI + 90}deg)`;
+    document.getElementById('br-center-distance').textContent = Math.round(Math.hypot(dx, dy)).toLocaleString('ru-RU');
   }
 
   updateBuffHUD() {
@@ -6755,7 +7209,8 @@ class Game {
         this.ctx.translate(pos.x, pos.y);
         this.ctx.globalAlpha = state.over ? 0.42 : 1;
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, 20, 0, Math.PI * 2);
+        if (state.migration85 && this.ctx.roundRect) this.ctx.roundRect(-20, -20, 40, 40, 9);
+        else this.ctx.arc(0, 0, 20, 0, Math.PI * 2);
         this.ctx.fillStyle = '#a29bfe';
         this.ctx.fill();
         this.ctx.strokeStyle = '#eeeaff';
@@ -6801,7 +7256,8 @@ class Game {
     }
 
     this.ctx.beginPath();
-    this.ctx.arc(0, 0, 19, 0, Math.PI * 2);
+    if (this.player.migration85 && this.ctx.roundRect) this.ctx.roundRect(-19, -19, 38, 38, 9);
+    else this.ctx.arc(0, 0, 19, 0, Math.PI * 2);
     this.ctx.fillStyle = '#ffd200';
     this.ctx.fill();
     this.ctx.strokeStyle = '#b29100';
@@ -6873,3 +7329,7 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
+
+
+

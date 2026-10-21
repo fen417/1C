@@ -723,7 +723,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 1.9.0 — «Новый подход»</h3>
-              <p>Появился выбор испытаний и награды за их выполнение. Перки и PvP-баланс стали ровнее, а контроль соперника — короче.</p>
+              <p>Обновлены описания улучшений, добавлены поджигающие снаряды и выбор награды за испытания. PvP-баланс стал ровнее, а контроль соперника — короче.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 1.8.0 — «Командный зачёт»</h3>
@@ -812,7 +812,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Появился выбор испытаний и награды за их выполнение. Перки и PvP-баланс стали ровнее, а контроль соперника — короче.</p></details>
+        <details class="release-notes" open><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания улучшений, добавлены поджигающие снаряды и выбор награды за испытания. PvP-баланс стал ровнее, а контроль соперника — короче.</p></details>
         <details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
@@ -1310,28 +1310,28 @@ class SoundEngine {
    ============================================================ */
 const WEAPONS_DEF = {
   turnstile: {
-    name: 'СКУД Sigur / AVI',
+    name: 'СКУД Sigur',
     icon: '🚧',
     desc: '«Коробочка мигает — значит подключена?» Питание есть, кабель лежит рядом, а клиент уже прислал счёт за простой. Турникет отталкивает толпу.',
     baseCooldown: 0,
     baseDmg: 16
   },
   keys: {
-    name: 'Телефонная настройка считывателя IronLogic',
+    name: 'Настройка считывателя IronLogic',
     icon: '🗝️',
-    desc: 'По телефону выяснили: IronLogic не видит карту, потому что кабель воткнули в соседний порт. Техспец просит показать экран через AnyDesk; клиент наводит камеру на монитор. Метает пропуска по курсу.',
+    desc: 'По телефону выяснили: IronLogic не видит карту, потому что кабель воткнули в соседний порт. Техспец просит показать экран через AnyDesk; клиент наводит вебкамеру на монитор. Метает пропуска по курсу.',
     baseCooldown: 1.5,
     baseDmg: 26
   },
   syntax: {
     name: 'Синтаксис-Контроль',
     icon: '⚡',
-    desc: 'Клиент трое суток не нажимал «Обновить конфигурацию». Техспец нажал — синтаксические ошибки посыпались на врагов.',
+    desc: 'Клиент три месяца не нажимал «Обновить конфигурацию». Техспец нажал — синтаксические ошибки посыпались на врагов.',
     baseCooldown: 0.85,
     baseDmg: 28
   },
   heavy_archive: {
-    name: 'Чековый принтер ШТРИХ',
+    name: 'ККТ Атол',
     icon: '🧾',
     desc: 'Заявка: «АТОЛ не печатает». Диагностика: лента вставлена наоборот. После пусконаладки чеки пробивают толпу насквозь.',
     baseCooldown: 2.8,
@@ -1361,7 +1361,7 @@ const WEAPONS_DEF = {
   egais_laser: {
     name: 'АТОЛ: фискальный сканер',
     icon: '🔴',
-    desc: 'Эвотор подключили, обмен настроили, счёт согласовали в трёх отделах. Теперь красный луч проходит по нескольким целям.',
+    desc: 'Кассу подключили, обмен настроили, счёт согласовали в трёх отделах. Теперь красный луч проходит по нескольким целям.',
     baseCooldown: 1.8,
     baseDmg: 34
   }
@@ -1384,7 +1384,7 @@ const PASSIVES_DEF = {
   coffee_machine: {
     name: 'Кофе из 308 кабинета',
     icon: '☕',
-    desc: 'Очередь на ресепшене подождёт: оружие и умения перезаряжаются быстрее.',
+    desc: 'Очередь подождёт: оружие и умения перезаряжаются быстрее.',
     levels: [
       { cdMult: 0.95 }, { cdMult: 0.90 }, { cdMult: 0.85 }, { cdMult: 0.80 }, { cdMult: 0.75 }
     ],
@@ -1414,9 +1414,9 @@ const PASSIVES_DEF = {
     levelDescriptions: ['+20% опыта, −2% скорости.', '+30% опыта, −2,5% скорости.', '+40% опыта, −3% скорости.', '+52% опыта, −3,5% скорости.', '+65% опыта, −4% скорости.']
   },
   overtime_pizza: {
-    name: 'Овертайм за Пиццу',
+    name: 'Пятничная Пицца',
     icon: '🍕',
-    desc: 'Увеличивает общий урон, но немного замедляет программиста.',
+    desc: 'Увеличивает общий урон, но немного замедляет героя.',
     levels: [
       { dmgMult: 0.20, speedMult: -0.04 }, { dmgMult: 0.28, speedMult: -0.06 },
       { dmgMult: 0.36, speedMult: -0.08 }, { dmgMult: 0.43, speedMult: -0.10 }, { dmgMult: 0.50, speedMult: -0.12 }
@@ -1434,7 +1434,7 @@ const PASSIVES_DEF = {
     levelDescriptions: ['+10% скорости и синяя дорожка.', '+14% скорости и синяя дорожка.', '+18% скорости и синяя дорожка.', '+22% скорости и синяя дорожка.', '+26% скорости и синяя дорожка.']
   },
   hasp_emu: {
-    name: 'HASP Эмулятор 2008',
+    name: 'HASP Эмулятор на 300 человек',
     icon: '🗝️',
     desc: 'Повышает шанс увернуться от претензий клиента.',
     levels: [{ dodge: 0.10 }, { dodge: 0.14 }, { dodge: 0.18 }, { dodge: 0.22 }, { dodge: 0.26 }],
@@ -1453,7 +1453,7 @@ const PASSIVES_DEF = {
   messenger_hub: {
     name: 'Интеграция мессенджеров',
     icon: '💬',
-    desc: 'Клиент отключил уведомления и просит проверить доставку сообщения по телефону. +18% к опыту, но бег немного медленнее.',
+    desc: 'Клиент создал сегмент, но забыл себя в него добавить и не видит сообщения. +18% к опыту, но бег немного медленнее.',
     levels: [
       { xpMult: 0.12, speedMult: -0.01 }, { xpMult: 0.18, speedMult: -0.02 },
       { xpMult: 0.24, speedMult: -0.03 }, { xpMult: 0.30, speedMult: -0.04 }, { xpMult: 0.36, speedMult: -0.05 }
@@ -1463,7 +1463,7 @@ const PASSIVES_DEF = {
   evotor_paid: {
     name: 'Эвотор: платная интеграция',
     icon: '💸',
-    desc: 'Техспец подключил платный модуль Эвотор и настроил обмен. Урон выше, перезарядка дольше.',
+    desc: 'Техспец подключил платную интеграцию Эвотор и настроил обмен. Урон выше, перезарядка дольше.',
     levels: [
       { dmgMult: 0.12, cdMult: 1.04 }, { dmgMult: 0.18, cdMult: 1.07 },
       { dmgMult: 0.24, cdMult: 1.10 }, { dmgMult: 0.30, cdMult: 1.13 }, { dmgMult: 0.36, cdMult: 1.16 }
@@ -1480,7 +1480,7 @@ const PASSIVES_DEF = {
   mango_hold: {
     name: 'Клиент ищет кнопку «Разрешить»',
     icon: '📞',
-    desc: 'Пока клиент сверяет код из SMS с письмом, опыт приходит быстрее. Но отвлекающие звонки немного снижают урон.',
+    desc: 'Пока клиент ищет кнопку "Разрешить", опыт приходит быстрее. Но отвлекающие звонки немного снижают урон.',
     levels: [
       { xpMult: 0.05, dmgMult: -0.01 }, { xpMult: 0.08, dmgMult: -0.015 },
       { xpMult: 0.11, dmgMult: -0.02 }, { xpMult: 0.14, dmgMult: -0.025 }, { xpMult: 0.17, dmgMult: -0.03 }
@@ -1488,7 +1488,7 @@ const PASSIVES_DEF = {
     levelDescriptions: ['+5% опыта, −1% урона.', '+8% опыта, −1,5% урона.', '+11% опыта, −2% урона.', '+14% опыта, −2,5% урона.', '+17% опыта, −3% урона.']
   },
   rudesktop_lag: {
-    name: 'Rudesktop: курсор уже почти здесь',
+    name: 'Rudesktop: курсор завис',
     icon: '🖱️',
     desc: 'Пока экран обновляет один пиксель, специалист успевает сделать больше. Скорость выше, перезарядка чуть дольше.',
     levels: [
@@ -1557,14 +1557,14 @@ const ACTIVE_SKILLS_DEF = {
     }
   },
   act_kill_sessions: {
-    name: 'Активное: Завершить зависшие сеансы (Kill -9)',
+    name: 'Активное: Завершить зависшие сеансы через консоль администрирования',
     icon: '✂️',
     desc: 'Очистка диспетчера: убивает обычных врагов с HP < 30% на всём экране и станит боссов на 3с!',
     baseCd: 18,
     cast: (g, lvl) => {
       g.sound.explosion();
       g.triggerGlitchScreen();
-      g.addPopup(g.player.x, g.player.y - 30, '✂️ KILL -9 СЕАНСЫ СБРОШЕНЫ!', '#ff4757');
+      g.addPopup(g.player.x, g.player.y - 30, '✂️ СЕАНСЫ СБРОШЕНЫ!', '#ff4757');
 
       for (let e of g.enemies) {
         if (e.is24hPursuer) continue;
@@ -1597,13 +1597,13 @@ const ACTIVE_SKILLS_DEF = {
     }
   },
   act_lavender_raf: {
-    name: 'Активное: Двойной Раф с Лавандой',
+    name: 'Активное: Чай из травы, которую собрал Владик на огороде',
     icon: '☕',
-    desc: 'Кофеиновый вакуум: моментально всасывает ВСЕ дискеты с карты в карман и взрывает ауру!',
+    desc: 'Чайный вакуум: моментально всасывает ВСЕ дискеты с карты в карман и взрывает ауру!',
     baseCd: 26,
     cast: (g, lvl) => {
       g.sound.playTone(850, 'triangle', 0.4, 0.25);
-      g.addPopup(g.player.x, g.player.y - 30, '☕ КОФЕИНОВЫЙ МАГНИТ!', '#e67e22');
+      g.addPopup(g.player.x, g.player.y - 30, '☕ ЧАЙНЫЙ МАГНИТ!', '#e67e22');
 
       // Притягиваем ВСЕ дискеты
       for (let gem of g.gems) {
@@ -1637,7 +1637,7 @@ const ACTIVE_SKILLS_DEF = {
     }
   },
   act_sigur_lockdown: {
-    name: 'Sigur / AVI: блокировка турникетов',
+    name: 'Sigur: блокировка турникетов',
     icon: '🚧',
     desc: 'Антипассбэк сработал: отбрасывает врагов вокруг и наносит урон.',
     baseCd: 24,
@@ -1853,8 +1853,8 @@ const CONSUMABLES_DEF = {
     }
   },
   messenger_push: {
-    name: 'Интеграция мессенджеров «Срочный push»', icon: '💬', cost: 155, stock: 2, maxStack: 3,
-    desc: 'Платный пакет рассылок: обычные враги поблизости замирают на 2 секунды. Доставка push не гарантирует прочтение счёта.',
+    name: 'Интеграция мессенджера «MAX»', icon: '💬', cost: 155, stock: 2, maxStack: 3,
+    desc: 'Звонок проходит даже на парковке: обычные враги поблизости замирают от внезапного звонка на 2 секунды.',
     use: (g) => {
       for (const e of g.enemies) {
         if (!e.isBoss && Math.hypot(e.x - g.player.x, e.y - g.player.y) < 420) e.freezeTimer = Math.max(e.freezeTimer, 2);
@@ -1889,6 +1889,11 @@ const COMBAT_UPGRADES = {
   slowshot: {
     name: 'Замедляющие снаряды', icon: '❄️',
     desc: 'Попадания замедляют противников сильнее с каждым уровнем. Максимум 5 уровней.'
+  },
+  burnshot: {
+    name: 'Поджигающие снаряды', icon: '🔥',
+    desc: 'Снаряды с возрастающим с уровнем шансом поджигают врагов и наносят им небольшой периодический урон. Максимум 5 уровней.',
+    levelDescriptions: ['Шанс поджога — 12%.', 'Шанс поджога — 20%.', 'Шанс поджога — 28%.', 'Шанс поджога — 36%.', 'Шанс поджога — 44%.']
   }
 };
 
@@ -2169,6 +2174,7 @@ class Game {
       ricochetLevel: 0,
       multishotLevel: 0,
       slowShotLevel: 0,
+      burnShotLevel: 0,
       hasShoeTrail: false,
       hasBackupShield: false,
       backupInterval: 38,
@@ -4724,9 +4730,9 @@ class Game {
       detail: PASSIVES_DEF[key].levelDescriptions[passive.lvl - 1]
     }));
     const combat = [
-      ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot']
+      ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
     ].filter(([stat]) => this.player[stat] > 0).map(([stat, key]) => ({
-      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${this.player[stat]}`, detail: COMBAT_UPGRADES[key].desc
+      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${this.player[stat]}`, detail: COMBAT_UPGRADES[key].levelDescriptions?.[this.player[stat] - 1] || COMBAT_UPGRADES[key].desc
     }));
     const active = this.activeSkills.filter(Boolean).map(skill => ({
       icon: ACTIVE_SKILLS_DEF[skill.key].icon,
@@ -5648,6 +5654,29 @@ class Game {
     enemy.slowTimer = Math.max(enemy.slowTimer || 0, 2.2);
   }
 
+  applyProjectileBurn(enemy) {
+    const level = this.player.burnShotLevel || 0;
+    if (level <= 0 || Math.random() >= Math.min(0.44, 0.12 + (level - 1) * 0.08)) return;
+    enemy.burnTimer = Math.max(enemy.burnTimer || 0, 3);
+    enemy.burnDamage = Math.max(enemy.burnDamage || 0, 2.5 + level * 0.3);
+    enemy.burnTickTimer = Math.min(enemy.burnTickTimer ?? 0.5, 0.5);
+  }
+
+  updateEnemyBurn(enemy, dt) {
+    if (!(enemy.burnTimer > 0)) return;
+    enemy.burnTimer = Math.max(0, enemy.burnTimer - dt);
+    enemy.burnTickTimer = (enemy.burnTickTimer ?? 0.5) - dt;
+    while (enemy.burnTickTimer <= 0 && enemy.burnTimer > 0) {
+      enemy.hp -= enemy.burnDamage * (enemy.isBoss ? 0.5 : 1);
+      enemy.burnTickTimer += 0.5;
+      if (Math.random() < 0.35) this.createHitFX(enemy.x, enemy.y, '#ff7b24', 2);
+    }
+    if (enemy.burnTimer <= 0) {
+      enemy.burnDamage = 0;
+      enemy.burnTickTimer = 0.5;
+    }
+  }
+
   updateWeapons(dt) {
     let cdFactor = this.player.cdMult;
     if (this.player.turboBuffTimer > 0) {
@@ -6041,6 +6070,7 @@ class Game {
             if (!p.hits.includes(e) && Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
               e.hp -= p.dmg;
               this.applyProjectileSlow(e);
+              this.applyProjectileBurn(e);
               p.hits.push(e);
               this.createHitFX(p.x, p.y, p.color, 4);
               this.sound.hit();
@@ -6053,6 +6083,7 @@ class Game {
             if (Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
               e.hp -= p.dmg;
               this.applyProjectileSlow(e);
+              this.applyProjectileBurn(e);
               this.createHitFX(p.x, p.y, p.color);
               this.sound.hit();
               if (p.isCrit) {
@@ -6170,6 +6201,7 @@ class Game {
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
       const worldAuthority = !this.pvp?.started || this.pvp.host;
+      this.updateEnemyBurn(e, dt);
 
       if (worldAuthority && !e.is24hPursuer && e.freezeTimer > 0) {
         e.freezeTimer -= dt;
@@ -6449,7 +6481,8 @@ class Game {
     for (const [key, stat] of Object.entries({
       ricochet: 'ricochetLevel',
       multishot: 'multishotLevel',
-      slowshot: 'slowShotLevel'
+      slowshot: 'slowShotLevel',
+      burnshot: 'burnShotLevel'
     })) {
       if (this.player[stat] < 5) {
         available.push({ type: 'combat_up', key, def: COMBAT_UPGRADES[key], lvl: this.player[stat] + 1 });
@@ -6486,9 +6519,10 @@ class Game {
       else if (ch.type.endsWith('up')) title = `${ch.def.name} [УР. ${ch.lvl}]`;
       else title = `${ch.def.name} <b style="color:#f39c12">[БОНУС РЕЛИЗА]</b>`;
       const passiveLevel = ch.type === 'pass_new' ? 1 : (ch.type === 'pass_up' ? ch.lvl : 0);
+      const combatLevel = ch.type === 'combat_up' ? ch.def.levelDescriptions?.[ch.lvl - 1] : '';
       const description = passiveLevel
         ? `${ch.def.levelDescriptions[passiveLevel - 1]} (уровень ${passiveLevel} из 5)`
-        : ch.def.desc;
+        : (combatLevel || ch.def.desc);
 
       card.innerHTML = `
         <div class="card-icon">${ch.def.icon}</div>
@@ -6537,7 +6571,7 @@ class Game {
       const item = this.activeSkills.find(s => s && s.key === ch.key);
       if (item) item.lvl++;
     } else if (ch.type === 'combat_up') {
-      const statByKey = { ricochet: 'ricochetLevel', multishot: 'multishotLevel', slowshot: 'slowShotLevel' };
+      const statByKey = { ricochet: 'ricochetLevel', multishot: 'multishotLevel', slowshot: 'slowShotLevel', burnshot: 'burnShotLevel' };
       const stat = statByKey[ch.key];
       if (stat) this.player[stat] = Math.min(5, this.player[stat] + 1);
     } else if (ch.type === 'repeatable') {

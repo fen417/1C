@@ -685,7 +685,7 @@
         <div class="act-cd-overlay"></div>
       </div>
     </div>
-    <div id="br-center-marker" aria-label="Направление к центру карты"><span id="br-center-arrow">▲</span> ЦЕНТР · <span id="br-center-distance">0</span> м</div>
+    <div id="br-center-marker" aria-label="Направление к центру карты"><span id="br-center-arrow">▲</span> ЦЕНТР · <span id="br-center-distance">0</span> м · <span id="br-zone-status">СЖАТИЕ · 01:00</span></div>
     <div id="hud-consumables"></div>
     <div id="dash-hud">💨 Рывок · ПКМ / Shift</div>
 
@@ -734,16 +734,16 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.0.0</b><br>Сборка фитнес-кластера: 8.5.0</div>
+            <div class="main-menu-version">Текущая версия: <b>2.0.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 2.0.0 — «Переход на 8.5»</h3>
-              <p>После первого большого босса выбирайте одну из трёх легендарных миграций. Комнаты поддерживают до восьми игроков и ручной запуск хостом; состав отряда усиливает волну мобов. В классическом PvP звонок магазина ждёт решения всей команды, а при 4+ игроках прокачка не останавливает матч и карта растёт на 15% за каждого участника сверх трёх. Battle Royale приносит большую карту, указатель к центру, лут с мобов и прокачку без паузы; общая пауза для всех включается и снимается клавишей F9. В рекордах видны режим и число игроков.</p>
+              <p>После первого большого босса выбирайте одну из трёх легендарных миграций. Комнаты поддерживают до восьми игроков и ручной запуск хостом; состав отряда усиливает волну мобов. В классическом PvP звонок магазина ждёт решения всей команды, а при 4+ игроках прокачка не останавливает матч и карта растёт на 15% за каждого участника сверх трёх. Battle Royale приносит большую карту, указатель к центру, лут с мобов и прокачку без паузы; общая пауза включается и снимается клавишей F9, а окно хоста на фоне автоматически ставит матч на паузу. Зона Battle Royale медленно сжимается к центру и наносит урон снаружи. В рекордах видны режим и число игроков.</p>
             </div>
             <div class="release-notes">
-              <h3>Версия 1.8.0 — «Командный зачёт»</h3>
-              <p>Добавлена сетевая игра по коду комнаты для команд до трёх игроков с режимами PvP и PvE. Игроки делят карту и добычу; обновлены пауза, магазин и баланс боссов.</p>
+              <h3>Версия 1.9.0 — «Новый подход»</h3>
+              <p>Добавлены три переброса улучшений за забег, эволюции совместимого оружия, поджигающие снаряды, рывок с неуязвимостью и магазинный переброс ассортимента. Обновлены тикеты, перки и баланс PvP.</p>
             </div>
           </div>
         </div>
@@ -825,8 +825,8 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник. На HUD активных умений есть указатель к центру карты. Таблица рекордов показывает режим и число игроков.</p></details><details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды: у улучшения пять уровней, шанс поджога растёт с каждым уровнем, а горение наносит врагам дополнительный периодический урон. На каждом забеге доступно три переброса полного набора карточек после повышения уровня. Если два совместимых оружия достигли 5-го уровня, при следующем выборе прокачки может появиться их эволюция: «Аудит доступа» для Синтаксис-Контроля и считывателя IronLogic, «Фискальный реестр» для ККТ Атол и фискального сканера, «Контроль доступа» для СКУД Sigur и IronLogic; выбранная комбинация заменяет оба исходных оружия. В магазине ассортимент можно обновить за фиткоины до двух раз за одно предложение. Добавлен короткий рывок на ПКМ или Shift с половиной секунды неуязвимости; перезарядка составляет 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрена сила перков на урон, опыт, регенерацию и уклонение, а также лечения и щитов в PvP. Эффекты контроля соперника стали короче.</p></details>
-        <details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
+        <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Таблица рекордов показывает режим и число игроков.</p></details>
+        <details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды с пятью уровнями. На каждом забеге доступно три переброса набора карточек. Совместимые оружия 5-го уровня можно объединить в эволюции: «Аудит доступа», «Фискальный реестр» и «Контроль доступа». В магазине ассортимент можно обновить за фиткоины до двух раз за предложение. Добавлен рывок с половиной секунды неуязвимости: перезарядка 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрен баланс перков, лечения, щитов и контроля в PvP.</p></details><details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
         <details class="release-notes"><summary><h3>1.6.0 — «Релиз без отката»</h3></summary><p>Теперь можно позвать отряд техподдержки: от одного до четырёх помощников следуют за героем, атакуют врагов и могут принять на себя выстрел. Навык «Эскалация во вторую линию» вызывает старшего специалиста, который выдерживает урон и бьёт по области. После гибели мини-босса проходит 40–50 секунд до появления следующего. Большие боссы чередуются: уничтоженная информационная база, релиз без тестовой базы и резервная копия на 99% — у каждого свои атаки. Тикеты стали требовательнее и срочнее; появился особый тикет от Максима Воронина — 45 секунд с инвертированным управлением. Все пассивные улучшения теперь усиливаются по пяти отдельным уровням, а карточка показывает эффект выбранного уровня. В прокачке появились усиления «Клиент ищет кнопку “Разрешить”» и «Rudesktop: курсор уже почти здесь», а также новые противники с рабочими историями. Двигаться можно клавиатурой или удержанием ЛКМ на игровом поле.</p></details>
         <details class="release-notes"><summary><h3>1.5.0 — «Новые обращения»</h3></summary><p>От клиентов приходят тикеты: задачу можно принять или отклонить, а за закрытые обращения выдаётся опыт. Среди заданий — зачистить ошибки, собрать опыт, продержаться без урона или выполнить сразу несколько целей. Кофе теперь даёт временное ускорение с видимым таймером, а в паузе можно проверить оружие, навыки, усиления и расходники. Улучшения стали ровнее по силе, а самые мощные требуют небольшого компромисса. Исправлены мешающие игре звуковые и интерфейсные скачки.</p></details>
@@ -2151,10 +2151,13 @@ class Game {
       this.keys = {};
       this.mouseMovePointerId = null;
       this.mouseMoveAim = null;
+      this.syncPvpHostWindowActivity();
     });
+    window.addEventListener('focus', () => this.syncPvpHostWindowActivity());
 
     document.addEventListener('visibilitychange', () => {
       this.lastTime = performance.now();
+      this.syncPvpHostWindowActivity();
       if (document.hidden && this.sound.musicTimer) this.sound.stopMusic();
       else if (!document.hidden && this.sound.musicEnabled && this.sound.ctx) this.sound.startMusic();
     });
@@ -2961,6 +2964,7 @@ class Game {
       if (this.player.hp <= 0) this.gameOver(`Battle Royale: вас выбил ${message.source || 'моб'}.`);
     }
     else if (message.type === 'br-pause-request' && this.isBattleRoyale && pvp.host && typeof message.paused === 'boolean') {
+      if (pvp.hostInactivePause && !message.paused) return;
       this.applyBattleRoyalePause(message.paused);
       this.sendPvpNetworkMessage({ type: 'br-pause', paused: message.paused });
     }
@@ -4500,6 +4504,41 @@ class Game {
     }
   }
 
+  syncPvpHostWindowActivity() {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started || pvp.matchOver) return;
+    const active = !document.hidden && document.hasFocus();
+    if (!active) {
+      if (pvp.hostInactivePause || this.paused) return;
+      pvp.hostInactivePause = true;
+      this.keys = {};
+      if (this.isBattleRoyale) {
+        this.applyBattleRoyalePause(true);
+        this.sendPvpNetworkMessage({ type: 'br-pause', paused: true });
+      } else {
+        this.paused = true;
+        this.setPvpManualPause(true);
+        this.logPvpDiagnostic(pvp, 'Пауза', 'матч приостановлен: окно хоста неактивно');
+      }
+      return;
+    }
+    if (!pvp.hostInactivePause) return;
+    pvp.hostInactivePause = false;
+    if (this.isBattleRoyale) {
+      this.applyBattleRoyalePause(false);
+      this.sendPvpNetworkMessage({ type: 'br-pause', paused: false });
+    } else {
+      this.setPvpManualPause(false);
+      const massUpgradeSelection = Boolean(this.isPvpMassUpgradeMode?.() && pvp.choosing === 'levelup');
+      const choosingPausesMatch = pvp.choosing && !massUpgradeSelection;
+      this.paused = Boolean(choosingPausesMatch || pvp.remotePaused || document.getElementById('modal-pause').style.display === 'flex' ||
+        document.getElementById('modal-shop').style.display === 'flex' || (document.getElementById('modal-lvlup').style.display === 'flex' && !massUpgradeSelection) || this.player?.hp <= 0);
+      this.lastTime = performance.now();
+      this.syncPvpWait();
+      this.logPvpDiagnostic(pvp, 'Пауза', 'матч продолжен: окно хоста снова активно');
+    }
+  }
+
   applyBattleRoyalePause(paused) {
     if (!this.isBattleRoyale || !this.pvp) return;
     this.pvp.brPaused = Boolean(paused);
@@ -5964,6 +6003,7 @@ class Game {
 
     this.player.x = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.x));
     this.player.y = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.y));
+    this.updateBattleRoyaleZone(dt);
 
     this.updateSummons(dt, frameScale);
     this.updateWeapons(dt);
@@ -6841,6 +6881,54 @@ class Game {
     const arrow = document.getElementById('br-center-arrow');
     arrow.style.transform = `rotate(${Math.atan2(dy, dx) * 180 / Math.PI + 90}deg)`;
     document.getElementById('br-center-distance').textContent = Math.round(Math.hypot(dx, dy)).toLocaleString('ru-RU');
+    const zoneStatus = document.getElementById('br-zone-status');
+    if (zoneStatus) {
+      const ratio = this.getBattleRoyaleSafeAreaRatio();
+      const remaining = 60 - (Math.floor(this.time) % 60);
+      const distance = Math.hypot(dx, dy);
+      const outside = distance > this.getBattleRoyaleSafeRadius();
+      zoneStatus.textContent = outside ? '⚠ ВНЕ ЗОНЫ · УРОН 2% HP/с'
+        : ratio <= 0.05 ? 'ФИНАЛЬНАЯ ЗОНА'
+          : `СЖАТИЕ · ${Math.floor(remaining / 60).toString().padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
+      zoneStatus.style.color = outside ? '#ff7675' : '#ffe08a';
+    }
+  }
+
+  getBattleRoyaleSafeAreaRatio() {
+    const mapArea = this.MAP_SIZE * this.MAP_SIZE;
+    const initialSafeArea = Math.PI * (this.MAP_SIZE / Math.SQRT2) ** 2;
+    const elapsedMinutes = Math.floor(Math.max(0, this.time) / 60);
+    return Math.max(0.05, (initialSafeArea - elapsedMinutes * mapArea * 0.1) / initialSafeArea);
+  }
+
+  getBattleRoyaleSafeRadius() {
+    const initialRadius = this.MAP_SIZE / Math.SQRT2;
+    return initialRadius * Math.sqrt(this.getBattleRoyaleSafeAreaRatio());
+  }
+
+  updateBattleRoyaleZone(dt) {
+    if (!this.isBattleRoyale || !this.player || this.player.hp <= 0 || this.pvp?.matchOver) return;
+    const center = this.MAP_SIZE / 2;
+    const outside = Math.hypot(this.player.x - center, this.player.y - center) > this.getBattleRoyaleSafeRadius();
+    if (!outside) {
+      this.brZoneDamageAccumulator = 0;
+      this.brZoneWarningTimer = 0;
+      return;
+    }
+    this.brZoneDamageAccumulator = (this.brZoneDamageAccumulator || 0) + dt;
+    this.brZoneWarningTimer = Math.max(0, (this.brZoneWarningTimer || 0) - dt);
+    if (this.brZoneDamageAccumulator < 0.25) return;
+    const damageTime = this.brZoneDamageAccumulator;
+    this.brZoneDamageAccumulator = 0;
+    const damage = Math.min(this.player.hp, this.player.maxHp * 0.02 * damageTime);
+    this.player.hp = Math.max(0, this.player.hp - damage);
+    this.lastPlayerDamage = { source: 'Сжимающаяся зона Battle Royale', damage, applied: damage };
+    if (this.brZoneWarningTimer <= 0) {
+      this.addPopup(this.player.x, this.player.y - 24, `⚠️ ВНЕ ЗОНЫ · -${Math.ceil(this.player.maxHp * 0.02)} HP/с`, '#ff7675');
+      this.brZoneWarningTimer = 1.5;
+    }
+    this.updateHUD();
+    if (this.player.hp <= 0) this.gameOver('Сжимающаяся зона Battle Royale поглотила игрока.');
   }
 
   updateBuffHUD() {
@@ -6962,6 +7050,25 @@ class Game {
     this.ctx.setLineDash([16, 12]);
     this.ctx.strokeRect(bMin - 6, bMin - 6, (bMax - bMin) + 12, (bMax - bMin) + 12);
     this.ctx.setLineDash([]);
+
+    if (this.isBattleRoyale) {
+      const zoneCenter = this.MAP_SIZE / 2;
+      const safeRadius = this.getBattleRoyaleSafeRadius();
+      this.ctx.save();
+      this.ctx.fillStyle = 'rgba(214, 48, 49, 0.20)';
+      this.ctx.beginPath();
+      this.ctx.rect(camX, camY, this.canvas.width, this.canvas.height);
+      this.ctx.arc(zoneCenter, zoneCenter, safeRadius, 0, Math.PI * 2);
+      this.ctx.fill('evenodd');
+      this.ctx.beginPath();
+      this.ctx.arc(zoneCenter, zoneCenter, safeRadius, 0, Math.PI * 2);
+      this.ctx.strokeStyle = '#ffd166';
+      this.ctx.lineWidth = 18;
+      this.ctx.setLineDash([42, 24]);
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+      this.ctx.restore();
+    }
 
     this.ctx.font = 'bold 16px monospace';
     this.ctx.fillStyle = '#ff7675';

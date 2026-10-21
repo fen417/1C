@@ -2443,9 +2443,8 @@ class Game {
     const rtc = pvp?.rtc;
     const report = [
       `Игра ${GAME_VERSION}; сторона при входе: ${pvp?.initialRole || (pvp?.host ? 'хост' : 'клиент')}; текущая роль: ${pvp?.host ? 'хост' : 'клиент'}; комната: ${pvp?.code || 'неизвестно'}`,
-      `Firebase connected: ${pvp?.firebaseConnected ?? 'неизвестно'}`,
-      `RTC: ICE=${rtc?.pc?.iceConnectionState || 'нет'}, connection=${rtc?.pc?.connectionState || 'нет'}, signaling=${rtc?.pc?.signalingState || 'нет'}`,
-      `Каналы: game-state=${rtc?.channel?.readyState || 'нет'}, game-world=${rtc?.worldChannel?.readyState || 'нет'}`,
+      `Прямое соединение: ${rtc?.connected ?? false}`,
+      `WebRTC: ICE=${rtc?.pc?.iceConnectionState || 'нет'}, connection=${rtc?.pc?.connectionState || 'нет'}, state=${rtc?.channel?.readyState || 'нет'}, world=${rtc?.worldChannel?.readyState || 'нет'}`,
       `Исходная причина: ${pvp?.connectionLostReason || pvp?.rtcFailure || 'обрыв не зафиксирован'}`,
       `Ошибка восстановления: ${pvp?.recoveryError || 'нет'}`,
       ...(pvp?.diagnostics?.entries || [])
@@ -2480,10 +2479,7 @@ class Game {
     nicknameInput.disabled = Boolean(this.pvp);
     document.getElementById('pvp-room-code-display').style.display = this.pvp?.host ? 'block' : 'none';
     if (this.pvp?.host) document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${this.pvp.code}`;
-    this.pvpStatus(this.pvp ? 'Комната открыта. Ожидаем второго игрока…' : 'Подключение к Firebase…');
-    window.firebaseLeaderboardReady.then(() => {
-      if (!this.pvp) this.pvpStatus('Firebase подключён. Можно создать комнату или ввести код.');
-    }).catch(err => this.pvpStatus(`Firebase недоступен: ${err.message}`, true));
+    this.pvpStatus(this.pvp ? 'Комната открыта. Ожидаем игроков…' : 'Комнаты работают через Firebase и прямое WebRTC-соединение.');
   }
 
   closePvpMenu() {
@@ -2535,389 +2531,287 @@ class Game {
 
   async createPvpRoom() {
     this.pvpStatus('Создаём комнату…');
-    let createStep = 'подключение к Firebase';
+    const maxPlayers = Math.max(2, Math.min(3, Number(document.getElementById('pvp-player-count')?.value) || 2));
+    const name = (this.savedNick || 'Архитектор 1С').slice(0, 20);
     try {
       const fb = await window.firebaseLeaderboardReady;
-      const alphabet = '0123456789';
-      let code = '', roomRef = null, exists = true;
-      for (let attempt = 0; attempt < 12 && exists; attempt++) {
-        createStep = 'проверка свободного кода комнаты';
-        code = Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
-        roomRef = fb.ref(fb.db, `pvpRooms/${code}`);
-        exists = (await fb.get(roomRef)).exists();
+      const { db, uid, ref, get, set, onDisconnect } = fb;
+      let code = '';
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const candidate = Array.from({ length: 4 }, () => String(Math.floor(Math.random() * 10))).join('');
+        const existing = await get(ref(db, `pvpRooms/${candidate}`));
+        if (!existing.exists()) { code = candidate; break; }
       }
-      if (exists) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
-      const playerRef = fb.ref(fb.db, `pvpRooms/${code}/players/${fb.uid}`);
-      const nick = (this.savedNick || 'Архитектор 1С').slice(0, 20);
-      createStep = 'запись комнаты';
-      await fb.set(roomRef, {
-        hostUid: fb.uid, status: 'waiting', mode: this.pvpMode, maxPlayers: Math.max(2, Math.min(3, Number(document.getElementById('pvp-player-count')?.value) || 2)), createdAt: Date.now(), rtcGeneration: 1,
-        guest2Uid: null,
-        players: { [fb.uid]: { uid: fb.uid, name: nick, online: true, choosing: null,
-          state: { x: 1820, y: 2000, hp: 100, maxHp: 100, level: 1, attackTotal: 0, over: false } } }
-      });
-      this.pvp = { fb, code, host: true, initialRole: 'host', uid: fb.uid, name: nick, roomRef, playerRef, started: false, rtcGeneration: 1,
-        maxPlayers: Math.max(2, Math.min(3, Number(document.getElementById('pvp-player-count')?.value) || 2)),
-        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
-        remoteShots: [],
-        attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode, unsub: null };
-      this.logPvpDiagnostic(this.pvp, 'Firebase', 'комната создана', { mode: this.pvpMode });
-      createStep = 'настройка статуса игрока при отключении';
-      // Keep the room and host identity alive during a transient Firebase
-      // disconnect so the host can still authorize WebRTC recovery.
-      await fb.onDisconnect(playerRef).update({ online: false });
+      if (!code) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
+      const state = { x: 2000, y: 2000, hp: 400, maxHp: 400, level: 1, attackTotal: 0, over: false, shield: false };
+      await set(ref(db, `pvpRooms/${code}`), { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt: Date.now(), rtcGeneration: 1, maxPlayers,
+        players: { [uid]: { uid, name, online: true, state } } });
+      await onDisconnect(ref(db, `pvpRooms/${code}`)).remove();
+      this.pvp = { code, host: true, initialRole: 'host', uid, name, started: false,
+        maxPlayers, slot: 0, choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
+        remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode,
+        roomCache: { status: 'waiting', players: { [uid]: { uid, name, online: true, state } } },
+        threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
+      await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
+      this.logPvpDiagnostic(this.pvp, 'WebRTC', 'комната создана через Firebase-сигнализацию', { mode: this.pvpMode, maxPlayers });
       this.attachPvpRoom();
       document.getElementById('pvp-room-code-display').style.display = 'block';
       document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;
       document.getElementById('pvp-copy-room-code').style.display = 'block';
       document.getElementById('pvp-leave-button').style.display = 'block';
-      this.pvpStatus(`Комната на ${this.pvp.maxPlayers} игрока создана. Матч начнётся после подключения всех участников.`);
-    } catch (err) {
-      this.pvpStatus(`Не удалось создать комнату (${createStep}): ${err.message || 'ошибка Firebase'}`, true);
-    }
+      this.pvpStatus(`Комната на ${maxPlayers} игрока создана. Матч начнётся после прямого подключения всех участников.`);
+    } catch (err) { this.pvpStatus(`Не удалось создать комнату: ${err.message || 'ошибка сервера'}`, true); }
   }
 
   async joinPvpRoom() {
     const code = document.getElementById('pvp-room-code').value.trim();
-    if (!/^[0-9]{4}$/.test(code)) {
-      this.pvpStatus('Введите четырёхзначный код комнаты.', true);
-      return;
-    }
-    this.pvpStatus('Ищем комнату…');
-    let guestUidRef = null;
-    let playerRef = null;
-    let guestSlotClaimed = false;
-    let guestSlot = 0;
-    let playerCreated = false;
+    if (!/^[0-9]{4}$/.test(code)) { this.pvpStatus('Введите четырёхзначный код комнаты.', true); return; }
+    this.pvpStatus('Подключаемся к комнате…');
+    const name = (this.savedNick || 'Архитектор 1С').slice(0, 20);
     try {
       const fb = await window.firebaseLeaderboardReady;
-      const roomRef = fb.ref(fb.db, `pvpRooms/${code}`);
-      const snapshot = await fb.get(roomRef);
-      if (!snapshot.exists()) throw new Error('Комната с таким кодом не найдена.');
+      const { db, uid, ref, get, set, onDisconnect } = fb;
+      const roomRef = ref(db, `pvpRooms/${code}`);
+      const snapshot = await get(roomRef);
+      if (!snapshot.exists()) throw new Error('Комната не найдена.');
       const room = snapshot.val();
-      if (room.status !== 'waiting') throw new Error('Матч в этой комнате уже начался.');
-      if (room.hostUid === fb.uid) throw new Error('Нельзя подключиться к собственной комнате.');
-      const maxPlayers = Math.max(2, Math.min(3, Number(room.maxPlayers) || 2));
-      const isFirstGuest = !room.guestUid;
-      if (isFirstGuest) guestSlot = 1;
-      else if (maxPlayers >= 3 && !room.guest2Uid) guestSlot = 2;
-      else throw new Error(`Комната уже заполнена (${maxPlayers} игрока).`);
-      guestUidRef = fb.ref(fb.db, `pvpRooms/${code}/${guestSlot === 1 ? 'guestUid' : 'guest2Uid'}`);
-      await fb.set(guestUidRef, fb.uid);
-      guestSlotClaimed = true;
-      playerRef = fb.ref(fb.db, `pvpRooms/${code}/players/${fb.uid}`);
-      const nick = (this.savedNick || 'Архитектор 1С').slice(0, 20);
-      await fb.set(playerRef, { uid: fb.uid, name: nick, online: true, choosing: null,
-        state: { x: 2180, y: 2000, hp: 100, maxHp: 100, level: 1, attackTotal: 0, over: false } });
-      playerCreated = true;
-      // Preserve the guest slot on transient Firebase disconnects. Reconnect
-      // requests are authorized against guestUid, so deleting it here makes
-      // recovery impossible after even a brief network interruption.
-      await fb.onDisconnect(playerRef).update({ online: false });
-      this.pvp = { fb, code, host: false, initialRole: guestSlot === 1 ? 'client' : 'client-2', uid: fb.uid, name: nick, roomRef, playerRef, started: false, rtcGeneration: Number(room.rtcGeneration) || 1,
-        maxPlayers, slot: guestSlot,
-        guestUidRef,
-        choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: room.hostUid,
-        remoteShots: [],
-        attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: room.mode === 'pve' ? 'pve' : 'pvp', unsub: null };
-      this.logPvpDiagnostic(this.pvp, 'Firebase', 'подключение к комнате', { mode: this.pvp.mode });
-      this.pvpMode = this.pvp.mode;
-      localStorage.setItem('1c_pvp_mode', this.pvpMode);
+      if (room.status !== 'waiting') throw new Error('Матч уже начался.');
+      if (uid === room.hostUid || room.players?.[uid]) throw new Error('Вы уже подключены к этой комнате.');
+      const slot = !room.guestUid ? 1 : (!room.guest2Uid && Number(room.maxPlayers) === 3 ? 2 : 0);
+      if (!slot) throw new Error('Комната уже заполнена.');
+      const state = { x: 2000, y: 2000, hp: 400, maxHp: 400, level: 1, attackTotal: 0, over: false, shield: false };
+      await set(ref(db, `pvpRooms/${code}/${slot === 1 ? 'guestUid' : 'guest2Uid'}`), uid);
+      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, online: true, state });
+      this.pvp = { code, host: false, initialRole: slot === 2 ? 'client-2' : 'client', uid, name, started: false,
+        maxPlayers: Number(room.maxPlayers), slot, choosing: null, remoteChoosing: null, remoteState: null,
+        remotePlayer: null, opponentUid: null, remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0,
+        matchOver: false, opponentLost: false, mode: room.mode, roomCache: room,
+        threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
+      this.pvpMode = room.mode; localStorage.setItem('1c_pvp_mode', this.pvpMode);
+      await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
+      this.logPvpDiagnostic(this.pvp, 'WebRTC', 'подключение к Firebase-комнате', { mode: this.pvp.mode, slot });
       this.attachPvpRoom();
       document.getElementById('pvp-leave-button').style.display = 'block';
-      this.pvpStatus('Подключились. Устанавливаем обязательное WebRTC-соединение…');
-    } catch (err) {
-      if (playerCreated && playerRef) await (await window.firebaseLeaderboardReady).remove(playerRef).catch(() => {});
-      if (guestSlotClaimed && guestUidRef) await (await window.firebaseLeaderboardReady).remove(guestUidRef).catch(() => {});
-      this.pvpStatus(`Не удалось подключиться: ${err.message || 'ошибка Firebase'}`, true);
-    }
+      this.pvpStatus('Подключились к комнате. Устанавливаем прямое соединение…');
+    } catch (err) { this.pvpStatus(`Не удалось подключиться: ${err.message || 'ошибка сервера'}`, true); }
   }
 
   attachPvpRoom() {
     const pvp = this.pvp;
-    if (!pvp) return;
-    pvp.unsub?.();
-    // Keep high-frequency player/world traffic on separate branches. Listening to
-    // the room root re-downloads the full world snapshot for every player update.
-    const roomRoot = `pvpRooms/${pvp.code}`;
-    const cache = pvp.roomCache = { status: null, players: {} };
-    const updateRoom = () => this.handlePvpRoom({ status: cache.status, players: cache.players });
-    let opponentUnsubscribe = null;
-    let watchedOpponentUid = null;
-    const watchOpponent = uid => {
-      if (uid === watchedOpponentUid) return;
-      opponentUnsubscribe?.();
-      opponentUnsubscribe = null;
-      watchedOpponentUid = uid || null;
-      cache.players = {};
-      if (!uid || uid === pvp.uid) {
-        updateRoom();
-        return;
-      }
-      pvp.opponentUid = uid;
-      opponentUnsubscribe = pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/players/${uid}`), snapshot => {
-        cache.players = snapshot.exists() ? { [uid]: snapshot.val() } : {};
-        updateRoom();
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения игрока соперника', { code: err.code, message: err.message }));
-    };
-    const unsubscribers = [
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, '.info/connected'), snapshot => {
-        const connected = Boolean(snapshot.val());
-        if (pvp.firebaseConnected !== connected) {
-          const previous = pvp.firebaseConnected;
-          pvp.firebaseConnected = connected;
-          this.logPvpDiagnostic(pvp, 'Firebase', previous === undefined
-            ? `начальное состояние: ${connected ? 'подключён' : 'не подключён'}`
-            : (connected ? 'соединение восстановлено' : 'соединение потеряно'));
-        }
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка статуса соединения', { code: err.code, message: err.message })),
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/status`), snapshot => {
-        cache.status = snapshot.val();
-        if (!snapshot.exists()) {
-          this.handlePvpRoom(null);
-          return;
-        }
-        updateRoom();
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения статуса комнаты', { code: err.code, message: err.message })),
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guestUid`), snapshot => {
-        if (pvp.host) watchOpponent(snapshot.val());
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения guestUid', { code: err.code, message: err.message })),
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guest2Uid`), snapshot => {
-        if (pvp.host && snapshot.val() && pvp.maxPlayers >= 3) {
-          pvp.guest2Uid = snapshot.val();
-          this.pvpStatus('Подключился второй игрок. Устанавливаем соединение перед запуском матча…');
-          this.setupThreePlayerHostPeer(snapshot.val());
-        }
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения guest2Uid', { code: err.code, message: err.message })),
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/rtcGeneration`), snapshot => {
-        if (pvp.opponentLost) return;
-        const generation = Number(snapshot.val());
-        if (!Number.isInteger(generation) || generation < 1 || generation === Number(pvp.rtcGeneration || 1)) return;
-        this.logPvpDiagnostic(pvp, 'Firebase', 'получено новое поколение RTC', { generation });
-        if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) {
-          pvp.rtcGeneration = generation;
-          this.logPvpDiagnostic(pvp, 'WebRTC', 'игнорируется поколение двухигрокового канала: третий игрок подключён отдельной сессией');
-          return;
-        }
-        this.restartPvpRtc(generation);
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения поколения RTC', { code: err.code, message: err.message })),
-      pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/rtc/reconnectRequests`), snapshot => {
-        if (!pvp.host || !pvp.started || pvp.opponentLost || !pvp.opponentUid || pvp.connectionLost) return;
-        const request = snapshot.val()?.[pvp.opponentUid];
-        if (!request || request === pvp.lastReconnectRequestSeen) return;
-        pvp.lastReconnectRequestSeen = request;
-        this.logPvpDiagnostic(pvp, 'Firebase', 'получен запрос реконнекта клиента');
-        if (pvp.rtc && !pvp.opponentLost) {
-          this.handlePvpRtcLost('Клиент запросил восстановление соединения.', pvp.rtc);
-        }
-      }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения запросов реконнекта', { code: err.code, message: err.message }))
-    ];
-    if (!pvp.host) watchOpponent(pvp.opponentUid);
-    pvp.unsub = () => {
-      opponentUnsubscribe?.();
-      unsubscribers.forEach(unsubscribe => unsubscribe());
-    };
-    if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) this.setupThreePlayerGuestPeer();
-    else this.setupPvpRtc();
+    if (!pvp || pvp.roomUnsub) return;
+    (async () => {
+      const fb = await window.firebaseLeaderboardReady;
+      const roomRef = fb.ref(fb.db, `pvpRooms/${pvp.code}`);
+      pvp.roomUnsub = fb.onValue(roomRef, snapshot => {
+        if (this.pvp !== pvp) return;
+        const room = snapshot.val();
+        if (!room) { this.handlePvpRoom(null); return; }
+        pvp.roomCache = room;
+        this.handlePvpRoom(room);
+        this.ensurePvpPeerConnections(room, fb).catch(error => this.logPvpDiagnostic(pvp, 'WebRTC', 'ошибка настройки соединения', { message: error.message }));
+      });
+    })().catch(error => this.pvpStatus(`Не удалось подключить комнату: ${error.message}`, true));
   }
 
-  setupThreePlayerHostPeer(uid) {
+  async ensurePvpPeerConnections(room, fb) {
     const pvp = this.pvp;
-    if (!pvp?.host || pvp.maxPlayers < 3 || !uid) return;
-    pvp.threePeers ||= {};
-    if (pvp.threePeers[uid]) return;
-    const root = `pvpRooms/${pvp.code}/rtc/peers/${uid}`;
-    let pc;
-    try { pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }); }
-    catch (err) { this.pvpStatus(`Не удалось подключить третьего игрока: ${err.message}`, true); return; }
-    const peer = pvp.threePeers[uid] = { uid, pc, channel: null, worldChannel: null, connected: false, state: null, stateAt: 0, lastAttackTotal: 0, sequence: 0, pendingCandidates: [], unsubscribers: [] };
-    const refAt = path => pvp.fb.ref(pvp.fb.db, `${root}/${path}`);
-    const addCandidates = (snapshot, seen) => {
-      for (const [id, candidate] of Object.entries(snapshot.val() || {})) {
-        if (seen.has(id)) continue;
-        seen.add(id);
-        if (pc.remoteDescription) pc.addIceCandidate(candidate).catch(err => this.logPvpDiagnostic(pvp, 'WebRTC', 'кандидат третьего игрока отклонён', { message: err.message }));
-        else peer.pendingCandidates.push(candidate);
+    if (!pvp || this.pvp !== pvp || !room?.players) return;
+    pvp.peerConnections ||= {};
+    for (const member of Object.values(room.players).filter(player => player?.uid && player.uid !== pvp.uid && player.online)) {
+      if (pvp.peerConnections[member.uid]) continue;
+      if (pvp.host) await this.createPvpOffer(member, fb);
+      else if (member.uid === room.hostUid) this.watchPvpOffer(member, room, fb);
+    }
+    if (pvp.host) this.maybeStartPvpRoom(room, fb);
+  }
+
+  pvpSignalPath(room, peerUid) {
+    return room.guest2Uid === peerUid
+      ? `pvpRooms/${this.pvp.code}/rtc/peers/${peerUid}`
+      : `pvpRooms/${this.pvp.code}/rtc/sessions/${peerUid}`;
+  }
+
+  async createPvpOffer(member, fb) {
+    const pvp = this.pvp;
+    if (!pvp?.host || pvp.peerConnections[member.uid]) return;
+    const path = this.pvpSignalPath(pvp.roomCache, member.uid);
+    const peer = this.makePvpPeer(member.uid, pvp.roomCache.guest2Uid === member.uid ? 2 : 1, fb);
+    pvp.peerConnections[member.uid] = peer;
+    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: true }));
+    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: true }));
+    peer.pc.onicecandidate = event => { if (event.candidate) fb.push(fb.ref(fb.db, `${path}/hostCandidates`), event.candidate.toJSON()); };
+    const unsub = fb.onValue(fb.ref(fb.db, `${path}/answer`), async snapshot => {
+      const answer = snapshot.val();
+      if (!answer?.sdp || peer.pc.remoteDescription) return;
+      try { await peer.pc.setRemoteDescription(answer); this.addPvpIceCandidates(peer, path, 'guestCandidates', fb); }
+      catch (error) { this.logPvpDiagnostic(pvp, 'WebRTC', 'не принят ответ клиента', { message: error.message }); }
+    });
+    pvp.signalingCleanups.push(unsub);
+    const offer = await peer.pc.createOffer();
+    await peer.pc.setLocalDescription(offer);
+    await fb.set(fb.ref(fb.db, `${path}/offer`), offer.toJSON());
+    this.addPvpIceCandidates(peer, path, 'guestCandidates', fb);
+  }
+
+  watchPvpOffer(host, room, fb) {
+    const pvp = this.pvp;
+    const path = this.pvpSignalPath(room, pvp.uid);
+    const unsub = fb.onValue(fb.ref(fb.db, `${path}/offer`), async snapshot => {
+      if (this.pvp !== pvp || pvp.peerConnections[host.uid]) return;
+      const offer = snapshot.val();
+      if (!offer?.sdp) return;
+      const peer = this.makePvpPeer(host.uid, 0, fb);
+      pvp.peerConnections[host.uid] = peer;
+      peer.pc.ondatachannel = event => this.attachPvpDataChannel(peer, event.channel);
+      peer.pc.onicecandidate = event => { if (event.candidate) fb.push(fb.ref(fb.db, `${path}/guestCandidates`), event.candidate.toJSON()); };
+      try {
+        await peer.pc.setRemoteDescription(offer);
+        this.addPvpIceCandidates(peer, path, 'hostCandidates', fb);
+        const answer = await peer.pc.createAnswer();
+        await peer.pc.setLocalDescription(answer);
+        await fb.set(fb.ref(fb.db, `${path}/answer`), answer.toJSON());
+        this.addPvpIceCandidates(peer, path, 'hostCandidates', fb);
+      } catch (error) { this.logPvpDiagnostic(pvp, 'WebRTC', 'не удалось ответить на offer', { message: error.message }); }
+    });
+    pvp.signalingCleanups.push(unsub);
+  }
+
+  makePvpPeer(uid, slot, fb) {
+    const pvp = this.pvp;
+    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    const peer = { uid, slot, pc, channel: null, worldChannel: null, connected: false, seenCandidates: new Set() };
+    if (pvp.host && slot === 2) pvp.threePeers[uid] = peer;
+    else pvp.rtc = peer;
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'connected') this.updatePvpPeerConnected(peer);
+      if (['failed', 'closed'].includes(pc.connectionState)) {
+        peer.connected = false;
+        if (pvp.started && !pvp.matchOver) this.waitForPvpOpponent(pvp, 'Прямое WebRTC-соединение потеряно.');
       }
     };
-    const seen = new Set();
-    peer.unsubscribers.push(pvp.fb.onValue(refAt('answer'), async snapshot => {
-      const answer = snapshot.val();
-      if (!answer || pc.currentRemoteDescription) return;
-      try {
-        await pc.setRemoteDescription(answer);
-        for (const candidate of peer.pendingCandidates.splice(0)) await pc.addIceCandidate(candidate);
-      } catch (err) { this.logPvpDiagnostic(pvp, 'WebRTC', 'не удалось принять ответ третьего игрока', { message: err.message }); }
-    }));
-    peer.unsubscribers.push(pvp.fb.onValue(refAt('guestCandidates'), snapshot => addCandidates(snapshot, seen)));
-    pc.onicecandidate = event => { if (event.candidate) pvp.fb.set(pvp.fb.push(refAt('hostCandidates')), event.candidate.toJSON()); };
-    const openCheck = () => {
-      if (peer.channel?.readyState !== 'open' || peer.worldChannel?.readyState !== 'open' || peer.connected) return;
-      peer.connected = true;
-      peer.channel.bufferedAmountLowThreshold = 16384;
-      peer.worldChannel.bufferedAmountLowThreshold = 32768;
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'третий игрок подключён', { uid });
-      this.maybeStartThreePlayerRoom();
-    };
-    const attachPeerChannel = channel => {
-      if (channel.label === 'game-state') peer.channel = channel;
-      else if (channel.label === 'game-world') peer.worldChannel = channel;
-      else { channel.close(); return; }
-      channel.onopen = openCheck;
-      channel.onmessage = event => {
-        peer.lastMessageAt = performance.now();
-        if (pvp.rtc?.pc === pc) pvp.rtc.lastMessageAt = peer.lastMessageAt;
-        let message; try { message = JSON.parse(event.data); } catch { return; }
-        if (channel.label === 'game-world') {
-          if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
-          return;
+    return peer;
+  }
+
+  attachPvpDataChannel(peer, channel) {
+    if (channel.label === 'game-world') peer.worldChannel = channel;
+    else peer.channel = channel;
+    channel.onopen = () => this.updatePvpPeerConnected(peer);
+    channel.onclose = () => { peer.connected = false; if (this.pvp?.started) this.waitForPvpOpponent(this.pvp, 'Канал WebRTC закрылся.'); };
+    channel.onmessage = event => { try { this.handlePvpSocketPacket(JSON.parse(event.data)); } catch (_) {} };
+  }
+
+  updatePvpPeerConnected(peer) {
+    peer.connected = peer.channel?.readyState === 'open' && peer.worldChannel?.readyState === 'open';
+    if (this.pvp?.rtc === peer) this.pvp.serverConnected = peer.connected;
+    if (peer.connected && this.pvp?.started) this.handlePvpRtcRecovered(peer);
+    if (this.pvp?.host) this.maybeStartPvpRoom(this.pvp.roomCache);
+  }
+
+  addPvpIceCandidates(peer, path, key, fb) {
+    const unsub = fb.onValue(fb.ref(fb.db, `${path}/${key}`), snapshot => {
+      if (!peer.pc.remoteDescription) return;
+      snapshot.forEach(child => {
+        if (peer.seenCandidates.has(child.key)) return;
+        peer.seenCandidates.add(child.key);
+        peer.pc.addIceCandidate(child.val()).catch(() => {});
+      });
+    });
+    this.pvp?.signalingCleanups?.push(unsub);
+  }
+
+  async maybeStartPvpRoom(room = this.pvp?.roomCache, fb = null) {
+    const pvp = this.pvp;
+    if (!pvp?.host || !room || room.status !== 'waiting') return;
+    const members = Object.values(room.players || {});
+    if (members.length !== pvp.maxPlayers || members.some(member => !member.online)) return;
+    if (Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length !== pvp.maxPlayers - 1) return;
+    try {
+      fb ||= await window.firebaseLeaderboardReady;
+      await fb.update(fb.ref(fb.db, `pvpRooms/${pvp.code}`), { status: 'playing' });
+    } catch (error) { this.logPvpDiagnostic(pvp, 'Firebase', 'не удалось отметить запуск комнаты', { message: error.message }); }
+  }
+
+  handlePvpSocketPacket(message) {
+    const pvp = this.pvp;
+    if (!pvp || pvp.opponentLost || !message) return;
+    if (message.type === 'roster' && pvp.maxPlayers >= 3) {
+      this.applyThreePlayerRoster(message.players || []);
+    } else if ((message.type === 'state' || message.type === 'match-over') && message.state) {
+      const uid = String(message.uid || 'opponent');
+      pvp.remoteStateSequences ||= {};
+      const sequence = Number(message.sequence || 0);
+      if (sequence && sequence <= Number(pvp.remoteStateSequences[uid] || 0)) return;
+      const previousState = pvp.maxPlayers >= 3 && pvp.host ? pvp.remotePlayers?.[uid]?.state : pvp.remoteState;
+      const savedRemoteState = pvp.remoteState;
+      const savedRemoteStateAt = pvp.remoteStateAt;
+      if (pvp.maxPlayers >= 3 && pvp.host) {
+        pvp.remoteState = previousState || null;
+        pvp.remoteStateAt = pvp.remotePlayers?.[uid]?.stateAt || performance.now();
+      }
+      const validation = this.validatePvpRemoteState(message.state);
+      if (pvp.maxPlayers >= 3 && pvp.host) {
+        pvp.remoteState = savedRemoteState;
+        pvp.remoteStateAt = savedRemoteStateAt;
+      }
+      if (!validation.ok) {
+        const now = Date.now();
+        if (now - Number(pvp.lastInvalidRemoteStateLogAt || 0) > 3000) {
+          pvp.lastInvalidRemoteStateLogAt = now;
+          this.logPvpDiagnostic(pvp, 'Проверка статов', 'отклонено некорректное состояние соперника', { reason: validation.reason });
         }
-        if (message.type === 'roster') { peer.name = message.name || peer.name || 'Соперник'; return; }
-        if (message.type !== 'state' && message.type !== 'match-over' || !message.state) return;
-        const previous = pvp.remoteState, previousAt = pvp.remoteStateAt;
-        pvp.remoteState = peer.state;
-        pvp.remoteStateAt = peer.stateAt;
-        const checked = this.validatePvpRemoteState(message.state);
-        peer.state = pvp.remoteState;
-        peer.stateAt = pvp.remoteStateAt;
-        pvp.remoteState = previous;
-        pvp.remoteStateAt = previousAt;
-        if (!checked.ok || Number(message.sequence || 0) <= peer.sequence) return;
-        peer.sequence = Number(message.sequence || 0);
-        const state = checked.state;
-        peer.state = state; peer.stateAt = performance.now();
-        peer.name = message.name || peer.name || 'Соперник';
+        return;
+      }
+      pvp.remoteStateSequences[uid] = sequence || Number(pvp.remoteStateSequences[uid] || 0) + 1;
+      const state = validation.state;
+      if (message.uid && (!pvp.host || !pvp.opponentUid || pvp.opponentUid === uid)) pvp.opponentUid = uid;
+      const remotePlayer = { ...(pvp.remotePlayers?.[uid] || pvp.remotePlayer || {}), uid,
+        name: message.name || pvp.remotePlayers?.[uid]?.name || pvp.remotePlayer?.name || 'Соперник', online: true,
+        choosing: message.choosing || null, paused: Boolean(message.paused), state };
+      if (!pvp.host || pvp.maxPlayers < 3 || uid === pvp.opponentUid) {
+        pvp.remoteState = state;
+        pvp.remotePlayer = remotePlayer;
+        pvp.remoteChoosing = message.choosing || null;
+        pvp.remotePaused = Boolean(message.paused);
+        pvp.remoteShots = Array.isArray(message.shots) ? message.shots : [];
+        pvp.remoteShotsAt = performance.now();
+        this.recordPvpPosition('@remote', state.x, state.y);
+      }
+      if (pvp.host && pvp.maxPlayers >= 3) {
         pvp.remotePlayers ||= {};
-        pvp.remotePlayers[uid] = { uid, name: peer.name, online: true, state };
-        if (state.attackTotal > peer.lastAttackTotal && this.player?.hp > 0) {
-          this.receivePvpDamage(state.attackTotal - peer.lastAttackTotal, `${message.name || 'Соперник'} · PvP`);
-        }
-        peer.lastAttackTotal = state.attackTotal;
+        const prior = pvp.remotePlayers[uid] || {};
+        pvp.remotePlayers[uid] = { ...remotePlayer, ...prior, uid, name: message.name || prior.name || 'Соперник', online: true, state, stateAt: performance.now() };
+        const previousAttack = Number(prior.state?.attackTotal || 0);
+        const attackDelta = Math.max(0, Number(state.attackTotal || 0) - previousAttack);
+        if (attackDelta > 0 && this.player?.hp > 0) this.receivePvpDamage(attackDelta, `${message.name || 'Соперник'} · PvP`);
         pvp.processedEnemyDamage ||= {};
         for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
           const amount = Math.max(0, Number(amountValue) || 0);
-          const previous = pvp.processedEnemyDamage[enemyId] || 0;
-          const delta = Math.max(0, amount - previous);
-          pvp.processedEnemyDamage[enemyId] = Math.max(previous, amount);
+          const before = Number(pvp.processedEnemyDamage[enemyId] || 0);
+          const delta = Math.max(0, amount - before);
+          pvp.processedEnemyDamage[enemyId] = Math.max(before, amount);
           if (delta > 0) {
             const enemy = this.enemies.find(item => item.syncId === enemyId);
             if (enemy && !enemy.is24hPursuer) {
               pvp.applyingRemoteEnemyDamage = true;
-              try { enemy.hp = Math.max(0, enemy.hp - delta); }
-              finally { pvp.applyingRemoteEnemyDamage = false; }
+              try { enemy.hp = Math.max(0, enemy.hp - delta); } finally { pvp.applyingRemoteEnemyDamage = false; }
             }
           }
         }
         for (const dropId of Object.keys(state.claimedDrops || {})) {
           if (!state.claimedDrops[dropId]) continue;
-          pvp.claimedDrops ||= {};
-          pvp.claimedDrops[dropId] = true;
+          pvp.claimedDrops ||= {}; pvp.claimedDrops[dropId] = true;
           this.gems = this.gems.filter(item => item.syncId !== dropId);
           this.pickups = this.pickups.filter(item => item.syncId !== dropId);
         }
+        if (uid === pvp.opponentUid) { pvp.remotePlayer = pvp.remotePlayers[uid]; pvp.remoteState = state; }
         this.publishThreePlayerRoster();
-        if (state.over) this.logPvpDiagnostic(pvp, 'Матч', 'третий игрок выбыл', { uid, name: message.name });
-      };
-      channel.onclose = () => { peer.connected = false; if (!pvp.matchOver) this.logPvpDiagnostic(pvp, 'WebRTC', 'канал третьего игрока закрыт', { uid }); };
-    };
-    peer.channel = pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 1 });
-    peer.worldChannel = pc.createDataChannel('game-world');
-    attachPeerChannel(peer.channel);
-    attachPeerChannel(peer.worldChannel);
-    peer.channel.onopen = peer.worldChannel.onopen = () => {
-      if (peer.channel.readyState !== 'open' || peer.worldChannel.readyState !== 'open' || peer.connected) return;
-      peer.connected = true;
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'третий игрок подключён', { uid });
-      this.maybeStartThreePlayerRoom();
-    };
-    pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => pvp.fb.set(refAt('offer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp }))
-      .catch(err => this.logPvpDiagnostic(pvp, 'WebRTC', 'не удалось предложить соединение третьему игроку', { uid, message: err.message }));
+      } else this.applyPvpRemoteState(state);
+      this.syncPvpWait();
+    } else if (message.type === 'world' && message.world) this.applyPvpSharedWorld(message.world);
+    else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
+    else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
+    else if (message.type === 'active-skill' && message.skill) this.receivePvpActiveSkill(message.skill);
   }
-
-  setupThreePlayerGuestPeer() {
-    const pvp = this.pvp;
-    if (!pvp || pvp.host || pvp.slot !== 2 || pvp.threeGuestPeer) return;
-    const root = `pvpRooms/${pvp.code}/rtc/peers/${pvp.uid}`;
-    let pc;
-    try { pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }); }
-    catch (err) { this.failPvpRtc(`браузер не создал WebRTC для третьего игрока: ${err.message}`); return; }
-    const peer = pvp.threeGuestPeer = { pc, channel: null, worldChannel: null, connected: false, unsubscribers: [], seen: new Set(), pendingCandidates: [] };
-    const refAt = path => pvp.fb.ref(pvp.fb.db, `${root}/${path}`);
-    const addCandidates = snapshot => {
-      for (const [id, candidate] of Object.entries(snapshot.val() || {})) {
-        if (peer.seen.has(id)) continue;
-        peer.seen.add(id);
-        if (pc.remoteDescription) pc.addIceCandidate(candidate).catch(err => this.logPvpDiagnostic(pvp, 'WebRTC', 'ICE-кандидат хоста отклонён', { message: err.message }));
-        else peer.pendingCandidates.push(candidate);
-      }
-    };
-    peer.unsubscribers.push(pvp.fb.onValue(refAt('hostCandidates'), addCandidates));
-    peer.unsubscribers.push(pvp.fb.onValue(refAt('offer'), async snapshot => {
-      const offer = snapshot.val(); if (!offer || peer.answerStarted) return;
-      peer.answerStarted = true;
-      try {
-        await pc.setRemoteDescription(offer);
-        for (const candidate of peer.pendingCandidates.splice(0)) await pc.addIceCandidate(candidate);
-        const answer = await pc.createAnswer(); await pc.setLocalDescription(answer);
-        await pvp.fb.set(refAt('answer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp });
-      } catch (err) { this.failPvpRtc(`не удалось принять offer третьего игрока: ${err.message}`); }
-    }));
-    pc.onicecandidate = event => { if (event.candidate) pvp.fb.set(pvp.fb.push(refAt('guestCandidates')), event.candidate.toJSON()); };
-    pc.onconnectionstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', 'изменилось состояние соединения', {
-      connection: pc.connectionState, ice: pc.iceConnectionState, signaling: pc.signalingState
-    });
-    pc.oniceconnectionstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', 'изменилось состояние ICE', {
-      ice: pc.iceConnectionState, connection: pc.connectionState
-    });
-    const openCheck = () => {
-      if (peer.channel?.readyState !== 'open' || peer.worldChannel?.readyState !== 'open' || peer.connected) return;
-      peer.connected = true;
-      pvp.rtc = { ...peer, pc, channel: peer.channel, worldChannel: peer.worldChannel, connected: true, lastMessageAt: performance.now(), unsubscribers: peer.unsubscribers };
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'соединение третьего игрока с хостом установлено');
-      this.handlePvpRoom({ status: pvp.roomCache?.status, players: pvp.roomCache?.players || {} });
-    };
-    pc.ondatachannel = event => {
-      const channel = event.channel;
-      if (channel.label === 'game-state') peer.channel = channel;
-      else if (channel.label === 'game-world') peer.worldChannel = channel;
-      else { channel.close(); return; }
-      channel.onopen = openCheck;
-      channel.onmessage = event => {
-        peer.lastMessageAt = performance.now();
-        if (pvp.rtc?.pc === pc) pvp.rtc.lastMessageAt = peer.lastMessageAt;
-        let message; try { message = JSON.parse(event.data); } catch { return; }
-        if (message.type === 'roster') this.applyThreePlayerRoster(message.players || []);
-        else if (message.type === 'state' && message.state) {
-          const checked = this.validatePvpRemoteState(message.state);
-          if (!checked.ok) return;
-          pvp.remoteState = checked.state; pvp.remotePlayer = { uid: message.uid || pvp.opponentUid, name: message.name || 'Хост', state: checked.state };
-          this.applyPvpRemoteState(checked.state);
-        } else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
-      };
-      channel.onclose = () => {
-        peer.connected = false;
-        if (pvp.rtc?.pc === pc) pvp.rtc.connected = false;
-        this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', `DataChannel ${channel.label} закрылся`, {
-          ice: pc.iceConnectionState, connection: pc.connectionState
-        });
-        this.pvpStatus('Связь третьего игрока с хостом потеряна. Перезапуск общего двухигрокового соединения не выполняется.', true);
-      };
-      channel.onerror = event => this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', `ошибка DataChannel ${channel.label}`, {
-        name: event?.error?.name || null, message: event?.error?.message || event?.message || null,
-        ice: pc.iceConnectionState, connection: pc.connectionState
-      });
-    };
-  }
-
-  maybeStartThreePlayerRoom() {
-    const pvp = this.pvp;
-    if (!pvp?.host || pvp.maxPlayers < 3 || pvp.started) return;
-    const guestsReady = pvp.rtc?.connected && Object.values(pvp.threePeers || {}).length >= 1 && Object.values(pvp.threePeers || {}).every(peer => peer.connected);
-    if (!guestsReady || !pvp.guest2Uid) return;
-    pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/status`), 'playing')
-      .catch(err => this.pvpStatus(`Не удалось запустить матч: ${err.message}`, true));
-  }
-
   applyThreePlayerRoster(players) {
     if (!this.pvp) return;
     const previousState = this.pvp.remoteState;
@@ -2942,7 +2836,9 @@ class Game {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.maxPlayers < 3) return;
     const players = [{ uid: pvp.uid, name: pvp.name, state: this.currentPvpState() }];
-    if (pvp.remotePlayer?.uid && pvp.remoteState) players.push({ uid: pvp.remotePlayer.uid, name: pvp.remotePlayer.name, state: pvp.remoteState });
+    for (const player of Object.values(pvp.remotePlayers || {})) {
+      if (player?.uid && player.state) players.push({ uid: player.uid, name: player.name || 'Соперник', state: player.state });
+    }
     for (const peer of Object.values(pvp.threePeers || {})) if (peer.state) players.push({ uid: peer.uid, name: peer.name || 'Соперник', state: peer.state });
     const payload = JSON.stringify({ type: 'roster', players });
     for (const peer of Object.values(pvp.threePeers || {})) if (peer.channel?.readyState === 'open') peer.channel.send(payload);
@@ -2957,481 +2853,10 @@ class Game {
       killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0) }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0 };
   }
 
-  setupPvpRtc() {
-    const pvp = this.pvp;
-    if (!pvp || pvp.rtc) return;
-    if (typeof RTCPeerConnection === 'undefined') {
-      this.failPvpRtc('браузер не поддерживает WebRTC');
-      return;
-    }
-    if (window.isSecureContext === false) {
-      this.failPvpRtc('WebRTC требует безопасную страницу HTTPS или localhost');
-      return;
-    }
-    const roomRoot = `pvpRooms/${pvp.code}`;
-    pvp.rtcGeneration = Number(pvp.rtcGeneration) || 1;
-    const rtcRoot = `${roomRoot}/rtc/sessions/${pvp.rtcGeneration}`;
-    const refAt = path => pvp.fb.ref(pvp.fb.db, `${rtcRoot}/${path}`);
-    let rtc = null;
-    const listenAt = (path, callback) => pvp.fb.onValue(refAt(path), callback, err =>
-      {
-        this.logPvpDiagnostic(pvp, 'Firebase', `отказ чтения ${path}`, { code: err.code, message: err.message });
-        this.failPvpRtc(`Firebase запретил читать ${path}: ${err.message}`, rtc);
-      });
-    let iceServers = [{ urls: 'stun:stun.l.google.com:19302' }];
-    try {
-      // TURN credentials are supplied per browser so they never go through Firebase.
-      const configuredIceServers = JSON.parse(localStorage.getItem('1c_webrtc_ice_servers') || '[]');
-      if (!Array.isArray(configuredIceServers)) throw new Error('ожидался список ICE-серверов');
-      for (const server of configuredIceServers) {
-        if (!server || !(typeof server.urls === 'string' || Array.isArray(server.urls))) {
-          throw new Error('у ICE-сервера отсутствует адрес urls');
-        }
-        iceServers.push(server);
-      }
-    } catch (err) {
-      this.failPvpRtc(`некорректная настройка ICE-серверов: ${err.message}`);
-      return;
-    }
-    let pc;
-    try {
-      pc = new RTCPeerConnection({ iceServers });
-    } catch (err) {
-      this.failPvpRtc(`браузер не смог создать RTCPeerConnection: ${err.message}`);
-      return;
-    }
-    rtc = pvp.rtc = {
-      pc, channel: null, worldChannel: null, connected: false, readyNotified: false,
-      offerStarted: false, answerStarted: false,
-      seenHostCandidates: new Set(), seenGuestCandidates: new Set(), pendingCandidates: [],
-      unsubscribers: []
-    };
-    this.logPvpDiagnostic(pvp, 'WebRTC', 'создан RTCPeerConnection', { generation: pvp.rtcGeneration });
-    const startConnectTimer = () => {
-      clearTimeout(rtc.connectTimer);
-      rtc.connectTimer = setTimeout(() => {
-        const reason = `истекло время ожидания прямого канала (ICE: ${pc.iceConnectionState}, соединение: ${pc.connectionState})`;
-        if (pvp.started) this.handlePvpRtcLost(reason, rtc);
-        else this.failPvpRtc(reason, rtc);
-      }, 20000);
-    };
-    if (!pvp.host) startConnectTimer();
-    const candidatePath = pvp.host ? 'hostCandidates' : 'guestCandidates';
-    pc.onicecandidate = event => {
-      if (!event.candidate) return;
-      pvp.fb.set(pvp.fb.push(refAt(candidatePath)), event.candidate.toJSON())
-        .catch(err => {
-          this.logPvpDiagnostic(pvp, 'Firebase', `отказ записи ${candidatePath}`, { code: err.code, message: err.message });
-          this.failPvpRtc(`Firebase отклонил передачу ICE-параметров: ${err.message}`, rtc);
-        });
-    };
-    const flushCandidates = async () => {
-      if (!pc.remoteDescription || !rtc.pendingCandidates.length) return;
-      const pending = rtc.pendingCandidates.splice(0);
-      for (const candidate of pending) {
-        try { await pc.addIceCandidate(candidate); }
-        catch (err) { this.failPvpRtc(`не удалось применить ICE-кандидат: ${err.message}`, rtc); }
-      }
-    };
-    const addRemoteCandidates = (snapshot, key, seen) => {
-      if (!snapshot.exists()) return;
-      const incoming = snapshot.val() || {};
-      for (const [id, candidate] of Object.entries(incoming)) {
-        if (seen.has(id)) continue;
-        seen.add(id);
-        if (pc.remoteDescription) pc.addIceCandidate(candidate).catch(err => this.failPvpRtc(`ICE-кандидат отклонён: ${err.message}`, rtc));
-        else rtc.pendingCandidates.push(candidate);
-      }
-    };
-    const setChannel = channel => {
-      if (channel.label === 'game-world') rtc.worldChannel = channel;
-      else if (channel.label === 'game-state') rtc.channel = channel;
-      else {
-        channel.close();
-        return;
-      }
-      channel.onopen = () => {
-        if (rtc.failed) { channel.close(); return; }
-        this.logPvpDiagnostic(pvp, 'WebRTC', `DataChannel ${channel.label} открыт`);
-        if (rtc.channel?.readyState !== 'open' || rtc.worldChannel?.readyState !== 'open') return;
-        if (rtc.readyNotified) return;
-        rtc.readyNotified = true;
-        rtc.connected = true;
-        rtc.lastMessageAt = performance.now();
-        rtc.channel.bufferedAmountLowThreshold = 16384;
-        rtc.worldChannel.bufferedAmountLowThreshold = 32768;
-        clearTimeout(rtc.connectTimer);
-        this.pvpStatus('Прямое соединение между игроками установлено.');
-        if (pvp.started) {
-          this.handlePvpRtcRecovered(rtc);
-          this.publishPvpSharedWorld();
-          this.sendPvpRtcState();
-        } else {
-          this.handlePvpRoom({ status: pvp.roomCache?.status, players: pvp.roomCache?.players || {} });
-        }
-      };
-      channel.onmessage = event => {
-        rtc.lastMessageAt = performance.now();
-        let message;
-        try { message = JSON.parse(event.data); } catch { return; }
-        if (pvp.opponentLost) return;
-        if (message.type === 'roster' && pvp.maxPlayers >= 3) {
-          this.applyThreePlayerRoster(message.players || []);
-        } else if ((message.type === 'state' || message.type === 'match-over') && message.state) {
-          const sequence = Number(message.sequence || 0);
-          if (sequence && sequence <= Number(pvp.remoteStateSequence || 0)) return;
-          const validation = this.validatePvpRemoteState(message.state);
-          if (!validation.ok) {
-            const now = Date.now();
-            if (now - Number(pvp.lastInvalidRemoteStateLogAt || 0) > 3000) {
-              pvp.lastInvalidRemoteStateLogAt = now;
-              this.logPvpDiagnostic(pvp, 'Проверка статов', 'отклонено некорректное состояние соперника', { reason: validation.reason });
-            }
-            return;
-          }
-          pvp.remoteStateSequence = sequence || Number(pvp.remoteStateSequence || 0) + 1;
-          const state = validation.state;
-          if (message.uid) pvp.opponentUid = message.uid;
-          pvp.remoteState = state;
-          pvp.remotePlayer = {
-            ...(pvp.remotePlayer || {}), uid: pvp.opponentUid || (pvp.host ? 'guest' : 'host'),
-            name: message.name || pvp.remotePlayer?.name || 'Соперник', online: true,
-            choosing: message.choosing || null, paused: Boolean(message.paused), state
-          };
-          pvp.remoteChoosing = message.choosing || null;
-          pvp.remotePaused = Boolean(message.paused);
-          pvp.remoteShots = Array.isArray(message.shots) ? message.shots : [];
-          pvp.remoteShotsAt = performance.now();
-          this.recordPvpPosition('@remote', state.x, state.y);
-          this.applyPvpRemoteState(state);
-          if (pvp.host && pvp.maxPlayers >= 3) {
-            pvp.remotePlayers ||= {};
-            pvp.remotePlayers[pvp.opponentUid] = pvp.remotePlayer;
-            this.publishThreePlayerRoster();
-          }
-          this.syncPvpWait();
-        } else if (message.type === 'world' && message.world) {
-          this.applyPvpSharedWorld(message.world);
-        } else if (message.type === 'world-chunk') {
-          this.receivePvpWorldChunk(message);
-        } else if (message.type === 'sales-call' && !pvp.host) {
-          this.showSalesCall();
-        } else if (message.type === 'active-skill' && message.skill) {
-          this.receivePvpActiveSkill(message.skill);
-        }
-      };
-      channel.onclose = () => {
-        if (pvp.rtc !== rtc || rtc.restarting) return;
-        if (pvp.matchOver || pvp.opponentLost) { rtc.connected = false; return; }
-        rtc.connected = false;
-        this.logPvpDiagnostic(pvp, 'WebRTC', `DataChannel ${channel.label} закрыт`, {
-          ice: pc.iceConnectionState, connection: pc.connectionState, signaling: pc.signalingState
-        });
-        if (pvp.started) {
-          const reason = `DataChannel закрыт (ICE: ${pc.iceConnectionState}, соединение: ${pc.connectionState}, сигнализация: ${pc.signalingState})`;
-          pvp.rtcFailure = reason;
-          this.handlePvpRtcLost(reason, rtc);
-        } else {
-          this.failPvpRtc(`канал закрыт до запуска (состояние: ${pc.connectionState}, ICE: ${pc.iceConnectionState})`, rtc);
-        }
-      };
-      channel.onerror = event => {
-        if (pvp.rtc !== rtc || rtc.restarting) return;
-        if (pvp.matchOver || pvp.opponentLost) { rtc.connected = false; return; }
-        const error = event?.error;
-        this.logPvpDiagnostic(pvp, 'WebRTC', `ошибка DataChannel ${channel.label}`, {
-          readyState: channel.readyState,
-          name: error?.name || null,
-          message: error?.message || event?.message || null,
-          errorDetail: error?.errorDetail || null,
-          sctpCauseCode: error?.sctpCauseCode || null,
-          ice: pc.iceConnectionState, connection: pc.connectionState, signaling: pc.signalingState
-        });
-        if (pvp.started) this.handlePvpRtcLost('ошибка DataChannel при прямом соединении', rtc);
-        else if (!rtc.connected) this.failPvpRtc('ошибка DataChannel при прямом соединении', rtc);
-      };
-    };
-    pc.ondatachannel = event => setChannel(event.channel);
-    pc.onconnectionstatechange = () => {
-      if (pvp.rtc !== rtc) return;
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'изменилось состояние соединения', {
-        connection: pc.connectionState, ice: pc.iceConnectionState, signaling: pc.signalingState
-      });
-      if (pc.connectionState === 'failed') {
-        const reason = `соединение отклонено сетью (ICE: ${pc.iceConnectionState}, состояние: ${pc.connectionState})`;
-        if (pvp.started) this.handlePvpRtcLost(reason, rtc);
-        else if (!rtc.connected) this.failPvpRtc(reason, rtc);
-      }
-    };
-    pc.oniceconnectionstatechange = () => {
-      if (pvp.rtc !== rtc) return;
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'изменилось состояние ICE', {
-        ice: pc.iceConnectionState, connection: pc.connectionState
-      });
-      if (pc.iceConnectionState === 'failed') {
-        const reason = 'ICE не нашёл прямой маршрут между сетями; вероятно, нужен TURN. Его ICE-серверы можно добавить в localStorage по ключу 1c_webrtc_ice_servers';
-        if (pvp.started) this.handlePvpRtcLost(reason, rtc);
-        else if (!rtc.connected) this.failPvpRtc(reason, rtc);
-      }
-    };
-    pc.onsignalingstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC', 'изменилось состояние сигнализации', { signaling: pc.signalingState });
-    pc.onicegatheringstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC', 'изменилось состояние сбора ICE', { gathering: pc.iceGatheringState });
-    pc.onicecandidateerror = event => {
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'ошибка ICE-кандидата', {
-        code: event.errorCode, text: event.errorText, url: event.url
-      });
-      if (!rtc.connected && event.errorCode) {
-        this.pvpStatus(`WebRTC ICE: ошибка ${event.errorCode}${event.errorText ? ` — ${event.errorText}` : ''}.`, true);
-      }
-    };
-
-    const remoteCandidatePath = pvp.host ? 'guestCandidates' : 'hostCandidates';
-    const remoteSeen = pvp.host ? rtc.seenGuestCandidates : rtc.seenHostCandidates;
-    rtc.unsubscribers.push(listenAt(remoteCandidatePath, snapshot =>
-      addRemoteCandidates(snapshot, remoteCandidatePath, remoteSeen)));
-
-    if (pvp.host) {
-      rtc.unsubscribers.push(listenAt('answer', async snapshot => {
-        const answer = snapshot.val();
-        if (!answer || pc.currentRemoteDescription) return;
-        try {
-          await pc.setRemoteDescription(answer);
-          await flushCandidates();
-        } catch (err) {
-          this.failPvpRtc(`не удалось принять ответ WebRTC: ${err.message}`, rtc);
-        }
-      }));
-      rtc.unsubscribers.push(pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/guestUid`), snapshot => {
-        if (!snapshot.exists() || rtc.offerStarted) return;
-        pvp.opponentUid = snapshot.val();
-        rtc.offerStarted = true;
-        startConnectTimer();
-        setChannel(pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 1 }));
-        setChannel(pc.createDataChannel('game-world'));
-        pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() =>
-          pvp.fb.set(refAt('offer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp })
-        ).catch(err => {
-          rtc.offerStarted = false;
-          this.logPvpDiagnostic(pvp, 'Firebase/WebRTC', 'не удалось создать и отправить offer', { code: err.code, message: err.message });
-          this.failPvpRtc(`не удалось создать offer: ${err.message}`, rtc);
-        });
-      }, err => this.failPvpRtc(`Firebase запретил читать guestUid: ${err.message}`, rtc)));
-    } else {
-      rtc.unsubscribers.push(listenAt('offer', async snapshot => {
-        const offer = snapshot.val();
-        if (!offer || rtc.answerStarted) return;
-        rtc.answerStarted = true;
-        startConnectTimer();
-        try {
-          await pc.setRemoteDescription(offer);
-          await flushCandidates();
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          await pvp.fb.set(refAt('answer'), { type: pc.localDescription.type, sdp: pc.localDescription.sdp });
-        } catch (err) {
-          rtc.answerStarted = false;
-          this.logPvpDiagnostic(pvp, 'Firebase/WebRTC', 'не удалось принять offer или отправить answer', { code: err.code, message: err.message });
-          this.failPvpRtc(`не удалось принять offer или отправить answer: ${err.message}`, rtc);
-        }
-      }));
-    }
-  }
-
-  failPvpRtc(reason, expectedRtc = null) {
-    const pvp = this.pvp;
-    if (!pvp || (expectedRtc && pvp.rtc !== expectedRtc) || pvp.rtc?.connected || pvp.rtc?.failed) return;
-    if (pvp.rtc) {
-      pvp.rtc.failed = true;
-      clearTimeout(pvp.rtc.connectTimer);
-      pvp.rtc.unsubscribers.forEach(unsubscribe => unsubscribe());
-      pvp.rtc.pc?.close();
-    }
-    const message = `Не удалось установить обязательное WebRTC-соединение: ${reason}. Firebase-резерв отключён.`;
-    pvp.rtcFailure = reason;
-    this.logPvpDiagnostic(pvp, 'Сбой', 'не удалось установить WebRTC', { reason });
-    this.pvpStatus(message, true);
-    if (pvp.started) {
-      pvp.connectionLost = true;
-      this.paused = true;
-      this.showBanner('WEBRTC НЕ ПОДКЛЮЧЁН. ИГРА ПРИОСТАНОВЛЕНА; ПРОВЕРЬТЕ СЕТЬ И ПОДКЛЮЧИТЕСЬ ЗАНОВО.');
-    } else {
-      this.cleanupFailedPvpRtc(pvp);
-    }
-  }
-
-  handlePvpRtcLost(reason, rtc = this.pvp?.rtc) {
-    const pvp = this.pvp;
-    if (!pvp?.started || !rtc || pvp.rtc !== rtc || rtc.restarting || pvp.opponentLost || pvp.matchOver) return;
-    if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) {
-      const diagnostic = this.describePvpRtcFailure(reason, rtc);
-      this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', 'сбой отдельного соединения; общий RTC-реконнект пропущен', { reason: diagnostic });
-      this.pvpStatus(`Связь третьего игрока потеряна: ${diagnostic}`, true);
-      return;
-    }
-    const diagnostic = this.describePvpRtcFailure(reason, rtc);
-    if (!pvp.connectionLost) {
-      pvp.connectionLostReason = diagnostic;
-      this.logPvpDiagnostic(pvp, 'Сбой', 'потеряна игровая связь', { reason: diagnostic, firebaseConnected: pvp.firebaseConnected });
-      this.capturePvpRtcStats(pvp, rtc);
-      pvp.wasPausedBeforeConnectionLost = Boolean(this.paused);
-      pvp.connectionLost = true;
-      this.paused = true;
-      this.pvpPausedByRemote = true;
-      const modal = document.getElementById('modal-pvp-wait');
-      modal.style.display = 'flex';
-      document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
-      document.getElementById('pvp-wait-message').textContent = `Игра приостановлена. ${diagnostic}. Восстанавливаем соединение.`;
-      this.pvpStatus(`Связь WebRTC потеряна. ${diagnostic}`, true);
-    }
-    if (pvp.recoveryRequested) return;
-    pvp.recoveryRequested = true;
-    if (!pvp.host) {
-      this.requestPvpRtcRecovery(pvp);
-      return;
-    }
-    const generation = Math.max(1, Number(pvp.rtcGeneration) || 1) + 1;
-    const generationRef = pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/rtcGeneration`);
-    pvp.recoveryTargetGeneration = generation;
-    this.publishPvpRtcGeneration(pvp, generation, generationRef);
-  }
-
-  describePvpRtcFailure(reason, rtc) {
-    const pc = rtc?.pc;
-    const secondsSinceMessage = rtc?.lastMessageAt
-      ? Math.max(0, (performance.now() - rtc.lastMessageAt) / 1000).toFixed(1)
-      : 'нет данных';
-    const channelStates = [rtc?.channel, rtc?.worldChannel]
-      .map(channel => channel ? `${channel.label}: ${channel.readyState}` : null)
-      .filter(Boolean).join(', ') || 'каналы не созданы';
-    return `${reason} Состояние: ICE ${pc?.iceConnectionState || 'неизвестно'}, соединение ${pc?.connectionState || 'неизвестно'}, сигнализация ${pc?.signalingState || 'неизвестно'}; ${channelStates}; последнее сообщение ${secondsSinceMessage} с назад`;
-  }
-
-  capturePvpRtcStats(pvp, rtc) {
-    if (!rtc?.pc?.getStats || rtc.statsCaptured) return;
-    rtc.statsCaptured = true;
-    rtc.pc.getStats().then(stats => {
-      const reports = Array.from(stats.values());
-      const transport = reports.find(item => item.type === 'transport' && item.selectedCandidatePairId);
-      const pairs = reports.filter(item => item.type === 'candidate-pair');
-      const pair = (transport && stats.get(transport.selectedCandidatePairId)) ||
-        pairs.find(item => item.state === 'succeeded' && (item.selected || item.nominated)) ||
-        pairs.find(item => item.state === 'succeeded');
-      const local = pair && stats.get(pair.localCandidateId);
-      const remote = pair && stats.get(pair.remoteCandidateId);
-      this.logPvpDiagnostic(pvp, 'WebRTC stats', 'снимок на момент сбоя', {
-        pairState: pair?.state || null,
-        localCandidate: local?.candidateType || null,
-        remoteCandidate: remote?.candidateType || null,
-        protocol: local?.protocol || remote?.protocol || null,
-        rttSeconds: pair?.currentRoundTripTime ?? null,
-        availableOutgoingBitrate: pair?.availableOutgoingBitrate ?? null,
-        bytesSent: pair?.bytesSent ?? null,
-        bytesReceived: pair?.bytesReceived ?? null,
-        candidatePairs: pairs.slice(0, 6).map(item => ({ state: item.state, nominated: item.nominated, selected: item.selected, rttSeconds: item.currentRoundTripTime, bytesSent: item.bytesSent, bytesReceived: item.bytesReceived })),
-        packetsLost: reports.filter(item => item.type === 'inbound-rtp').reduce((sum, item) => sum + Number(item.packetsLost || 0), 0)
-      });
-    }).catch(err => this.logPvpDiagnostic(pvp, 'WebRTC stats', 'не удалось получить снимок', { message: err.message }));
-  }
-
-  publishPvpRtcGeneration(pvp, generation, generationRef) {
-    if (this.pvp !== pvp || !pvp.connectionLost || pvp.recoveryBlocked || pvp.recoveryTargetGeneration !== generation) return;
-    pvp.fb.set(generationRef, generation).then(() => {
-      if (this.pvp === pvp && pvp.connectionLost && Number(pvp.rtcGeneration) !== generation) {
-        this.restartPvpRtc(generation);
-      }
-    }).catch(err => {
-      if (this.pvp !== pvp || !pvp.connectionLost || pvp.recoveryTargetGeneration !== generation) return;
-      const message = `Firebase не разрешил объявить новую RTC-сессию: ${err.message}. Проверьте правила RTDB; повторяем попытку.`;
-      if (Date.now() - Number(pvp.lastGenerationDeniedLogAt || 0) >= 10000) {
-        pvp.lastGenerationDeniedLogAt = Date.now();
-        this.logPvpDiagnostic(pvp, 'Firebase', 'отказ записи rtcGeneration', { code: err.code, message: err.message });
-      }
-      this.pvpStatus(message, true);
-      pvp.recoveryError = message;
-      document.getElementById('pvp-wait-message').textContent = `Причина обрыва: ${pvp.connectionLostReason}. Ошибка восстановления: ${message}`;
-      if (err.code === 'PERMISSION_DENIED') {
-        pvp.recoveryBlocked = true;
-        return;
-      }
-      clearTimeout(pvp.recoveryRetryTimer);
-      pvp.recoveryRetryTimer = setTimeout(() =>
-        this.publishPvpRtcGeneration(pvp, generation, generationRef), 2500);
-    });
-  }
-
-  requestPvpRtcRecovery(pvp) {
-    if (this.pvp !== pvp || !pvp.connectionLost || pvp.host || pvp.opponentLost || pvp.recoveryBlocked) return;
-    const requestRef = pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/rtc/reconnectRequests/${pvp.uid}`);
-    const requestId = pvp.lastReconnectRequestSent = Math.max(Date.now(), Number(pvp.lastReconnectRequestSent || 0) + 1);
-    pvp.fb.set(requestRef, requestId).catch(err => {
-      if (this.pvp === pvp && pvp.connectionLost) {
-        const message = `Firebase отклонил запрос на переподключение: ${err.message}. Проверьте правила RTDB; повторяем попытку.`;
-        if (Date.now() - Number(pvp.lastReconnectDeniedLogAt || 0) >= 10000) {
-          pvp.lastReconnectDeniedLogAt = Date.now();
-          this.logPvpDiagnostic(pvp, 'Firebase', 'отказ запроса реконнекта', { code: err.code, message: err.message });
-        }
-        this.pvpStatus(message, true);
-        pvp.recoveryError = message;
-        document.getElementById('pvp-wait-message').textContent = `Причина обрыва: ${pvp.connectionLostReason}. Ошибка восстановления: ${message}`;
-        if (err.code === 'PERMISSION_DENIED') {
-          pvp.recoveryBlocked = true;
-          clearTimeout(pvp.recoveryRequestTimer);
-        }
-      }
-    });
-    if (!pvp.recoveryBlocked) {
-      clearTimeout(pvp.recoveryRequestTimer);
-      pvp.recoveryRequestTimer = setTimeout(() => this.requestPvpRtcRecovery(pvp), 2500);
-    }
-  }
-
-  restartPvpRtc(generation) {
-    const pvp = this.pvp;
-    if (!pvp || pvp.opponentLost || pvp.matchOver || Number(generation) === Number(pvp.rtcGeneration) && pvp.rtc?.connected) return;
-    if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) {
-      pvp.rtcGeneration = Number(generation) || pvp.rtcGeneration;
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'пропущен перезапуск двухигрокового канала для третьего игрока');
-      return;
-    }
-    if (pvp.started && !pvp.connectionLost && !pvp.matchOver) {
-      pvp.wasPausedBeforeConnectionLost = Boolean(this.paused);
-      pvp.connectionLost = true;
-      this.paused = true;
-      this.pvpPausedByRemote = true;
-      document.getElementById('modal-pvp-wait').style.display = 'flex';
-      document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
-      const diagnostic = this.describePvpRtcFailure('Второй игрок запросил переподключение.', pvp.rtc);
-      if (!pvp.connectionLostReason) pvp.connectionLostReason = diagnostic;
-      this.logPvpDiagnostic(pvp, 'WebRTC', 'соперник запросил перестройку RTC-сессии', { generation });
-      document.getElementById('pvp-wait-message').textContent = `Игра приостановлена. ${diagnostic}`;
-    }
-    const oldRtc = pvp.rtc;
-    if (oldRtc) {
-      oldRtc.restarting = true;
-      clearTimeout(oldRtc.connectTimer);
-      oldRtc.unsubscribers.forEach(unsubscribe => unsubscribe());
-      oldRtc.channel?.close();
-      oldRtc.worldChannel?.close();
-      oldRtc.pc?.close();
-    }
-    pvp.rtc = null;
-    pvp.rtcGeneration = Number(generation) || 1;
-    pvp.recoveryRequested = false;
-    pvp.recoveryTargetGeneration = null;
-    clearTimeout(pvp.recoveryRequestTimer);
-    clearTimeout(pvp.recoveryRetryTimer);
-    pvp.remoteStateSequence = 0;
-    pvp.remoteWorldRevision = 0;
-    pvp.pendingWorldSnapshot = null;
-    pvp.remotePaused = false;
-    pvp.remoteChoosing = null;
-    this.setupPvpRtc();
-  }
-
   handlePvpRtcRecovered(rtc) {
     const pvp = this.pvp;
     if (!pvp?.started || pvp.rtc !== rtc || !pvp.connectionLost) return;
-    this.logPvpDiagnostic(pvp, 'Восстановление', 'WebRTC восстановлен');
+    this.logPvpDiagnostic(pvp, 'Восстановление', 'прямое WebRTC-соединение восстановлено');
     pvp.connectionLost = false;
     pvp.recoveryRequested = false;
     clearTimeout(pvp.recoveryRetryTimer);
@@ -3443,36 +2868,10 @@ class Game {
       document.getElementById('modal-shop').style.display === 'flex' ||
       document.getElementById('modal-lvlup').style.display === 'flex');
     this.lastTime = performance.now();
-    this.pvpStatus('Соединение восстановлено, матч продолжается.');
-    this.refreshPvpDiagnostics(pvp);
+    this.pvpStatus('Прямое WebRTC-соединение восстановлено, матч продолжается.');
     this.syncPvpWait();
   }
-
-  async cleanupFailedPvpRtc(pvp) {
-    pvp.unsub?.();
-    try {
-      if (pvp.host) {
-        await pvp.fb.onDisconnect(pvp.roomRef).cancel().catch(() => {});
-        await pvp.fb.remove(pvp.roomRef);
-      } else {
-        await pvp.fb.onDisconnect(pvp.playerRef).cancel().catch(() => {});
-        if (pvp.guestUidRef) await pvp.fb.onDisconnect(pvp.guestUidRef).cancel().catch(() => {});
-        await pvp.fb.remove(pvp.playerRef);
-        if (pvp.guestUidRef) await pvp.fb.remove(pvp.guestUidRef);
-      }
-    } catch (err) {
-      console.warn('Не удалось очистить комнату после ошибки WebRTC:', err);
-    }
-    if (this.pvp !== pvp) return;
-    this.pvp = null;
-    this.pvpPausedByRemote = false;
-    document.getElementById('pvp-room-code-display').style.display = 'none';
-    document.getElementById('pvp-copy-room-code').style.display = 'none';
-    document.getElementById('pvp-leave-button').style.display = 'none';
-    document.getElementById('pvp-disable-attacks').disabled = false;
-  }
-
-  sendPvpRtcMessage(message, channelOverride = null, force = false) {
+  sendPvpNetworkMessage(message, channelOverride = null, force = false) {
     const pvp = this.pvp;
     if (!pvp?.rtc?.connected) return false;
     const limit = message.type === 'state' ? 98304 : 65536;
@@ -3483,7 +2882,7 @@ class Game {
     for (const channel of channels) {
       if (channel?.readyState !== 'open' || (!force && channel.bufferedAmount > limit)) continue;
       try { channel.send(payload); sent = true; }
-      catch (err) { console.warn('Не удалось отправить сообщение WebRTC:', err); }
+      catch (err) { console.warn('Не удалось отправить сообщение в серверную комнату:', err); }
     }
     return sent;
   }
@@ -3501,7 +2900,7 @@ class Game {
     });
   }
 
-  sendPvpRtcState(state = null, channelOverride = null, type = 'state') {
+  sendPvpNetworkState(state = null, channelOverride = null, type = 'state') {
     const pvp = this.pvp;
     if (!pvp?.started || !pvp.rtc?.connected) return false;
     const player = this.player;
@@ -3517,7 +2916,7 @@ class Game {
       over: pvp.matchOver || player.hp <= 0,
       enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}
     };
-    return this.sendPvpRtcMessage({
+    return this.sendPvpNetworkMessage({
       type, sequence: pvp.rtcStateSequence = (pvp.rtcStateSequence || 0) + 1,
       uid: pvp.uid, name: pvp.name || 'Соперник', state,
       choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), shots: this.serializePvpShots()
@@ -3651,7 +3050,7 @@ class Game {
     document.getElementById('modal-pvp-wait').style.display = 'flex';
     document.getElementById('pvp-wait-head').textContent = '🔄 Связь потеряна — переподключаемся';
     document.getElementById('pvp-wait-message').textContent = 'Не видим состояние соперника. Игра приостановлена; ждём восстановления связи до 20 секунд.';
-    this.logPvpDiagnostic(pvp, 'Firebase', 'временно не виден игрок соперника; запущено ожидание', { reason, timeoutSeconds: 20 });
+      this.logPvpDiagnostic(pvp, 'Комната', 'временно не виден игрок соперника; запущено ожидание', { reason, timeoutSeconds: 20 });
     pvp.opponentMissingTimer = setTimeout(() => {
       pvp.opponentMissingTimer = null;
       if (this.pvp !== pvp || pvp.opponentLost || pvp.opponentVisible) return;
@@ -3663,7 +3062,7 @@ class Game {
     if (!pvp?.opponentMissingTimer) return;
     clearTimeout(pvp.opponentMissingTimer);
     pvp.opponentMissingTimer = null;
-    this.logPvpDiagnostic(pvp, 'Firebase', 'игрок соперника снова виден');
+    this.logPvpDiagnostic(pvp, 'Комната', 'игрок соперника снова виден');
     if (pvp.connectionLost) return;
     this.paused = Boolean(pvp.wasPausedBeforeOpponentMissing || pvp.choosing || pvp.manualPaused ||
       document.getElementById('modal-pause').style.display === 'flex' ||
@@ -3686,9 +3085,11 @@ class Game {
       return;
     }
     const players = Object.values(room.players || {});
-    const opponent = players.find(player => player.uid !== pvp.uid);
+    const opponents = players.filter(player => player.uid !== pvp.uid);
+    const opponent = opponents[0];
+    const allOpponentsOnline = opponents.length === pvp.maxPlayers - 1 && opponents.every(player => player.online);
     if (opponent) {
-      pvp.opponentVisible = true;
+      pvp.opponentVisible = allOpponentsOnline;
       this.cancelPvpOpponentWait(pvp);
       pvp.opponentUid = opponent.uid;
       if (!pvp.rtc?.connected) {
@@ -3702,18 +3103,14 @@ class Game {
         if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
       }
       this.syncPvpWait();
+      if (!allOpponentsOnline && pvp.started && !pvp.opponentLost) this.waitForPvpOpponent(pvp, 'Один из игроков комнаты отключился.');
     } else if (pvp.remotePlayer && pvp.started) {
       pvp.opponentVisible = false;
       this.waitForPvpOpponent(pvp, 'Игрок соперника временно исчез из комнаты.');
     }
-    if (pvp.host && pvp.opponentUid && room.status === 'waiting' && pvp.rtc?.connected && !pvp.rtc.failed) {
-      if (pvp.maxPlayers >= 3) {
-        if (!pvp.guest2Uid) this.pvpStatus('Первый игрок подключён. Ожидаем второго клиента по коду комнаты…');
-        this.maybeStartThreePlayerRoom();
-      }
-      else pvp.fb.set(pvp.fb.ref(pvp.fb.db, `pvpRooms/${pvp.code}/status`), 'playing')
-          .catch(err => this.pvpStatus(`Не удалось запустить матч: ${err.message}`, true));
-      if (pvp.maxPlayers >= 3) return;
+    if (room.status === 'waiting' && pvp.host) {
+      const connectedCount = players.filter(player => player.online).length;
+      this.pvpStatus(`Ожидаем игроков на сервере: ${connectedCount}/${pvp.maxPlayers}.`);
     }
     if (room.status === 'playing' && !pvp.started && pvp.rtc?.connected && !pvp.rtc.failed) {
       pvp.started = true;
@@ -3731,7 +3128,7 @@ class Game {
     if (!pvp?.started || pvp.opponentLost) return;
     this.logPvpDiagnostic(pvp, 'Матч', 'соперник признан выбывшим', {
       reason: message, promoteLocalPlayerToHost: promoteToHost,
-      firebaseConnected: pvp.firebaseConnected, rtcGeneration: pvp.rtcGeneration
+      directConnection: pvp.rtc?.connected
     });
     clearTimeout(pvp.opponentMissingTimer);
     pvp.opponentMissingTimer = null;
@@ -3786,7 +3183,7 @@ class Game {
   startPvpSync() {
     if (!this.pvp) return;
     if (!this.pvp.rtc?.connected) {
-      this.failPvpRtc('игра не запускается без открытого DataChannel');
+      this.pvpStatus('Матч не запускается: нет прямого WebRTC-соединения.', true);
       return;
     }
     if (this.pvpTimer) clearInterval(this.pvpTimer);
@@ -3815,15 +3212,6 @@ class Game {
         this.pvpTimer = null;
         return;
       }
-      const dedicatedThirdPlayer = this.pvp.maxPlayers >= 3 && this.pvp.slot === 2;
-      if (!dedicatedThirdPlayer && this.pvp.rtc?.connected && !this.pvp.connectionLost && performance.now() - Number(this.pvp.rtc.lastMessageAt || 0) > 2500) {
-        this.logPvpDiagnostic(this.pvp, 'WebRTC', 'тайм-аут входящих сообщений', {
-          secondsSinceMessage: ((performance.now() - Number(this.pvp.rtc.lastMessageAt || 0)) / 1000).toFixed(1),
-          ice: this.pvp.rtc.pc?.iceConnectionState, connection: this.pvp.rtc.pc?.connectionState
-        });
-        this.handlePvpRtcLost('Нет данных от соперника более 2,5 секунды.', this.pvp.rtc);
-        return;
-      }
       const p = this.player;
       const state = {
         x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
@@ -3837,7 +3225,7 @@ class Game {
         enemyDamage: this.pvp.enemyDamageTotals || {},
         claimedDrops: this.pvp.claimedDrops || {}
       };
-      this.sendPvpRtcState(state);
+      this.sendPvpNetworkState(state);
       if (this.pvp.host && this.pvp.maxPlayers >= 3) this.publishThreePlayerRoster();
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 100) {
         this.pvp.lastWorldSync = performance.now();
@@ -3934,7 +3322,7 @@ class Game {
     for (const channel of channels) {
       if (channel.bufferedAmount + encodedBytes > 196608) continue;
       try { for (const packet of packets) channel.send(packet); sent = true; }
-      catch (err) { console.warn('Не удалось отправить снимок мира WebRTC:', err); }
+      catch (err) { console.warn('Не удалось отправить снимок игрового мира соперникам:', err); }
     }
     if (sent) this.pvp.lastWorldPayloadBytes = encodedBytes;
     return sent;
@@ -4131,7 +3519,7 @@ class Game {
     }[key];
     if (!offensive) return; // Поддерживающие умения усиливают PvP-атаки игрока.
     const [base, perLevel, control] = offensive;
-    this.sendPvpRtcMessage({ type: 'active-skill', skill: { key, name: ACTIVE_SKILLS_DEF[key]?.name || key, level, damage: base + Math.max(0, level - 1) * perLevel, control } });
+    this.sendPvpNetworkMessage({ type: 'active-skill', skill: { key, name: ACTIVE_SKILLS_DEF[key]?.name || key, level, damage: base + Math.max(0, level - 1) * perLevel, control } });
   }
 
   async restartFromGameOver() {
@@ -4142,14 +3530,14 @@ class Game {
   setPvpChoosing(kind) {
     if (!this.pvp) return;
     this.pvp.choosing = kind || null;
-    this.sendPvpRtcState();
+    this.sendPvpNetworkState();
     this.syncPvpWait();
   }
 
   setPvpManualPause(paused) {
     if (!this.pvp?.started) return;
     this.pvp.manualPaused = Boolean(paused);
-    this.sendPvpRtcState();
+    this.sendPvpNetworkState();
     this.syncPvpWait();
   }
 
@@ -4190,29 +3578,17 @@ class Game {
     if (!pvp) return;
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
-    clearTimeout(pvp.recoveryRequestTimer);
-    clearTimeout(pvp.recoveryRetryTimer);
-    pvp.unsub?.();
-    if (pvp.rtc) {
-      pvp.rtc.unsubscribers.forEach(unsubscribe => unsubscribe());
-      pvp.rtc.pc?.close();
-      pvp.rtc.connected = false;
-    }
-    for (const peer of Object.values(pvp.threePeers || {})) {
-      peer.unsubscribers?.forEach(unsubscribe => unsubscribe());
-      peer.pc?.close();
-    }
-    pvp.threeGuestPeer?.unsubscribers?.forEach(unsubscribe => unsubscribe());
-    pvp.threeGuestPeer?.pc?.close();
     try {
-      if (pvp.initialRole === 'host' || (!pvp.initialRole && pvp.host)) await pvp.fb.remove(pvp.roomRef);
+      pvp.roomUnsub?.();
+      for (const unsubscribe of pvp.signalingCleanups || []) unsubscribe();
+      for (const peer of Object.values(pvp.peerConnections || {})) peer.pc?.close();
+      const fb = await window.firebaseLeaderboardReady;
+      if (pvp.host) await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`));
       else {
-        await pvp.fb.remove(pvp.playerRef);
-        if (pvp.guestUidRef) await pvp.fb.remove(pvp.guestUidRef);
+        await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}/players/${pvp.uid}`));
+        await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}/${pvp.slot === 1 ? 'guestUid' : 'guest2Uid'}`));
       }
-    } catch (err) {
-      this.pvpStatus(`Не удалось закрыть комнату: ${err.message}`, true);
-    }
+    } catch (error) { this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка очистки комнаты при выходе', { message: error.message }); }
     this.pvp = null;
     this.pvpPausedByRemote = false;
     document.getElementById('modal-pvp-wait').style.display = 'none';
@@ -4224,7 +3600,6 @@ class Game {
     this.paused = true;
     this.showMainMenu();
   }
-
   showSettings() {
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-settings').style.display = 'flex';
@@ -4273,7 +3648,7 @@ class Game {
 
   showSalesCall() {
     if (this.salesCallActive || this.player.hp <= 0) return;
-    if (this.pvp?.started && this.pvp.host) this.sendPvpRtcMessage({ type: 'sales-call' });
+    if (this.pvp?.started && this.pvp.host) this.sendPvpNetworkMessage({ type: 'sales-call' });
     this.salesCallActive = true;
     this.salesCallX = 12;
     this.salesCallY = 12;
@@ -6800,8 +6175,8 @@ class Game {
     if (this.pvp) {
       this.pvp.matchOver = true;
       this.pvp.choosing = null;
-      this.sendPvpRtcState();
-      this.sendPvpRtcState(null, this.pvp.rtc?.worldChannel, 'match-over');
+      this.sendPvpNetworkState();
+      this.sendPvpNetworkState(null, this.pvp.rtc?.worldChannel, 'match-over');
     }
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;

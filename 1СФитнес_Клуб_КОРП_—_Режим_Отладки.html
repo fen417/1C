@@ -2627,6 +2627,11 @@ class Game {
         const generation = Number(snapshot.val());
         if (!Number.isInteger(generation) || generation < 1 || generation === Number(pvp.rtcGeneration || 1)) return;
         this.logPvpDiagnostic(pvp, 'Firebase', 'получено новое поколение RTC', { generation });
+        if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) {
+          pvp.rtcGeneration = generation;
+          this.logPvpDiagnostic(pvp, 'WebRTC', 'игнорируется поколение двухигрокового канала: третий игрок подключён отдельной сессией');
+          return;
+        }
         this.restartPvpRtc(generation);
       }, err => this.logPvpDiagnostic(pvp, 'Firebase', 'ошибка чтения поколения RTC', { code: err.code, message: err.message })),
       pvp.fb.onValue(pvp.fb.ref(pvp.fb.db, `${roomRoot}/rtc/reconnectRequests`), snapshot => {
@@ -2693,6 +2698,8 @@ class Game {
       else { channel.close(); return; }
       channel.onopen = openCheck;
       channel.onmessage = event => {
+        peer.lastMessageAt = performance.now();
+        if (pvp.rtc?.pc === pc) pvp.rtc.lastMessageAt = peer.lastMessageAt;
         let message; try { message = JSON.parse(event.data); } catch { return; }
         if (channel.label === 'game-world') {
           if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
@@ -2789,6 +2796,12 @@ class Game {
       } catch (err) { this.failPvpRtc(`не удалось принять offer третьего игрока: ${err.message}`); }
     }));
     pc.onicecandidate = event => { if (event.candidate) pvp.fb.set(pvp.fb.push(refAt('guestCandidates')), event.candidate.toJSON()); };
+    pc.onconnectionstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', 'изменилось состояние соединения', {
+      connection: pc.connectionState, ice: pc.iceConnectionState, signaling: pc.signalingState
+    });
+    pc.oniceconnectionstatechange = () => this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', 'изменилось состояние ICE', {
+      ice: pc.iceConnectionState, connection: pc.connectionState
+    });
     const openCheck = () => {
       if (peer.channel?.readyState !== 'open' || peer.worldChannel?.readyState !== 'open' || peer.connected) return;
       peer.connected = true;
@@ -2803,6 +2816,8 @@ class Game {
       else { channel.close(); return; }
       channel.onopen = openCheck;
       channel.onmessage = event => {
+        peer.lastMessageAt = performance.now();
+        if (pvp.rtc?.pc === pc) pvp.rtc.lastMessageAt = peer.lastMessageAt;
         let message; try { message = JSON.parse(event.data); } catch { return; }
         if (message.type === 'roster') this.applyThreePlayerRoster(message.players || []);
         else if (message.type === 'state' && message.state) {
@@ -2812,6 +2827,18 @@ class Game {
           this.applyPvpRemoteState(checked.state);
         } else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
       };
+      channel.onclose = () => {
+        peer.connected = false;
+        if (pvp.rtc?.pc === pc) pvp.rtc.connected = false;
+        this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', `DataChannel ${channel.label} закрылся`, {
+          ice: pc.iceConnectionState, connection: pc.connectionState
+        });
+        this.pvpStatus('Связь третьего игрока с хостом потеряна. Перезапуск общего двухигрокового соединения не выполняется.', true);
+      };
+      channel.onerror = event => this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', `ошибка DataChannel ${channel.label}`, {
+        name: event?.error?.name || null, message: event?.error?.message || event?.message || null,
+        ice: pc.iceConnectionState, connection: pc.connectionState
+      });
     };
   }
 
@@ -3168,6 +3195,12 @@ class Game {
   handlePvpRtcLost(reason, rtc = this.pvp?.rtc) {
     const pvp = this.pvp;
     if (!pvp?.started || !rtc || pvp.rtc !== rtc || rtc.restarting || pvp.opponentLost || pvp.matchOver) return;
+    if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) {
+      const diagnostic = this.describePvpRtcFailure(reason, rtc);
+      this.logPvpDiagnostic(pvp, 'WebRTC · третий игрок', 'сбой отдельного соединения; общий RTC-реконнект пропущен', { reason: diagnostic });
+      this.pvpStatus(`Связь третьего игрока потеряна: ${diagnostic}`, true);
+      return;
+    }
     const diagnostic = this.describePvpRtcFailure(reason, rtc);
     if (!pvp.connectionLost) {
       pvp.connectionLostReason = diagnostic;
@@ -3288,6 +3321,11 @@ class Game {
   restartPvpRtc(generation) {
     const pvp = this.pvp;
     if (!pvp || pvp.opponentLost || pvp.matchOver || Number(generation) === Number(pvp.rtcGeneration) && pvp.rtc?.connected) return;
+    if (!pvp.host && pvp.maxPlayers >= 3 && pvp.slot === 2) {
+      pvp.rtcGeneration = Number(generation) || pvp.rtcGeneration;
+      this.logPvpDiagnostic(pvp, 'WebRTC', 'пропущен перезапуск двухигрокового канала для третьего игрока');
+      return;
+    }
     if (pvp.started && !pvp.connectionLost && !pvp.matchOver) {
       pvp.wasPausedBeforeConnectionLost = Boolean(this.paused);
       pvp.connectionLost = true;
@@ -3710,7 +3748,8 @@ class Game {
         this.pvpTimer = null;
         return;
       }
-      if (this.pvp.rtc?.connected && !this.pvp.connectionLost && performance.now() - Number(this.pvp.rtc.lastMessageAt || 0) > 2500) {
+      const dedicatedThirdPlayer = this.pvp.maxPlayers >= 3 && this.pvp.slot === 2;
+      if (!dedicatedThirdPlayer && this.pvp.rtc?.connected && !this.pvp.connectionLost && performance.now() - Number(this.pvp.rtc.lastMessageAt || 0) > 2500) {
         this.logPvpDiagnostic(this.pvp, 'WebRTC', 'тайм-аут входящих сообщений', {
           secondsSinceMessage: ((performance.now() - Number(this.pvp.rtc.lastMessageAt || 0)) / 1000).toFixed(1),
           ice: this.pvp.rtc.pc?.iceConnectionState, connection: this.pvp.rtc.pc?.connectionState
@@ -6547,10 +6586,13 @@ class Game {
         const entryMode = entry.mode || 'solo';
         const modeLabel = entryMode === 'pvp' ? 'Сетевая · PvP'
           : entryMode === 'pve' ? 'Сетевая · PvE' : 'Одиночная';
+        const displayName = this.escapeHtml(String(entry.name || 'Архитектор_1С'));
+        const usernameTag = String(entry.name || '').toLowerCase() === 'username'
+          ? ' <span style="color:#c0392b;">(читерок)</span>' : '';
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><b>${idx + 1}</b></td>
-          <td><b>${this.escapeHtml(String(entry.name || 'Архитектор_1С'))}</b></td>
+          <td><b>${displayName}</b>${usernameTag}</td>
           <td>${this.escapeHtml(String(entry.version || '1.7.1'))}</td>
           <td>${modeLabel}</td>
           <td style="color:#b33939; font-weight:bold;">${Math.max(0, Number(entry.score) || 0)}</td>

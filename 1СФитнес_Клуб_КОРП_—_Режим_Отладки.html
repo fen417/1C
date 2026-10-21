@@ -457,7 +457,7 @@
   .main-menu-version { color: #777; font-size: 11px; margin-top: 4px; }
   .legendary-card { border: 3px solid #c87524 !important; background: linear-gradient(145deg,#fff8e8,#f3c47b) !important; box-shadow: 0 0 12px rgba(200,117,36,.42); }
   .legendary-card h4 { color: #8a4310; }
-  #br-upgrade-button { display:none; position:absolute; z-index:80; left:14px; top:150px; width:44px; height:44px; border:3px solid #f39c12; border-radius:50%; background:#fff4d6; color:#8a4310; font-size:27px; font-weight:bold; cursor:pointer; box-shadow:0 0 14px #f39c12; }
+  #br-upgrade-button { display:none; position:absolute; z-index:80; left:14px; top:150px; width:44px; height:44px; border:3px solid #f39c12; border-radius:50%; background:#fff4d6; color:#8a4310; font-size:27px; font-weight:bold; cursor:pointer; box-shadow:0 0 14px #f39c12; pointer-events:auto; }
   #br-upgrade-button.available { display:block; animation: br-pulse 1.1s infinite; }
   @keyframes br-pulse { 50% { transform:scale(1.12); box-shadow:0 0 22px #ffb52e; } }
   @media (max-width: 640px) {
@@ -2782,7 +2782,10 @@ class Game {
       if (pc.connectionState === 'connected') this.updatePvpPeerConnected(peer);
       if (['failed', 'closed'].includes(pc.connectionState)) {
         peer.connected = false;
-        if (pvp.started && !pvp.matchOver) this.waitForPvpOpponent(pvp, 'Прямое WebRTC-соединение потеряно.');
+        if (pvp.started && !pvp.matchOver && !pvp.leaving) {
+          if (pvp.host && pvp.mode === 'battle_royale') this.markBattleRoyalePlayerEliminated(uid, 'Прямое WebRTC-соединение потеряно.');
+          else this.waitForPvpOpponent(pvp, 'Прямое WebRTC-соединение потеряно.');
+        }
       }
     };
     return peer;
@@ -2792,7 +2795,12 @@ class Game {
     if (channel.label === 'game-world') peer.worldChannel = channel;
     else peer.channel = channel;
     channel.onopen = () => this.updatePvpPeerConnected(peer);
-    channel.onclose = () => { peer.connected = false; if (this.pvp?.started) this.waitForPvpOpponent(this.pvp, 'Канал WebRTC закрылся.'); };
+    channel.onclose = () => {
+      peer.connected = false;
+      if (!this.pvp?.started || this.pvp.matchOver || this.pvp.leaving) return;
+      if (this.pvp.host && this.pvp.mode === 'battle_royale') this.markBattleRoyalePlayerEliminated(peer.uid, 'Канал WebRTC закрылся.');
+      else this.waitForPvpOpponent(this.pvp, 'Канал WebRTC закрылся.');
+    };
     channel.onmessage = event => { try { this.handlePvpSocketPacket(JSON.parse(event.data)); } catch (_) {} };
   }
 
@@ -3220,6 +3228,46 @@ class Game {
     this.lastTime = performance.now();
   }
 
+  markBattleRoyalePlayerEliminated(uid, reason = 'Игрок покинул Battle Royale.') {
+    const pvp = this.pvp;
+    if (!pvp?.host || pvp.mode !== 'battle_royale' || !pvp.started || !uid || uid === pvp.uid) return;
+    const prior = pvp.remotePlayers?.[uid] || {};
+    if (prior.disconnected || prior.state?.over) return;
+    const roomPlayer = pvp.roomCache?.players?.[uid] || {};
+    const previousState = prior.state || roomPlayer.state || {};
+    const state = {
+      ...previousState,
+      x: Number(previousState.x) || this.player.x,
+      y: Number(previousState.y) || this.player.y,
+      hp: 0,
+      maxHp: Math.max(1, Number(previousState.maxHp) || 100),
+      level: Math.max(1, Number(previousState.level) || 1),
+      time: Math.max(0, Number(previousState.time) || this.time || 0),
+      attackTotal: Math.max(0, Number(previousState.attackTotal) || 0),
+      enemyAttackTotal: Math.max(0, Number(previousState.enemyAttackTotal) || 0),
+      over: true,
+      shield: Boolean(previousState.shield)
+    };
+    pvp.remotePlayers ||= {};
+    pvp.remotePlayers[uid] = {
+      ...prior,
+      uid,
+      name: prior.name || roomPlayer.name || 'Игрок',
+      online: false,
+      disconnected: true,
+      state,
+      stateAt: performance.now()
+    };
+    const peer = pvp.peerConnections?.[uid] || pvp.threePeers?.[uid] || (pvp.rtc?.uid === uid ? pvp.rtc : null);
+    if (peer && !peer.disconnectedHandled) {
+      peer.disconnectedHandled = true;
+      peer.connected = false;
+      peer.pc?.close();
+    }
+    this.logPvpDiagnostic(pvp, 'Battle Royale', 'отключившийся игрок выбывает, матч продолжается', { uid, reason });
+    this.publishThreePlayerRoster();
+  }
+
   handlePvpRoom(room) {
     const pvp = this.pvp;
     if (!pvp) return;
@@ -3234,14 +3282,27 @@ class Game {
     }
     const players = Object.values(room.players || {});
     const opponents = players.filter(player => player.uid !== pvp.uid);
-    const opponent = pvp.host ? opponents[0] : (opponents.find(player => player.uid === room.hostUid) || opponents[0]);
+    const opponent = pvp.host ? opponents[0] : (pvp.mode === 'battle_royale'
+      ? opponents.find(player => player.uid === room.hostUid)
+      : (opponents.find(player => player.uid === room.hostUid) || opponents[0]));
     const allOpponentsOnline = players.length >= 2 && opponents.every(player => player.online);
+    if (pvp.started && pvp.host && pvp.mode === 'battle_royale') {
+      const participantUids = pvp.matchPlayerUids || Object.keys(room.players || {});
+      for (const uid of participantUids) {
+        if (uid === pvp.uid) continue;
+        const participant = room.players?.[uid];
+        if (!participant || participant.online === false) this.markBattleRoyalePlayerEliminated(uid, 'Игрок покинул комнату или потерял соединение.');
+      }
+    }
+    const opponentVisible = pvp.mode === 'battle_royale'
+      ? (pvp.host || Boolean(room.players?.[room.hostUid]?.online))
+      : allOpponentsOnline;
     if (!pvp.started) this.updatePvpLobby(room);
     if (opponent) {
-      pvp.opponentVisible = allOpponentsOnline;
+      pvp.opponentVisible = opponentVisible;
       this.cancelPvpOpponentWait(pvp);
       pvp.opponentUid = opponent.uid;
-      if (!pvp.rtc?.connected) {
+      if (!pvp.rtc?.connected && !(pvp.host && pvp.mode === 'battle_royale')) {
         pvp.remotePlayer = opponent;
         pvp.remoteState = opponent.state || null;
         if (pvp.remoteState) this.recordPvpPosition('@remote', Number(pvp.remoteState.x), Number(pvp.remoteState.y));
@@ -3252,8 +3313,8 @@ class Game {
         if (pvp.remoteState) this.applyPvpRemoteState(pvp.remoteState);
       }
       this.syncPvpWait();
-      if (!allOpponentsOnline && pvp.started && !pvp.opponentLost) this.waitForPvpOpponent(pvp, 'Один из игроков комнаты отключился.');
-    } else if (pvp.remotePlayer && pvp.started) {
+      if (!opponentVisible && pvp.started && !pvp.opponentLost) this.waitForPvpOpponent(pvp, 'Один из игроков комнаты отключился.');
+    } else if (pvp.remotePlayer && pvp.started && !(pvp.host && pvp.mode === 'battle_royale')) {
       pvp.opponentVisible = false;
       this.waitForPvpOpponent(pvp, 'Игрок соперника временно исчез из комнаты.');
     }
@@ -3264,6 +3325,7 @@ class Game {
     if (room.status === 'playing' && !pvp.started && (pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected && !pvp.rtc?.failed)) {
       pvp.started = true;
       pvp.actualPlayerCount = players.length;
+      pvp.matchPlayerUids = players.map(player => player.uid).filter(Boolean);
       document.getElementById('modal-pvp').style.display = 'none';
       this.start();
       this.startPvpSync();
@@ -3753,12 +3815,14 @@ class Game {
   async leavePvpRoom() {
     const pvp = this.pvp;
     if (!pvp) return;
+    pvp.leaving = true;
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
     try {
       pvp.roomUnsub?.();
       for (const unsubscribe of pvp.signalingCleanups || []) unsubscribe();
       for (const peer of Object.values(pvp.peerConnections || {})) peer.pc?.close();
+      pvp.rtc?.pc?.close();
       const fb = await window.firebaseLeaderboardReady;
       if (pvp.host) await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`));
       else {
@@ -4431,7 +4495,7 @@ class Game {
   updateConsumableHUD() {
     const hud = document.getElementById('hud-consumables');
     if (!hud) return;
-    hud.style.display = this.isBattleRoyale ? 'none' : '';
+    hud.style.display = '';
     const passives = document.getElementById('hud-shop-passives');
     if (passives) passives.style.display = this.isBattleRoyale ? 'none' : 'flex';
     const keys = ['7', '8', '9', '0'];

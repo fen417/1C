@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.0.1</title>
+<title>1С:Фитнес Клуб КОРП 2.1.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -481,6 +481,7 @@
   .shop-card h3 { color: #900; font-size: 12px; margin: 5px 0; }
   .shop-card p { color: #444; font-size: 10px; line-height: 1.35; flex: 1; }
   .shop-card .shop-icon { font-size: 24px; }
+  .shop-combo-hint { margin-top: 6px; padding: 5px 6px; background: #fff2cf; border: 1px solid #c78b26; border-radius: 3px; color: #754500; font-size: 10px; line-height: 1.3; font-weight: bold; }
   .shop-card button { margin-top: 8px; }
   .shop-card button:disabled { opacity: .45; cursor: not-allowed; }
   #sales-call {
@@ -606,7 +607,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.0.1 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.1.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -725,7 +726,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.0.1</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.1.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -734,16 +735,16 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.0.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.1.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 2.0.0 — «Переход на 8.5»</h3>
-              <p>После первого большого босса выбирайте одну из трёх легендарных миграций. Комнаты поддерживают до восьми игроков и ручной запуск хостом; состав отряда усиливает волну мобов. В классическом PvP звонок магазина ждёт решения всей команды, а при 4+ игроках прокачка не останавливает матч и карта растёт на 15% за каждого участника сверх трёх. Battle Royale приносит большую карту, указатель к центру, лут с мобов и прокачку без паузы; общая пауза включается и снимается клавишей F9, а окно хоста на фоне автоматически ставит матч на паузу. Зона Battle Royale медленно сжимается к центру и наносит урон снаружи. Победитель получает зелёный экран итогов и может записать результат. В рекордах видны режим и число игроков.</p>
+              <h3>Версия 2.1.0 — «Комплектация по акции»</h3>
+              <p>В магазин добавлены пять пассивных предметов и пять комплектов: две вещи объединяются, освобождая слот и сохраняя свои эффекты. В Battle Royale автоатаки переключаются на ближайшего соперника, а урон по игрокам составляет 14% от обычного. Магнит для дискет ослаблен до 19%. Добавлены два события: отключение от 70-го сервера оглушает, нехватка оперативки на 59-м замедляет.</p>
             </div>
             <div class="release-notes">
-              <h3>Версия 1.9.0 — «Новый подход»</h3>
-              <p>Добавлены три переброса улучшений за забег, эволюции совместимого оружия, поджигающие снаряды, рывок с неуязвимостью и магазинный переброс ассортимента. Обновлены тикеты, перки и баланс PvP.</p>
+              <h3>Версия 2.0.0 — «Переход на 8.5»</h3>
+              <p>Добавлены легендарки после первого босса, комнаты до восьми игроков, режим Battle Royale с сужением зоны, совместные решения в магазине классического PvP и обновлённая таблица рекордов.</p>
             </div>
           </div>
         </div>
@@ -820,6 +821,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
+        <details class="release-notes" open><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два случайных офисных события: «Кто-то зашёл на 70-й сервер и тебя выкинуло» на 3,5 секунды блокирует движение, рывок, активные умения и расходники; «На 59 заканчивается оперативка» на 5 секунд снижает скорость передвижения на 60%. В сетевом матче оба события применяются ко всем игрокам.</p></details>
         <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд. Тикеты выдаются случайно из общего пула, без выбора игроком. Таблица рекордов показывает режим и число игроков.</p></details>
         <details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды с пятью уровнями. На каждом забеге доступно три переброса набора карточек. Совместимые оружия 5-го уровня можно объединить в эволюции: «Аудит доступа», «Фискальный реестр» и «Контроль доступа». В магазине ассортимент можно обновить за фиткоины до двух раз за предложение. Добавлен рывок с половиной секунды неуязвимости: перезарядка 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрен баланс перков, лечения, щитов и контроля в PvP.</p></details><details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
         <details class="release-notes" open><summary><h3>1.7.0 — «Три отказа и М.В.»</h3></summary><p>В паузе появились характеристики героя с учётом выбранных улучшений и действующих усилений. После трёх отказов от тикетов в погоню вступает быстрый и сильный босс М.В. После десятой минуты приходят новые сложные мини-боссы. В настройках теперь отдельно регулируются громкость бита и звуков игры. В магазине появились постоянные улучшения характеристик и инвентарь на шесть предметов, который виден под усилениями и в паузе. Появились новые умения и противники с разными повадками, а офисные события пополнились новыми шутками. После пятнадцатой минуты за героем до конца забега следует неуязвимый «RuDesktop: исчерпан 24-ти часовой лимит»; его появление сопровождается предупреждением, а касание завершает сессию. В версии 1.7.0 окно магазина стало прокручиваться и помещаться в экран.</p></details>
@@ -1000,7 +1002,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.0.1';
+const GAME_VERSION = '2.1.0';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -1858,10 +1860,48 @@ const STORE_PASSIVES_DEF = {
   fast_service_shoes: { name: 'Кроссовки быстрого обслуживания', icon: '👟', cost: 320, stock: 4, desc: '+10% к скорости бега.', apply: p => { p.speedMult += 0.10; } },
   tech_gloves: { name: 'Перчатки техспециалиста', icon: '🧤', cost: 380, stock: 4, desc: '+12% к урону.', apply: p => { p.dmgMult += 0.12; } },
   mssql_card: { name: 'Индекс-карта MSSQL', icon: '🎯', cost: 340, stock: 4, desc: '+6% к шансу критического удара.', apply: p => { p.critChance += 0.06; } },
-  floppy_magnet: { name: 'Магнит для дискет', icon: '🧲', cost: 290, stock: 4, desc: '+25% к радиусу сбора опыта.', apply: p => { p.magnetMult += 0.25; } },
+  floppy_magnet: { name: 'Магнит для дискет', icon: '🧲', cost: 290, stock: 4, desc: '+19% к радиусу сбора опыта.', apply: p => { p.magnetMult += 0.19; } },
   backup_coil: { name: 'Контур автоматического бэкапа', icon: '🩹', cost: 420, stock: 3, desc: '+1,5 HP регенерации в секунду.', apply: p => { p.regen += 1.5; } },
   coffee_thermos: { name: 'Термокружка из 308 кабинета', icon: '☕', cost: 400, stock: 3, desc: 'Умения и оружие перезаряжаются на 8% быстрее.', apply: p => { p.cdMult *= 0.92; } },
-  hasp_license: { name: 'HASP-лицензия на уклонение', icon: '🗝️', cost: 360, stock: 3, desc: '+5% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.05); } }
+  hasp_license: { name: 'HASP-лицензия на уклонение', icon: '🗝️', cost: 360, stock: 3, desc: '+5% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.05); } },
+  ergonomic_chair: { name: 'Кресло по охране труда', icon: '🪑', cost: 390, stock: 3, desc: 'Восстанавливает ещё 8 HP при каждом повышении уровня. Эффект суммируется до +24 HP за уровень.', apply: p => { p.levelUpHeal = Math.min(24, (p.levelUpHeal || 0) + 8); } },
+  toner_fax: { name: 'Факс с резервным тонером', icon: '📠', cost: 350, stock: 3, desc: '+15% фиткоинов с дискет. Бонус суммируется до +45%. Тонер не входит в комплект.', apply: p => { p.currencyMult = Math.min(1.45, (p.currencyMult || 1) + 0.15); } },
+  usb_adapter: { name: 'Переходник с переходника', icon: '🔌', cost: 330, stock: 3, desc: 'Сокращает перезарядку рывка на 20%. Эффект суммируется до 45%. Совместимость подтверждена устно.', apply: p => { p.dashCooldownMult = Math.max(0.55, (p.dashCooldownMult || 1) * 0.8); } },
+  training_spreadsheet: { name: 'Excel «Обучение_финал_7.xlsx»', icon: '📊', cost: 370, stock: 3, desc: '+10% к получаемому опыту. Формулы защищены от редактирования.', apply: p => { p.xpMult += 0.10; } },
+  access_badge: { name: 'Пропуск в серверную', icon: '🪪', cost: 410, stock: 3, desc: 'Снижает урон от атак боссов на 10%. Эффект суммируется до 30%. Охрана всё равно спросит, кто вы.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.10); } }
+};
+
+const STORE_PASSIVE_COMBOS = {
+  sla_courier_kit: {
+    parts: ['fast_service_shoes', 'usb_adapter'],
+    name: 'Комплект «Курьер на SLA»', icon: '🛵',
+    desc: 'Бонус комплекта: ещё +5% к скорости и +4% к скорости перезарядки. Исходные эффекты предметов сохраняются.',
+    apply: p => { p.speedMult += 0.05; p.cdMult *= 0.96; }
+  },
+  backup_server: {
+    parts: ['stability_belt', 'toner_fax'],
+    name: 'Резервный сервер под столом', icon: '🗄️',
+    desc: 'Бонус комплекта: +12 к максимальному здоровью и +0,5 HP регенерации в секунду. Исходные эффекты предметов сохраняются.',
+    apply: p => { p.maxHp += 12; p.hp = Math.min(p.maxHp, p.hp + 6); p.regen += 0.5; }
+  },
+  analyst_bundle: {
+    parts: ['tech_gloves', 'mssql_card'],
+    name: 'Набор «Аналитик на линии»', icon: '📈',
+    desc: 'Бонус комплекта: +7% к урону и +3% к шансу критического удара. Исходные эффекты предметов сохраняются.',
+    apply: p => { p.dmgMult += 0.07; p.critChance += 0.03; }
+  },
+  migration_toolkit: {
+    parts: ['floppy_magnet', 'training_spreadsheet'],
+    name: 'Набор «Миграция без бэкапа»', icon: '💾',
+    desc: 'Бонус комплекта: +8% к радиусу сбора и +5% к опыту. Исходные эффекты предметов сохраняются.',
+    apply: p => { p.magnetMult += 0.08; p.xpMult += 0.05; }
+  },
+  secure_perimeter: {
+    parts: ['hasp_license', 'access_badge'],
+    name: 'СКУД «Охрана пропускает охрану»', icon: '🛡️',
+    desc: 'Бонус комплекта: +3% к шансу уклонения и +10 к максимальному здоровью. Исходные эффекты предметов сохраняются.',
+    apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.03); p.maxHp += 10; p.hp = Math.min(p.maxHp, p.hp + 5); }
+  }
 };
 
 const CONSUMABLES_DEF = {
@@ -2084,6 +2124,10 @@ class Game {
         this.togglePause();
         return;
       }
+      if (this.player?.stunTimer > 0) {
+        if (['Space', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'ShiftLeft', 'ShiftRight'].includes(e.code)) e.preventDefault();
+        return;
+      }
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
         e.preventDefault();
         if (!e.repeat) this.tryDash();
@@ -2119,7 +2163,7 @@ class Game {
         this.tryDash();
         return;
       }
-      if (e.pointerType !== 'mouse' || e.button !== 0 || this.paused || !this.player || this.player.hp <= 0) return;
+      if (e.pointerType !== 'mouse' || e.button !== 0 || this.paused || !this.player || this.player.hp <= 0 || this.player.stunTimer > 0) return;
       e.preventDefault();
       this.mouseMovePointerId = e.pointerId;
       this.setMouseMoveAim(e.clientX, e.clientY);
@@ -2282,15 +2326,22 @@ class Game {
       facingX: 1,
       facingY: 0,
       dashCooldown: 0,
+      dashCooldownMult: 1,
       dashTimer: 0,
       dashX: 1,
       dashY: 0,
       dashInvulnerabilityTimer: 0,
+      stunTimer: 0,
+      slowTimer: 0,
+      slowFactor: 1,
       speedMult: 1.0,
       dmgMult: 1.0,
       cdMult: 1.0,
       magnetMult: 1.0,
       xpMult: 1.0,
+      currencyMult: 1.0,
+      levelUpHeal: 0,
+      bossDamageReduction: 0,
       xpEventMult: 1.0,
       xpBoostTimer: 0,
       damageBuffMult: 1.0,
@@ -2922,6 +2973,7 @@ class Game {
     } else if (message.type === 'world' && message.world) this.applyPvpSharedWorld(message.world);
     else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
     else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
+    else if (message.type === 'office-event-debuff' && !pvp.host && pvp.started) this.applyOfficeEventDebuff(message.effect);
     else if (message.type === 'integration-shop-start' && !pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopStart(message);
     else if (message.type === 'integration-shop-vote' && pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopVote(message);
     else if (message.type === 'integration-shop-result' && pvp.mode === 'pvp') this.receiveIntegrationShopResult(message);
@@ -2955,7 +3007,7 @@ class Game {
       const target = targetUid === pvp.uid ? { state: this.currentPvpState() } : pvp.remotePlayers?.[targetUid];
       const damage = Math.min(1000, Math.max(0, Number(message.damage) || 0));
       if (!attacker?.state || attacker.state.over || !target?.state || target.state.over || target.state.hp <= 0 ||
-          !damage || attackerUid === targetUid || Math.hypot(attacker.state.x - target.state.x, attacker.state.y - target.state.y) > 1800) return;
+          !damage || message.pvpDamage !== true || attackerUid === targetUid || Math.hypot(attacker.state.x - target.state.x, attacker.state.y - target.state.y) > 1800) return;
       const source = `${String(attacker.name || 'Игрок').slice(0, 20)} · PvP`;
       if (targetUid === pvp.uid) this.receiveBattleRoyaleDamage(damage, source);
       else {
@@ -3227,10 +3279,10 @@ class Game {
 
   damageBattleRoyalePlayer(targetUid, damage, source = 'Атака игрока') {
     const pvp = this.pvp;
-    const amount = Math.max(0, Number(damage) || 0);
+    const amount = Math.max(0, Number(damage) || 0) * 0.14;
     if (!this.isBattleRoyale || !pvp?.started || !targetUid || targetUid === pvp.uid || amount <= 0) return;
     if (pvp.host) this.damageRemotePlayerFromEnemy(amount, source, targetUid);
-    else this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage: amount, source }, null, true);
+    else this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage: amount, source, pvpDamage: true }, null, true);
   }
 
   receiveBattleRoyaleDamage(damage, source = 'Атака противника') {
@@ -3748,9 +3800,12 @@ class Game {
   }
 
   recordPlayerDamage(damage, source) {
-    const incoming = Math.max(0, Number(damage) || 0);
-    if (!this.player || incoming <= 0) return 0;
+    const rawIncoming = Math.max(0, Number(damage) || 0);
+    if (!this.player || rawIncoming <= 0) return 0;
     if (this.player.dashInvulnerabilityTimer > 0) return 0;
+    const isBossAttack = /босс/i.test(String(source || ''));
+    const bossReduction = isBossAttack ? Math.min(0.30, Math.max(0, Number(this.player.bossDamageReduction) || 0)) : 0;
+    const incoming = rawIncoming * (1 - bossReduction);
     const hpBefore = Math.max(0, Number(this.player.hp) || 0);
     const applied = Math.min(hpBefore, incoming);
     this.player.hp = Math.max(0, hpBefore - applied);
@@ -4408,6 +4463,64 @@ class Game {
     this.updateChallengeUI();
   }
 
+  getShopPassiveDef(key) {
+    return STORE_PASSIVES_DEF[key] || STORE_PASSIVE_COMBOS[key] || null;
+  }
+
+  canCombinePassiveItem(key) {
+    return Object.values(STORE_PASSIVE_COMBOS).some(combo => {
+      if (!combo.parts.includes(key)) return false;
+      const otherKey = combo.parts.find(part => part !== key);
+      return this.shopPassives.some(slot => slot.key === otherKey);
+    });
+  }
+
+  getShopPassiveComboHint(key) {
+    for (const combo of Object.values(STORE_PASSIVE_COMBOS)) {
+      if (!combo.parts.includes(key)) continue;
+      const ownedKey = combo.parts.find(part => part !== key);
+      const ownedItem = this.shopPassives.some(slot => slot.key === ownedKey) ? STORE_PASSIVES_DEF[ownedKey] : null;
+      if (ownedItem) return { ownedItem, combo };
+    }
+    return null;
+  }
+
+  combineShopPassives(key) {
+    for (const [comboKey, combo] of Object.entries(STORE_PASSIVE_COMBOS)) {
+      if (!combo.parts.includes(key)) continue;
+      const otherKey = combo.parts.find(part => part !== key);
+      const firstIndex = this.shopPassives.findIndex(slot => slot.key === key);
+      const secondIndex = this.shopPassives.findIndex((slot, index) => index !== firstIndex && slot.key === otherKey);
+      if (firstIndex < 0 || secondIndex < 0) continue;
+      this.shopPassives.splice(Math.max(firstIndex, secondIndex), 1);
+      this.shopPassives.splice(Math.min(firstIndex, secondIndex), 1);
+      this.shopPassives.push({ key: comboKey });
+      return combo;
+    }
+    return null;
+  }
+
+  applyShopPassiveEffect(item) {
+    const before = {
+      hp: this.player.hp, regen: this.player.regen, dmgMult: this.player.dmgMult,
+      magnetMult: this.player.magnetMult, cdMult: this.player.cdMult,
+      levelUpHeal: this.player.levelUpHeal, currencyMult: this.player.currencyMult,
+      dashCooldownMult: this.player.dashCooldownMult, bossDamageReduction: this.player.bossDamageReduction
+    };
+    item.apply(this.player);
+    if (this.pvp?.mode === 'pvp') {
+      this.player.hp = before.hp + (this.player.hp - before.hp) * 0.5;
+      this.player.regen = before.regen + (this.player.regen - before.regen) * 0.4;
+      this.player.dmgMult = before.dmgMult + (this.player.dmgMult - before.dmgMult) * 0.5;
+      this.player.magnetMult = before.magnetMult + (this.player.magnetMult - before.magnetMult) * 0.7;
+      this.player.cdMult = before.cdMult + (this.player.cdMult - before.cdMult) * 0.8;
+      this.player.levelUpHeal = before.levelUpHeal + (this.player.levelUpHeal - before.levelUpHeal) * 0.5;
+      this.player.currencyMult = before.currencyMult + (this.player.currencyMult - before.currencyMult) * 0.7;
+      this.player.dashCooldownMult = before.dashCooldownMult + (this.player.dashCooldownMult - before.dashCooldownMult) * 0.5;
+      this.player.bossDamageReduction = before.bossDamageReduction + (this.player.bossDamageReduction - before.bossDamageReduction) * 0.5;
+    }
+  }
+
   renderShop() {
     const grid = document.getElementById('shop-products');
     const passiveGrid = document.getElementById('shop-passive-products');
@@ -4443,10 +4556,17 @@ class Game {
       const card = document.createElement('div');
       card.className = 'shop-card';
       card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>В инвентаре: ${this.shopPassives.filter(slot => slot.key === key).length} · Остаток: ${stock}</b></p>`;
+      const comboHint = this.getShopPassiveComboHint(key);
+      if (comboHint) {
+        const hint = document.createElement('div');
+        hint.className = 'shop-combo-hint';
+        hint.textContent = `🔗 Объединится с ${comboHint.ownedItem.icon} ${comboHint.ownedItem.name} → ${comboHint.combo.name}`;
+        card.appendChild(hint);
+      }
       const button = document.createElement('button');
       button.className = 'btn-1c';
       button.innerText = purchased ? 'Уже куплено' : `Купить · ${price} 💰`;
-      button.disabled = purchased || stock <= 0 || this.currency < price || this.shopPassives.length >= 6;
+      button.disabled = purchased || stock <= 0 || this.currency < price || (this.shopPassives.length >= 6 && !this.canCombinePassiveItem(key));
       button.onclick = () => this.buyPassiveItem(key);
       card.appendChild(button);
       passiveGrid.appendChild(card);
@@ -4504,21 +4624,17 @@ class Game {
     const item = STORE_PASSIVES_DEF[key];
     const stockKey = `passive_${key}`;
     const price = this.shopPrice[stockKey] || item.cost;
-    if (!item || this.shopPurchased.has(stockKey) || this.shopPassives.length >= 6 || (this.shopStock[stockKey] || 0) <= 0 || this.currency < price) return;
+    if (!item || this.shopPurchased.has(stockKey) || (this.shopPassives.length >= 6 && !this.canCombinePassiveItem(key)) || (this.shopStock[stockKey] || 0) <= 0 || this.currency < price) return;
     this.currency -= price;
     this.shopStock[stockKey]--;
     this.shopPurchased.add(stockKey);
     this.shopPassives.push({ key });
-    const before = { hp: this.player.hp, regen: this.player.regen, dmgMult: this.player.dmgMult, magnetMult: this.player.magnetMult, cdMult: this.player.cdMult };
-    item.apply(this.player);
-    if (this.pvp?.mode === 'pvp') {
-      this.player.hp = before.hp + (this.player.hp - before.hp) * 0.5;
-      this.player.regen = before.regen + (this.player.regen - before.regen) * 0.4;
-      this.player.dmgMult = before.dmgMult + (this.player.dmgMult - before.dmgMult) * 0.5;
-      this.player.magnetMult = before.magnetMult + (this.player.magnetMult - before.magnetMult) * 0.7;
-      this.player.cdMult = before.cdMult + (this.player.cdMult - before.cdMult) * 0.8;
-    }
-    document.getElementById('shop-message').innerText = `${item.name}: улучшение добавлено в инвентарь и сразу действует.`;
+    this.applyShopPassiveEffect(item);
+    const combo = this.combineShopPassives(key);
+    if (combo) this.applyShopPassiveEffect(combo);
+    document.getElementById('shop-message').innerText = combo
+      ? `Сборка завершена: ${combo.name}. Эффекты исходных предметов сохранены, бонус комплекта применён.`
+      : `${item.name}: улучшение добавлено в инвентарь и сразу действует.`;
     this.updateInventoryHUD();
     this.updateHUD();
     this.renderShop();
@@ -4565,7 +4681,7 @@ class Game {
   }
 
   useConsumable(slotIndex) {
-    if (this.paused || this.player.hp <= 0) return;
+    if (this.paused || this.player.hp <= 0 || this.player.stunTimer > 0) return;
     const slot = this.consumables[slotIndex];
     if (!slot) return;
     const item = CONSUMABLES_DEF[slot.key];
@@ -4695,13 +4811,18 @@ class Game {
       { icon: '⏱️', name: 'Перезарядка', value: `×${cooldown.toFixed(2)}` },
       { icon: '🧲', name: 'Радиус сбора', value: `×${player.magnetMult.toFixed(2)}` },
       { icon: '📈', name: 'Опыт', value: `×${(player.xpMult * player.xpEventMult * (player.xpBoostTimer > 0 ? 2 : 1)).toFixed(2)}` },
+      { icon: '💰', name: 'Фиткоины с дискет', value: `×${(player.currencyMult || 1).toFixed(2)}` },
+      { icon: '💨', name: 'Перезарядка рывка', value: `×${(player.dashCooldownMult || 1).toFixed(2)}` },
+      { icon: '🪑', name: 'Лечение при повышении уровня', value: `+${Math.round(player.levelUpHeal || 0)} HP` },
+      { icon: '🪪', name: 'Защита от боссов', value: `${Math.round((player.bossDamageReduction || 0) * 100)}%` },
       { icon: '🛡️', name: 'Защита', value: player.shieldTimer > 0 ? `Щит · ${Math.ceil(player.shieldTimer)}с` : 'Без щита' }
     ];
     if (statsContainer) statsContainer.innerHTML = section('Текущие параметры', currentStats);
-    const shopItems = (this.shopPassives || []).map(slot => ({
-      icon: STORE_PASSIVES_DEF[slot.key].icon, name: STORE_PASSIVES_DEF[slot.key].name,
-      value: 'пассивный', detail: STORE_PASSIVES_DEF[slot.key].desc
-    }));    const weapons = Object.entries(this.weapons).map(([key, weapon]) => ({
+    const shopItems = (this.shopPassives || []).map(slot => {
+      const item = this.getShopPassiveDef(slot.key);
+      return { icon: item?.icon || '📦', name: item?.name || slot.key, value: 'пассивный', detail: item?.desc || '' };
+    });
+    const weapons = Object.entries(this.weapons).map(([key, weapon]) => ({
       icon: WEAPONS_DEF[key].icon, name: WEAPONS_DEF[key].name, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key].desc
     }));
     const passives = Object.entries(this.passives).map(([key, passive]) => ({
@@ -4816,7 +4937,7 @@ class Game {
 
   /* Использование активного умения [1][2][3][4] */
   useActiveSkill(slotIdx) {
-    if (this.paused || this.player.hp <= 0) return;
+    if (this.paused || this.player.hp <= 0 || this.player.stunTimer > 0) return;
     const skill = this.activeSkills[slotIdx];
     if (!skill) return;
 
@@ -4894,7 +5015,7 @@ class Game {
   }
 
   triggerDynamicUpdate() {
-    if (this.activeChallenge?.missingButton && this.activeChallenge.status === 'active') return;
+    if (this.player?.stunTimer > 0 || (this.activeChallenge?.missingButton && this.activeChallenge.status === 'active')) return;
     if (this.dynUpdateCd > 0 || this.player.hp <= 0 || this.paused) return;
 
     this.dynUpdateCd = 35;
@@ -4907,8 +5028,16 @@ class Game {
       e.hp -= 95;
       this.createHitFX(e.x, e.y, '#ffd200', 6);
     }
-    const pvpTarget = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-    if (pvpTarget && Math.hypot(pvpTarget.x - this.player.x, pvpTarget.y - this.player.y) < 420) this.damagePvpOpponent(95);
+    if (this.isBattleRoyale) {
+      for (const target of this.getPvpWeaponTargets()) {
+        if (Math.hypot(target.x - this.player.x, target.y - this.player.y) < 420) {
+          this.dealWeaponTargetDamage(target, 95, 'Обновление конфигурации');
+        }
+      }
+    } else {
+      const pvpTarget = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+      if (pvpTarget && Math.hypot(pvpTarget.x - this.player.x, pvpTarget.y - this.player.y) < 420) this.damagePvpOpponent(95);
+    }
     this.addPopup(this.player.x, this.player.y - 40, "СЕАНС РАЗОРВАН АДМИНИСТРАТОРОМ!", "#ffd200");
   }
 
@@ -4927,7 +5056,7 @@ class Game {
   }
 
   triggerOfficeEvent() {
-    const roll = Math.floor(Math.random() * 8);
+    const roll = Math.floor(Math.random() * 10);
     if (roll === 0) {
       this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
@@ -4958,11 +5087,35 @@ class Game {
     } else if (roll === 6) {
       this.showBanner('📞 «Алло, вы меня слышите?» — «Да». — «Тогда почему молчите?» За терпение: защитный щит на 3 секунды.');
       this.player.shieldTimer = Math.max(this.player.shieldTimer, this.pvp?.mode === 'pvp' ? 1.5 : 3);
-    } else {
+    } else if (roll === 7) {
       this.showBanner('🧪 «У нас на тестовой базе работало». Клиент подключил её к продакшену. В зал зашли три тестировщика.');
       for (let i = 0; i < 3; i++) this.spawnEnemy();
+    } else if (roll === 8) {
+      this.applyOfficeEventDebuff('server70');
+      if (this.pvp?.host && this.pvp.started) this.sendPvpNetworkMessage({ type: 'office-event-debuff', effect: 'server70' });
+    } else {
+      this.applyOfficeEventDebuff('memory59');
+      if (this.pvp?.host && this.pvp.started) this.sendPvpNetworkMessage({ type: 'office-event-debuff', effect: 'memory59' });
     }
   }
+
+  applyOfficeEventDebuff(effect) {
+    if (!this.player) return;
+    if (effect === 'server70') {
+      this.player.stunTimer = Math.max(this.player.stunTimer || 0, 3.5);
+      this.keys = {};
+      this.mouseMoveAim = null;
+      this.mouseMovePointerId = null;
+      this.showBanner('🖥️ Кто-то зашёл на 70-й сервер и тебя выкинуло. Управление заблокировано на 3,5 секунды.');
+      this.addPopup(this.player.x, this.player.y - 28, 'ОТКЛЮЧЕНО ОТ СЕРВЕРА · 3,5с', '#ff7675');
+    } else if (effect === 'memory59') {
+      this.player.slowTimer = Math.max(this.player.slowTimer || 0, 5);
+      this.player.slowFactor = Math.min(this.player.slowFactor || 1, 0.4);
+      this.showBanner('🧠 На 59 заканчивается оперативка. Скорость снижена на 60% на 5 секунд.');
+      this.addPopup(this.player.x, this.player.y - 28, 'НЕТ ОПЕРАТИВКИ · −60% СКОРОСТИ', '#f39c12');
+    }
+  }
+
   spawnDirector(dt) {
     this.spawnTimer -= dt;
     if (this.time >= this.nextMegaBossTime) {
@@ -5391,9 +5544,9 @@ class Game {
       if (localHit) {
         if (this.player.shieldTimer <= 0) {
           const damage = warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1);
-          this.recordPlayerDamage(damage, warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса');
+          const applied = this.recordPlayerDamage(damage, warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса');
           this.sound.hit();
-          this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(damage)} HP`, '#ff4757');
+          this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(applied)} HP`, '#ff4757');
         } else {
           this.addPopup(this.player.x, this.player.y - 20, 'ЗОНА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
         }
@@ -5428,7 +5581,7 @@ class Game {
         const aim = Math.atan2(target.y - b.y, target.x - b.x);
         for (const offset of [-0.22, 0, 0.22]) {
           const angle = aim + offset;
-          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 5.2, vy: Math.sin(angle) * 5.2, dmg: 30, size: 10, life: 2.0, icon: '📞', color: '#ff4757' });
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 5.2, vy: Math.sin(angle) * 5.2, dmg: 30, size: 10, life: 2.0, icon: '📞', color: '#ff4757', isBossAttack: true });
         }
       }
     } else if (b.bossType === 'late_audit' || b.bossType === 'late_overload' || b.bossType === 'late_friday') {
@@ -5439,7 +5592,7 @@ class Game {
         const count = b.bossType === 'late_overload' ? 9 : 7;
         for (let k = 0; k < count; k++) {
           const angle = aim + (k - (count - 1) / 2) * 0.18;
-          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * (b.bossType === 'late_friday' ? 5.4 : 4.5), vy: Math.sin(angle) * (b.bossType === 'late_friday' ? 5.4 : 4.5), dmg: enraged ? 24 : 18, size: 10, life: 2.4, icon: b.icon, color: b.col });
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * (b.bossType === 'late_friday' ? 5.4 : 4.5), vy: Math.sin(angle) * (b.bossType === 'late_friday' ? 5.4 : 4.5), dmg: enraged ? 24 : 18, size: 10, life: 2.4, icon: b.icon, color: b.col, isBossAttack: true });
         }
       }
       if (b.bossTimer2 >= (enraged ? 5.0 : 7.0)) {
@@ -5448,7 +5601,7 @@ class Game {
         const phase = this.time * 0.7;
         for (let k = 0; k < count; k++) {
           const angle = phase + k * Math.PI * 2 / count;
-          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.5, vy: Math.sin(angle) * 3.5, dmg: enraged ? 22 : 16, size: 9, life: 3.1, icon: '⚠️', color: b.col });
+          this.enemyProjectiles.push({ x: b.x, y: b.y, vx: Math.cos(angle) * 3.5, vy: Math.sin(angle) * 3.5, dmg: enraged ? 22 : 16, size: 9, life: 3.1, icon: '⚠️', color: b.col, isBossAttack: true });
         }
         if (b.bossType === 'late_friday') this.bossWarnings.push({ x: target.x, y: target.y, radius: 105, dmg: 48, life: 1.0, maxLife: 1.0 });
       }
@@ -5463,7 +5616,7 @@ class Game {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
             vx: Math.cos(ra) * 3.6, vy: Math.sin(ra) * 3.6,
-            dmg: 18, size: 8, life: 2.2, icon: '🔒', color: '#e74c3c'
+            dmg: 18, size: 8, life: 2.2, icon: '🔒', color: '#e74c3c', isBossAttack: true
           });
         }
       }
@@ -5489,7 +5642,7 @@ class Game {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
             vx: Math.cos(a + k * 0.18) * 4.4, vy: Math.sin(a + k * 0.18) * 4.4,
-            dmg: 16, size: 8, life: 2.4, icon: '📑', color: '#8e44ad'
+            dmg: 16, size: 8, life: 2.4, icon: '📑', color: '#8e44ad', isBossAttack: true
           });
         }
       }
@@ -5520,7 +5673,7 @@ class Game {
         this.enemyProjectiles.push({
           x: b.x, y: b.y,
           vx: Math.cos(a) * 5.2, vy: Math.sin(a) * 5.2,
-          dmg: 25, size: 12, life: 2.5, icon: '🏋️', color: '#d35400'
+          dmg: 25, size: 12, life: 2.5, icon: '🏋️', color: '#d35400', isBossAttack: true
         });
       }
       if (b.bossTimer2 > 6.5) {
@@ -5551,7 +5704,7 @@ class Game {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
             vx: Math.cos(ra) * 3.8, vy: Math.sin(ra) * 3.8,
-            dmg: 22, size: 10, life: 2.2, icon: '🗄️', color: '#34495e'
+            dmg: 22, size: 10, life: 2.2, icon: '🗄️', color: '#34495e', isBossAttack: true
           });
         }
       }
@@ -5568,7 +5721,7 @@ class Game {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
             vx: Math.cos(ra) * 4.2, vy: Math.sin(ra) * 4.2,
-            dmg: 24, size: 9, life: 2.2, icon: '⏰', color: '#b71540'
+            dmg: 24, size: 9, life: 2.2, icon: '⏰', color: '#b71540', isBossAttack: true
           });
         }
       }
@@ -5592,7 +5745,7 @@ class Game {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
             vx: Math.cos(a + k * 0.25) * 5.0, vy: Math.sin(a + k * 0.25) * 5.0,
-            dmg: 26, size: 10, life: 2.5, icon: '💸', color: '#10ac84'
+            dmg: 26, size: 10, life: 2.5, icon: '💸', color: '#10ac84', isBossAttack: true
           });
         }
       }
@@ -5617,7 +5770,7 @@ class Game {
           this.enemyProjectiles.push({
             x: b.x, y: b.y,
             vx: Math.cos(ra) * 4.6, vy: Math.sin(ra) * 4.6,
-            dmg: 28, size: 9, life: 2.3, icon: '💥', color: '#ff0055'
+            dmg: 28, size: 9, life: 2.3, icon: '💥', color: '#ff0055', isBossAttack: true
           });
         }
       }
@@ -5993,6 +6146,11 @@ class Game {
     this.player.dashCooldown = Math.max(0, (this.player.dashCooldown || 0) - dt);
     this.player.dashTimer = Math.max(0, (this.player.dashTimer || 0) - dt);
     this.player.dashInvulnerabilityTimer = Math.max(0, (this.player.dashInvulnerabilityTimer || 0) - dt);
+    this.player.stunTimer = Math.max(0, (this.player.stunTimer || 0) - dt);
+    if (this.player.slowTimer > 0) {
+      this.player.slowTimer = Math.max(0, this.player.slowTimer - dt);
+      if (this.player.slowTimer === 0) this.player.slowFactor = 1;
+    }
     this.updateDashHUD();
     this.queueScoreRunCheckpoints();
     this.updateChallenge(dt);
@@ -6067,6 +6225,7 @@ class Game {
     }
     if (this.pvpControlTimer > 0) this.pvpControlTimer = Math.max(0, this.pvpControlTimer - dt);
     if (this.pvpControlTimer > 0) effectiveSpeedMult *= 0.35;
+    if (this.player.slowTimer > 0) effectiveSpeedMult *= this.player.slowFactor || 0.4;
     this.updateBuffHUD();
 
     // Движение
@@ -6087,7 +6246,7 @@ class Game {
     }
     if ((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && this.pvp?.choosing === 'levelup') { mx = 0; my = 0; this.mouseMoveAim = null; }
 
-    if (this.pvpControlTimer <= 0 && (mx !== 0 || my !== 0)) {
+    if (this.pvpControlTimer <= 0 && this.player.stunTimer <= 0 && (mx !== 0 || my !== 0)) {
       const len = Math.hypot(mx, my);
       this.player.facingX = mx / len;
       this.player.facingY = my / len;
@@ -6220,16 +6379,16 @@ class Game {
       if (!summonHit && remoteTarget && remoteDistance < 18 + ep.size && remoteDistance <= localDistance) {
         this.damageRemotePlayerFromEnemy(
           ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1),
-          ep.isMegaBossAttack ? 'Снаряд большого босса' : `Снаряд ${ep.icon || 'противника'}`
+          ep.isMegaBossAttack ? 'Снаряд большого босса' : ep.isBossAttack ? 'Снаряд босса' : `Снаряд ${ep.icon || 'противника'}`
         );
         this.createHitFX(remoteTarget.x, remoteTarget.y, '#ff7675', 3);
         ep.life = 0;
       } else if (!summonHit && localDistance < 18 + ep.size) {
         if (this.player.shieldTimer <= 0) {
           const damage = ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1);
-          this.recordPlayerDamage(damage, ep.isMegaBossAttack ? 'Снаряд большого босса' : `Снаряд ${ep.icon || 'противника'}`);
+          const applied = this.recordPlayerDamage(damage, ep.isMegaBossAttack ? 'Снаряд большого босса' : ep.isBossAttack ? 'Снаряд босса' : `Снаряд ${ep.icon || 'противника'}`);
           this.sound.hit();
-          this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(damage)}`, '#ff4757');
+          this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(applied)}`, '#ff4757');
         } else {
           this.addPopup(this.player.x, this.player.y - 20, "ОТРАЖЕНО ЩИТОМ", "#00cec9");
         }
@@ -6253,9 +6412,17 @@ class Game {
           if (pud.isTrail) e.x -= (e.x - this.player.x) * 0.01 * frameScale;
         }
       }
-      const pvpTarget = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
-      if (pvpTarget && !pvpTarget.over && Math.hypot(pvpTarget.x - pud.x, pvpTarget.y - pud.y) < pud.radius + 18) {
-        this.damagePvpOpponent(pud.dmg * dt);
+      if (this.isBattleRoyale) {
+        for (const target of this.getPvpWeaponTargets()) {
+          if (Math.hypot(target.x - pud.x, target.y - pud.y) < pud.radius + 18) {
+            this.dealWeaponTargetDamage(target, pud.dmg * dt, 'Лужа');
+          }
+        }
+      } else {
+        const pvpTarget = this.pvp?.mode === 'pvp' ? this.pvp.remoteState : null;
+        if (pvpTarget && !pvpTarget.over && Math.hypot(pvpTarget.x - pud.x, pvpTarget.y - pud.y) < pud.radius + 18) {
+          this.damagePvpOpponent(pud.dmg * dt);
+        }
       }
       if (pud.life <= 0) this.puddles.splice(i, 1);
     }
@@ -6337,11 +6504,12 @@ class Game {
       // Касание
       const targetDistance = Math.hypot(target.x - e.x, target.y - e.y);
       if (worldAuthority && targetDistance < e.size + 18) {
+        const enemyAttackSource = e.isBoss ? `${e.name} · босс` : e.name;
         if (target.untargetable) continue;
         if (e.is24hPursuer && target.isRemote) {
-          this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1, e.name);
+          this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1, enemyAttackSource);
         } else if (e.is24hPursuer) {
-          this.recordPlayerDamage((this.player.hp || 0) + 1, e.name);
+          this.recordPlayerDamage((this.player.hp || 0) + 1, enemyAttackSource);
           this.gameOver(`Сессия завершена: вас догнал ${e.name}.`);
           return;
         }
@@ -6352,11 +6520,11 @@ class Game {
         }
 
         if (target.isRemote) {
-          this.damageRemotePlayerFromEnemy(e.dmg * dt, e.name, target.uid);
+          this.damageRemotePlayerFromEnemy(e.dmg * dt, enemyAttackSource, target.uid);
         } else if (this.player.shieldTimer <= 0) {
           if (Math.random() > this.player.dodge) {
             const damage = e.dmg * dt;
-            this.recordPlayerDamage(damage, e.name);
+            this.recordPlayerDamage(damage, enemyAttackSource);
             if (Math.random() < 0.08) {
               this.sound.hit();
               this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(e.dmg)}`, '#e74c3c');
@@ -6485,7 +6653,7 @@ class Game {
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
-        this.currency += Math.max(0, Math.round(g.xp));
+        this.currency += Math.max(0, Math.round(g.xp * (this.player.currencyMult || 1)));
         document.getElementById('currency-display').innerText = this.currency;
         this.gems.splice(i, 1);
         if (this.paused) break;
@@ -6508,12 +6676,12 @@ class Game {
   }
 
   tryDash() {
-    if (this.paused || !this.player || this.player.hp <= 0 || this.player.dashCooldown > 0) return;
+    if (this.paused || !this.player || this.player.hp <= 0 || this.player.stunTimer > 0 || this.player.dashCooldown > 0) return;
     this.player.dashX = this.player.facingX || 1;
     this.player.dashY = this.player.facingY || 0;
     this.player.dashTimer = 0.15;
     this.player.dashInvulnerabilityTimer = 0.5;
-    this.player.dashCooldown = this.pvp?.started ? 6 : 3;
+    this.player.dashCooldown = (this.pvp?.started ? 6 : 3) * (this.player.dashCooldownMult || 1);
     this.addPopup(this.player.x, this.player.y - 25, '💨 РЫВОК · НЕУЯЗВИМОСТЬ', '#55efc4');
     this.updateDashHUD();
   }
@@ -6556,6 +6724,7 @@ class Game {
     // ПАССИВНЫЙ РОСТ СИЛЫ ПРОГРАММИСТА С КАЖДЫМ РЕЛИЗОМ:
     this.player.maxHp += 10;
     this.player.hp = Math.min(this.player.maxHp, this.player.hp + (this.pvp?.mode === 'pvp' ? 7.5 : 15));
+    if (this.player.levelUpHeal > 0) this.player.hp = Math.min(this.player.maxHp, this.player.hp + this.player.levelUpHeal);
     this.player.dmgMult += 0.02;
     this.player.baseSpeed += 0.02;
 
@@ -7057,8 +7226,18 @@ class Game {
     const panel = document.getElementById('hud-buffs');
     const coffeeTimer = this.player.coffeeBuffTimer || 0;
     const speedTimer = this.player.speedBuffTimer || 0;
-    if (coffeeTimer <= 0 && speedTimer <= 0) {
+    const stunTimer = this.player.stunTimer || 0;
+    const slowTimer = this.player.slowTimer || 0;
+    if (coffeeTimer <= 0 && speedTimer <= 0 && stunTimer <= 0 && slowTimer <= 0) {
       panel.style.display = 'none';
+      return;
+    }
+    if (stunTimer > 0 || slowTimer > 0) {
+      const isStunned = stunTimer > 0;
+      panel.style.display = 'flex';
+      document.getElementById('coffee-buff-symbol').innerText = isStunned ? '⛔' : '🧠';
+      document.getElementById('coffee-buff-timer').innerText = `${(isStunned ? stunTimer : slowTimer).toFixed(1)}с`;
+      document.getElementById('buff-indicator').innerText = isStunned ? 'СЕРВЕР 70 · СВЯЗЬ ПОТЕРЯНА' : 'СЕРВЕР 59 · НЕТ ОПЕРАТИВКИ';
       return;
     }
     const coffeeActive = coffeeTimer > 0;
@@ -7082,7 +7261,7 @@ class Game {
     }
     for (let i = 0; i < 6; i++) {
       const slot = (this.shopPassives || [])[i];
-      const item = slot ? STORE_PASSIVES_DEF[slot.key] : null;
+      const item = slot ? this.getShopPassiveDef(slot.key) : null;
       const entry = document.createElement('div');
       entry.className = `inv-slot${item ? '' : ' empty'}`;
       entry.title = item ? `${item.name}: ${item.desc}` : `Пустой слот пассивного инвентаря ${i + 1}/6`;

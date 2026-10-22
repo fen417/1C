@@ -774,7 +774,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.3.0 — «Мобы не ушли в отпуск»</h3>
-              <p>В начале каждого забега появился выбор одного из четырёх классов со стартовыми характеристиками и оружием; считыватель IronLogic теперь стреляет по ближайшему противнику. В сетевой игре выбранные игроки ждут остальных на общей паузе. Большой босс больше не вычищает обычных мобов с карты и останавливает новые волны. Урон от события «70-й сервер» оглушает на 1 секунду. Клавиша L завершает забег и на русской раскладке. Добавлены ковровая бомбардировка, метеоритный дождь с горящими зонами и порыв ветра; в таблице рекордов виден класс игрока, а читерков можно скрыть в настройках.</p>
+              <p>В начале каждого забега появился выбор одного из четырёх классов со стартовыми характеристиками и оружием; считыватель IronLogic теперь стреляет по ближайшему противнику. В сетевой игре выбранные игроки ждут остальных на общей паузе. Большой босс больше не вычищает обычных мобов с карты и останавливает новые волны. Урон от события «70-й сервер» оглушает на 1 секунду. Клавиша L завершает забег и на русской раскладке. Добавлены ковровая бомбардировка, метеоритный дождь с горящими зонами и порыв ветра; в таблице рекордов виден класс игрока, а читерков можно скрыть в настройках. Для БРа появился отдельный бит «Последний круг»; музыку можно выбирать отдельно для соло, PvP/PvE и Battle Royale.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.2.0 — «Релиз без согласования»</h3>
@@ -849,6 +849,18 @@
           <label for="sfx-volume" style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:7px;"><b>🔊 Звуки игры</b><span id="sfx-volume-value">70%</span></label>
           <input id="sfx-volume" type="range" min="0" max="100" value="70" oninput="game.sound.setVolume('sfx', this.value)" style="width:100%;">
         </div>
+        <div class="release-notes" style="margin-bottom:14px;">
+          <b style="display:block; font-size:12px; margin-bottom:8px;">🎼 Музыка по режимам</b>
+          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Одиночная игра
+            <select id="music-track-solo" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('solo', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option></select>
+          </label>
+          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Онлайн PvP / PvE
+            <select id="music-track-online" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('online', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option></select>
+          </label>
+          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px;">Battle Royale
+            <select id="music-track-battle-royale" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('battle_royale', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option></select>
+          </label>
+        </div>
         <div class="release-notes">
           <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Рывок:</b> Shift или ПКМ<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 7, 8, 9, 0<br><b>Пауза:</b> Esc / P<br><b>Завершить забег:</b> L (в одиночной игре в любое время; в сети после выбытия соперника)</p>
         </div>
@@ -870,7 +882,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются.</p></details>
+        <details class="release-notes" open><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
         <details class="release-notes"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
         <details class="release-notes"><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два новых события, влияющих на игрока. В Battle Royale безопасная зона забирает 10% площади карты каждые 45 секунд; урон вне неё увеличен до 18,4% максимального HP в секунду. Стрелка направления и логотип 1С теперь указывают на корректный центр увеличенной карты. Рывок на ПКМ срабатывает и при удержании ЛКМ для движения. Неуязвимый преследователь RuDesktop, появляющийся с 15-й минуты, теперь выделяется белым квадратом с контрастной рамкой и заметной подписью.</p></details>
         <details class="release-notes"><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд. Тикеты выдаются случайно из общего пула, без выбора игроком. Таблица рекордов показывает режим и число игроков.</p></details>
@@ -1067,6 +1079,12 @@ class SoundEngine {
     this.gemPitch = 220;
     this.mutedSFX = localStorage.getItem('1c_sfx_muted') === 'true';
     this.musicEnabled = localStorage.getItem('1c_music_enabled') !== 'false';
+    this.modeMusicTracks = {
+      solo: this.loadModeTrack('1c_music_track_solo', 'classic'),
+      online: this.loadModeTrack('1c_music_track_online', 'classic'),
+      battle_royale: this.loadModeTrack('1c_music_track_battle_royale', 'br')
+    };
+    this.activeTrack = null;
     this.musicVolume = Math.max(0, Math.min(1, Number(localStorage.getItem('1c_music_volume') ?? 0.7)));
     this.sfxVolume = Math.max(0, Math.min(1, Number(localStorage.getItem('1c_sfx_volume') ?? 0.7)));
     this.musicBus = null;
@@ -1108,6 +1126,33 @@ class SoundEngine {
     for (let i = 0; i < bufferSize; i++) {
       output[i] = Math.random() * 2 - 1;
     }
+  }
+
+  loadModeTrack(storageKey, defaultTrack) {
+    const saved = localStorage.getItem(storageKey);
+    return saved === 'classic' || saved === 'br' ? saved : defaultTrack;
+  }
+
+  getActiveModeKey() {
+    if (typeof game !== 'undefined' && (game.isBattleRoyale || game.pvp?.mode === 'battle_royale')) return 'battle_royale';
+    if (typeof game !== 'undefined' && game.pvp?.mode && game.pvp.mode !== 'solo') return 'online';
+    return 'solo';
+  }
+
+  getActiveTrack() {
+    return this.modeMusicTracks[this.getActiveModeKey()] || 'classic';
+  }
+
+  setModeTrack(mode, track) {
+    if (!['solo', 'online', 'battle_royale'].includes(mode) || !['classic', 'br'].includes(track)) return;
+    this.modeMusicTracks[mode] = track;
+    localStorage.setItem(`1c_music_track_${mode}`, track);
+    if (this.getActiveModeKey() === mode) {
+      this.activeTrack = null;
+      this.step = 0;
+      if (this.ctx) this.nextNoteTime = this.ctx.currentTime + 0.05;
+    }
+    game.log(`Музыка для режима обновлена: ${track === 'br' ? '«Последний круг»' : 'текущий бит'}.`);
   }
 
   syncToggleButtons() {
@@ -1173,6 +1218,7 @@ class SoundEngine {
   startMusic() {
     if (this.musicTimer) clearInterval(this.musicTimer);
     this.step = 0;
+    this.activeTrack = null;
     if (!this.ctx) return;
     this.nextNoteTime = this.ctx.currentTime + 0.05;
     this.musicTimer = setInterval(() => this.scheduleBeat(), 25);
@@ -1193,7 +1239,9 @@ class SoundEngine {
     const megaTarget = aliveMegaBosses > 0 ? 1 : 0;
     const megaTransition = 1 - Math.exp(-dt / (megaTarget > this.megaBossIntensity ? 0.45 : 1.8));
     this.megaBossIntensity += (megaTarget - this.megaBossIntensity) * megaTransition;
-    this.bpm = 132 + this.bossIntensity * 40 + this.megaBossIntensity * 68;
+    this.bpm = this.getActiveTrack() === 'br'
+      ? 86 + this.bossIntensity * 10 + this.megaBossIntensity * 18
+      : 132 + this.bossIntensity * 40 + this.megaBossIntensity * 68;
   }
 
   scheduleBeat() {
@@ -1201,6 +1249,12 @@ class SoundEngine {
 
     if (this.nextNoteTime < this.ctx.currentTime) {
       this.nextNoteTime = this.ctx.currentTime + 0.05;
+    }
+
+    const selectedTrack = this.getActiveTrack();
+    if (selectedTrack !== this.activeTrack) {
+      this.activeTrack = selectedTrack;
+      this.step = 0;
     }
 
     const secondsPerBeat = 60.0 / this.bpm;
@@ -1214,6 +1268,10 @@ class SoundEngine {
   }
 
   playStep(step, time) {
+    if (this.activeTrack === 'br') {
+      this.playBattleRoyaleStep(step, time);
+      return;
+    }
     const barStep = step % 16;
     const bar = Math.floor(step / 16);
     const mega = this.megaBossIntensity;
@@ -1356,6 +1414,120 @@ class SoundEngine {
       leadGain.connect(this.musicBus);
       lead.start(time);
       lead.stop(time + 0.17);
+    }
+  }
+
+  playBattleRoyaleStep(step, time) {
+    const barStep = step % 16;
+    const bar = Math.floor(step / 16) % 4;
+    const boss = Math.max(this.bossIntensity, this.megaBossIntensity);
+    const mega = this.megaBossIntensity;
+    const rootNotes = [55, 65.41, 49, 58.27];
+
+    // Неспешный half-time грув: низкий пульс, сухой хлопок и холодная подложка.
+    if (barStep === 0 || barStep === 8 || (boss > 0.45 && (barStep === 4 || barStep === 12))) {
+      const kick = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      kick.type = 'sine';
+      kick.frequency.setValueAtTime(92 + mega * 20, time);
+      kick.frequency.exponentialRampToValueAtTime(34, time + 0.24);
+      gain.gain.setValueAtTime(0.24 + boss * 0.12, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
+      kick.connect(gain); gain.connect(this.musicBus);
+      kick.start(time); kick.stop(time + 0.34);
+    }
+
+    if ((barStep === 4 || barStep === 12 || (mega > 0.3 && barStep === 15)) && this.noiseBuffer) {
+      const noise = this.ctx.createBufferSource();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      noise.buffer = this.noiseBuffer;
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1500 + boss * 700, time);
+      filter.Q.value = 0.8;
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.linearRampToValueAtTime(0.12 + boss * 0.12, time + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+      noise.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+      noise.start(time); noise.stop(time + 0.2);
+    }
+
+    if ([0, 6, 10, 14].includes(barStep)) {
+      const bass = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      bass.type = 'triangle';
+      bass.frequency.setValueAtTime(rootNotes[bar] * (barStep === 10 ? 1.5 : 1), time);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(180 + boss * 420, time);
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.linearRampToValueAtTime(0.13 + boss * 0.08, time + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+      bass.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+      bass.start(time); bass.stop(time + 0.3);
+    }
+
+    if ((barStep % 4 === 2 || (boss > 0.35 && barStep % 2 === 1)) && this.noiseBuffer) {
+      const hat = this.ctx.createBufferSource();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      hat.buffer = this.noiseBuffer;
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(7800 - boss * 1900, time);
+      gain.gain.setValueAtTime(0.035 + boss * 0.035, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.055);
+      hat.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+      hat.start(time); hat.stop(time + 0.06);
+    }
+
+    if (barStep === 0) {
+      const padRoot = rootNotes[bar] * 2;
+      for (const ratio of [1, 1.2, 1.498]) {
+        const pad = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+        pad.type = 'sine';
+        pad.frequency.setValueAtTime(padRoot * ratio, time);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(380 + boss * 500, time);
+        gain.gain.setValueAtTime(0.0001, time);
+        gain.gain.linearRampToValueAtTime(0.018 + boss * 0.012, time + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 2.2);
+        pad.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+        pad.start(time); pad.stop(time + 2.25);
+      }
+    }
+
+    // Босс добавляет пульсирующий высокий мотив, мегабосс — тяжёлые индустриальные акценты.
+    if (boss > 0.18 && [2, 6, 10, 14].includes(barStep)) {
+      const notes = [1, 1.2, 1.498, 1.782];
+      const lead = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      lead.type = 'triangle';
+      lead.frequency.setValueAtTime(rootNotes[bar] * 4 * notes[(barStep / 4 + bar) % notes.length], time);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(900 + boss * 1500, time);
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.linearRampToValueAtTime(0.025 + boss * 0.045, time + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.2);
+      lead.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+      lead.start(time); lead.stop(time + 0.22);
+    }
+
+    if (mega > 0.25 && [3, 7, 11, 15].includes(barStep)) {
+      const stab = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      stab.type = 'sawtooth';
+      stab.frequency.setValueAtTime(rootNotes[bar] * (barStep === 11 ? 1.5 : 1), time);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(260 + mega * 850, time);
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.linearRampToValueAtTime(0.055 * mega, time + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.13);
+      stab.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+      stab.start(time); stab.stop(time + 0.15);
     }
   }
 
@@ -4281,6 +4453,9 @@ class Game {
     document.getElementById('sfx-volume').value = Math.round(this.sound.sfxVolume * 100);
     document.getElementById('music-volume-value').textContent = `${Math.round(this.sound.musicVolume * 100)}%`;
     document.getElementById('sfx-volume-value').textContent = `${Math.round(this.sound.sfxVolume * 100)}%`;
+    document.getElementById('music-track-solo').value = this.sound.modeMusicTracks.solo;
+    document.getElementById('music-track-online').value = this.sound.modeMusicTracks.online;
+    document.getElementById('music-track-battle-royale').value = this.sound.modeMusicTracks.battle_royale;
     document.getElementById('collapse-accepted-tickets').checked = this.collapseAcceptedTickets;
     document.getElementById('hide-cheaters-leaderboard').checked = this.hideCheatersFromLeaderboard;
   }

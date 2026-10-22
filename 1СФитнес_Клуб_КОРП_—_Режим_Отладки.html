@@ -3246,6 +3246,10 @@ class Game {
     if (message.type === 'roster' && pvp.maxPlayers >= 2) {
       this.applyThreePlayerRoster(message.players || [], message.classSelectionPending);
       this.syncPvpWait();
+    } else if (message.type === 'player-state' && !pvp.host) {
+      this.applyRelayedPvpPlayerState(message);
+    } else if (message.type === 'world-positions' && !pvp.host) {
+      this.receivePvpWorldPositions(message);
     } else if ((message.type === 'state' || message.type === 'match-over') && message.state) {
       const uid = String(message.uid || 'opponent');
       pvp.remoteStateSequences ||= {};
@@ -3315,6 +3319,7 @@ class Game {
           this.pickups = this.pickups.filter(item => item.syncId !== dropId);
         }
         if (uid === pvp.opponentUid) { pvp.remotePlayer = pvp.remotePlayers[uid]; pvp.remoteState = state; }
+        if (Number(pvp.actualPlayerCount) >= 3) this.relayPvpPlayerState(message, uid);
         this.publishThreePlayerRoster();
       } else this.applyPvpRemoteState(state);
       this.syncPvpWait();
@@ -3379,6 +3384,48 @@ class Game {
     }
     else if (message.type === 'active-skill' && message.skill) this.receivePvpActiveSkill(message.skill);
   }
+  relayPvpPlayerState(message, excludeUid) {
+    const pvp = this.pvp;
+    if (!pvp?.host || Number(pvp.actualPlayerCount) < 3 || !message?.uid || !message.state) return;
+    const { enemyDamage, claimedDrops, ...state } = message.state;
+    const payload = JSON.stringify({
+      type: 'player-state', uid: String(message.uid), name: String(message.name || 'Игрок').slice(0, 20),
+      sequence: Number(message.sequence) || 0, state, choosing: message.choosing || null,
+      paused: Boolean(message.paused)
+    });
+    for (const [uid, peer] of Object.entries(pvp.peerConnections || {})) {
+      const channel = peer?.channel;
+      if (uid === excludeUid || channel?.readyState !== 'open' || channel.bufferedAmount > 32768) continue;
+      try { channel.send(payload); } catch (_) {}
+    }
+  }
+
+  applyRelayedPvpPlayerState(message) {
+    const pvp = this.pvp;
+    const uid = String(message?.uid || '');
+    if (!pvp?.started || !uid || uid === pvp.uid || !message.state) return;
+    pvp.remoteStateSequences ||= {};
+    const sequence = Number(message.sequence) || 0;
+    if (sequence && sequence <= Number(pvp.remoteStateSequences[uid] || 0)) return;
+    const checked = this.validatePvpRemoteState(message.state);
+    if (!checked.ok) return;
+    if (sequence) pvp.remoteStateSequences[uid] = sequence;
+    pvp.remotePlayers ||= {};
+    const prior = pvp.remotePlayers[uid] || {};
+    const player = pvp.remotePlayers[uid] = {
+      ...prior, uid, name: String(message.name || prior.name || 'Игрок').slice(0, 20),
+      online: true, state: checked.state, stateAt: performance.now(),
+      choosing: message.choosing || prior.choosing || null, paused: Boolean(message.paused),
+      classId: PLAYER_CLASSES[prior.classId] ? prior.classId : 'technician'
+    };
+    this.recordPvpPosition(`@remote-${uid}`, checked.state.x, checked.state.y);
+    if (!pvp.remotePlayer || uid === pvp.opponentUid) {
+      pvp.remotePlayer = player;
+      pvp.remoteState = checked.state;
+      this.recordPvpPosition('@remote', checked.state.x, checked.state.y);
+    }
+  }
+
   applyThreePlayerRoster(players, classSelectionPending = false) {
     if (!this.pvp) return;
     const previousState = this.pvp.remoteState;
@@ -3386,11 +3433,20 @@ class Game {
     const previousPlayers = this.pvp.remotePlayers || {};
     const validPlayers = [];
     for (const player of players) {
-      if (!player || typeof player.uid !== 'string' || player.uid === this.pvp.uid || !player.state) continue;
-      this.pvp.remoteState = previousPlayers[player.uid]?.state || null;
-      this.pvp.remoteStateAt = previousPlayers[player.uid]?.stateAt || performance.now();
-      const checked = this.validatePvpRemoteState(player.state);
-      if (checked.ok) validPlayers.push({ uid: player.uid, name: String(player.name || 'Игрок').slice(0, 20), online: true, state: checked.state, stateAt: performance.now(), choosing: player.choosing || null, paused: Boolean(player.paused), classId: PLAYER_CLASSES[player.classId] ? player.classId : 'technician' });
+      if (!player || typeof player.uid !== 'string' || player.uid === this.pvp.uid) continue;
+      const prior = previousPlayers[player.uid] || {};
+      let state = prior.state || null;
+      if (player.state) {
+        const checked = this.validatePvpRemoteState(player.state);
+        if (!checked.ok) continue;
+        state = checked.state;
+      }
+      validPlayers.push({
+        ...prior, uid: player.uid, name: String(player.name || prior.name || 'Игрок').slice(0, 20),
+        online: player.online !== false, state, stateAt: prior.stateAt || 0,
+        choosing: player.choosing || null, paused: Boolean(player.paused),
+        classId: PLAYER_CLASSES[player.classId] ? player.classId : 'technician'
+      });
     }
     this.pvp.remoteState = previousState;
     this.pvp.remoteStateAt = previousAt;
@@ -3404,18 +3460,20 @@ class Game {
     const pvp = this.pvp;
     if (!pvp?.host || Number(pvp.actualPlayerCount || 0) < 3) return;
     const now = performance.now();
-    const rosterInterval = 100;
-    if (now - Number(pvp.lastRosterSentAt || 0) < rosterInterval) return;
-    pvp.lastRosterSentAt = now;
     const byUid = new Map();
-    byUid.set(pvp.uid, { uid: pvp.uid, name: pvp.name, classId: this.player?.classId || pvp.classId, choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), state: this.currentPvpState() });
+    byUid.set(pvp.uid, { uid: pvp.uid, name: pvp.name, classId: this.player?.classId || pvp.classId, choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused) });
     for (const player of Object.values(pvp.remotePlayers || {})) {
-      if (player?.uid && player.state) byUid.set(player.uid, { uid: player.uid, name: player.name || 'Соперник', classId: player.classId || 'technician', choosing: player.choosing || null, paused: Boolean(player.paused), state: player.state });
+      if (player?.uid) byUid.set(player.uid, { uid: player.uid, name: player.name || 'Соперник', classId: player.classId || 'technician', choosing: player.choosing || null, paused: Boolean(player.paused) });
     }
-    for (const peer of Object.values(pvp.threePeers || {})) if (peer.state) byUid.set(peer.uid, { uid: peer.uid, name: peer.name || 'Соперник', classId: peer.classId || 'technician', choosing: peer.choosing || null, paused: Boolean(peer.paused), state: peer.state });
+    for (const peer of Object.values(pvp.threePeers || {})) if (peer?.uid) byUid.set(peer.uid, { uid: peer.uid, name: peer.name || 'Соперник', classId: peer.classId || 'technician', choosing: peer.choosing || null, paused: Boolean(peer.paused) });
     const players = [...byUid.values()];
     const expected = Math.max(1, Number(pvp.actualPlayerCount || pvp.matchPlayerUids?.length) || 1);
     pvp.classSelectionPending = players.length < expected || players.some(player => player.choosing === 'class');
+    const signature = JSON.stringify({ players, pending: pvp.classSelectionPending });
+    const changed = signature !== pvp.lastRosterSignature;
+    if (!changed && now - Number(pvp.lastRosterSentAt || 0) < 2000) return;
+    pvp.lastRosterSentAt = now;
+    pvp.lastRosterSignature = signature;
     const payload = JSON.stringify({ type: 'roster', players, classSelectionPending: pvp.classSelectionPending });
     for (const peer of [pvp.rtc, ...Object.values(pvp.threePeers || {})]) {
       if (peer?.channel?.readyState === 'open' && peer.channel.bufferedAmount < 32768) {
@@ -3930,6 +3988,9 @@ class Game {
     pvp.positionHistory ||= {};
     pvp.nextEnemyId ||= 0;
     pvp.nextDropId ||= 0;
+    pvp.worldPositionSequence = 0;
+    pvp.remoteWorldPositionSequence = 0;
+    pvp.latestWorldPositions = {};
     pvp.worldRevision = Number(pvp.remoteWorldRevision || 0);
     pvp.lastWorldSync = 0;
     pvp.manualPaused = false;
@@ -3955,6 +4016,7 @@ class Game {
         claimedDrops: this.pvp.host ? undefined : (this.pvp.claimedDrops || {})
       };
       this.sendPvpNetworkState(state);
+      if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.sendPvpWorldPositions();
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.publishThreePlayerRoster();
       if (this.pvp.host && this.isBattleRoyale && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
         const alive = [{ uid: this.pvp.uid, name: this.pvp.name, over: p.hp <= 0 }];
@@ -3976,7 +4038,7 @@ class Game {
         }
       }
       const playerCount = Math.max(2, Number(this.pvp.actualPlayerCount) || 2);
-      const worldSyncInterval = playerCount >= 3 ? 100 : 66;
+      const worldSyncInterval = playerCount >= 5 ? 250 : playerCount >= 3 ? 200 : 100;
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= worldSyncInterval) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
@@ -4029,6 +4091,7 @@ class Game {
     const byId = items => Object.fromEntries(items.filter(item => item.syncId).map(item => [item.syncId, item]));
     const world = {
       revision: ++pvp.worldRevision,
+      positionSequence: Number(pvp.worldPositionSequence || 0),
       enemies: byId(this.enemies),
       gems: byId(this.gems),
       pickups: byId(this.pickups),
@@ -4040,45 +4103,97 @@ class Game {
     return this.sendPvpWorldSnapshot(world);
   }
 
+  filterPvpWorldForPeer(world, uid) {
+    const state = this.pvp?.remotePlayers?.[uid]?.state;
+    if (!state || !Number.isFinite(Number(state.x)) || !Number.isFinite(Number(state.y))) return world;
+    const centerX = Number(state.x);
+    const centerY = Number(state.y);
+    const radiusSquared = 2200 * 2200;
+    const relevant = item => {
+      if (!Number.isFinite(Number(item.x)) || !Number.isFinite(Number(item.y))) return true;
+      if (item.isBoss || item.isMegaBoss || item.is24hPursuer) return true;
+      const dx = Number(item.x) - centerX;
+      const dy = Number(item.y) - centerY;
+      return dx * dx + dy * dy <= radiusSquared;
+    };
+    const filtered = { revision: world.revision, positionSequence: world.positionSequence };
+    for (const collection of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) {
+      filtered[collection] = Object.fromEntries(Object.entries(world[collection] || {}).filter(([, item]) => relevant(item)));
+    }
+    return filtered;
+  }
+
+  sendPvpWorldPositions() {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started) return false;
+    const allEntities = [];
+    for (const collection of [this.enemies, this.gems, this.pickups, this.enemyProjectiles, this.bossWarnings, this.officeHazards]) {
+      for (const item of collection) {
+        if (item.syncId && Number.isFinite(item.x) && Number.isFinite(item.y)) allEntities.push(item);
+      }
+    }
+    const sequence = pvp.worldPositionSequence = (Number(pvp.worldPositionSequence) || 0) + 1;
+    let sent = false;
+    for (const peer of Object.values(pvp.peerConnections || {})) {
+      const channel = peer?.worldChannel;
+      if (channel?.readyState !== 'open' || channel.bufferedAmount > 32768) continue;
+      const state = pvp.remotePlayers?.[peer.uid]?.state;
+      const centerX = Number(state?.x);
+      const centerY = Number(state?.y);
+      const hasCenter = Number.isFinite(centerX) && Number.isFinite(centerY);
+      const entities = allEntities
+        .filter(item => !hasCenter || item.isBoss || item.isMegaBoss || item.is24hPursuer || (item.x - centerX) ** 2 + (item.y - centerY) ** 2 <= 2200 * 2200)
+        .map(item => [item.syncId, item.x, item.y]);
+      const payload = JSON.stringify({ type: 'world-positions', sequence, entities });
+      try { channel.send(payload); sent = true; } catch (_) {}
+    }
+    return sent;
+  }
+
   sendPvpWorldSnapshot(world) {
     const pvp = this.pvp;
     if (!pvp || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
-    const channels = (pvp.host ? Object.values(pvp.peerConnections || {}).map(peer => peer.worldChannel) : [pvp.rtc?.worldChannel])
-      .filter(channel => channel?.readyState === 'open');
-    if (!channels.length) return false;
     const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards'];
-    const chunks = [];
     const chunkLimit = 12000;
     const encodeItem = (item) => JSON.stringify(item, (key, value) =>
       typeof value === 'number' && !Number.isFinite(value) ? 1e12 : value);
-    for (const collection of collectionNames) {
-      let entries = [];
-      let entryLength = 0;
-      for (const [id, item] of Object.entries(world[collection] || {})) {
-        const entry = `${JSON.stringify(id)}:${encodeItem(item)}`;
-        const addedLength = entry.length + (entries.length ? 1 : 0);
-        if (entries.length && entryLength + addedLength > chunkLimit) {
-          chunks.push({ collection, entries: entries.join(',') });
-          entries = [];
-          entryLength = 0;
-        }
-        entryLength += entry.length + (entries.length ? 1 : 0);
-        entries.push(entry);
-      }
-      chunks.push({ collection, entries: entries.join(',') });
-    }
-    const packets = chunks.map((chunk, index) =>
-      `{"type":"world-chunk","revision":${world.revision},"index":${index},"total":${chunks.length},"collection":${JSON.stringify(chunk.collection)},"items":{${chunk.entries}}}`);
-    const encoder = new TextEncoder();
-    const encodedBytes = packets.reduce((sum, packet) => sum + encoder.encode(packet).byteLength, 0);
+    const peers = pvp.host
+      ? Object.values(pvp.peerConnections || {})
+      : [{ uid: pvp.uid, worldChannel: pvp.rtc?.worldChannel }];
     let sent = false;
-    for (const channel of channels) {
+    let totalEncodedBytes = 0;
+    const encoder = new TextEncoder();
+    for (const peer of peers) {
+      const channel = peer?.worldChannel;
+      if (channel?.readyState !== 'open' || channel.bufferedAmount > 65536) continue;
+      const peerWorld = pvp.host ? this.filterPvpWorldForPeer(world, peer.uid) : world;
+      const chunks = [];
+      for (const collection of collectionNames) {
+        let entries = [];
+        let entryLength = 0;
+        for (const [id, item] of Object.entries(peerWorld[collection] || {})) {
+          const entry = `${JSON.stringify(id)}:${encodeItem(item)}`;
+          const addedLength = entry.length + (entries.length ? 1 : 0);
+          if (entries.length && entryLength + addedLength > chunkLimit) {
+            chunks.push({ collection, entries: entries.join(',') });
+            entries = [];
+            entryLength = 0;
+          }
+          entryLength += entry.length + (entries.length ? 1 : 0);
+          entries.push(entry);
+        }
+        chunks.push({ collection, entries: entries.join(',') });
+      }
+      const packets = chunks.map((chunk, index) =>
+        `{"type":"world-chunk","revision":${peerWorld.revision},"positionSequence":${Number(peerWorld.positionSequence) || 0},"index":${index},"total":${chunks.length},"collection":${JSON.stringify(chunk.collection)},"items":{${chunk.entries}}}`);
+      const encodedBytes = packets.reduce((sum, packet) => sum + encoder.encode(packet).byteLength, 0);
+      totalEncodedBytes += encodedBytes;
       // Drop a stale snapshot before it can queue behind already buffered data.
-      if (channel.bufferedAmount > 65536 || channel.bufferedAmount + encodedBytes > 196608) continue;
+      if (channel.bufferedAmount + encodedBytes > 196608) continue;
       try { for (const packet of packets) channel.send(packet); sent = true; }
       catch (err) { console.warn('Не удалось отправить снимок игрового мира соперникам:', err); }
     }
-    if (sent) this.pvp.lastWorldPayloadBytes = encodedBytes;
+    if (sent) this.pvp.lastWorldPayloadBytes = totalEncodedBytes;
     return sent;
   }
 
@@ -4091,7 +4206,7 @@ class Game {
         !Number.isInteger(index) || index < 0 || index >= total) return;
     let pending = pvp.pendingWorldSnapshot;
     if (!pending || revision > pending.revision) {
-      pending = pvp.pendingWorldSnapshot = { revision, total, received: new Set(), world: { revision } };
+      pending = pvp.pendingWorldSnapshot = { revision, total, received: new Set(), world: { revision, positionSequence: Number(message.positionSequence) || 0 } };
       for (const name of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) pending.world[name] = {};
     }
     if (revision !== pending.revision || total !== pending.total) return;
@@ -4108,17 +4223,24 @@ class Game {
     const pvp = this.pvp;
     if (!pvp || pvp.host || !world || Number(world.revision || 0) <= Number(pvp.remoteWorldRevision || 0)) return;
     pvp.remoteWorldRevision = Number(world.revision || 0);
-    for (const collection of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) {
-      for (const item of Object.values(world[collection] || {})) {
-        this.recordPvpPosition(item.syncId, Number(item.x), Number(item.y));
-      }
-    }
-    this.enemies = Object.values(world.enemies || {}).map(enemy => ({ ...enemy }));
-    this.gems = Object.values(world.gems || {}).map(gem => ({ ...gem }));
-    this.pickups = Object.values(world.pickups || {}).map(item => ({ ...item }));
-    this.enemyProjectiles = Object.values(world.enemyProjectiles || {}).map(projectile => ({ ...projectile }));
-    this.bossWarnings = Object.values(world.bossWarnings || {}).map(warning => ({ ...warning }));
-    this.officeHazards = Object.values(world.officeHazards || {}).map(hazard => ({ ...hazard }));
+    const latestPositions = pvp.latestWorldPositions || {};
+    const snapshotPositionSequence = Number(world.positionSequence) || 0;
+    const materialize = collection => Object.values(world[collection] || {}).map(item => {
+      const copy = { ...item };
+      const latest = latestPositions[copy.syncId];
+      if (latest && latest.sequence > snapshotPositionSequence) { copy.x = latest.x; copy.y = latest.y; }
+      return copy;
+    });
+    this.enemies = materialize('enemies');
+    this.gems = materialize('gems');
+    this.pickups = materialize('pickups');
+    this.enemyProjectiles = materialize('enemyProjectiles');
+    this.bossWarnings = materialize('bossWarnings');
+    this.officeHazards = materialize('officeHazards');
+    pvp.sharedEntityById = new Map([...this.enemies, ...this.gems, ...this.pickups, ...this.enemyProjectiles, ...this.bossWarnings, ...this.officeHazards]
+      .filter(item => item.syncId).map(item => [item.syncId, item]));
+    pvp.latestWorldPositions = Object.fromEntries(Object.entries(latestPositions).filter(([id]) => pvp.sharedEntityById.has(id)));
+    for (const item of pvp.sharedEntityById.values()) this.recordPvpPosition(item.syncId, Number(item.x), Number(item.y));
     const activeEnemyIds = new Set(this.enemies.map(enemy => enemy.syncId).filter(Boolean));
     for (const id of Object.keys(pvp.enemyDamageTotals || {})) {
       if (!activeEnemyIds.has(id) && performance.now() - Number(pvp.enemyDamageAt?.[id] || 0) > 2000) {
@@ -4129,6 +4251,28 @@ class Game {
     const sharedIds = new Set([...this.enemies, ...this.gems, ...this.pickups].map(item => item.syncId).filter(Boolean));
     for (const id of Object.keys(pvp.claimedDrops || {})) {
       if (!sharedIds.has(id)) delete pvp.claimedDrops[id];
+    }
+  }
+
+  receivePvpWorldPositions(message) {
+    const pvp = this.pvp;
+    const sequence = Number(message?.sequence) || 0;
+    if (!pvp || pvp.host || !sequence || sequence <= Number(pvp.remoteWorldPositionSequence || 0) || !Array.isArray(message.entities)) return;
+    const entities = pvp.sharedEntityById;
+    if (!entities) return;
+    pvp.remoteWorldPositionSequence = sequence;
+    pvp.latestWorldPositions ||= {};
+    for (const entry of message.entities) {
+      if (!Array.isArray(entry) || typeof entry[0] !== 'string') continue;
+      const x = Number(entry[1]);
+      const y = Number(entry[2]);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      const item = entities.get(entry[0]);
+      if (!item) continue;
+      item.x = x;
+      item.y = y;
+      pvp.latestWorldPositions[entry[0]] = { x, y, sequence };
+      this.recordPvpPosition(entry[0], x, y);
     }
   }
 

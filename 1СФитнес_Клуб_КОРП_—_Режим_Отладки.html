@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.1.0</title>
+<title>1С:Фитнес Клуб КОРП 2.2.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -607,7 +607,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.1.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.2.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -726,7 +726,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.1.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.2.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -735,16 +735,16 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.1.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.2.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 2.1.0 — «Комплектация по акции»</h3>
-              <p>В магазин добавлены пять пассивных предметов и пять комплектов: две вещи объединяются, освобождая слот и сохраняя свои эффекты. В Battle Royale автоатаки переключаются на ближайшего соперника, а урон по игрокам составляет 14% от обычного. Магнит для дискет ослаблен до 19%. Добавлены два новых события, влияющих на игрока. Кольцо Battle Royale сжимается на 10% каждые 45 секунд и наносит за пределами зоны 18,4% максимального HP в секунду. Исправлены указатель центра, положение логотипа и рывок на ПКМ при удержании ЛКМ. Преследователь с 15-й минуты теперь заметнее: белый квадрат с контрастной рамкой.</p>
+              <h3>Версия 2.2.0 — «Релиз без согласования»</h3>
+              <p>В Battle Royale появились поставки. Добавлены «Администратор только на чтение», «Дубль клиента», события «Пятничный релиз» и «Ответить всем», предметы «Сетевой фильтр» и «Второй монитор», а также активное умение «Откат транзакций».</p>
             </div>
             <div class="release-notes">
-              <h3>Версия 2.0.0 — «Переход на 8.5»</h3>
-              <p>Добавлены легендарки после первого босса, комнаты до восьми игроков, режим Battle Royale с сужением зоны, совместные решения в магазине классического PvP и обновлённая таблица рекордов.</p>
+              <h3>Версия 2.1.0 — «Комплектация по акции»</h3>
+              <p>Добавлены пять магазинных предметов и пять комплектов с объединением эффектов. Пересмотрен PvP-урон в Battle Royale, ослаблен магнит для дискет и добавлены офисные события. Исправлены индикаторы центра карты, положение логотипа и рывок на ПКМ при удержании ЛКМ; преследователь с 15-й минуты стал заметнее.</p>
             </div>
           </div>
         </div>
@@ -821,6 +821,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
+        <details class="release-notes" open><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale через равные интервалы появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (показывает стрелками до четырёх ближайших врагов за краями экрана). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды.</p></details>
         <details class="release-notes" open><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два новых события, влияющих на игрока. В Battle Royale безопасная зона забирает 10% площади карты каждые 45 секунд; урон вне неё увеличен до 18,4% максимального HP в секунду. Стрелка направления и логотип 1С теперь указывают на корректный центр увеличенной карты. Рывок на ПКМ срабатывает и при удержании ЛКМ для движения. Неуязвимый преследователь RuDesktop, появляющийся с 15-й минуты, теперь выделяется белым квадратом с контрастной рамкой и заметной подписью.</p></details>
         <details class="release-notes" open><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд. Тикеты выдаются случайно из общего пула, без выбора игроком. Таблица рекордов показывает режим и число игроков.</p></details>
         <details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды с пятью уровнями. На каждом забеге доступно три переброса набора карточек. Совместимые оружия 5-го уровня можно объединить в эволюции: «Аудит доступа», «Фискальный реестр» и «Контроль доступа». В магазине ассортимент можно обновить за фиткоины до двух раз за предложение. Добавлен рывок с половиной секунды неуязвимости: перезарядка 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрен баланс перков, лечения, щитов и контроля в PvP.</p></details><details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
@@ -1002,7 +1003,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.1.0';
+const GAME_VERSION = '2.2.0';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -1852,6 +1853,30 @@ const ACTIVE_SKILLS_DEF = {
       g.addPopup(g.player.x, g.player.y - 34, '🧑‍🔧 ВТОРАЯ ЛИНИЯ ПОДКЛЮЧИЛАСЬ', '#f1c40f');
       g.sound.playTone(460, 'triangle', 0.3, 0.2);
     }
+  },
+  act_transaction_rollback: {
+    name: 'Активное: Откат транзакций',
+    icon: '↩️',
+    desc: 'Возвращает героя в сохранённую точку 3–5 секунд назад и немного лечит. База откатывается только у вас; за транзакцию отвечает лично техспец.',
+    baseCd: 34,
+    cast: (g, lvl) => {
+      const lookback = 2.5 + lvl * 0.5;
+      const history = g.transactionHistory || [];
+      const anchor = [...history].reverse().find(point => point.time <= g.time - lookback) || history[0];
+      const from = { x: g.player.x, y: g.player.y };
+      if (anchor) {
+        g.player.x = Math.max(g.BOUND_MIN, Math.min(g.BOUND_MAX, anchor.x));
+        g.player.y = Math.max(g.BOUND_MIN, Math.min(g.BOUND_MAX, anchor.y));
+        g.transactionHistory = history.filter(point => point.time < anchor.time);
+      }
+      const heal = Math.round(g.player.maxHp * (0.04 + lvl * 0.01));
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal);
+      g.player.shieldTimer = Math.max(g.player.shieldTimer, 0.35 + lvl * 0.1);
+      g.createHitFX(from.x, from.y, '#74b9ff', 7);
+      g.createHitFX(g.player.x, g.player.y, '#55efc4', 9);
+      g.addPopup(g.player.x, g.player.y - 34, `↩️ ТРАНЗАКЦИЯ ОТКАЧЕНА · +${heal} HP`, '#74b9ff');
+      g.sound.playTone(560, 'sine', 0.35, 0.22);
+    }
   }
 };
 
@@ -1868,7 +1893,9 @@ const STORE_PASSIVES_DEF = {
   toner_fax: { name: 'Факс с резервным тонером', icon: '📠', cost: 350, stock: 3, desc: '+15% фиткоинов с дискет. Бонус суммируется до +45%. Тонер не входит в комплект.', apply: p => { p.currencyMult = Math.min(1.45, (p.currencyMult || 1) + 0.15); } },
   usb_adapter: { name: 'Переходник с переходника', icon: '🔌', cost: 330, stock: 3, desc: 'Сокращает перезарядку рывка на 20%. Эффект суммируется до 45%. Совместимость подтверждена устно.', apply: p => { p.dashCooldownMult = Math.max(0.55, (p.dashCooldownMult || 1) * 0.8); } },
   training_spreadsheet: { name: 'Excel «Обучение_финал_7.xlsx»', icon: '📊', cost: 370, stock: 3, desc: '+10% к получаемому опыту. Формулы защищены от редактирования.', apply: p => { p.xpMult += 0.10; } },
-  access_badge: { name: 'Пропуск в серверную', icon: '🪪', cost: 410, stock: 3, desc: 'Снижает урон от атак боссов на 10%. Эффект суммируется до 30%. Охрана всё равно спросит, кто вы.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.10); } }
+  access_badge: { name: 'Пропуск в серверную', icon: '🪪', cost: 410, stock: 3, desc: 'Снижает урон от атак боссов на 10%. Эффект суммируется до 30%. Охрана всё равно спросит, кто вы.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.10); } },
+  network_filter: { name: 'Сетевой фильтр', icon: '🔌', cost: 460, stock: 2, desc: 'Раз в 38 секунд блокирует весь входящий урон на 0,7 секунды. В классическом PvP перезарядка — 55 секунд.', apply: p => { p.hasNetworkFilter = true; p.networkFilterCooldown = 0; p.networkFilterBlockTimer = 0; } },
+  second_monitor: { name: 'Второй монитор', icon: '🖥️', cost: 430, stock: 2, desc: 'Подсвечивает стрелками до четырёх ближайших врагов за краями экрана. Наконец-то видно, кто занял всю оперативку.', apply: p => { p.hasSecondMonitor = true; } }
 };
 
 const STORE_PASSIVE_COMBOS = {
@@ -2361,6 +2388,11 @@ class Game {
       hasBackupShield: false,
       backupInterval: 38,
       backupDuration: 3.5,
+      hasNetworkFilter: false,
+      networkFilterCooldown: 0,
+      networkFilterBlockTimer: 0,
+      hasSecondMonitor: false,
+      readOnlyTimer: 0,
       shieldTimer: 0,
       speedBuffTimer: 0,
       coffeeBuffTimer: 0,
@@ -2398,8 +2430,13 @@ class Game {
     this.nextMiniBossAllowedTime = 0;
     this.nextMegaBossTime = 300;
     this.nextBananaSupplyTime = 75;
+    this.nextBrSupplyTime = 105;
     this.megaBossCount = 0;
     this.nextEventTime = 70;
+    this.fridayReleaseTimer = 0;
+    this.fridayReleaseUntil = 0;
+    this.transactionHistory = [];
+    this.transactionHistoryLastSample = -1;
     this.dynUpdateCd = 0;
     this.currency = 0;
     this.consumables = Array(4).fill(null);
@@ -2977,6 +3014,9 @@ class Game {
     } else if (message.type === 'world' && message.world) this.applyPvpSharedWorld(message.world);
     else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
     else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
+    else if (message.type === 'office-event-notice' && !pvp.host && pvp.started) this.showBanner(String(message.text || 'Офисное событие'));
+    else if (message.type === 'friday-release-start' && !pvp.host && pvp.started) this.fridayReleaseUntil = this.time + Math.max(1, Number(message.duration) || 8);
+    else if (message.type === 'read-only-debuff' && pvp.started && message.targetUid === pvp.uid) this.applyReadOnlyDebuff();
     else if (message.type === 'office-event-debuff' && !pvp.host && pvp.started) this.applyOfficeEventDebuff(message.effect);
     else if (message.type === 'integration-shop-start' && !pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopStart(message);
     else if (message.type === 'integration-shop-vote' && pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopVote(message);
@@ -3807,6 +3847,13 @@ class Game {
     const rawIncoming = Math.max(0, Number(damage) || 0);
     if (!this.player || rawIncoming <= 0) return 0;
     if (this.player.dashInvulnerabilityTimer > 0) return 0;
+    if (this.player.networkFilterBlockTimer > 0) return 0;
+    if (this.player.hasNetworkFilter && this.player.networkFilterCooldown <= 0) {
+      this.player.networkFilterBlockTimer = 0.7;
+      this.player.networkFilterCooldown = this.pvp?.mode === 'pvp' ? 55 : 38;
+      this.addPopup(this.player.x, this.player.y - 26, '🔌 СЕТЕВОЙ ФИЛЬТР · УРОН ЗАБЛОКИРОВАН', '#74b9ff');
+      return 0;
+    }
     const isBossAttack = /босс/i.test(String(source || ''));
     const bossReduction = isBossAttack ? Math.min(0.30, Math.max(0, Number(this.player.bossDamageReduction) || 0)) : 0;
     const incoming = rawIncoming * (1 - bossReduction);
@@ -5060,7 +5107,7 @@ class Game {
   }
 
   triggerOfficeEvent() {
-    const roll = Math.floor(Math.random() * 10);
+    const roll = Math.floor(Math.random() * 12);
     if (roll === 0) {
       this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
@@ -5097,10 +5144,23 @@ class Game {
     } else if (roll === 8) {
       this.applyOfficeEventDebuff('server70');
       if (this.pvp?.host && this.pvp.started) this.sendPvpNetworkMessage({ type: 'office-event-debuff', effect: 'server70' });
-    } else {
+    } else if (roll === 9) {
       this.applyOfficeEventDebuff('memory59');
       if (this.pvp?.host && this.pvp.started) this.sendPvpNetworkMessage({ type: 'office-event-debuff', effect: 'memory59' });
+    } else if (roll === 10) {
+      this.announceOfficeEvent('📣 ПЯТНИЧНЫЙ РЕЛИЗ через 3 секунды! Тестовую базу опять не подняли.');
+      this.fridayReleaseTimer = 3;
+    } else {
+      this.announceOfficeEvent('📧 Клиент нажал «Ответить всем». Вся цепочка писем направляется к вам!');
+      for (let i = 0; i < 5; i++) this.spawnEnemy('mango_client');
     }
+  }
+
+  applyReadOnlyDebuff() {
+    if (!this.player) return;
+    this.player.readOnlyTimer = Math.max(this.player.readOnlyTimer || 0, 4);
+    this.addPopup(this.player.x, this.player.y - 28, '🔒 ТОЛЬКО ЧТЕНИЕ · УРОН −45% · 4с', '#dfe6e9');
+    this.updateBuffHUD();
   }
 
   applyOfficeEventDebuff(effect) {
@@ -5122,6 +5182,18 @@ class Game {
 
   spawnDirector(dt) {
     this.spawnTimer -= dt;
+    if (this.isBattleRoyale && this.time >= this.nextBrSupplyTime) {
+      this.spawnBrSupply();
+      this.nextBrSupplyTime += 105;
+    }
+    if (this.fridayReleaseTimer > 0) {
+      this.fridayReleaseTimer = Math.max(0, this.fridayReleaseTimer - dt);
+      if (this.fridayReleaseTimer === 0) {
+        this.fridayReleaseUntil = this.time + 8;
+        if (this.pvp?.host && this.pvp.started) this.sendPvpNetworkMessage({ type: 'friday-release-start', duration: 8 });
+        this.announceOfficeEvent('🚀 ПЯТНИЧНЫЙ РЕЛИЗ В ПРОДЕ! Мобы ускорились на 8 секунд. Тестовой базы, разумеется, не было.');
+      }
+    }
     if (this.time >= this.nextMegaBossTime) {
       this.spawnMegaBoss();
       this.nextMegaBossTime += 300;
@@ -5165,6 +5237,23 @@ class Game {
     }
   }
 
+  spawnBrSupply() {
+    const center = this.MAP_SIZE / 2;
+    const angle = Math.random() * Math.PI * 2;
+    const radius = this.getBattleRoyaleSafeRadius() * (0.35 + Math.random() * 0.45);
+    const x = Math.max(this.BOUND_MIN + 80, Math.min(this.BOUND_MAX - 80, center + Math.cos(angle) * radius));
+    const y = Math.max(this.BOUND_MIN + 80, Math.min(this.BOUND_MAX - 80, center + Math.sin(angle) * radius));
+    const consumableKeys = Object.keys(CONSUMABLES_DEF);
+    const consumableKey = consumableKeys[Math.floor(Math.random() * consumableKeys.length)];
+    this.pickups.push({ x, y, type: 'br_supply', consumableKey, icon: '📦' });
+    this.announceOfficeEvent('📦 В Battle Royale сброшена поставка! Внутри случайный расходник — успейте добраться.');
+  }
+
+  announceOfficeEvent(message) {
+    this.showBanner(message);
+    if (this.pvp?.host && this.pvp.started) this.sendPvpNetworkMessage({ type: 'office-event-notice', text: message });
+  }
+
   spawn24hPursuer() {
     const angle = Math.random() * Math.PI * 2;
     const distance = 760;
@@ -5185,7 +5274,7 @@ class Game {
     return players === 1 ? 1 : 1.8 + (players - 2) * 0.25;
   }
 
-  spawnEnemy() {
+  spawnEnemy(forcedType = null) {
     const angle = Math.random() * Math.PI * 2;
     const dist = 640 + Math.random() * 80;
     const center = this.getPvpSpawnCenter();
@@ -5197,7 +5286,9 @@ class Game {
 
     if (this.time > 480 && roll < 0.06) type = 'queue_blob';
     else if (this.time > 360 && roll < 0.12) type = 'audit_bot';
-    else if (this.time > 240 && roll < 0.18) type = 'refresh_client';
+    else if (this.time > 300 && roll < 0.18) type = 'readonly_admin';
+    else if (this.time > 240 && roll < 0.24) type = 'duplicate_client';
+    else if (this.time > 240 && roll < 0.32) type = 'refresh_client';
     else if (this.time > 150 && roll < 0.08) type = 'mango_client';
     else if (this.time > 150 && roll < 0.16) type = 'rudesktop_cursor';
     else if (this.time > 15 && roll < 0.22) type = 'trainee';
@@ -5207,7 +5298,6 @@ class Game {
     else if (this.time > 95 && roll < 0.85) type = 'trainer';
     else if (this.time > 105 && roll > 0.91) type = 'evotor';
     else if (this.time > 115) type = 'remote_dev';
-
     const defs = {
       gymbro: { name: 'Качок в сланцах', hp: 30, speed: 1.7, dmg: 7, icon: '💪', xp: 3, size: 16, col: '#e67e22' },
       trainee: { name: 'Стажёр после курсов', hp: 18, speed: 2.9, dmg: 5, icon: '🐣', xp: 4, size: 13, col: '#f1c40f' },
@@ -5221,9 +5311,12 @@ class Game {
       rudesktop_cursor: { name: 'Курсор Rudesktop (ещё 3 пикселя)', hp: 82, speed: 3.5, dmg: 9, icon: '🖱️', xp: 9, size: 14, col: '#6c5ce7' },
       refresh_client: { name: 'Клиент обновляет страницу, пока вы объясняете', hp: 96, speed: 1.55, dmg: 11, icon: '🔄', xp: 11, size: 16, col: '#00b894', isRefreshClient: true },
       audit_bot: { name: 'Аудитор с чек-листом на 47 пунктов', hp: 150, speed: 1.05, dmg: 13, icon: '🧾', xp: 16, size: 20, col: '#f39c12', shooter: true, burstShooter: true, shootTimer: 3.0 },
-      queue_blob: { name: 'Очередь на ресепшене · растёт сама', hp: 250, speed: 0.82, dmg: 21, icon: '🗂️', xp: 20, size: 24, col: '#6c5ce7', explodes: true }
+      queue_blob: { name: 'Очередь на ресепшене · растёт сама', hp: 250, speed: 0.82, dmg: 21, icon: '🗂️', xp: 20, size: 24, col: '#6c5ce7', explodes: true },
+      readonly_admin: { name: 'Администратор с правами только на чтение', hp: 190, speed: 0.78, dmg: 12, icon: '🔒', xp: 18, size: 21, col: '#ecf0f1', shooter: true, shootTimer: 3.3, readOnlyProjectile: true },
+      duplicate_client: { name: 'Дубль клиента', hp: 145, speed: 1.55, dmg: 11, icon: '📱', xp: 16, size: 19, col: '#ff9ff3', isClientDuplicate: true }
     };
 
+    if (forcedType && Object.hasOwn(defs, forcedType)) type = forcedType;
     const d = defs[type];
     const hpBuff = 1 + (this.time / 150);
     this.enemies.push({
@@ -5241,6 +5334,9 @@ class Game {
       shooter: d.shooter || false,
       burstShooter: d.burstShooter || false,
       isRefreshClient: d.isRefreshClient || false,
+      readOnlyProjectile: d.readOnlyProjectile || false,
+      isClientDuplicate: d.isClientDuplicate || false,
+      duplicateTriggered: false,
       shootTimer: d.shootTimer || 0,
       isCleaner: d.isCleaner || false,
       freezeTimer: 0,
@@ -5782,7 +5878,7 @@ class Game {
   }
 
   dealPlayerDamage(baseDmg) {
-    let dmg = baseDmg * this.player.dmgMult * (this.player.damageBuffMult || 1);
+    let dmg = baseDmg * this.player.dmgMult * (this.player.damageBuffMult || 1) * (this.player.readOnlyTimer > 0 ? 0.55 : 1);
     let isCrit = Math.random() < Math.min(0.8, this.player.critChance);
     if (isCrit) {
       dmg *= 2.5;
@@ -6151,6 +6247,9 @@ class Game {
     this.player.dashTimer = Math.max(0, (this.player.dashTimer || 0) - dt);
     this.player.dashInvulnerabilityTimer = Math.max(0, (this.player.dashInvulnerabilityTimer || 0) - dt);
     this.player.stunTimer = Math.max(0, (this.player.stunTimer || 0) - dt);
+    this.player.networkFilterCooldown = Math.max(0, (this.player.networkFilterCooldown || 0) - dt);
+    this.player.networkFilterBlockTimer = Math.max(0, (this.player.networkFilterBlockTimer || 0) - dt);
+    this.player.readOnlyTimer = Math.max(0, (this.player.readOnlyTimer || 0) - dt);
     if (this.player.slowTimer > 0) {
       this.player.slowTimer = Math.max(0, this.player.slowTimer - dt);
       if (this.player.slowTimer === 0) this.player.slowFactor = 1;
@@ -6277,6 +6376,12 @@ class Game {
 
     this.player.x = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.x));
     this.player.y = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.y));
+    this.transactionHistoryLastSample += dt;
+    if (this.transactionHistoryLastSample >= 0.5) {
+      this.transactionHistoryLastSample %= 0.5;
+      this.transactionHistory.push({ x: this.player.x, y: this.player.y, time: this.time });
+      this.transactionHistory = this.transactionHistory.filter(point => this.time - point.time <= 8).slice(-20);
+    }
     this.updateBattleRoyaleZone(dt);
 
     this.updateSummons(dt, frameScale);
@@ -6385,12 +6490,14 @@ class Game {
           ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1),
           ep.isMegaBossAttack ? 'Снаряд большого босса' : ep.isBossAttack ? 'Снаряд босса' : `Снаряд ${ep.icon || 'противника'}`
         );
+        if (ep.readOnlyProjectile) this.sendPvpNetworkMessage({ type: 'read-only-debuff', targetUid: remoteTarget.uid || this.pvp.remotePlayer?.uid });
         this.createHitFX(remoteTarget.x, remoteTarget.y, '#ff7675', 3);
         ep.life = 0;
       } else if (!summonHit && localDistance < 18 + ep.size) {
         if (this.player.shieldTimer <= 0) {
           const damage = ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1);
           const applied = this.recordPlayerDamage(damage, ep.isMegaBossAttack ? 'Снаряд большого босса' : ep.isBossAttack ? 'Снаряд босса' : `Снаряд ${ep.icon || 'противника'}`);
+          if (ep.readOnlyProjectile) this.applyReadOnlyDebuff();
           this.sound.hit();
           this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(applied)}`, '#ff4757');
         } else {
@@ -6462,7 +6569,16 @@ class Game {
 
       const target = this.getPvpEnemyTarget(e);
       const ang = Math.atan2(target.y - e.y, target.x - e.x);
-      let moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1);
+      if (worldAuthority && e.isClientDuplicate && !e.duplicateTriggered && e.hp <= e.maxHp * 0.5) {
+        e.duplicateTriggered = true;
+        const cloneHp = Math.max(1, e.maxHp * 0.28);
+        this.enemies.push({ x: e.x + 34, y: e.y - 24, name: 'Копия клиента · «я тоже в копии»',
+          hp: cloneHp, maxHp: cloneHp, speed: e.speed * 1.18, dmg: Math.max(1, e.dmg * 0.7),
+          icon: '📱', xp: Math.max(1, Math.round(e.xp * 0.35)), size: 14, col: '#fd79a8',
+          freezeTimer: 0, slowTimer: 0, slowFactor: 1, isBoss: false, isClientDuplicate: false, duplicateTriggered: true });
+        this.addPopup(e.x, e.y - e.size - 14, 'ДВОЙНОЙ ЗВОНОК!', '#ff9ff3');
+      }
+      let moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1) * (this.time < (this.fridayReleaseUntil || 0) ? 1.45 : 1);
       if (worldAuthority && e.isRefreshClient) {
         e.dashTimer = (e.dashTimer ?? 3.8) - dt;
         if (e.dashTimer <= 0) {
@@ -6499,7 +6615,8 @@ class Game {
               vx: Math.cos(angle) * (e.burstShooter ? 4.2 : 4.5),
               vy: Math.sin(angle) * (e.burstShooter ? 4.2 : 4.5),
               dmg: e.burstShooter ? 13 : 16, size: e.burstShooter ? 8 : 7, life: 2.2,
-              icon: e.burstShooter ? '🧾' : '⚠️', color: e.col
+              icon: e.burstShooter ? '🧾' : (e.readOnlyProjectile ? '🔒' : '⚠️'), color: e.col,
+              readOnlyProjectile: Boolean(e.readOnlyProjectile)
             });
           }
           if (e.burstShooter) this.addPopup(e.x, e.y - e.size - 12, 'ПРОВЕРКА ПО ПУНКТАМ!', '#f39c12');
@@ -6618,8 +6735,20 @@ class Game {
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const item = this.pickups[i];
       if (Math.hypot(this.player.x - item.x, this.player.y - item.y) < 32) {
+        const freeConsumableSlot = this.consumables.findIndex(slot => !slot);
+        if ((item.type === 'br_supply' || item.type === 'consumable') && freeConsumableSlot < 0) {
+          if (!item.fullInventoryNotified) {
+            this.addPopup(this.player.x, this.player.y - 25, 'Инвентарь забит', '#aaa');
+            item.fullInventoryNotified = true;
+          }
+          continue;
+        }
         this.claimPvpDrop(item);
-        if (item.type === 'its_box') {
+        if (item.type === 'br_supply') {
+          this.consumables[freeConsumableSlot] = { key: item.consumableKey, count: 1 };
+          this.addPopup(this.player.x, this.player.y - 25, `${CONSUMABLES_DEF[item.consumableKey].icon} Поставка получена`, '#ffcf70');
+          this.updateConsumableHUD();
+        } else if (item.type === 'its_box') {
           this.triggerNukeITS();
         } else if (item.type === 'coffee') {
           this.player.speedBuffTimer = Math.max(this.player.speedBuffTimer, 8.0);
@@ -7232,7 +7361,9 @@ class Game {
     const speedTimer = this.player.speedBuffTimer || 0;
     const stunTimer = this.player.stunTimer || 0;
     const slowTimer = this.player.slowTimer || 0;
-    if (coffeeTimer <= 0 && speedTimer <= 0 && stunTimer <= 0 && slowTimer <= 0) {
+    const readOnlyTimer = this.player.readOnlyTimer || 0;
+    const filterTimer = this.player.networkFilterBlockTimer || 0;
+    if (coffeeTimer <= 0 && speedTimer <= 0 && stunTimer <= 0 && slowTimer <= 0 && readOnlyTimer <= 0 && filterTimer <= 0) {
       panel.style.display = 'none';
       return;
     }
@@ -7242,6 +7373,14 @@ class Game {
       document.getElementById('coffee-buff-symbol').innerText = isStunned ? '⛔' : '🧠';
       document.getElementById('coffee-buff-timer').innerText = `${(isStunned ? stunTimer : slowTimer).toFixed(1)}с`;
       document.getElementById('buff-indicator').innerText = isStunned ? 'СЕРВЕР 70 · СВЯЗЬ ПОТЕРЯНА' : 'СЕРВЕР 59 · НЕТ ОПЕРАТИВКИ';
+      return;
+    }
+    if (readOnlyTimer > 0 || filterTimer > 0) {
+      const isReadOnly = readOnlyTimer > 0;
+      panel.style.display = 'flex';
+      document.getElementById('coffee-buff-symbol').innerText = isReadOnly ? '🔒' : '🔌';
+      document.getElementById('coffee-buff-timer').innerText = `${(isReadOnly ? readOnlyTimer : filterTimer).toFixed(1)}с`;
+      document.getElementById('buff-indicator').innerText = isReadOnly ? 'ТОЛЬКО ЧТЕНИЕ · УРОН −45%' : 'СЕТЕВОЙ ФИЛЬТР';
       return;
     }
     const coffeeActive = coffeeTimer > 0;
@@ -7433,6 +7572,20 @@ class Game {
     // Лут
     for (let item of this.pickups) {
       const pos = this.getPvpRenderPosition(item.syncId, item.x, item.y);
+      if (item.type === 'br_supply') {
+        const pulse = 0.5 + 0.5 * Math.sin(this.time * 4);
+        this.ctx.save();
+        this.ctx.shadowColor = '#ffb142';
+        this.ctx.shadowBlur = 9 + pulse * 12;
+        this.ctx.beginPath();
+        this.ctx.arc(pos.x, pos.y, 17 + pulse * 3, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(255, 177, 66, 0.2)';
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#ffb142';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        this.ctx.restore();
+      }
       this.ctx.font = '22px sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
@@ -7752,6 +7905,41 @@ class Game {
     }
 
     this.ctx.restore();
+
+    if (this.player.hasSecondMonitor) {
+      const margin = 38;
+      const centerX = this.canvas.width / 2;
+      const centerY = this.canvas.height / 2;
+      const candidates = this.enemies.map(enemy => {
+        const screenX = enemy.x - camX;
+        const screenY = enemy.y - camY;
+        const dx = screenX - centerX;
+        const dy = screenY - centerY;
+        return { enemy, screenX, screenY, dx, dy, distance: Math.hypot(dx, dy) };
+      }).filter(mark => mark.screenX < margin || mark.screenX > this.canvas.width - margin || mark.screenY < margin || mark.screenY > this.canvas.height - margin)
+        .sort((a, b) => a.distance - b.distance).slice(0, 4);
+      for (const mark of candidates) {
+        const angle = Math.atan2(mark.dy, mark.dx);
+        const reach = Math.min((this.canvas.width / 2 - margin) / Math.max(0.001, Math.abs(Math.cos(angle))), (this.canvas.height / 2 - margin) / Math.max(0.001, Math.abs(Math.sin(angle))));
+        const x = centerX + Math.cos(angle) * reach;
+        const y = centerY + Math.sin(angle) * reach;
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(angle);
+        this.ctx.beginPath();
+        this.ctx.moveTo(12, 0);
+        this.ctx.lineTo(-8, -7);
+        this.ctx.lineTo(-5, 0);
+        this.ctx.lineTo(-8, 7);
+        this.ctx.closePath();
+        this.ctx.fillStyle = mark.enemy.isBoss ? '#ff4757' : '#74b9ff';
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 2;
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.restore();
+      }
+    }
 
     if (this.pvp?.mode === 'pvp' && this.time < 120) {
       const remaining = Math.max(0, Math.ceil(120 - this.time));

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.2.1</title>
+<title>1С:Фитнес Клуб КОРП 2.3.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -450,6 +450,15 @@
   #modal-changelog .win-1c { width: min(760px, 94vw) !important; max-height: 90vh; overflow-y: auto; }
   #modal-main-menu { z-index: 300; }
   #modal-pvp { z-index: 320; }
+  #modal-class-select { z-index: 350; padding: 12px; }
+  #modal-class-select .win-1c { width: min(860px, 96vw); max-height: 94vh; overflow-y: auto; }
+  .class-select-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+  .class-select-card { appearance:none; display:flex; flex-direction:column; align-items:stretch; gap:6px; min-width:0; padding:12px; border:2px solid #b9a15d; border-radius:5px; background:linear-gradient(145deg,#fffdf5,#f2e6bd); color:#292313; text-align:left; cursor:pointer; font:inherit; }
+  .class-select-card:hover { border-color:#9b7217; background:#fff5cb; box-shadow:0 3px 10px rgba(95,70,12,.2); }
+  .class-select-card b { color:#714300; font-size:15px; }
+  .class-select-stats { font-size:11px; line-height:1.5; color:#444; }
+  .class-select-weapon { font-size:12px; font-weight:bold; }
+  @media (max-width: 600px) { .class-select-grid { grid-template-columns:1fr; } }
   .main-menu-window { width: min(900px, 94%); }
   .main-menu-layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; }
   .main-menu-actions { display: flex; flex-direction: column; gap: 9px; }
@@ -632,7 +641,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.2.1 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.3.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -751,7 +760,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.2.1</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.3.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -760,9 +769,13 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.2.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.3.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
+            <div class="release-notes">
+              <h3>Версия 2.3.0 — «Мобы не ушли в отпуск»</h3>
+              <p>В начале каждого забега появился выбор одного из четырёх классов со стартовыми характеристиками и оружием. В сетевой игре выбранные игроки ждут остальных на общей паузе. Большой босс больше не вычищает обычных мобов с карты и останавливает новые волны. Урон от события «70-й сервер» оглушает на 1 секунду. Клавиша L завершает забег и на русской раскладке.</p>
+            </div>
             <div class="release-notes">
               <h3>Версия 2.2.0 — «Релиз без согласования»</h3>
               <p>В Battle Royale поставки с расходниками появляются каждые 30 секунд. Добавлены «Администратор только на чтение», «Дубль клиента», события «Пятничный релиз» и «Ответить всем», предметы «Сетевой фильтр» и «Второй монитор» (в PvP отмечает игроков синими, боссов красными стрелками), а также активное умение «Откат транзакций». Карточки легендарного выбора выровнены, а «Переход на 8.5» получил квадратную иконку. Панель большого босса перенесена над HUD расходников. Настройки звука сохраняются после перезапуска; старые версии в истории обновлений свёрнуты.</p>
@@ -813,6 +826,17 @@
     </div>
   </div>
 
+  <div id="modal-class-select" class="modal-overlay">
+    <div class="win-1c" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span>🧑‍💻 Выберите класс</span></div>
+      <div class="win-1c-body">
+        <p id="class-select-subtitle" style="font-size:12px; line-height:1.45; margin-bottom:12px;">Выберите специалиста и его стартовый комплект.</p>
+        <div id="class-select-grid" class="class-select-grid"></div>
+        <p id="class-select-status" style="font-size:11px; color:#666; margin:10px 0 0;"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Настройки -->
   <div id="modal-settings" class="modal-overlay">
     <div class="win-1c" style="width:480px;">
@@ -846,7 +870,8 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
+        <details class="release-notes" open><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке.</p></details>
+        <details class="release-notes"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
         <details class="release-notes"><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два новых события, влияющих на игрока. В Battle Royale безопасная зона забирает 10% площади карты каждые 45 секунд; урон вне неё увеличен до 18,4% максимального HP в секунду. Стрелка направления и логотип 1С теперь указывают на корректный центр увеличенной карты. Рывок на ПКМ срабатывает и при удержании ЛКМ для движения. Неуязвимый преследователь RuDesktop, появляющийся с 15-й минуты, теперь выделяется белым квадратом с контрастной рамкой и заметной подписью.</p></details>
         <details class="release-notes"><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд. Тикеты выдаются случайно из общего пула, без выбора игроком. Таблица рекордов показывает режим и число игроков.</p></details>
         <details class="release-notes"><summary><h3>1.9.0 — «Новый подход»</h3></summary><p>Обновлены описания перков и улучшений. При поступлении тикета теперь можно выбрать одно из трёх испытаний, а за выполнение — награду: опыт, лечение или щит. В прокачке появились поджигающие снаряды с пятью уровнями. На каждом забеге доступно три переброса набора карточек. Совместимые оружия 5-го уровня можно объединить в эволюции: «Аудит доступа», «Фискальный реестр» и «Контроль доступа». В магазине ассортимент можно обновить за фиткоины до двух раз за предложение. Добавлен рывок с половиной секунды неуязвимости: перезарядка 3 секунды в одиночной игре и 6 секунд в сети. Пересмотрен баланс перков, лечения, щитов и контроля в PvP.</p></details><details class="release-notes"><summary><h3>1.8.0 — «Командный зачёт»</h3></summary><p>В магазине за один визит можно купить не больше одного предмета каждого вида. Добавлена сетевая игра через комнаты Firebase с четырёхсимвольным кодом. В PvP игроки сражаются друг с другом и с противниками; в кооперативном PvE урон между игроками отключён. В первые две минуты PvP игроки защищены от урона друг друга. Противники и трофеи общие для обоих игроков, а в сетевой игре их стало больше. Пауза, выбор улучшения или покупки останавливают игру соперника и показывают причину. В настройках можно свернуть описание принятого тикета, оставив заголовок и задачу. После поражения соперника можно завершить забег клавишей L и сохранить текущий счёт; в одиночной игре клавиша L доступна в любое время. В таблице рекордов теперь указаны версия игры и режим забега. Большие боссы, появляющиеся каждые пять минут, потеряли половину здоровья, но стали наносить на 40% больше урона.</p></details>
@@ -1028,7 +1053,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.2.1';
+const GAME_VERSION = '2.3.0';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -1406,6 +1431,20 @@ const WEAPONS_DEF = {
     baseCooldown: 0.85,
     baseDmg: 28
   },
+  table_chart: {
+    name: 'Сводная таблица',
+    icon: '📊',
+    desc: 'Автоматически отправляет таблицу в ближайшую цель. Урон растёт с уровнем оружия.',
+    baseCooldown: 1.0,
+    baseDmg: 32
+  },
+  support_phone: {
+    name: 'Телефон техподдержки',
+    icon: '☎️',
+    desc: 'Автоматически дозванивается до ближайшего врага и забрасывает его входящими обращениями.',
+    baseCooldown: 1.0,
+    baseDmg: 38
+  },
   heavy_archive: {
     name: 'ККТ Атол',
     icon: '🧾',
@@ -1455,6 +1494,25 @@ const WEAPONS_DEF = {
     name: 'Эволюция: Контроль доступа', icon: '🚧',
     desc: 'Турникет и IronLogic создают ударную волну, отбрасывающую врагов вокруг героя.',
     baseCooldown: 2.5, baseDmg: 55
+  }
+};
+
+const PLAYER_CLASSES = {
+  technician: {
+    name: 'Технарь', weapon: 'iron_logic',
+    stats: { hp: 100, maxHp: 100, baseSpeed: 3.2, dmgMult: 1.0, cdMult: 1.0, xpMult: 1.0, currencyMult: 1.0, critChance: 0.05, bossDamageReduction: 0 }
+  },
+  courier: {
+    name: 'Переносчик', weapon: 'table_chart',
+    stats: { hp: 120, maxHp: 120, baseSpeed: 3.0, dmgMult: 0.80, cdMult: 1.0, xpMult: 1.0, currencyMult: 1.0, critChance: 0.15, bossDamageReduction: 0.10 }
+  },
+  developer: {
+    name: 'Разработчик', weapon: 'syntax',
+    stats: { hp: 80, maxHp: 80, baseSpeed: 3.4, dmgMult: 1.10, cdMult: 1.10, xpMult: 1.0, currencyMult: 1.0, critChance: 0.05, bossDamageReduction: 0 }
+  },
+  support: {
+    name: 'Чел с техпода', weapon: 'support_phone',
+    stats: { hp: 60, maxHp: 60, baseSpeed: 3.5, dmgMult: 0.80, cdMult: 1.20, xpMult: 1.20, currencyMult: 1.20, critChance: 0.05, bossDamageReduction: 0 }
   }
 };
 
@@ -2188,7 +2246,7 @@ class Game {
         }
         return;
       }
-      if (e.key.toLowerCase() === 'l') {
+      if (e.code === 'KeyL' || ['l', 'д'].includes(e.key.toLowerCase())) {
         this.finishRunWithCurrentScore();
         return;
       }
@@ -2286,9 +2344,12 @@ class Game {
 
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
     this.pvpMode = ['pvp', 'pve', 'battle_royale'].includes(localStorage.getItem('1c_pvp_mode')) ? localStorage.getItem('1c_pvp_mode') : 'pvp';
+    const savedClass = localStorage.getItem('1c_player_class');
+    this.selectedClassId = PLAYER_CLASSES[savedClass] ? savedClass : 'technician';
     this.collapseAcceptedTickets = localStorage.getItem('1c_collapse_accepted_tickets') !== 'false';
     document.getElementById('player-nickname').value = this.savedNick;
     document.getElementById('pvp-player-nickname').value = this.savedNick;
+    this.updateClassSelectionUI();
     document.getElementById('player-nickname').addEventListener('input', event => this.setPlayerNickname(event.target.value));
     document.getElementById('pvp-player-nickname').addEventListener('input', event => this.setPlayerNickname(event.target.value));
     document.getElementById('pvp-room-code').addEventListener('input', (event) => {
@@ -2328,6 +2389,7 @@ class Game {
     this.BOUND_MIN = this.isBattleRoyale ? 90 : 90;
     this.BOUND_MAX = this.MAP_SIZE - 90;
     this.pendingBattleRoyaleUpgrades = [];
+    if (this.pvp?.started) this.pvp.classSelectionPending = true;
     this.legendaryMigrationChosen = false;
     this.firstMegaBossDefeated = false;
     this.legendaryOffered = false;
@@ -2354,6 +2416,7 @@ class Game {
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-pvp').style.display = 'none';
     document.getElementById('modal-pvp-wait').style.display = 'none';
+    document.getElementById('modal-class-select').style.display = 'none';
     document.getElementById('modal-legendary').style.display = 'none';
     document.getElementById('modal-settings').style.display = 'none';
     document.getElementById('modal-changelog').style.display = 'none';
@@ -2395,6 +2458,9 @@ class Game {
       { x: this.BOUND_MIN + 300, y: this.MAP_SIZE / 2 }
     ];
     const spawnPoint = arenaCorners[(Number(this.pvp?.slot) || 0) % arenaCorners.length];
+    const classId = PLAYER_CLASSES[this.selectedClassId] ? this.selectedClassId : 'technician';
+    this.selectedClassId = classId;
+    const playerClass = PLAYER_CLASSES[classId];
     this.player = {
       x: this.isBattleRoyale ? spawnPoint.x : (this.pvp && !this.pvp.host ? 2180 : 1820),
       y: this.isBattleRoyale ? spawnPoint.y : 2000,
@@ -2443,12 +2509,14 @@ class Game {
       shieldTimer: 0,
       speedBuffTimer: 0,
       coffeeBuffTimer: 0,
-      turboBuffTimer: 0
+      turboBuffTimer: 0,
+      ...playerClass.stats,
+      classId,
+      className: playerClass.name
     };
 
     this.weapons = {
-      syntax: { lvl: 1, timer: 0 },
-      iron_logic: { lvl: 1, timer: 0 }
+      [playerClass.weapon]: { lvl: 1, timer: 0 }
     };
     this.evolvedWeapons = new Set();
     this.passives = {};
@@ -2511,7 +2579,10 @@ class Game {
     this.updateActiveHUD();
     this.updateConsumableHUD();
     this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
-    if (!options.skipScoreSession) this.beginScoreRun();
+    if (!options.skipScoreSession) {
+      this.beginScoreRun();
+      this.openClassSelection();
+    }
   }
 
   async beginScoreRun() {
@@ -2707,6 +2778,101 @@ class Game {
     document.getElementById('pvp-mode-select').value = this.pvpMode;
   }
 
+  updateClassSelectionUI() {
+    const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
+    const weapon = WEAPONS_DEF[classDef.weapon];
+    const stats = classDef.stats;
+    const summary = `${stats.hp} HP · скорость ${stats.baseSpeed.toFixed(1)} · урон ${Math.round(stats.dmgMult * 100)}% · КД ${Math.round(stats.cdMult * 100)}% · крит ${Math.round(stats.critChance * 100)}% · защита от боссов ${Math.round(stats.bossDamageReduction * 100)}% · опыт ${Math.round(stats.xpMult * 100)}% · фиткоины ${Math.round(stats.currencyMult * 100)}% · оружие ${weapon.icon} ${weapon.name}`;
+    for (const [selectId, summaryId] of [['solo-class-select', 'solo-class-summary'], ['pvp-class-select', 'pvp-class-summary']]) {
+      const select = document.getElementById(selectId);
+      const summaryNode = document.getElementById(summaryId);
+      if (select) select.value = PLAYER_CLASSES[this.selectedClassId] ? this.selectedClassId : 'technician';
+      if (summaryNode) summaryNode.textContent = summary;
+    }
+  }
+
+  async setSelectedClass(classId) {
+    if (!PLAYER_CLASSES[classId]) return;
+    this.selectedClassId = classId;
+    localStorage.setItem('1c_player_class', classId);
+    this.updateClassSelectionUI();
+    const pvp = this.pvp;
+    if (!pvp || pvp.started || !pvp.uid) return;
+    pvp.classId = classId;
+    if (pvp.roomCache?.players?.[pvp.uid]) pvp.roomCache.players[pvp.uid].classId = classId;
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      await fb.set(fb.ref(fb.db, `pvpRooms/${pvp.code}/players/${pvp.uid}/classId`), classId);
+      this.updatePvpLobby();
+    } catch (error) {
+      this.pvpStatus(`Класс выбран локально, но не удалось обновить лобби: ${error.message || 'ошибка сети'}`, true);
+    }
+  }
+
+  openClassSelection() {
+    const modal = document.getElementById('modal-class-select');
+    const grid = document.getElementById('class-select-grid');
+    const subtitle = document.getElementById('class-select-subtitle');
+    const status = document.getElementById('class-select-status');
+    grid.replaceChildren();
+    subtitle.textContent = this.pvp?.started
+      ? 'Выберите класс и стартовое оружие. В сетевой игре матч ждёт, пока остальные игроки тоже выберут.'
+      : 'Выберите специалиста: характеристики и стартовое оружие начнут действовать сразу.';
+    status.textContent = this.pvp?.started ? 'Матч будет приостановлен для всех до готовности каждого игрока.' : 'Класс можно будет изменить в следующем забеге.';
+
+    for (const [classId, classDef] of Object.entries(PLAYER_CLASSES)) {
+      const stats = classDef.stats;
+      const weapon = WEAPONS_DEF[classDef.weapon];
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'class-select-card';
+      const name = document.createElement('b');
+      name.textContent = classDef.name;
+      const statsLine = document.createElement('span');
+      statsLine.className = 'class-select-stats';
+      statsLine.textContent = `❤️ ${stats.hp} HP · ⚡ скорость ${stats.baseSpeed.toFixed(1)} · ⚔️ урон ${Math.round(stats.dmgMult * 100)}% · ⏱️ перезарядка ${Math.round(stats.cdMult * 100)}% · 🎯 крит ${Math.round(stats.critChance * 100)}% · 🪪 защита от боссов ${Math.round(stats.bossDamageReduction * 100)}% · 📈 опыт ${Math.round(stats.xpMult * 100)}% · 💰 фиткоины ${Math.round(stats.currencyMult * 100)}%`;
+      const weaponLine = document.createElement('span');
+      weaponLine.className = 'class-select-weapon';
+      weaponLine.textContent = `${weapon.icon} ${weapon.name} · ${weapon.baseDmg} базового урона · перезарядка ${weapon.baseCooldown} с`;
+      const description = document.createElement('span');
+      description.className = 'class-select-stats';
+      description.textContent = weapon.desc;
+      card.append(name, statsLine, weaponLine, description);
+      card.addEventListener('click', () => this.choosePlayerClass(classId));
+      grid.appendChild(card);
+    }
+
+    this.paused = true;
+    modal.style.display = 'flex';
+    if (this.pvp?.started) this.setPvpChoosing('class');
+  }
+
+  choosePlayerClass(classId) {
+    const classDef = PLAYER_CLASSES[classId];
+    if (!classDef || document.getElementById('modal-class-select').style.display !== 'flex') return;
+    this.selectedClassId = classId;
+    localStorage.setItem('1c_player_class', classId);
+    Object.assign(this.player, classDef.stats, { classId, className: classDef.name });
+    this.weapons = { [classDef.weapon]: { lvl: 1, timer: 0 } };
+    this.evolvedWeapons = new Set();
+    this.passives = {};
+    this.repeatableUpgradeCounts = {};
+    document.getElementById('modal-class-select').style.display = 'none';
+    this.updateHUD();
+    this.updateInventoryHUD();
+    this.updateActiveHUD();
+    if (this.pvp?.started) {
+      this.pvp.classId = classId;
+      this.setPvpChoosing(null);
+      this.sendPvpNetworkState();
+      this.syncPvpWait();
+    } else {
+      this.paused = false;
+    }
+    this.lastTime = performance.now();
+    this.addPopup(this.player.x, this.player.y - 34, `КЛАСС ВЫБРАН: ${classDef.name}`, '#ffd200');
+  }
+
   setPlayerNickname(value) {
     this.savedNick = String(value || '').replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15);
     localStorage.setItem('1c_nick', this.savedNick);
@@ -2728,14 +2894,15 @@ class Game {
         if (!existing.exists()) { code = candidate; break; }
       }
       if (!code) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
-      const state = { x: 2000, y: 2000, hp: 100, maxHp: 100, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
+      const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
+      const state = { x: 2000, y: 2000, hp: classDef.stats.hp, maxHp: classDef.stats.maxHp, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
       await set(ref(db, `pvpRooms/${code}`), { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt: Date.now(), rtcGeneration: 1, maxPlayers,
-        players: { [uid]: { uid, name, slot: 0, online: true, state } } });
+        players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state } } });
       await onDisconnect(ref(db, `pvpRooms/${code}`)).remove();
       this.pvp = { code, host: true, initialRole: 'host', uid, name, started: false,
         maxPlayers, slot: 0, choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
         remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode,
-        roomCache: { status: 'waiting', hostUid: uid, players: { [uid]: { uid, name, slot: 0, online: true, state } } },
+        classId: this.selectedClassId, roomCache: { status: 'waiting', hostUid: uid, players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state } } },
         threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
       await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
       this.logPvpDiagnostic(this.pvp, 'WebRTC', 'комната создана через Firebase-сигнализацию', { mode: this.pvpMode, maxPlayers });
@@ -2766,12 +2933,13 @@ class Game {
       const currentPlayers = Object.values(room.players || {});
       if (currentPlayers.length >= 8) throw new Error('Лобби заполнено (максимум 8 игроков).');
       const slot = currentPlayers.length;
-      const state = { x: 2000, y: 2000, hp: 100, maxHp: 100, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
-      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, slot, online: true, state });
+      const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
+      const state = { x: 2000, y: 2000, hp: classDef.stats.hp, maxHp: classDef.stats.maxHp, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
+      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, classId: this.selectedClassId, slot, online: true, state });
       this.pvp = { code, host: false, initialRole: 'client', uid, name, started: false,
         maxPlayers: Number(room.maxPlayers), slot, choosing: null, remoteChoosing: null, remoteState: null,
         remotePlayer: null, opponentUid: null, remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0,
-        matchOver: false, opponentLost: false, mode: room.mode, roomCache: room,
+        matchOver: false, opponentLost: false, mode: room.mode, classId: this.selectedClassId, roomCache: room,
         threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
       this.pvpMode = room.mode; localStorage.setItem('1c_pvp_mode', this.pvpMode);
       await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
@@ -2791,7 +2959,7 @@ class Game {
     }
     const players = Object.values(room.players || {}).sort((a, b) => Number(a.slot || 0) - Number(b.slot || 0));
     list.style.display = 'block';
-    list.innerHTML = `<b>Игроки в лобби · ${players.length}/8</b><br>${players.map(player => `${player.online ? '🟢' : '⚪'} ${this.escapeHtml(String(player.name || 'Игрок'))}${player.uid === room.hostUid ? ' · хост' : ''}`).join('<br>')}`;
+    list.innerHTML = `<b>Игроки в лобби · ${players.length}/8</b><br>${players.map(player => `${player.online ? '🟢' : '⚪'} ${this.escapeHtml(String(player.name || 'Игрок'))} · ${this.escapeHtml(PLAYER_CLASSES[player.classId]?.name || 'Технарь')}${player.uid === room.hostUid ? ' · хост' : ''}`).join('<br>')}`;
     startButton.style.display = pvp.host ? 'block' : 'none';
     const connected = Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length;
     const ready = players.length >= 2 && players.every(player => player.online) && connected >= players.length - 1;
@@ -2986,7 +3154,8 @@ class Game {
     const pvp = this.pvp;
     if (!pvp || pvp.opponentLost || !message) return;
     if (message.type === 'roster' && pvp.maxPlayers >= 2) {
-      this.applyThreePlayerRoster(message.players || []);
+      this.applyThreePlayerRoster(message.players || [], message.classSelectionPending);
+      this.syncPvpWait();
     } else if ((message.type === 'state' || message.type === 'match-over') && message.state) {
       const uid = String(message.uid || 'opponent');
       pvp.remoteStateSequences ||= {};
@@ -3030,7 +3199,7 @@ class Game {
       if (pvp.host && pvp.maxPlayers >= 3) {
         pvp.remotePlayers ||= {};
         const prior = pvp.remotePlayers[uid] || {};
-        pvp.remotePlayers[uid] = { ...remotePlayer, ...prior, uid, name: message.name || prior.name || 'Соперник', online: true, state, stateAt: performance.now() };
+        pvp.remotePlayers[uid] = { ...prior, ...remotePlayer, uid, name: message.name || prior.name || 'Соперник', online: true, state, stateAt: performance.now(), choosing: message.choosing || null, paused: Boolean(message.paused) };
         const previousAttack = Number(prior.state?.attackTotal || 0);
         const attackDelta = Math.max(0, Number(state.attackTotal || 0) - previousAttack);
         if (attackDelta > 0 && this.player?.hp > 0) this.receivePvpDamage(attackDelta, `${message.name || 'Соперник'} · PvP`);
@@ -3119,7 +3288,7 @@ class Game {
     }
     else if (message.type === 'active-skill' && message.skill) this.receivePvpActiveSkill(message.skill);
   }
-  applyThreePlayerRoster(players) {
+  applyThreePlayerRoster(players, classSelectionPending = false) {
     if (!this.pvp) return;
     const previousState = this.pvp.remoteState;
     const previousAt = this.pvp.remoteStateAt;
@@ -3130,11 +3299,12 @@ class Game {
       this.pvp.remoteState = previousPlayers[player.uid]?.state || null;
       this.pvp.remoteStateAt = previousPlayers[player.uid]?.stateAt || performance.now();
       const checked = this.validatePvpRemoteState(player.state);
-      if (checked.ok) validPlayers.push({ uid: player.uid, name: String(player.name || 'Игрок').slice(0, 20), online: true, state: checked.state, stateAt: performance.now() });
+      if (checked.ok) validPlayers.push({ uid: player.uid, name: String(player.name || 'Игрок').slice(0, 20), online: true, state: checked.state, stateAt: performance.now(), choosing: player.choosing || null, paused: Boolean(player.paused), classId: PLAYER_CLASSES[player.classId] ? player.classId : 'technician' });
     }
     this.pvp.remoteState = previousState;
     this.pvp.remoteStateAt = previousAt;
     this.pvp.remotePlayers = Object.fromEntries(validPlayers.map(player => [player.uid, player]));
+    this.pvp.classSelectionPending = Boolean(classSelectionPending);
     const host = validPlayers.find(player => player.uid === this.pvp.opponentUid);
     if (host?.state) { this.pvp.remoteState = host.state; this.pvp.remotePlayer = host; }
   }
@@ -3142,12 +3312,16 @@ class Game {
   publishThreePlayerRoster() {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.maxPlayers < 2) return;
-    const players = [{ uid: pvp.uid, name: pvp.name, state: this.currentPvpState() }];
+    const byUid = new Map();
+    byUid.set(pvp.uid, { uid: pvp.uid, name: pvp.name, classId: this.player?.classId || pvp.classId, choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), state: this.currentPvpState() });
     for (const player of Object.values(pvp.remotePlayers || {})) {
-      if (player?.uid && player.state) players.push({ uid: player.uid, name: player.name || 'Соперник', state: player.state });
+      if (player?.uid && player.state) byUid.set(player.uid, { uid: player.uid, name: player.name || 'Соперник', classId: player.classId || 'technician', choosing: player.choosing || null, paused: Boolean(player.paused), state: player.state });
     }
-    for (const peer of Object.values(pvp.threePeers || {})) if (peer.state) players.push({ uid: peer.uid, name: peer.name || 'Соперник', state: peer.state });
-    const payload = JSON.stringify({ type: 'roster', players });
+    for (const peer of Object.values(pvp.threePeers || {})) if (peer.state) byUid.set(peer.uid, { uid: peer.uid, name: peer.name || 'Соперник', classId: peer.classId || 'technician', choosing: peer.choosing || null, paused: Boolean(peer.paused), state: peer.state });
+    const players = [...byUid.values()];
+    const expected = Math.max(1, Number(pvp.actualPlayerCount || pvp.matchPlayerUids?.length) || 1);
+    pvp.classSelectionPending = players.length < expected || players.some(player => player.choosing === 'class');
+    const payload = JSON.stringify({ type: 'roster', players, classSelectionPending: pvp.classSelectionPending });
     for (const peer of [pvp.rtc, ...Object.values(pvp.threePeers || {})]) if (peer?.channel?.readyState === 'open') peer.channel.send(payload);
   }
 
@@ -4033,14 +4207,19 @@ class Game {
     if (!pvp?.started) return;
     if (this.integrationShopWait) return;
     const remoteLevelChoice = (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && pvp.remoteChoosing === 'levelup';
-    const showWait = Boolean(!this.isBattleRoyale && (pvp.connectionLost || pvp.remotePaused || (pvp.remoteChoosing && !pvp.choosing && !remoteLevelChoice)) && !pvp.matchOver);
+    const classSelectionWait = Boolean(pvp.classSelectionPending && pvp.choosing !== 'class');
+    const showWait = Boolean((classSelectionWait || (!this.isBattleRoyale && (pvp.connectionLost || pvp.remotePaused || (pvp.remoteChoosing && !pvp.choosing && !remoteLevelChoice)))) && !pvp.matchOver);
     const modal = document.getElementById('modal-pvp-wait');
     modal.style.display = showWait ? 'flex' : 'none';
     if (showWait) {
-      document.getElementById('pvp-wait-head').textContent = pvp.connectionLost
+      document.getElementById('pvp-wait-head').textContent = classSelectionWait
+        ? '🧑‍💻 Выбор класса'
+        : pvp.connectionLost
         ? '🔄 Связь потеряна — переподключаемся'
         : pvp.remotePaused ? '⏸ Игра приостановлена' : '⏳ Соперник выбирает';
-      document.getElementById('pvp-wait-message').textContent = pvp.connectionLost
+      document.getElementById('pvp-wait-message').textContent = classSelectionWait
+        ? 'Вы выбрали класс. Матч приостановлен, пока остальные игроки не сделают свой выбор.'
+        : pvp.connectionLost
         ? `Игра приостановлена. ${pvp.connectionLostReason || 'Восстанавливаем прямое соединение; прогресс матча сохранён.'}`
         : pvp.remotePaused
         ? `${pvp.remotePlayer?.name || 'Второй игрок'} поставил игру на паузу. Ожидаем продолжения.`
@@ -4900,6 +5079,7 @@ class Game {
     const activeSpeedMult = player.speedMult + (player.speedBuffTimer > 0 ? 0.5 : 0);
     const cooldown = player.cdMult * (player.turboBuffTimer > 0 ? 0.5 : 1);
     const currentStats = [
+      { icon: '🧑‍💻', name: 'Класс', value: player.className || 'Технарь' },
       { icon: '❤️', name: 'Здоровье', value: `${Math.ceil(player.hp)} / ${player.maxHp}` },
       { icon: '⚔️', name: 'Урон', value: `×${activeDamage.toFixed(2)}${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
       { icon: '⚡', name: 'Скорость бега', value: `${(player.baseSpeed * activeSpeedMult).toFixed(2)} · ×${activeSpeedMult.toFixed(2)}` },
@@ -5213,12 +5393,12 @@ class Game {
   applyOfficeEventDebuff(effect) {
     if (!this.player) return;
     if (effect === 'server70') {
-      this.player.stunTimer = Math.max(this.player.stunTimer || 0, 3.5);
+      this.player.stunTimer = Math.max(this.player.stunTimer || 0, 1);
       this.keys = {};
       this.mouseMoveAim = null;
       this.mouseMovePointerId = null;
-      this.showBanner('🖥️ Кто-то зашёл на 70-й сервер и тебя выкинуло. Управление заблокировано на 3,5 секунды.');
-      this.addPopup(this.player.x, this.player.y - 28, 'ОТКЛЮЧЕНО ОТ СЕРВЕРА · 3,5с', '#ff7675');
+      this.showBanner('🖥️ Кто-то зашёл на 70-й сервер и тебя выкинуло. Управление заблокировано на 1 секунду.');
+      this.addPopup(this.player.x, this.player.y - 28, 'ОТКЛЮЧЕНО ОТ СЕРВЕРА · 1с', '#ff7675');
     } else if (effect === 'memory59') {
       this.player.slowTimer = Math.max(this.player.slowTimer || 0, 5);
       this.player.slowFactor = Math.min(this.player.slowFactor || 1, 0.4);
@@ -5400,8 +5580,8 @@ class Game {
   }
 
   spawnMegaBoss() {
-    // Очищение не проходит через смерть мобов: оно не даёт опыт, валюту, очки или лут.
-    this.enemies = this.enemies.filter(enemy => enemy.is24hPursuer);
+    // Обычные мобы остаются на карте; спавн новых волн остановлен в spawnDirector,
+    // пока большой босс активен.
     this.enemyProjectiles = [];
     this.puddles = [];
     this.bossWarnings = [];
@@ -5439,7 +5619,7 @@ class Game {
     this.enemies.push(boss);
     this.showBanner(`🚨 БОЛЬШОЙ БОСС В ЦЕНТРЕ КАРТЫ: ${boss.name}!`);
     this.addPopup(boss.x, boss.y - boss.size - 20, `⚠️ ${variant.label}`, '#ff7675');
-    this.log(`Плановое окно 5 минут: карта очищена без выдачи опыта. В центре развёрнута проблема: ${boss.name}.`);
+    this.log(`Плановое окно 5 минут: обычные мобы остаются на карте, новые волны остановлены. В центре развёрнута проблема: ${boss.name}.`);
     this.sound.boss();
   }
 
@@ -6053,6 +6233,54 @@ class Game {
             });
           }
           this.sound.playTone(460, 'sine', 0.04, 0.08);
+        }
+      }
+    }
+
+    if (this.weapons.table_chart) {
+      const w = this.weapons.table_chart;
+      w.timer -= dt;
+      if (w.timer <= 0 && (this.enemies.length > 0 || this.getPvpWeaponTargets().length > 0)) {
+        w.timer = WEAPONS_DEF.table_chart.baseCooldown * cdFactor;
+        const target = this.getNearestWeaponTarget(480);
+        if (target) {
+          const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
+          const shotCount = 1 + this.player.multishotLevel;
+          for (let i = 0; i < shotCount; i++) {
+            const shotAngle = angle + (i - (shotCount - 1) / 2) * 0.12;
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.table_chart.baseDmg + (w.lvl - 1) * 8);
+            this.projectiles.push({
+              x: this.player.x, y: this.player.y,
+              vx: Math.cos(shotAngle) * 9.0, vy: Math.sin(shotAngle) * 9.0,
+              dmg: hit.dmg, isCrit: hit.isCrit,
+              life: 1.35, icon: '📊', color: '#27ae60', size: 10
+            });
+          }
+          this.sound.playTone(390, 'triangle', 0.06, 0.1);
+        }
+      }
+    }
+
+    if (this.weapons.support_phone) {
+      const w = this.weapons.support_phone;
+      w.timer -= dt;
+      if (w.timer <= 0 && (this.enemies.length > 0 || this.getPvpWeaponTargets().length > 0)) {
+        w.timer = WEAPONS_DEF.support_phone.baseCooldown * cdFactor;
+        const target = this.getNearestWeaponTarget(520);
+        if (target) {
+          const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
+          const shotCount = 1 + this.player.multishotLevel;
+          for (let i = 0; i < shotCount; i++) {
+            const shotAngle = angle + (i - (shotCount - 1) / 2) * 0.1;
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.support_phone.baseDmg + (w.lvl - 1) * 8);
+            this.projectiles.push({
+              x: this.player.x, y: this.player.y,
+              vx: Math.cos(shotAngle) * 9.5, vy: Math.sin(shotAngle) * 9.5,
+              dmg: hit.dmg, isCrit: hit.isCrit,
+              life: 1.55, icon: '☎️', color: '#e17055', size: 12
+            });
+          }
+          this.sound.playTone(520, 'sine', 0.08, 0.08);
         }
       }
     }

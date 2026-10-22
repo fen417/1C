@@ -1425,13 +1425,13 @@ class SoundEngine {
     const rootNotes = [55, 65.41, 49, 58.27];
 
     // Неспешный half-time грув: низкий пульс, сухой хлопок и холодная подложка.
-    if (barStep === 0 || barStep === 8 || (boss > 0.45 && (barStep === 4 || barStep === 12))) {
+    if (barStep === 0 || barStep === 8 || (mega > 0.65 && (barStep === 4 || barStep === 12))) {
       const kick = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       kick.type = 'sine';
       kick.frequency.setValueAtTime(92 + mega * 20, time);
       kick.frequency.exponentialRampToValueAtTime(34, time + 0.24);
-      gain.gain.setValueAtTime(0.24 + boss * 0.12, time);
+      gain.gain.setValueAtTime(0.19 + mega * 0.08, time);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
       kick.connect(gain); gain.connect(this.musicBus);
       kick.start(time); kick.stop(time + 0.34);
@@ -1446,7 +1446,7 @@ class SoundEngine {
       filter.frequency.setValueAtTime(1500 + boss * 700, time);
       filter.Q.value = 0.8;
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.12 + boss * 0.12, time + 0.006);
+      gain.gain.linearRampToValueAtTime(0.11 + boss * 0.08, time + 0.006);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
       noise.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
       noise.start(time); noise.stop(time + 0.2);
@@ -1461,7 +1461,7 @@ class SoundEngine {
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(180 + boss * 420, time);
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.13 + boss * 0.08, time + 0.018);
+      gain.gain.linearRampToValueAtTime(0.09 + mega * 0.06, time + 0.018);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
       bass.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
       bass.start(time); bass.stop(time + 0.3);
@@ -1491,7 +1491,7 @@ class SoundEngine {
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(380 + boss * 500, time);
         gain.gain.setValueAtTime(0.0001, time);
-        gain.gain.linearRampToValueAtTime(0.018 + boss * 0.012, time + 0.3);
+        gain.gain.linearRampToValueAtTime(0.014 + boss * 0.006, time + 0.3);
         gain.gain.exponentialRampToValueAtTime(0.0001, time + 2.2);
         pad.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
         pad.start(time); pad.stop(time + 2.25);

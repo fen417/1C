@@ -3600,10 +3600,10 @@ class Game {
   getPvpRenderPosition(id, x, y) {
     const samples = this.pvp?.positionHistory?.[id];
     if (!samples?.length) return { x, y };
-    // Чем больше лобби, тем реже приходят тяжёлые снимки мира.
+    // Позиции идут каждые 66 мс в дуэли и каждые 100 мс в лобби от 3 игроков.
     const players = Math.max(2, Number(this.pvp?.actualPlayerCount) || 2);
-    const snapshotInterval = players >= 3 ? 100 : 66;
-    const targetTime = performance.now() - Math.max(80, snapshotInterval * 1.25);
+    const positionInterval = players >= 3 ? 100 : 66;
+    const targetTime = performance.now() - Math.max(100, positionInterval * 1.5);
     let before = null;
     let after = null;
     let beforeIndex = -1;
@@ -4016,7 +4016,7 @@ class Game {
         claimedDrops: this.pvp.host ? undefined : (this.pvp.claimedDrops || {})
       };
       this.sendPvpNetworkState(state);
-      if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.sendPvpWorldPositions();
+      if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 2) this.sendPvpWorldPositions();
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.publishThreePlayerRoster();
       if (this.pvp.host && this.isBattleRoyale && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
         const alive = [{ uid: this.pvp.uid, name: this.pvp.name, over: p.hp <= 0 }];
@@ -4182,8 +4182,11 @@ class Game {
           entryLength += entry.length + (entries.length ? 1 : 0);
           entries.push(entry);
         }
-        chunks.push({ collection, entries: entries.join(',') });
+        if (entries.length) chunks.push({ collection, entries: entries.join(',') });
       }
+      // Empty collections are already represented by the receiver's empty defaults.
+      // Keep one marker chunk so an entirely empty world still advances its revision.
+      if (!chunks.length) chunks.push({ collection: '', entries: '' });
       const packets = chunks.map((chunk, index) =>
         `{"type":"world-chunk","revision":${peerWorld.revision},"positionSequence":${Number(peerWorld.positionSequence) || 0},"index":${index},"total":${chunks.length},"collection":${JSON.stringify(chunk.collection)},"items":{${chunk.entries}}}`);
       const encodedBytes = packets.reduce((sum, packet) => sum + encoder.encode(packet).byteLength, 0);
@@ -4210,8 +4213,8 @@ class Game {
       for (const name of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) pending.world[name] = {};
     }
     if (revision !== pending.revision || total !== pending.total) return;
-    if (!Object.prototype.hasOwnProperty.call(pending.world, message.collection)) return;
-    Object.assign(pending.world[message.collection], message.items || {});
+    if (message.collection && !Object.prototype.hasOwnProperty.call(pending.world, message.collection)) return;
+    if (message.collection) Object.assign(pending.world[message.collection], message.items || {});
     pending.received.add(index);
     if (pending.received.size === pending.total) {
       pvp.pendingWorldSnapshot = null;

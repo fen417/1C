@@ -1239,8 +1239,10 @@ class SoundEngine {
     const megaTarget = aliveMegaBosses > 0 ? 1 : 0;
     const megaTransition = 1 - Math.exp(-dt / (megaTarget > this.megaBossIntensity ? 0.45 : 1.8));
     this.megaBossIntensity += (megaTarget - this.megaBossIntensity) * megaTransition;
+
+    // В БР темп разгоняется с 86 до ~98-100 на боссе и до 110+ на мегабоссе
     this.bpm = this.getActiveTrack() === 'br'
-      ? 86
+      ? 86 + this.bossIntensity * 14 + this.megaBossIntensity * 22
       : 132 + this.bossIntensity * 40 + this.megaBossIntensity * 68;
   }
 
@@ -1260,9 +1262,15 @@ class SoundEngine {
     const secondsPerBeat = 60.0 / this.bpm;
     const stepDuration = secondsPerBeat / 4;
 
-    while (this.nextNoteTime < this.ctx.currentTime + 0.12) {
-      this.playStep(this.step, this.nextNoteTime);
-      this.nextNoteTime += stepDuration;
+    try {
+      while (this.nextNoteTime < this.ctx.currentTime + 0.12) {
+        this.playStep(this.step, this.nextNoteTime);
+        this.nextNoteTime += stepDuration;
+        this.step = (this.step + 1) % 64;
+      }
+    } catch (e) {
+      console.warn("Audio scheduling error:", e);
+      this.nextNoteTime = this.ctx.currentTime + 0.05;
       this.step = (this.step + 1) % 64;
     }
   }
@@ -1424,62 +1432,76 @@ class SoundEngine {
     const mega = this.megaBossIntensity;
     const rootNotes = [55, 65.41, 49, 58.27];
 
-    // Неспешный half-time грув: низкий пульс, сухой хлопок и холодная подложка.
-    if (barStep === 0 || barStep === 8 || (mega > 0.65 && (barStep === 4 || barStep === 12))) {
+    // Бочка: в покое на 0 и 8; при боссе становится плотнее и добавляет сбивки
+    const kickHit = barStep === 0 || barStep === 8 ||
+      (boss > 0.35 && (barStep === 4 || barStep === 10 || barStep === 14)) ||
+      (mega > 0.65 && (barStep === 4 || barStep === 12));
+    if (kickHit) {
       const kick = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      kick.type = 'sine';
-      kick.frequency.setValueAtTime(92 + mega * 20, time);
-      kick.frequency.exponentialRampToValueAtTime(34, time + 0.24);
-      gain.gain.setValueAtTime(0.19 + mega * 0.08, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
+      kick.type = boss > 0.4 ? 'triangle' : 'sine';
+      kick.frequency.setValueAtTime(92 + boss * 32 + mega * 20, time);
+      kick.frequency.exponentialRampToValueAtTime(32, time + 0.22);
+      gain.gain.setValueAtTime(0.20 + boss * 0.10 + mega * 0.08, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.30);
       kick.connect(gain); gain.connect(this.musicBus);
-      kick.start(time); kick.stop(time + 0.34);
+      kick.start(time); kick.stop(time + 0.32);
     }
 
-    if ((barStep === 4 || barStep === 12 || (mega > 0.3 && barStep === 15)) && this.noiseBuffer) {
+    // Снейр / хлопок: акцент на 4 и 12, при боссе добавляются синкопы для напора
+    const snareHit = barStep === 4 || barStep === 12 ||
+      (boss > 0.35 && (barStep === 7 || barStep === 15)) ||
+      (mega > 0.3 && barStep === 15);
+    if (snareHit && this.noiseBuffer) {
       const noise = this.ctx.createBufferSource();
       const filter = this.ctx.createBiquadFilter();
       const gain = this.ctx.createGain();
       noise.buffer = this.noiseBuffer;
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1500 + boss * 700, time);
+      filter.frequency.setValueAtTime(1400 + boss * 800, time);
       filter.Q.value = 0.8;
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.11 + boss * 0.08, time + 0.006);
+      gain.gain.linearRampToValueAtTime(0.12 + boss * 0.09, time + 0.006);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
       noise.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
       noise.start(time); noise.stop(time + 0.2);
     }
 
-    if ([0, 8].includes(barStep)) {
+    // Бас: при боссе становится плотнее и добавляет шаги в верхнюю октаву
+    const bassHit = [0, 8].includes(barStep) || (boss > 0.35 && [2, 6, 10, 14].includes(barStep));
+    if (bassHit) {
       const bass = this.ctx.createOscillator();
       const filter = this.ctx.createBiquadFilter();
       const gain = this.ctx.createGain();
-      bass.type = 'triangle';
-      bass.frequency.setValueAtTime(rootNotes[bar] * (barStep === 10 ? 1.5 : 1), time);
+      bass.type = boss > 0.4 ? 'sawtooth' : 'triangle';
+      const octaveMult = (boss > 0.35 && barStep % 4 !== 0) ? 1.5 : 1;
+      bass.frequency.setValueAtTime(rootNotes[bar] * octaveMult, time);
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(180 + boss * 420, time);
+      filter.frequency.setValueAtTime(220 + boss * 600, time);
       gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.09 + mega * 0.06, time + 0.018);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+      gain.gain.linearRampToValueAtTime(0.10 + boss * 0.07 + mega * 0.06, time + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.24);
       bass.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
-      bass.start(time); bass.stop(time + 0.3);
+      bass.start(time); bass.stop(time + 0.26);
     }
 
-    if ((barStep === 6 || barStep === 14) && this.noiseBuffer) {
+    // Хэт: при боссе переходит в частую пульсацию каждые 2 шага
+    const hatHit = (barStep === 6 || barStep === 14) || (boss > 0.25 && (barStep % 2 === 0));
+    if (hatHit && this.noiseBuffer) {
       const hat = this.ctx.createBufferSource();
       const filter = this.ctx.createBiquadFilter();
       const gain = this.ctx.createGain();
       hat.buffer = this.noiseBuffer;
       filter.type = 'highpass';
-      filter.frequency.setValueAtTime(7800 - boss * 1900, time);
-      gain.gain.setValueAtTime(0.035 + boss * 0.035, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.055);
+      filter.frequency.setValueAtTime(7400 - boss * 1500, time);
+      const isAccent = barStep === 6 || barStep === 14;
+      gain.gain.setValueAtTime((isAccent ? 0.05 : 0.025) + boss * 0.04, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
       hat.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
-      hat.start(time); hat.stop(time + 0.06);
+      hat.start(time); hat.stop(time + 0.07);
     }
 
+    // Фоновый пэд
     if (barStep === 0) {
       const padRoot = rootNotes[bar] * 2;
       for (const ratio of [1, 1.2, 1.498]) {
@@ -1489,7 +1511,7 @@ class SoundEngine {
         pad.type = 'sine';
         pad.frequency.setValueAtTime(padRoot * ratio, time);
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(380 + boss * 500, time);
+        filter.frequency.setValueAtTime(380 + boss * 400, time);
         gain.gain.setValueAtTime(0.0001, time);
         gain.gain.linearRampToValueAtTime(0.014 + boss * 0.006, time + 0.3);
         gain.gain.exponentialRampToValueAtTime(0.0001, time + 2.2);
@@ -1498,23 +1520,30 @@ class SoundEngine {
       }
     }
 
-    // Босс добавляет пульсирующий высокий мотив, мегабосс — тяжёлые индустриальные акценты.
-    if (boss > 0.18 && [2, 10].includes(barStep)) {
-      const notes = [1, 1.2, 1.498, 1.782];
-      const lead = this.ctx.createOscillator();
-      const filter = this.ctx.createBiquadFilter();
-      const gain = this.ctx.createGain();
-      lead.type = 'triangle';
-      lead.frequency.setValueAtTime(rootNotes[bar] * 4 * notes[(Math.floor(barStep / 4) + bar) % notes.length], time);
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(900 + boss * 1500, time);
-      gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(0.025 + boss * 0.045, time + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.2);
-      lead.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
-      lead.start(time); lead.stop(time + 0.22);
+    // Лид-мотив босса: чёткий синтезированный арпеджио-рифф
+    if (boss > 0.18 && [2, 6, 10, 14].includes(barStep)) {
+      const notes = [1, 1.2, 1.498, 1.782, 2.0, 1.498];
+      const noteIdx = (Math.floor(barStep / 2) + bar) % notes.length;
+      const noteMultiplier = notes[noteIdx] || 1;
+      const leadFreq = rootNotes[bar] * 4 * noteMultiplier;
+
+      if (Number.isFinite(leadFreq)) {
+        const lead = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+        lead.type = boss > 0.5 ? 'sawtooth' : 'triangle';
+        lead.frequency.setValueAtTime(leadFreq, time);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(900 + boss * 1600, time);
+        gain.gain.setValueAtTime(0.0001, time);
+        gain.gain.linearRampToValueAtTime(0.035 + boss * 0.05, time + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.2);
+        lead.connect(filter); filter.connect(gain); gain.connect(this.musicBus);
+        lead.start(time); lead.stop(time + 0.22);
+      }
     }
 
+    // Индустриальный стаб для мегабосса
     if (mega > 0.65 && [7, 15].includes(barStep)) {
       const stab = this.ctx.createOscillator();
       const filter = this.ctx.createBiquadFilter();

@@ -686,7 +686,7 @@
         <div class="act-cd-overlay"></div>
       </div>
     </div>
-    <div id="br-center-marker" aria-label="Направление к центру карты"><span id="br-center-arrow">▲</span> ЦЕНТР · <span id="br-center-distance">0</span> м · <span id="br-zone-status">СЖАТИЕ · 01:00</span></div>
+    <div id="br-center-marker" aria-label="Направление к центру карты"><span id="br-center-arrow">↑</span> ЦЕНТР · <span id="br-center-distance">0</span> м · <span id="br-zone-status">СЖАТИЕ · 01:00</span></div>
     <div id="hud-consumables"></div>
     <div id="dash-hud">💨 Рывок · ПКМ / Shift</div>
 
@@ -7175,10 +7175,10 @@ class Game {
     const zoneStatus = document.getElementById('br-zone-status');
     if (zoneStatus) {
       const ratio = this.getBattleRoyaleSafeAreaRatio();
-      const remaining = 60 - (Math.floor(this.time) % 60);
+      const remaining = 45 - (Math.floor(this.time) % 45);
       const distance = Math.hypot(dx, dy);
       const outside = distance > this.getBattleRoyaleSafeRadius();
-      zoneStatus.textContent = outside ? '⚠ ВНЕ ЗОНЫ · УРОН 2% HP/с'
+      zoneStatus.textContent = outside ? '⚠ ВНЕ ЗОНЫ · УРОН 18,4% HP/с'
         : ratio <= 0.05 ? 'ФИНАЛЬНАЯ ЗОНА'
           : `СЖАТИЕ · ${Math.floor(remaining / 60).toString().padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
       zoneStatus.style.color = outside ? '#ff7675' : '#ffe08a';
@@ -7188,8 +7188,8 @@ class Game {
   getBattleRoyaleSafeAreaRatio() {
     const mapArea = this.MAP_SIZE * this.MAP_SIZE;
     const initialSafeArea = Math.PI * (this.MAP_SIZE / Math.SQRT2) ** 2;
-    const elapsedMinutes = Math.floor(Math.max(0, this.time) / 60);
-    return Math.max(0.05, (initialSafeArea - elapsedMinutes * mapArea * 0.1) / initialSafeArea);
+    const shrinkIntervals = Math.floor(Math.max(0, this.time) / 45);
+    return Math.max(0.05, (initialSafeArea - shrinkIntervals * mapArea * 0.1) / initialSafeArea);
   }
 
   getBattleRoyaleSafeRadius() {
@@ -7211,11 +7211,11 @@ class Game {
     if (this.brZoneDamageAccumulator < 0.25) return;
     const damageTime = this.brZoneDamageAccumulator;
     this.brZoneDamageAccumulator = 0;
-    const damage = Math.min(this.player.hp, this.player.maxHp * 0.02 * damageTime);
+    const damage = Math.min(this.player.hp, this.player.maxHp * 0.184 * damageTime);
     this.player.hp = Math.max(0, this.player.hp - damage);
     this.lastPlayerDamage = { source: 'Сжимающаяся зона Battle Royale', damage, applied: damage };
     if (this.brZoneWarningTimer <= 0) {
-      this.addPopup(this.player.x, this.player.y - 24, `⚠️ ВНЕ ЗОНЫ · -${Math.ceil(this.player.maxHp * 0.02)} HP/с`, '#ff7675');
+      this.addPopup(this.player.x, this.player.y - 24, `⚠️ ВНЕ ЗОНЫ · -${(this.player.maxHp * 0.184).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} HP/с`, '#ff7675');
       this.brZoneWarningTimer = 1.5;
     }
     this.updateHUD();
@@ -7324,7 +7324,7 @@ class Game {
 
     // Логотип 1С
     this.ctx.save();
-    this.ctx.translate(2000, 2000);
+    this.ctx.translate(this.MAP_SIZE / 2, this.MAP_SIZE / 2);
     this.ctx.fillStyle = 'rgba(255, 210, 0, 0.08)';
     this.ctx.beginPath();
     this.ctx.arc(0, 0, 160, 0, Math.PI * 2);

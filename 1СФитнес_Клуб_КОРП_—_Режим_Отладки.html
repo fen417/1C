@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.3.0</title>
+<title>1С:Фитнес Клуб КОРП 2.3.1</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -641,7 +641,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.3.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.3.1 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -760,7 +760,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.3.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.3.1</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -769,16 +769,16 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.3.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.3.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 2.3.0 — «Мобы не ушли в отпуск»</h3>
-              <p>В начале каждого забега появился выбор одного из четырёх классов со стартовыми характеристиками и оружием; считыватель IronLogic теперь стреляет по ближайшему противнику. В сетевой игре выбранные игроки ждут остальных на общей паузе. Большой босс больше не вычищает обычных мобов с карты и останавливает новые волны. Урон от события «70-й сервер» оглушает на 1 секунду. Клавиша L завершает забег и на русской раскладке.</p>
+              <h3>Версия 2.3.1 — «Интеграции под огнём»</h3>
+              <p>Добавлены три опасных офисных события. В таблице рекордов теперь виден класс игрока, а читерков можно скрыть в настройках.</p>
             </div>
             <div class="release-notes">
-              <h3>Версия 2.2.0 — «Релиз без согласования»</h3>
-              <p>В Battle Royale поставки с расходниками появляются каждые 30 секунд. Добавлены «Администратор только на чтение», «Дубль клиента», события «Пятничный релиз» и «Ответить всем», предметы «Сетевой фильтр» и «Второй монитор» (в PvP отмечает игроков синими, боссов красными стрелками), а также активное умение «Откат транзакций». Карточки легендарного выбора выровнены, а «Переход на 8.5» получил квадратную иконку. Панель большого босса перенесена над HUD расходников. Настройки звука сохраняются после перезапуска; старые версии в истории обновлений свёрнуты.</p>
+              <h3>Версия 2.3.0 — «Мобы не ушли в отпуск»</h3>
+              <p>В начале каждого забега появился выбор одного из четырёх классов со стартовыми характеристиками и оружием; считыватель IronLogic теперь стреляет по ближайшему противнику. В сетевой игре выбранные игроки ждут остальных на общей паузе. Большой босс больше не вычищает обычных мобов с карты и останавливает новые волны. Урон от события «70-й сервер» оглушает на 1 секунду. Клавиша L завершает забег и на русской раскладке.</p>
             </div>
           </div>
         </div>
@@ -856,6 +856,10 @@
           <input id="collapse-accepted-tickets" type="checkbox" checked onchange="game.setCollapseAcceptedTickets(this.checked)">
           <span><b>Сворачивать принятые тикеты</b><br><span style="color:#666;">Скрывать описание, оставляя заголовок и цель</span></span>
         </label>
+        <label class="release-notes" style="display:flex; align-items:center; gap:9px; margin-bottom:14px; font-size:12px;">
+          <input id="hide-cheaters-leaderboard" type="checkbox" onchange="game.setHideCheatersFromLeaderboard(this.checked)">
+          <span><b>Скрывать читерков в таблице рекордов</b><br><span style="color:#666;">Убирает записи с подписью «Читерок» и пересчитывает места</span></span>
+        </label>
         <div style="text-align:right;"><button class="btn-1c" onclick="game.closeSettings()">Назад в меню</button></div>
       </div>
     </div>
@@ -866,7 +870,8 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке.</p></details>
+        <details class="release-notes"><summary><h3>2.3.1 — «Интеграции под огнём»</h3></summary><p>Добавлены три офисных события: ковровая бомбардировка с последовательными ударами по области вокруг игроков и боссов; метеоритный дождь, который длится 6 секунд, а после каждого попадания оставляет горящую зону на 3 секунды; порыв ветра, на 3 секунды сдувающий игроков и мобов к случайному краю карты. Зоны падения показывают предупреждение, события синхронизируются в сетевой игре, урон получают игроки, обычные мобы и боссы. В таблице рекордов отображается выбранный класс; для старых результатов поле остаётся пустым. В настройках можно скрыть записи с подписью «Читерок», места видимых результатов пересчитываются.</p></details>
+        <details class="release-notes" open><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Дополнено в 2.3.1 новыми офисными событиями: «Клиент сгорел и уходит с 1С» (бомбардировка), «Клиент: опять ваши интеграции не работают» (метеориты с горящими зонами) и «Клиент громко дышит в трубку» (порыв ветра).</p></details>
         <details class="release-notes"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
         <details class="release-notes"><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два новых события, влияющих на игрока. В Battle Royale безопасная зона забирает 10% площади карты каждые 45 секунд; урон вне неё увеличен до 18,4% максимального HP в секунду. Стрелка направления и логотип 1С теперь указывают на корректный центр увеличенной карты. Рывок на ПКМ срабатывает и при удержании ЛКМ для движения. Неуязвимый преследователь RuDesktop, появляющийся с 15-й минуты, теперь выделяется белым квадратом с контрастной рамкой и заметной подписью.</p></details>
         <details class="release-notes"><summary><h3>2.0.0 — «Переход на 8.5»</h3></summary><p>После победы над первым большим боссом на пятой минуте открывается выбор одной из трёх легендарных миграций в оранжево-коричневой рамке. «Переход на 8.5» меняет модель героя на квадрат со скруглёнными углами и усиливает его, но снижает скорость и получаемый опыт; две другие легендарки предлагают альтернативные сочетания силы и недостатка. Добавлен тикет «Клиент: “У меня пропала кнопка”»: кнопка динамического обновления временно скрывается на время диагностики. Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Сетевая комната теперь вмещает до восьми человек: хост видит список ников и запускает матч вручную. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. В классическом PvP звонок отдела интеграций сначала собирает решение каждого игрока: согласившиеся открывают собственный магазин, отказавшиеся ждут на паузе, пока покупатели завершат выбор. При 4–8 игроках прокачка не останавливает матч: значок «+» открывает улучшения, а мобы временно теряют выбравшего игрока из агро. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках). Добавлен режим Battle Royale: карта увеличена в восемь раз по площади, игроки появляются у разных углов, магазина и видимых ячеек расходников нет, а расходники иногда выпадают из мобов. Повышение уровня в Battle Royale не останавливает матч: значок «+» открывает выбор, пока мобы временно теряют игрока из агро. Безопасная зона сжимается к центру, забирая 10% площади карты в минуту; вне неё игрок теряет 2% максимального HP в секунду. Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд. Тикеты выдаются случайно из общего пула, без выбора игроком. Таблица рекордов показывает режим и число игроков.</p></details>
@@ -973,6 +978,7 @@
               <tr>
                 <th style="width:40px;">#</th>
                 <th>Разработчик</th>
+                <th>Класс</th>
                 <th>Версия</th>
                 <th>Режим</th>
                 <th>Игроки</th>
@@ -981,7 +987,7 @@
               </tr>
             </thead>
             <tbody id="lb-body">
-              <tr><td colspan="7" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
+              <tr><td colspan="8" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1049,7 +1055,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.3.0';
+const GAME_VERSION = '2.3.1';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
 const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
 
@@ -2343,6 +2349,7 @@ class Game {
     const savedClass = localStorage.getItem('1c_player_class');
     this.selectedClassId = PLAYER_CLASSES[savedClass] ? savedClass : 'technician';
     this.collapseAcceptedTickets = localStorage.getItem('1c_collapse_accepted_tickets') !== 'false';
+    this.hideCheatersFromLeaderboard = localStorage.getItem('1c_hide_cheaters_leaderboard') === 'true';
     document.getElementById('player-nickname').value = this.savedNick;
     document.getElementById('pvp-player-nickname').value = this.savedNick;
     this.updateClassSelectionUI();
@@ -2532,6 +2539,9 @@ class Game {
     this.particles = [];
     this.texts = [];
     this.bossWarnings = [];
+    this.officeHazards = [];
+    this.officeHazardSequence = 0;
+    this.localOfficeHazardState = new Map();
 
     this.spawnTimer = 0;
     this.trailTimer = 0;
@@ -3903,6 +3913,7 @@ class Game {
       for (const item of this.pickups) assignDropId(item, 'd');
       for (const projectile of this.enemyProjectiles) assignDropId(projectile, 'p');
       for (const warning of this.bossWarnings) assignDropId(warning, 'w');
+      for (const hazard of this.officeHazards) if (!hazard.syncId) hazard.syncId = `oh${++pvp.nextDropId}`;
     }
   }
 
@@ -3919,7 +3930,8 @@ class Game {
       gems: byId(this.gems),
       pickups: byId(this.pickups),
       enemyProjectiles: byId(this.enemyProjectiles),
-      bossWarnings: byId(this.bossWarnings)
+      bossWarnings: byId(this.bossWarnings),
+      officeHazards: byId(this.officeHazards)
     };
     if (pvp.host ? !Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : !pvp.rtc?.connected || pvp.rtc?.failed) return false;
     return this.sendPvpWorldSnapshot(world);
@@ -3931,7 +3943,7 @@ class Game {
     const channels = (pvp.host ? Object.values(pvp.peerConnections || {}).map(peer => peer.worldChannel) : [pvp.rtc?.worldChannel])
       .filter(channel => channel?.readyState === 'open');
     if (!channels.length) return false;
-    const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings'];
+    const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards'];
     const chunks = [];
     const chunkLimit = 12000;
     for (const collection of collectionNames) {
@@ -3972,7 +3984,7 @@ class Game {
     let pending = pvp.pendingWorldSnapshot;
     if (!pending || revision > pending.revision) {
       pending = pvp.pendingWorldSnapshot = { revision, total, received: new Set(), world: { revision } };
-      for (const name of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings']) pending.world[name] = {};
+      for (const name of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) pending.world[name] = {};
     }
     if (revision !== pending.revision || total !== pending.total) return;
     if (!Object.prototype.hasOwnProperty.call(pending.world, message.collection)) return;
@@ -3988,7 +4000,7 @@ class Game {
     const pvp = this.pvp;
     if (!pvp || pvp.host || !world || Number(world.revision || 0) <= Number(pvp.remoteWorldRevision || 0)) return;
     pvp.remoteWorldRevision = Number(world.revision || 0);
-    for (const collection of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings']) {
+    for (const collection of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) {
       for (const item of Object.values(world[collection] || {})) {
         this.recordPvpPosition(item.syncId, Number(item.x), Number(item.y));
       }
@@ -3998,6 +4010,7 @@ class Game {
     this.pickups = Object.values(world.pickups || {}).map(item => ({ ...item }));
     this.enemyProjectiles = Object.values(world.enemyProjectiles || {}).map(projectile => ({ ...projectile }));
     this.bossWarnings = Object.values(world.bossWarnings || {}).map(warning => ({ ...warning }));
+    this.officeHazards = Object.values(world.officeHazards || {}).map(hazard => ({ ...hazard }));
     const activeEnemyIds = new Set(this.enemies.map(enemy => enemy.syncId).filter(Boolean));
     for (const id of Object.keys(pvp.enemyDamageTotals || {})) {
       if (!activeEnemyIds.has(id) && performance.now() - Number(pvp.enemyDamageAt?.[id] || 0) > 2000) {
@@ -4270,12 +4283,19 @@ class Game {
     document.getElementById('music-volume-value').textContent = `${Math.round(this.sound.musicVolume * 100)}%`;
     document.getElementById('sfx-volume-value').textContent = `${Math.round(this.sound.sfxVolume * 100)}%`;
     document.getElementById('collapse-accepted-tickets').checked = this.collapseAcceptedTickets;
+    document.getElementById('hide-cheaters-leaderboard').checked = this.hideCheatersFromLeaderboard;
   }
 
   setCollapseAcceptedTickets(enabled) {
     this.collapseAcceptedTickets = Boolean(enabled);
     localStorage.setItem('1c_collapse_accepted_tickets', String(this.collapseAcceptedTickets));
     this.updateChallengeUI();
+  }
+
+  setHideCheatersFromLeaderboard(enabled) {
+    this.hideCheatersFromLeaderboard = Boolean(enabled);
+    localStorage.setItem('1c_hide_cheaters_leaderboard', String(this.hideCheatersFromLeaderboard));
+    if (document.getElementById('modal-lb').style.display === 'flex') this.fetchLeaderboard();
   }
   closeSettings() {
     document.getElementById('modal-settings').style.display = 'none';
@@ -5329,7 +5349,7 @@ class Game {
   }
 
   triggerOfficeEvent() {
-    const roll = Math.floor(Math.random() * 12);
+    const roll = Math.floor(Math.random() * 15);
     if (roll === 0) {
       this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
@@ -5372,10 +5392,197 @@ class Game {
     } else if (roll === 10) {
       this.announceOfficeEvent('📣 ПЯТНИЧНЫЙ РЕЛИЗ через 3 секунды! Тестовую базу опять не подняли.');
       this.fridayReleaseTimer = 3;
-    } else {
+    } else if (roll === 11) {
       this.announceOfficeEvent('📧 Клиент нажал «Ответить всем». Вся цепочка писем направляется к вам!');
       for (let i = 0; i < 5; i++) this.spawnEnemy('mango_client');
+    } else if (roll === 12) {
+      this.announceOfficeEvent('🔥 Клиент сгорел и уходит с 1С. Началась трёхсекундная ковровая бомбардировка!');
+      this.spawnOfficeBombardment();
+    } else if (roll === 13) {
+      this.announceOfficeEvent('☄️ Клиент: «Опять ваши интеграции не работают». Шесть секунд падают метеориты; места ударов будут гореть ещё три секунды!');
+      this.spawnOfficeMeteorShower();
+    } else {
+      const directions = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+      const direction = directions[Math.floor(Math.random() * directions.length)];
+      this.officeHazards.push({
+        syncId: this.createOfficeHazardId(), kind: 'wind', dx: direction.x, dy: direction.y,
+        startsAt: this.time + 0.12, endsAt: this.time + 3.12, speed: 520
+      });
+      const side = direction.x > 0 ? 'вправо' : direction.x < 0 ? 'влево' : direction.y > 0 ? 'вниз' : 'вверх';
+      this.announceOfficeEvent(`📞 Клиент громко дышит в трубку. Порыв ветра сдувает игроков и мобов ${side}, к краю карты!`);
     }
+  }
+
+  createOfficeHazardId() {
+    this.officeHazardSequence = (this.officeHazardSequence || 0) + 1;
+    return `office-${Math.floor(this.time * 1000)}-${this.officeHazardSequence}`;
+  }
+
+  getOfficeEventCenters() {
+    const centers = [];
+    const add = (x, y, type = 'player') => {
+      if (!Number.isFinite(Number(x)) || !Number.isFinite(Number(y))) return;
+      const point = { x: Number(x), y: Number(y), type };
+      if (!centers.some(existing => Math.hypot(existing.x - point.x, existing.y - point.y) < 160)) centers.push(point);
+    };
+    add(this.player?.x, this.player?.y, 'player');
+    if (this.pvp?.started && this.pvp.host) {
+      for (const player of Object.values(this.pvp.remotePlayers || {})) {
+        if (player?.state && !player.state.over && player.state.hp > 0) add(player.state.x, player.state.y, 'player');
+      }
+      const remote = this.pvp.remoteState;
+      if (remote && !remote.over && remote.hp > 0) add(remote.x, remote.y, 'player');
+    }
+    for (const enemy of this.enemies) {
+      if (enemy.isBoss && enemy.hp > 0) add(enemy.x, enemy.y, 'boss');
+    }
+    return centers;
+  }
+
+  randomOfficeHazardPoint(center, spread) {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.sqrt(Math.random()) * spread;
+    return {
+      x: Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.x + Math.cos(angle) * distance)),
+      y: Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.y + Math.sin(angle) * distance))
+    };
+  }
+
+  spawnOfficeBombardment() {
+    const startsAt = this.time;
+    const centers = this.getOfficeEventCenters();
+    const targets = centers.length ? centers : [{ x: this.MAP_SIZE / 2, y: this.MAP_SIZE / 2, type: 'player' }];
+    for (const center of targets) {
+      const strikes = center.type === 'boss' ? 5 : 7;
+      for (let i = 0; i < strikes; i++) {
+        const point = this.randomOfficeHazardPoint(center, center.type === 'boss' ? 520 : 680);
+        const impactAt = startsAt + 0.32 + i * (2.3 / Math.max(1, strikes - 1)) + Math.random() * 0.08;
+        this.officeHazards.push({
+          syncId: this.createOfficeHazardId(), kind: 'bomb', x: point.x, y: point.y,
+          radius: 132, damage: 27, impactAt, expiresAt: impactAt + 0.28,
+          resolved: false, resolvedAt: 0
+        });
+      }
+    }
+  }
+
+  spawnOfficeMeteorShower() {
+    const startsAt = this.time;
+    const centers = this.getOfficeEventCenters();
+    const targets = centers.length ? centers : [{ x: this.MAP_SIZE / 2, y: this.MAP_SIZE / 2, type: 'player' }];
+    for (const center of targets) {
+      for (let i = 0; i < 3; i++) {
+        const point = this.randomOfficeHazardPoint(center, center.type === 'boss' ? 520 : 620);
+        const impactAt = startsAt + 0.55 + i * 2.35 + Math.random() * 0.25;
+        this.officeHazards.push({
+          syncId: this.createOfficeHazardId(), kind: 'meteor', x: point.x, y: point.y,
+          radius: 92, damage: 24, burnDamage: 4.5, impactAt,
+          burnEndsAt: impactAt + 3, expiresAt: impactAt + 3,
+          impactDone: false, nextBurnAt: impactAt + 0.5
+        });
+      }
+    }
+  }
+
+  applyOfficeHazardPlayerDamage(damage, source) {
+    if (!this.player || this.player.hp <= 0) return;
+    if (this.player.shieldTimer > 0) {
+      this.addPopup(this.player.x, this.player.y - 22, '🛡️ ЩИТ ПОГЛОТИЛ УДАР', '#00cec9');
+      return;
+    }
+    const dodgeChance = this.pvp?.mode === 'pvp' ? Math.min(0.30, this.player.dodge || 0) : (this.player.dodge || 0);
+    if (Math.random() < dodgeChance) {
+      this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
+      return;
+    }
+    const applied = this.recordPlayerDamage(damage, source);
+    if (applied > 0) {
+      this.sound.hit();
+      this.addPopup(this.player.x, this.player.y - 22, `-${Math.ceil(applied)} HP`, '#ff7675');
+      this.updateHUD();
+    }
+    if (this.player.hp <= 0) this.gameOver(`База разрушена: ${source}.`);
+  }
+
+  updateOfficeHazards(dt) {
+    const hostSimulation = !this.pvp?.started || this.pvp.host;
+    const localState = this.localOfficeHazardState ||= new Map();
+    const activeIds = new Set();
+    const damageEnemies = (hazard, damage) => {
+      for (const enemy of this.enemies) {
+        if (enemy.hp <= 0 || enemy.is24hPursuer) continue;
+        if (Math.hypot(enemy.x - hazard.x, enemy.y - hazard.y) <= hazard.radius + enemy.size) {
+          enemy.hp -= damage;
+          this.createHitFX(enemy.x, enemy.y, hazard.kind === 'meteor' ? '#ff7b24' : '#ff7675', 3);
+        }
+      }
+    };
+    for (const hazard of this.officeHazards) {
+      const id = hazard.syncId;
+      if (id) activeIds.add(id);
+      if (hazard.kind === 'wind') {
+        if (this.time < hazard.startsAt || this.time >= hazard.endsAt) continue;
+        if (hostSimulation) {
+          for (const enemy of this.enemies) {
+            enemy.x = Math.max(this.BOUND_MIN + enemy.size, Math.min(this.BOUND_MAX - enemy.size, enemy.x + hazard.dx * hazard.speed * dt));
+            enemy.y = Math.max(this.BOUND_MIN + enemy.size, Math.min(this.BOUND_MAX - enemy.size, enemy.y + hazard.dy * hazard.speed * dt));
+          }
+        }
+        this.player.x = Math.max(this.BOUND_MIN + 18, Math.min(this.BOUND_MAX - 18, this.player.x + hazard.dx * hazard.speed * dt));
+        this.player.y = Math.max(this.BOUND_MIN + 18, Math.min(this.BOUND_MAX - 18, this.player.y + hazard.dy * hazard.speed * dt));
+        continue;
+      }
+
+      const local = id ? (localState.get(id) || {}) : {};
+      if (id && !localState.has(id)) localState.set(id, local);
+      if (hazard.kind === 'bomb' && this.time >= hazard.impactAt) {
+        if (hostSimulation && !hazard.resolved) {
+          hazard.resolved = true;
+          hazard.resolvedAt = this.time;
+          damageEnemies(hazard, hazard.damage);
+          if (Math.hypot(this.player.x - hazard.x, this.player.y - hazard.y) <= hazard.radius + 18) {
+            this.applyOfficeHazardPlayerDamage(hazard.damage, 'Ковровая бомбардировка');
+          }
+          this.createHitFX(hazard.x, hazard.y, '#ff5e3a', 12);
+        } else if (!hostSimulation && !local.bombHit && this.time <= hazard.expiresAt && Math.hypot(this.player.x - hazard.x, this.player.y - hazard.y) <= hazard.radius + 18) {
+          local.bombHit = true;
+          this.applyOfficeHazardPlayerDamage(hazard.damage, 'Ковровая бомбардировка');
+        }
+      } else if (hazard.kind === 'meteor') {
+        if (hostSimulation && !hazard.impactDone && this.time >= hazard.impactAt) {
+          hazard.impactDone = true;
+          hazard.nextBurnAt = hazard.impactAt + 0.5;
+          damageEnemies(hazard, hazard.damage);
+          if (Math.hypot(this.player.x - hazard.x, this.player.y - hazard.y) <= hazard.radius + 18) {
+            this.applyOfficeHazardPlayerDamage(hazard.damage, 'Метеоритный дождь');
+          }
+          this.createHitFX(hazard.x, hazard.y, '#ff7b24', 12);
+        } else if (!hostSimulation && !local.meteorImpact && this.time >= hazard.impactAt) {
+          local.meteorImpact = true;
+          if (Math.hypot(this.player.x - hazard.x, this.player.y - hazard.y) <= hazard.radius + 18) {
+            this.applyOfficeHazardPlayerDamage(hazard.damage, 'Метеоритный дождь');
+          }
+        }
+        if (this.time >= hazard.impactAt && this.time < hazard.burnEndsAt) {
+          if (hostSimulation && this.time >= hazard.nextBurnAt) {
+            hazard.nextBurnAt = this.time + 0.5;
+            damageEnemies(hazard, hazard.burnDamage);
+            if (Math.hypot(this.player.x - hazard.x, this.player.y - hazard.y) <= hazard.radius + 18) {
+              this.applyOfficeHazardPlayerDamage(hazard.burnDamage, 'Горящий след метеорита');
+            }
+          } else if (!hostSimulation && this.time >= (local.nextBurnAt || hazard.impactAt + 0.5)) {
+            local.nextBurnAt = this.time + 0.5;
+            if (Math.hypot(this.player.x - hazard.x, this.player.y - hazard.y) <= hazard.radius + 18) {
+              this.applyOfficeHazardPlayerDamage(hazard.burnDamage, 'Горящий след метеорита');
+            }
+          }
+        }
+      }
+    }
+    this.officeHazards = this.officeHazards.filter(hazard => this.time < hazard.expiresAt);
+    for (const id of localState.keys()) if (!activeIds.has(id)) localState.delete(id);
+    if (this.player.hp <= 0) return true;
+    return false;
   }
 
   applyReadOnlyDebuff() {
@@ -7057,6 +7264,7 @@ class Game {
       if (t.life <= 0) this.texts.splice(i, 1);
     }
 
+    if (this.updateOfficeHazards(dt)) return;
     this.updateHUD();
   }
 
@@ -7415,7 +7623,7 @@ class Game {
       const response = await fetch(`${SCORE_RUN_API_BASE}/finish`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ runId: this.scoreRunId, name: nick, score, seconds })
+        body: JSON.stringify({ runId: this.scoreRunId, name: nick, score, seconds, classId: this.player?.classId || this.selectedClassId })
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || `сервер ответил ${response.status}`);
@@ -7433,7 +7641,7 @@ class Game {
 
   async fetchLeaderboard() {
     const tbody = document.getElementById('lb-body');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
 
     try {
       if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён.');
@@ -7447,14 +7655,18 @@ class Game {
       const scoresQuery = fb.query(fb.ref(fb.db, 'leaderboard'), fb.orderByChild('score'), fb.limitToLast(100));
       const snapshot = await fb.get(scoresQuery);
       if (snapshot.exists()) scores.push(...Object.values(snapshot.val()));
-      scores.sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
+      const hasCheaterTag = entry => String(entry.tag || entry.label || entry.signature || '').trim().toLowerCase() === 'читерок'
+        || String(entry.name || '').trim().toLowerCase() === 'username';
+      const visibleScores = (this.hideCheatersFromLeaderboard ? scores.filter(entry => !hasCheaterTag(entry)) : scores)
+        .sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
       tbody.innerHTML = '';
-      if (!scores.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Таблица пока пуста. Запишите первый результат!</td></tr>';
+      if (!visibleScores.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">${scores.length ? 'Все записи скрыты настройкой.' : 'Таблица пока пуста. Запишите первый результат!'}</td></tr>`;
         return;
       }
 
-      scores.forEach((entry, idx) => {
+      const classNames = { technician: 'Технарь', courier: 'Переносчик', developer: 'Разработчик', support: 'Чел с техпода' };
+      visibleScores.forEach((entry, idx) => {
         const seconds = Math.max(0, Number(entry.seconds) || 0);
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
         const s = (seconds % 60).toString().padStart(2, '0');
@@ -7464,12 +7676,14 @@ class Game {
           : entryMode === 'pve' ? 'Сетевая · PvE' : 'Одиночная';
         const playerCount = Math.max(1, Math.min(8, Number(entry.playerCount) || (entryMode === 'solo' ? 1 : 2)));
         const displayName = this.escapeHtml(String(entry.name || 'Архитектор_1С'));
-        const usernameTag = String(entry.name || '').toLowerCase() === 'username'
+        const usernameTag = hasCheaterTag(entry)
           ? ' <span style="color:#c0392b;">(читерок)</span>' : '';
+        const classLabel = classNames[String(entry.classId || '')] || '';
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><b>${idx + 1}</b></td>
           <td><b>${displayName}</b>${usernameTag}</td>
+          <td>${this.escapeHtml(classLabel)}</td>
           <td>${this.escapeHtml(String(entry.version || '1.7.1'))}</td>
           <td>${modeLabel}</td>
           <td>${playerCount}</td>
@@ -7479,7 +7693,7 @@ class Game {
         tbody.appendChild(tr);
       });
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
     }
   }
 
@@ -7838,6 +8052,88 @@ class Game {
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       this.ctx.fillText(item.icon, pos.x, pos.y);
+    }
+
+    // Опасные офисные события
+    for (const hazard of this.officeHazards) {
+      if (hazard.kind === 'wind') {
+        if (this.time < hazard.startsAt || this.time >= hazard.endsAt) continue;
+        this.ctx.save();
+        this.ctx.translate(this.player.x, this.player.y - 52);
+        this.ctx.rotate(Math.atan2(hazard.dy, hazard.dx));
+        this.ctx.font = 'bold 28px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillStyle = '#dff9fb';
+        this.ctx.shadowColor = '#74b9ff';
+        this.ctx.shadowBlur = 14;
+        this.ctx.fillText('💨 ➜', 0, 0);
+        this.ctx.restore();
+        continue;
+      }
+      const pos = this.getPvpRenderPosition(hazard.syncId, hazard.x, hazard.y);
+      const falling = this.time < hazard.impactAt;
+      const pulse = 0.5 + 0.5 * Math.sin(this.time * 18);
+      this.ctx.save();
+      this.ctx.translate(pos.x, pos.y);
+      if (hazard.kind === 'meteor' && falling) {
+        this.ctx.globalAlpha = 0.5 + pulse * 0.35;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, hazard.radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(255, 71, 87, 0.28)';
+        this.ctx.fill();
+        this.ctx.setLineDash([8, 6]);
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = '#ffb142';
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        this.ctx.font = 'bold 38px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('☄️', 0, -65 - pulse * 25);
+      } else if (hazard.kind === 'meteor') {
+        this.ctx.globalAlpha = 0.30 + pulse * 0.16;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, hazard.radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#ff7b24';
+        this.ctx.fill();
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#ffd166';
+        this.ctx.stroke();
+        this.ctx.globalAlpha = 1;
+        this.ctx.font = 'bold 25px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🔥', 0, 0);
+      } else if (falling) {
+        this.ctx.globalAlpha = 0.28 + pulse * 0.25;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, hazard.radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#ff1744';
+        this.ctx.fill();
+        this.ctx.setLineDash([9, 6]);
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        this.ctx.globalAlpha = 1;
+        this.ctx.font = 'bold 24px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('💣', 0, 0);
+      } else {
+        const age = Math.max(0, this.time - hazard.impactAt);
+        const radius = hazard.radius * (1 + Math.min(0.35, age * 0.5));
+        this.ctx.globalAlpha = Math.max(0, 0.45 - age * 0.55);
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#ff5e3a';
+        this.ctx.fill();
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#ffd166';
+        this.ctx.stroke();
+      }
+      this.ctx.restore();
     }
 
     // Враги и боссы

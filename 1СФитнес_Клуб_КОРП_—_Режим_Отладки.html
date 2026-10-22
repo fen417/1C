@@ -3109,7 +3109,9 @@ class Game {
     // Position/state packets are snapshots: stale packets are less useful than fresh ones.
     // Keep them off the reliable ordered channel so a lost packet cannot queue the match.
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 0 }));
-    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: true }));
+    // World snapshots replace one another; a small amount of loss is cheaper
+    // than retransmitting stale chunks and building a queue behind the match.
+    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: false, maxRetransmits: 1 }));
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-control', { ordered: true }));
     peer.pc.onicecandidate = event => {
       if (!event.candidate) return;
@@ -3292,13 +3294,14 @@ class Game {
         const attackDelta = Math.max(0, Number(state.attackTotal || 0) - previousAttack);
         if (attackDelta > 0 && this.player?.hp > 0) this.receivePvpDamage(attackDelta, `${message.name || 'Соперник'} · PvP`);
         pvp.processedEnemyDamage ||= {};
+        const enemiesBySyncId = new Map(this.enemies.filter(item => item.syncId).map(item => [item.syncId, item]));
         for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
           const amount = Math.max(0, Number(amountValue) || 0);
           const before = Number(pvp.processedEnemyDamage[enemyId] || 0);
           const delta = Math.max(0, amount - before);
           pvp.processedEnemyDamage[enemyId] = Math.max(before, amount);
           if (delta > 0) {
-            const enemy = this.enemies.find(item => item.syncId === enemyId);
+            const enemy = enemiesBySyncId.get(enemyId);
             if (enemy && !enemy.is24hPursuer) {
               pvp.applyingRemoteEnemyDamage = true;
               try { enemy.hp = Math.max(0, enemy.hp - delta); } finally { pvp.applyingRemoteEnemyDamage = false; }
@@ -3399,9 +3402,10 @@ class Game {
 
   publishThreePlayerRoster() {
     const pvp = this.pvp;
-    if (!pvp?.host || pvp.maxPlayers < 2) return;
+    if (!pvp?.host || Number(pvp.actualPlayerCount || 0) < 3) return;
     const now = performance.now();
-    const rosterInterval = Number(pvp.actualPlayerCount || 2) >= 5 ? 180 : 100;
+    const playerCount = Number(pvp.actualPlayerCount || 2);
+    const rosterInterval = playerCount >= 5 ? 350 : playerCount >= 3 ? 250 : 100;
     if (now - Number(pvp.lastRosterSentAt || 0) < rosterInterval) return;
     pvp.lastRosterSentAt = now;
     const byUid = new Map();
@@ -3952,7 +3956,7 @@ class Game {
         claimedDrops: this.pvp.host ? undefined : (this.pvp.claimedDrops || {})
       };
       this.sendPvpNetworkState(state);
-      if (this.pvp.host && this.pvp.maxPlayers >= 2) this.publishThreePlayerRoster();
+      if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.publishThreePlayerRoster();
       if (this.pvp.host && this.isBattleRoyale && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
         const alive = [{ uid: this.pvp.uid, name: this.pvp.name, over: p.hp <= 0 }];
         for (const member of Object.values(this.pvp.remotePlayers || {})) alive.push({ uid: member.uid, name: member.name, over: !member.state || member.state.over || member.state.hp <= 0 });
@@ -3973,12 +3977,12 @@ class Game {
         }
       }
       const playerCount = Math.max(2, Number(this.pvp.actualPlayerCount) || 2);
-      const worldSyncInterval = playerCount >= 5 ? 300 : playerCount >= 3 ? 200 : 100;
+      const worldSyncInterval = playerCount >= 5 ? 450 : playerCount >= 3 ? 300 : 180;
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= worldSyncInterval) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
       }
-    }, Number(pvp.actualPlayerCount) >= 3 ? 100 : 50);
+    }, Number(pvp.actualPlayerCount) >= 5 ? 150 : Number(pvp.actualPlayerCount) >= 3 ? 100 : 66);
   }
 
   trackPvpSharedEntities() {
@@ -4023,9 +4027,7 @@ class Game {
     const pvp = this.pvp;
     if (!pvp?.host || !pvp.started || pvp.matchOver || pvp.opponentLost || !Object.values(pvp.peerConnections || {}).some(peer => peer.connected)) return false;
     this.trackPvpSharedEntities();
-    const safe = value => JSON.parse(JSON.stringify(value, (key, item) =>
-      typeof item === 'number' && !Number.isFinite(item) ? 1e12 : item));
-    const byId = items => Object.fromEntries(items.filter(item => item.syncId).map(item => [item.syncId, safe(item)]));
+    const byId = items => Object.fromEntries(items.filter(item => item.syncId).map(item => [item.syncId, item]));
     const world = {
       revision: ++pvp.worldRevision,
       enemies: byId(this.enemies),
@@ -4048,27 +4050,32 @@ class Game {
     const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards'];
     const chunks = [];
     const chunkLimit = 12000;
+    const encodeItem = (item) => JSON.stringify(item, (key, value) =>
+      typeof value === 'number' && !Number.isFinite(value) ? 1e12 : value);
     for (const collection of collectionNames) {
-      let items = {};
+      let entries = [];
+      let entryLength = 0;
       for (const [id, item] of Object.entries(world[collection] || {})) {
-        items[id] = item;
-        const sample = JSON.stringify({ type: 'world-chunk', revision: world.revision, index: 0, total: 1, collection, items });
-        if (sample.length > chunkLimit && Object.keys(items).length > 1) {
-          delete items[id];
-          chunks.push({ collection, items });
-          items = { [id]: item };
+        const entry = `${JSON.stringify(id)}:${encodeItem(item)}`;
+        const addedLength = entry.length + (entries.length ? 1 : 0);
+        if (entries.length && entryLength + addedLength > chunkLimit) {
+          chunks.push({ collection, entries: entries.join(',') });
+          entries = [];
+          entryLength = 0;
         }
+        entryLength += entry.length + (entries.length ? 1 : 0);
+        entries.push(entry);
       }
-      chunks.push({ collection, items });
+      chunks.push({ collection, entries: entries.join(',') });
     }
-    const packets = chunks.map((chunk, index) => JSON.stringify({
-      type: 'world-chunk', revision: world.revision, index, total: chunks.length,
-      collection: chunk.collection, items: chunk.items
-    }));
-    const encodedBytes = packets.reduce((sum, packet) => sum + new TextEncoder().encode(packet).byteLength, 0);
+    const packets = chunks.map((chunk, index) =>
+      `{"type":"world-chunk","revision":${world.revision},"index":${index},"total":${chunks.length},"collection":${JSON.stringify(chunk.collection)},"items":{${chunk.entries}}}`);
+    const encoder = new TextEncoder();
+    const encodedBytes = packets.reduce((sum, packet) => sum + encoder.encode(packet).byteLength, 0);
     let sent = false;
     for (const channel of channels) {
-      if (channel.bufferedAmount + encodedBytes > 196608) continue;
+      // Drop a stale snapshot before it can queue behind already buffered data.
+      if (channel.bufferedAmount > 65536 || channel.bufferedAmount + encodedBytes > 196608) continue;
       try { for (const packet of packets) channel.send(packet); sent = true; }
       catch (err) { console.warn('Не удалось отправить снимок игрового мира соперникам:', err); }
     }
@@ -4144,13 +4151,14 @@ class Game {
     this.pvp.lastRemoteEnemyAttackTotal = Math.max(previousEnemyAttackTotal, enemyAttackTotal);
     if (this.pvp.host) {
       this.pvp.processedEnemyDamage ||= {};
+      const enemiesBySyncId = new Map(this.enemies.filter(item => item.syncId).map(item => [item.syncId, item]));
       for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
         const amount = Math.max(0, Number(amountValue) || 0);
         const previous = this.pvp.processedEnemyDamage[enemyId] || 0;
         const delta = Math.max(0, amount - previous);
         this.pvp.processedEnemyDamage[enemyId] = Math.max(previous, amount);
         if (delta > 0) {
-          const enemy = this.enemies.find(item => item.syncId === enemyId);
+          const enemy = enemiesBySyncId.get(enemyId);
           if (enemy && !enemy.is24hPursuer) {
             this.pvp.applyingRemoteEnemyDamage = true;
             try { enemy.hp = Math.max(0, enemy.hp - delta); }

@@ -2581,7 +2581,10 @@ class Game {
     this.BOUND_MIN = this.isBattleRoyale ? 90 : 90;
     this.BOUND_MAX = this.MAP_SIZE - 90;
     this.pendingBattleRoyaleUpgrades = [];
-    if (this.pvp?.started) this.pvp.classSelectionPending = true;
+    if (this.pvp?.started) {
+      this.pvp.classSelectionPending = true;
+      this.pvp.classSelectionReadyUids = new Set();
+    }
     this.legendaryMigrationChosen = false;
     this.firstMegaBossDefeated = false;
     this.legendaryOffered = false;
@@ -2947,7 +2950,10 @@ class Game {
     this.updateActiveHUD();
     if (this.pvp?.started) {
       this.pvp.classId = classId;
+      this.markPvpClassSelectionReady(this.pvp.uid, classId);
+      this.sendPvpNetworkMessage({ type: 'class-selected', uid: this.pvp.uid, classId }, null, true);
       this.setPvpChoosing(null);
+      this.maybeCompletePvpClassSelection();
       this.sendPvpNetworkState();
       this.syncPvpWait();
     } else {
@@ -3243,7 +3249,16 @@ class Game {
   handlePvpSocketPacket(message) {
     const pvp = this.pvp;
     if (!pvp || pvp.opponentLost || !message) return;
-    if (message.type === 'roster' && pvp.maxPlayers >= 2) {
+    if (message.type === 'class-selected') {
+      const uid = String(message.uid || '');
+      const classId = String(message.classId || '');
+      if (!pvp.matchPlayerUids?.includes(uid) || !PLAYER_CLASSES[classId]) return;
+      this.markPvpClassSelectionReady(uid, classId);
+      if (pvp.host) this.maybeCompletePvpClassSelection();
+    } else if (message.type === 'class-selection-complete' && !pvp.host) {
+      pvp.classSelectionPending = false;
+      this.syncPvpWait();
+    } else if (message.type === 'roster' && pvp.maxPlayers >= 2) {
       this.applyThreePlayerRoster(message.players || [], message.classSelectionPending);
       this.syncPvpWait();
     } else if (message.type === 'player-state' && !pvp.host) {
@@ -3255,15 +3270,16 @@ class Game {
       pvp.remoteStateSequences ||= {};
       const sequence = Number(message.sequence || 0);
       if (sequence && sequence <= Number(pvp.remoteStateSequences[uid] || 0)) return;
-      const previousState = pvp.maxPlayers >= 3 && pvp.host ? pvp.remotePlayers?.[uid]?.state : pvp.remoteState;
+      const isMultiPlayerMatch = Number(pvp.actualPlayerCount) >= 3;
+      const previousState = isMultiPlayerMatch && pvp.host ? pvp.remotePlayers?.[uid]?.state : pvp.remoteState;
       const savedRemoteState = pvp.remoteState;
       const savedRemoteStateAt = pvp.remoteStateAt;
-      if (pvp.maxPlayers >= 3 && pvp.host) {
+      if (isMultiPlayerMatch && pvp.host) {
         pvp.remoteState = previousState || null;
         pvp.remoteStateAt = pvp.remotePlayers?.[uid]?.stateAt || performance.now();
       }
       const validation = this.validatePvpRemoteState(message.state);
-      if (pvp.maxPlayers >= 3 && pvp.host) {
+      if (isMultiPlayerMatch && pvp.host) {
         pvp.remoteState = savedRemoteState;
         pvp.remoteStateAt = savedRemoteStateAt;
       }
@@ -3281,7 +3297,7 @@ class Game {
       const remotePlayer = { ...(pvp.remotePlayers?.[uid] || pvp.remotePlayer || {}), uid,
         name: message.name || pvp.remotePlayers?.[uid]?.name || pvp.remotePlayer?.name || 'Соперник', online: true,
         choosing: message.choosing || null, paused: Boolean(message.paused), state };
-      if (!pvp.host || pvp.maxPlayers < 3 || uid === pvp.opponentUid) {
+      if (!isMultiPlayerMatch || !pvp.host || uid === pvp.opponentUid) {
         pvp.remoteState = state;
         pvp.remotePlayer = remotePlayer;
         pvp.remoteChoosing = message.choosing || null;
@@ -3290,7 +3306,7 @@ class Game {
         pvp.remoteShotsAt = performance.now();
         this.recordPvpPosition('@remote', state.x, state.y);
       }
-      if (pvp.host && pvp.maxPlayers >= 3) {
+      if (pvp.host && isMultiPlayerMatch) {
         pvp.remotePlayers ||= {};
         const prior = pvp.remotePlayers[uid] || {};
         pvp.remotePlayers[uid] = { ...prior, ...remotePlayer, uid, name: message.name || prior.name || 'Соперник', online: true, state, stateAt: performance.now(), choosing: message.choosing || null, paused: Boolean(message.paused) };
@@ -4451,6 +4467,37 @@ class Game {
     this.pvp.choosing = kind || null;
     this.sendPvpNetworkState();
     this.syncPvpWait();
+  }
+
+  markPvpClassSelectionReady(uid, classId) {
+    const pvp = this.pvp;
+    if (!pvp || !uid || !PLAYER_CLASSES[classId]) return;
+    pvp.classSelectionReadyUids ||= new Set();
+    pvp.classSelectionReadyUids.add(uid);
+    if (uid === pvp.uid) return;
+    pvp.remotePlayers ||= {};
+    const prior = pvp.remotePlayers[uid] || {};
+    const remote = pvp.remotePlayers[uid] = {
+      ...prior, uid, classId, choosing: null, online: true,
+      name: prior.name || (uid === pvp.opponentUid ? pvp.remotePlayer?.name : '') || 'Игрок'
+    };
+    if (uid === pvp.opponentUid || !pvp.remotePlayer) {
+      pvp.remotePlayer = remote;
+      pvp.remoteChoosing = null;
+    }
+    if (pvp.host && Number(pvp.actualPlayerCount) >= 3) this.publishThreePlayerRoster();
+  }
+
+  maybeCompletePvpClassSelection() {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started) return false;
+    const participants = (pvp.matchPlayerUids || []).filter(Boolean);
+    if (!participants.length || !participants.every(uid => pvp.classSelectionReadyUids?.has(uid))) return false;
+    pvp.classSelectionPending = false;
+    this.sendPvpNetworkMessage({ type: 'class-selection-complete' }, null, true);
+    this.publishThreePlayerRoster();
+    this.syncPvpWait();
+    return true;
   }
 
   setPvpManualPause(paused) {

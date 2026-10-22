@@ -2165,12 +2165,16 @@ class Game {
       this.canvas.setPointerCapture(e.pointerId);
       this.sound.init();
     });
-    window.addEventListener('mousedown', (e) => {
+    document.addEventListener('mousedown', (e) => {
       if (e.button !== 2 || (!this.canvas.contains(e.target) && this.mouseMovePointerId === null)) return;
       e.preventDefault();
       this.tryDash();
-    });
-    this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    }, true);
+    document.addEventListener('contextmenu', (e) => {
+      if (!this.canvas.contains(e.target) && this.mouseMovePointerId === null) return;
+      e.preventDefault();
+      if (e.button === 2) this.tryDash();
+    }, true);
     this.canvas.addEventListener('pointermove', (e) => {
       if (e.pointerId === this.mouseMovePointerId && (e.buttons & 1)) {
         this.setMouseMoveAim(e.clientX, e.clientY);

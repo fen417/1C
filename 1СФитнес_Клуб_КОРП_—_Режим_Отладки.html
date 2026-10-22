@@ -2365,6 +2365,7 @@ class Game {
 
     this.paused = false;
     this.time = 0;
+    this.pursuerSpawnCountdown = null;
     this.lastPlayerDamage = null;
     this.scoreRunId = null;
     this.scoreRunStartPromise = null;
@@ -5247,7 +5248,15 @@ class Game {
     }
 
     if (this.time >= 900 && !this.enemies.some(enemy => enemy.is24hPursuer)) {
-      this.spawn24hPursuer();
+      if (this.pursuerSpawnCountdown === null) {
+        this.pursuerSpawnCountdown = 3;
+        this.announceOfficeEvent('⚠️ Через 3 секунды появится RuDesktop: 24ч ЛИМИТ. Он неуязвим и убивает с одного касания!');
+      }
+      this.pursuerSpawnCountdown -= dt;
+      if (this.pursuerSpawnCountdown <= 0) {
+        this.pursuerSpawnCountdown = null;
+        this.spawn24hPursuer();
+      }
     }
     const megaBossAlive = this.enemies.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
     if (!megaBossAlive && this.spawnTimer <= 0) {
@@ -5306,13 +5315,13 @@ class Game {
     const center = this.getPvpSpawnCenter();
     const x = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, center.x + Math.cos(angle) * distance));
     const y = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, center.y + Math.sin(angle) * distance));
-    const name = 'RuDesktop: исчерпан 24-ти часовой лимит';
+    const name = 'RuDesktop: 24ч ЛИМИТ';
     this.enemies.push({ x, y, name, hp: Infinity, maxHp: Infinity, size: 25, speed: 1.05, dmg: 0,
       icon: '🐢', col: '#8e44ad', xp: 0, isBoss: false, isMegaBoss: false,
       is24hPursuer: true, freezeTimer: 0, slowTimer: 0, slowFactor: 1 });
-    this.showBanner(`🚨 ${name} — он не отстанет до конца сессии!`);
-    this.addPopup(x, y - 38, 'НЕУСТРАНИМЫЙ ПРЕСЛЕДОВАТЕЛЬ', '#e0aaff');
-    this.log(`На 15-й минуте появился ${name}. Он медленно идёт за вами, неуязвим и не отстанет до конца сессии.`);
+    this.showBanner(`🚨 ${name} появился и не отстанет до конца сессии!`);
+    this.addPopup(x, y - 38, 'НЕУЯЗВИМ · УБИВАЕТ С КАСАНИЯ', '#e0aaff');
+    this.log(`На 15-й минуте появился ${name}. Он медленно идёт за вами, неуязвим, убивает с одного касания и не отстанет до конца сессии.`);
   }
   getMobCountMultiplier() {
     if (!this.pvp?.started) return 1;
@@ -7671,7 +7680,7 @@ class Game {
         this.ctx.fillStyle = '#111';
         this.ctx.fillText('24ч', 0, 1);
 
-        const label = 'НЕУСТРАНИМЫЙ · 24Ч';
+        const label = 'НЕУЯЗВИМ · ВАНШОТ · 24Ч';
         this.ctx.font = 'bold 12px sans-serif';
         const labelWidth = this.ctx.measureText(label).width + 14;
         const labelY = -e.size - 30;

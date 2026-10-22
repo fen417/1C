@@ -1068,7 +1068,7 @@
 <script>
 const GAME_VERSION = '2.3.1';
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
-const SCORE_RUN_API_BASE = 'https://fitness-leaderboard.fitness1c.workers.dev/run';
+const SCORE_SUBMIT_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/record';
 
 /* ============================================================
    АУДИО-ДВИЖОК
@@ -2402,16 +2402,6 @@ class Game {
     this.sound.syncToggleButtons();
     this.pvp = null;
     this.pvpTimer = null;
-    this.scoreRunId = null;
-    this.scoreRunGeneration = 0;
-    this.scoreRunStartPromise = null;
-    this.scoreRunCheckpointNo = 0;
-    this.scoreRunNextCheckpointAt = 10;
-    this.scoreRunCheckpointQueue = [];
-    this.scoreRunCheckpointPromise = null;
-    this.scoreRunRetryAt = 0;
-    this.scoreRunError = '';
-    this.scoreRunRetryable = false;
 
     this.MAP_SIZE = 4000;
     this.BOUND_MIN = 90;
@@ -2583,7 +2573,6 @@ class Game {
   }
 
   start(options = {}) {
-    this.scoreRunGeneration++;
     this.isBattleRoyale = this.pvp?.mode === 'battle_royale';
     this.isPvpMassUpgradeMode = () => Boolean(this.pvp?.started && this.pvp.mode === 'pvp' && Number(this.pvp.actualPlayerCount) > 3);
     const classicPvpExtraPlayers = this.pvp?.started && this.pvp.mode === 'pvp'
@@ -2633,15 +2622,6 @@ class Game {
     this.time = 0;
     this.pursuerSpawnCountdown = null;
     this.lastPlayerDamage = null;
-    this.scoreRunId = null;
-    this.scoreRunStartPromise = null;
-    this.scoreRunCheckpointNo = 0;
-    this.scoreRunNextCheckpointAt = 10;
-    this.scoreRunCheckpointQueue = [];
-    this.scoreRunCheckpointPromise = null;
-    this.scoreRunRetryAt = 0;
-    this.scoreRunError = '';
-    this.scoreRunRetryable = false;
     this.challengeDeclines = 0;
     this.kills = 0;
     this.gemsCollected = 0;
@@ -2785,109 +2765,8 @@ class Game {
     this.updateConsumableHUD();
     this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
     if (!options.skipScoreSession) {
-      this.beginScoreRun();
       this.openClassSelection();
     }
-  }
-
-  async beginScoreRun() {
-    const generation = this.scoreRunGeneration;
-    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
-    const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
-    this.scoreRunStartPromise = (async () => {
-      const response = await fetch(`${SCORE_RUN_API_BASE}/start`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ version: GAME_VERSION, mode, players })
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || typeof result.runId !== 'string') {
-        throw new Error(result.error || `сервер ответил ${response.status}`);
-      }
-      if (generation !== this.scoreRunGeneration) throw new Error('Забег уже перезапущен.');
-      this.scoreRunId = result.runId;
-      return result.runId;
-    })();
-    this.scoreRunStartPromise.catch(error => {
-      if (generation === this.scoreRunGeneration) this.scoreRunError = error.message || 'Не удалось открыть проверяемый забег.';
-    });
-    return this.scoreRunStartPromise;
-  }
-
-  queueScoreRunCheckpoints() {
-    if (!this.scoreRunStartPromise || (this.scoreRunError && !this.scoreRunRetryable)) return;
-    while (this.time >= this.scoreRunNextCheckpointAt) {
-      this.scoreRunCheckpointQueue.push({
-        seconds: Math.floor(this.time),
-        score: this.calcScore()
-      });
-      this.scoreRunNextCheckpointAt += 10;
-      if (this.scoreRunCheckpointQueue.length > 12) {
-        this.scoreRunError = 'Не удалось вовремя отправить контрольные точки забега.';
-        this.scoreRunCheckpointQueue = [];
-        return;
-      }
-    }
-    this.sendNextScoreRunCheckpoint();
-  }
-
-  sendNextScoreRunCheckpoint(force = false) {
-    if (this.scoreRunCheckpointPromise) return this.scoreRunCheckpointPromise;
-    if (!this.scoreRunId || !this.scoreRunCheckpointQueue.length || (this.scoreRunError && !this.scoreRunRetryable)) return null;
-    if (!force && performance.now() < this.scoreRunRetryAt) return null;
-
-    const sample = this.scoreRunCheckpointQueue[0];
-    const sequence = this.scoreRunCheckpointNo + 1;
-    const generation = this.scoreRunGeneration;
-    this.scoreRunCheckpointPromise = (async () => {
-      try {
-        const response = await fetch(`${SCORE_RUN_API_BASE}/checkpoint`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ runId: this.scoreRunId, sequence, ...sample })
-        });
-        const result = await response.json().catch(() => ({}));
-        if (generation !== this.scoreRunGeneration) return false;
-        if (!response.ok) {
-          const message = result.error || `сервер ответил ${response.status}`;
-          if (response.status === 429 || response.status >= 500) {
-            this.scoreRunRetryAt = performance.now() + 5000;
-            this.scoreRunError = `Контрольная точка временно не отправлена: ${message}`;
-            this.scoreRunRetryable = true;
-          } else {
-            this.scoreRunError = `Забег не прошёл проверку: ${message}`;
-            this.scoreRunRetryable = false;
-            this.scoreRunCheckpointQueue = [];
-          }
-          return false;
-        }
-        this.scoreRunCheckpointNo = result.sequence;
-        this.scoreRunCheckpointQueue.shift();
-        this.scoreRunRetryAt = 0;
-        this.scoreRunError = '';
-        this.scoreRunRetryable = false;
-        return true;
-      } catch (error) {
-        if (generation !== this.scoreRunGeneration) return false;
-        this.scoreRunRetryAt = performance.now() + 5000;
-        this.scoreRunError = `Нет связи для проверки забега: ${error.message || 'ошибка сети'}`;
-        this.scoreRunRetryable = true;
-        return false;
-      } finally {
-        if (generation === this.scoreRunGeneration) this.scoreRunCheckpointPromise = null;
-      }
-    })();
-    return this.scoreRunCheckpointPromise;
-  }
-
-  async flushScoreRunCheckpoints() {
-    if (!this.scoreRunStartPromise) throw new Error('Сервер не зарегистрировал начало забега.');
-    await this.scoreRunStartPromise;
-    while (this.scoreRunCheckpointQueue.length) {
-      const sent = await this.sendNextScoreRunCheckpoint(true);
-      if (!sent) throw new Error(this.scoreRunError || 'Не удалось отправить контрольную точку.');
-    }
-    if (this.scoreRunError) throw new Error(this.scoreRunError);
   }
 
   calcScore() {
@@ -3227,8 +3106,11 @@ class Game {
     const path = this.pvpSignalPath(pvp.roomCache, member.uid);
     const peer = this.makePvpPeer(member.uid, Number(member.slot) || 1, fb);
     pvp.peerConnections[member.uid] = peer;
-    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: true }));
+    // Position/state packets are snapshots: stale packets are less useful than fresh ones.
+    // Keep them off the reliable ordered channel so a lost packet cannot queue the match.
+    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 0 }));
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: true }));
+    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-control', { ordered: true }));
     peer.pc.onicecandidate = event => {
       if (!event.candidate) return;
       fb.push(fb.ref(fb.db, `${path}/hostCandidates`), event.candidate.toJSON())
@@ -3283,7 +3165,7 @@ class Game {
   makePvpPeer(uid, slot, fb) {
     const pvp = this.pvp;
     const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-    const peer = { uid, slot, pc, channel: null, worldChannel: null, connected: false, seenCandidates: new Set() };
+    const peer = { uid, slot, pc, channel: null, worldChannel: null, controlChannel: null, connected: false, seenCandidates: new Set() };
     if (pvp.host && pvp.rtc) pvp.threePeers[uid] = peer;
     else pvp.rtc = peer;
     this.logPvpDiagnostic(pvp, 'WebRTC', 'создано соединение с игроком', { uid, slot });
@@ -3295,7 +3177,7 @@ class Game {
       if (['failed', 'closed'].includes(pc.connectionState)) {
         peer.connected = false;
         if (pvp.started && !pvp.matchOver && !pvp.leaving) {
-          if (pvp.host && pvp.mode === 'battle_royale') this.markBattleRoyalePlayerEliminated(uid, 'Прямое WebRTC-соединение потеряно.');
+          if (pvp.host && Number(pvp.actualPlayerCount) >= 3) this.handlePvpPeerDisconnected(uid, 'Прямое WebRTC-соединение потеряно.');
           else this.waitForPvpOpponent(pvp, 'Прямое WebRTC-соединение потеряно.');
         }
       }
@@ -3305,19 +3187,20 @@ class Game {
 
   attachPvpDataChannel(peer, channel) {
     if (channel.label === 'game-world') peer.worldChannel = channel;
+    else if (channel.label === 'game-control') peer.controlChannel = channel;
     else peer.channel = channel;
     channel.onopen = () => this.updatePvpPeerConnected(peer);
     channel.onclose = () => {
       peer.connected = false;
       if (!this.pvp?.started || this.pvp.matchOver || this.pvp.leaving) return;
-      if (this.pvp.host && this.pvp.mode === 'battle_royale') this.markBattleRoyalePlayerEliminated(peer.uid, 'Канал WebRTC закрылся.');
+      if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.handlePvpPeerDisconnected(peer.uid, 'Канал WebRTC закрылся.');
       else this.waitForPvpOpponent(this.pvp, 'Канал WebRTC закрылся.');
     };
     channel.onmessage = event => { try { this.handlePvpSocketPacket(JSON.parse(event.data)); } catch (_) {} };
   }
 
   updatePvpPeerConnected(peer) {
-    peer.connected = peer.channel?.readyState === 'open' && peer.worldChannel?.readyState === 'open';
+    peer.connected = peer.channel?.readyState === 'open' && peer.worldChannel?.readyState === 'open' && peer.controlChannel?.readyState === 'open';
     const pvp = this.pvp;
     if (pvp?.rtc === peer) pvp.serverConnected = peer.connected;
     if (peer.connected && pvp?.started) {
@@ -3477,7 +3360,7 @@ class Game {
       if (targetUid === pvp.uid) this.receiveBattleRoyaleDamage(damage, source);
       else {
         const peer = pvp.peerConnections?.[targetUid];
-        if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source }, peer.channel, true);
+        if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source }, peer.controlChannel || peer.channel, true);
       }
     }
     else if (message.type === 'br-damage' && this.isBattleRoyale && message.targetUid === pvp.uid) {
@@ -3517,6 +3400,10 @@ class Game {
   publishThreePlayerRoster() {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.maxPlayers < 2) return;
+    const now = performance.now();
+    const rosterInterval = Number(pvp.actualPlayerCount || 2) >= 5 ? 180 : 100;
+    if (now - Number(pvp.lastRosterSentAt || 0) < rosterInterval) return;
+    pvp.lastRosterSentAt = now;
     const byUid = new Map();
     byUid.set(pvp.uid, { uid: pvp.uid, name: pvp.name, classId: this.player?.classId || pvp.classId, choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), state: this.currentPvpState() });
     for (const player of Object.values(pvp.remotePlayers || {})) {
@@ -3527,7 +3414,11 @@ class Game {
     const expected = Math.max(1, Number(pvp.actualPlayerCount || pvp.matchPlayerUids?.length) || 1);
     pvp.classSelectionPending = players.length < expected || players.some(player => player.choosing === 'class');
     const payload = JSON.stringify({ type: 'roster', players, classSelectionPending: pvp.classSelectionPending });
-    for (const peer of [pvp.rtc, ...Object.values(pvp.threePeers || {})]) if (peer?.channel?.readyState === 'open') peer.channel.send(payload);
+    for (const peer of [pvp.rtc, ...Object.values(pvp.threePeers || {})]) {
+      if (peer?.channel?.readyState === 'open' && peer.channel.bufferedAmount < 32768) {
+        try { peer.channel.send(payload); } catch (_) {}
+      }
+    }
   }
 
   currentPvpState() {
@@ -3559,14 +3450,15 @@ class Game {
   sendPvpNetworkMessage(message, channelOverride = null, force = false) {
     const pvp = this.pvp;
     if (!pvp?.started || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
-    const limit = message.type === 'state' ? 98304 : 65536;
+    const isSnapshot = message.type === 'state' || message.type === 'roster';
+    const limit = isSnapshot ? 32768 : 262144;
     const payload = JSON.stringify(message);
     const channels = channelOverride ? [channelOverride] : (pvp.host
-      ? Object.values(pvp.peerConnections || {}).map(peer => peer.channel)
-      : [pvp.rtc?.channel]);
+      ? Object.values(pvp.peerConnections || {}).map(peer => isSnapshot ? peer.channel : (peer.controlChannel || peer.channel))
+      : [isSnapshot ? pvp.rtc?.channel : (pvp.rtc?.controlChannel || pvp.rtc?.channel)]);
     let sent = false;
     for (const channel of channels) {
-      if (channel?.readyState !== 'open' || (!force && channel.bufferedAmount > limit)) continue;
+      if (channel?.readyState !== 'open' || (isSnapshot && channel.bufferedAmount > limit) || (!force && channel.bufferedAmount > limit)) continue;
       try { channel.send(payload); sent = true; }
       catch (err) { console.warn('Не удалось отправить сообщение в серверную комнату:', err); }
     }
@@ -3600,12 +3492,14 @@ class Game {
       enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
       killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0) },
       over: pvp.matchOver || player.hp <= 0,
-      enemyDamage: pvp.enemyDamageTotals || {}, claimedDrops: pvp.claimedDrops || {}, migration85: Boolean(player.migration85)
+      enemyDamage: pvp.host ? undefined : (pvp.enemyDamageTotals || {}),
+      claimedDrops: pvp.host ? undefined : (pvp.claimedDrops || {}), migration85: Boolean(player.migration85)
     };
     return this.sendPvpNetworkMessage({
       type, sequence: pvp.rtcStateSequence = (pvp.rtcStateSequence || 0) + 1,
       uid: pvp.uid, name: pvp.name || 'Соперник', state,
-      choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused), shots: this.serializePvpShots()
+      choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused),
+      shots: Number(pvp.actualPlayerCount || 2) <= 2 ? this.serializePvpShots() : []
     }, channelOverride, Boolean(channelOverride));
   }
 
@@ -3613,51 +3507,22 @@ class Game {
     if (!state || typeof state !== 'object' || Array.isArray(state)) return { ok: false, reason: 'ожидался объект состояния' };
     const numeric = ['x', 'y', 'hp', 'maxHp', 'level', 'time', 'attackTotal', 'enemyAttackTotal'];
     if (numeric.some(key => !Number.isFinite(Number(state[key])))) return { ok: false, reason: 'числовой стат отсутствует или не является конечным числом' };
-    const x = Number(state.x), y = Number(state.y), hp = Number(state.hp), maxHp = Number(state.maxHp);
-    const level = Number(state.level), time = Number(state.time);
-    const attackTotal = Number(state.attackTotal), enemyAttackTotal = Number(state.enemyAttackTotal);
-    if (x < this.BOUND_MIN || x > this.BOUND_MAX || y < this.BOUND_MIN || y > this.BOUND_MAX) return { ok: false, reason: 'позиция за пределами карты' };
-    if (hp < 0 || maxHp < 1 || hp > maxHp || maxHp > 100000) return { ok: false, reason: 'HP или максимальное HP вне допустимого диапазона' };
-    if (!Number.isInteger(level) || level < 1 || level > 10000 || time < 0 || time > 86400 || level > 11 + Math.floor(time * 3)) return { ok: false, reason: 'уровень или время вне допустимого диапазона' };
-    if (maxHp > 400 + (level - 1) * 25) return { ok: false, reason: 'максимальное HP слишком велико для текущего уровня' };
-    if (attackTotal < 0 || enemyAttackTotal < 0 || attackTotal > 1000 + time * 12000 || enemyAttackTotal > 1000 + time * 12000 ||
-        typeof state.over !== 'boolean' || typeof state.shield !== 'boolean') return { ok: false, reason: 'счётчики урона или флаги состояния некорректны' };
-    if (state.killCredits != null && (typeof state.killCredits !== 'object' || Array.isArray(state.killCredits) ||
-        ['host', 'guest'].some(key => !Number.isInteger(Number(state.killCredits[key])) || Number(state.killCredits[key]) < 0 || Number(state.killCredits[key]) > 1000000))) {
-      return { ok: false, reason: 'счётчик уничтоженных противников некорректен' };
-    }
-    if (state.enemyDamage != null && (typeof state.enemyDamage !== 'object' || Array.isArray(state.enemyDamage) ||
-        Object.values(state.enemyDamage).some(value => !Number.isFinite(Number(value)) || Number(value) < 0 || Number(value) > 100000000))) {
-      return { ok: false, reason: 'счётчик урона по противникам некорректен' };
-    }
-    const previous = this.pvp?.remoteState;
-    if (previous) {
-      if (Number(previous.level || 1) > level) return { ok: false, reason: 'уровень соперника неожиданно уменьшился' };
-      if (Number(previous.maxHp || 1) > maxHp) return { ok: false, reason: 'максимальное HP соперника неожиданно уменьшилось' };
-      if (Number(previous.time || 0) > time + 0.25) return { ok: false, reason: 'игровое время пошло назад' };
-      if (previous.over && !state.over) return { ok: false, reason: 'соперник продолжил игру после завершения матча' };
-      const elapsedPosition = Math.max(0.05, Math.min(3, (performance.now() - Number(this.pvp.remoteStateAt || performance.now())) / 1000));
-      const distance = Math.hypot(x - Number(previous.x), y - Number(previous.y));
-      if (distance > 800 * elapsedPosition + 180) return { ok: false, reason: 'позиция соперника переместилась быстрее допустимой скорости' };
-      if (previous.killCredits && state.killCredits && ['host', 'guest'].some(key => Number(state.killCredits[key]) < Number(previous.killCredits[key] || 0))) {
-        return { ok: false, reason: 'счётчик уничтоженных противников уменьшился' };
-      }
-      for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
-        const amount = Number(amountValue);
-        const oldAmount = Number(previous.enemyDamage?.[enemyId] || 0);
-        if (amount < oldAmount) return { ok: false, reason: 'счётчик урона по противнику уменьшился' };
-        const enemy = this.enemies.find(item => item.syncId === enemyId);
-        if (enemy && Number.isFinite(enemy.maxHp) && amount > Math.max(1000, enemy.maxHp * 4)) {
-          return { ok: false, reason: 'урон по противнику выше его возможного запаса HP' };
-        }
-      }
-      const elapsed = elapsedPosition;
-      const maxDamageDelta = 250 + elapsed * 10000;
-      if (attackTotal < Number(previous.attackTotal || 0) || attackTotal - Number(previous.attackTotal || 0) > maxDamageDelta) return { ok: false, reason: 'счётчик PvP-урона уменьшился или резко вырос' };
-      if (enemyAttackTotal < Number(previous.enemyAttackTotal || 0) || enemyAttackTotal - Number(previous.enemyAttackTotal || 0) > maxDamageDelta) return { ok: false, reason: 'счётчик урона противников уменьшился или резко вырос' };
-    }
-    this.pvp.remoteStateAt = performance.now();
-    return { ok: true, state: { ...state, x, y, hp, maxHp, level, time, attackTotal, enemyAttackTotal } };
+    const maxHp = Math.max(1, Math.min(1000000, Number(state.maxHp)));
+    const level = Math.max(1, Math.min(10000, Math.floor(Number(state.level))));
+    const cleanState = {
+      ...state,
+      x: Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, Number(state.x))),
+      y: Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, Number(state.y))),
+      hp: Math.max(0, Math.min(maxHp, Number(state.hp))),
+      maxHp,
+      level,
+      time: Math.max(0, Number(state.time)),
+      attackTotal: Math.max(0, Number(state.attackTotal)),
+      enemyAttackTotal: Math.max(0, Number(state.enemyAttackTotal)),
+      over: Boolean(state.over),
+      shield: Boolean(state.shield)
+    };
+    return { ok: true, state: cleanState };
   }
 
   recordPvpPosition(id, x, y) {
@@ -3674,9 +3539,10 @@ class Game {
   getPvpRenderPosition(id, x, y) {
     const samples = this.pvp?.positionHistory?.[id];
     if (!samples?.length) return { x, y };
-    // Снимки мира приходят примерно раз в 100 мс. Небольшой буфер даёт
-    // отрисовке соседние точки для плавной интерполяции вместо скачков.
-    const targetTime = performance.now() - 150;
+    // Чем больше лобби, тем реже приходят тяжёлые снимки мира.
+    const players = Math.max(2, Number(this.pvp?.actualPlayerCount) || 2);
+    const snapshotInterval = players >= 5 ? 300 : players >= 3 ? 200 : 100;
+    const targetTime = performance.now() - Math.max(150, snapshotInterval * 1.5);
     let before = null;
     let after = null;
     let beforeIndex = -1;
@@ -3838,6 +3704,36 @@ class Game {
     this.lastTime = performance.now();
   }
 
+  handlePvpPeerDisconnected(uid, reason = 'Игрок отключился.') {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started || !uid || uid === pvp.uid) return;
+    if (pvp.mode === 'battle_royale') {
+      this.markBattleRoyalePlayerEliminated(uid, reason);
+      return;
+    }
+    const prior = pvp.remotePlayers?.[uid] || {};
+    if (prior.disconnected || prior.state?.over) return;
+    const roomPlayer = pvp.roomCache?.players?.[uid] || {};
+    const previousState = prior.state || roomPlayer.state || {};
+    pvp.remotePlayers ||= {};
+    pvp.remotePlayers[uid] = {
+      ...prior,
+      uid,
+      name: prior.name || roomPlayer.name || 'Игрок',
+      online: false,
+      disconnected: true,
+      state: { ...previousState, hp: 0, over: true }
+    };
+    const peer = pvp.peerConnections?.[uid] || pvp.threePeers?.[uid] || (pvp.rtc?.uid === uid ? pvp.rtc : null);
+    if (peer && !peer.disconnectedHandled) {
+      peer.disconnectedHandled = true;
+      peer.connected = false;
+      peer.pc?.close();
+    }
+    this.logPvpDiagnostic(pvp, 'Мультиплеер', 'один участник отключился; матч остальных игроков продолжается', { uid, reason });
+    this.publishThreePlayerRoster();
+  }
+
   markBattleRoyalePlayerEliminated(uid, reason = 'Игрок покинул Battle Royale.') {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.mode !== 'battle_royale' || !pvp.started || !uid || uid === pvp.uid) return;
@@ -3896,14 +3792,18 @@ class Game {
     const allOpponentsOnline = pvp.host
       ? opponents.length > 0 && opponents.every(player => player.online)
       : Boolean(room.players?.[room.hostUid]?.online);
-    if (pvp.started && pvp.host && pvp.mode === 'battle_royale') {
+    if (pvp.started && pvp.host && Number(pvp.actualPlayerCount) >= 3) {
       const participantUids = pvp.matchPlayerUids || Object.keys(room.players || {});
       for (const uid of participantUids) {
         if (uid === pvp.uid) continue;
         const participant = room.players?.[uid];
-        if (!participant || participant.online === false) this.markBattleRoyalePlayerEliminated(uid, 'Игрок покинул комнату или потерял соединение.');
+        if (!participant || participant.online === false) {
+          if (pvp.mode === 'battle_royale') this.markBattleRoyalePlayerEliminated(uid, 'Игрок покинул комнату или потерял соединение.');
+          else this.handlePvpPeerDisconnected(uid, 'Игрок покинул комнату или потерял соединение.');
+        }
       }
     }
+    const multiHostMatch = pvp.started && pvp.host && Number(pvp.actualPlayerCount) >= 3;
     const directOpponentConnected = pvp.host
       ? opponents.filter(player => player.online).every(player => pvp.peerConnections?.[player.uid]?.connected)
       : Boolean(pvp.rtc?.connected);
@@ -3911,7 +3811,7 @@ class Game {
       ? (pvp.host || Boolean(room.players?.[room.hostUid]?.online && pvp.rtc?.connected))
       : Boolean(allOpponentsOnline && directOpponentConnected);
     if (!pvp.started) this.updatePvpLobby(room);
-    if (opponent) {
+    if (opponent && !multiHostMatch) {
       pvp.opponentVisible = opponentVisible;
       if (opponentVisible) this.cancelPvpOpponentWait(pvp);
       pvp.opponentUid = opponent.uid;
@@ -3927,7 +3827,7 @@ class Game {
       }
       this.syncPvpWait();
       if (!opponentVisible && pvp.started && !pvp.opponentLost) this.waitForPvpOpponent(pvp, 'Один из игроков комнаты отключился.');
-    } else if (pvp.remotePlayer && pvp.started && !(pvp.host && pvp.mode === 'battle_royale')) {
+    } else if (!multiHostMatch && pvp.remotePlayer && pvp.started && !(pvp.host && pvp.mode === 'battle_royale')) {
       pvp.opponentVisible = false;
       this.waitForPvpOpponent(pvp, 'Игрок соперника временно исчез из комнаты.');
     }
@@ -4048,8 +3948,8 @@ class Game {
         killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0) },
         over: this.pvp.matchOver || p.hp <= 0,
         migration85: Boolean(p.migration85),
-        enemyDamage: this.pvp.enemyDamageTotals || {},
-        claimedDrops: this.pvp.claimedDrops || {}
+        enemyDamage: this.pvp.host ? undefined : (this.pvp.enemyDamageTotals || {}),
+        claimedDrops: this.pvp.host ? undefined : (this.pvp.claimedDrops || {})
       };
       this.sendPvpNetworkState(state);
       if (this.pvp.host && this.pvp.maxPlayers >= 2) this.publishThreePlayerRoster();
@@ -4072,11 +3972,13 @@ class Game {
           this.pvpTimer = null;
         }
       }
-      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= 100) {
+      const playerCount = Math.max(2, Number(this.pvp.actualPlayerCount) || 2);
+      const worldSyncInterval = playerCount >= 5 ? 300 : playerCount >= 3 ? 200 : 100;
+      if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= worldSyncInterval) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
       }
-    }, 50);
+    }, Number(pvp.actualPlayerCount) >= 3 ? 100 : 50);
   }
 
   trackPvpSharedEntities() {
@@ -4336,7 +4238,7 @@ class Game {
     if (!this.pvp?.host || !this.pvp.started || damage <= 0) return;
     if (this.isBattleRoyale && targetUid) {
       const peer = this.pvp.peerConnections?.[targetUid];
-      if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source }, peer.channel, true);
+      if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source }, peer.controlChannel || peer.channel, true);
       return;
     }
     if (!this.pvp.remoteState || this.pvp.remoteState.over) return;
@@ -6923,7 +6825,6 @@ class Game {
       if (this.player.slowTimer === 0) this.player.slowFactor = 1;
     }
     this.updateDashHUD();
-    this.queueScoreRunCheckpoints();
     this.updateChallenge(dt);
     if ((!this.pvp || this.pvp.host) && this.time >= this.nextBananaSupplyTime) {
       this.spawnBananaSupply();
@@ -7812,21 +7713,15 @@ class Game {
     const status = document.getElementById('submit-status');
     const btn = document.getElementById('btn-submit-score');
 
-    const maxPlausibleScore = Math.min(26000000, seconds * 300 + 300);
-    if (!Number.isFinite(score) || score < 0 || score > maxPlausibleScore) {
-      status.innerHTML = '<span style="color:#c0392b">Рекорд не сохранён: счёт превышает допустимый предел для этой длительности забега.</span>';
-      return;
-    }
-
-    status.innerText = 'Проверяем контрольные точки забега...';
+    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
+    const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
+    status.innerText = 'Сохраняем результат...';
     btn.disabled = true;
     try {
-      await this.flushScoreRunCheckpoints();
-      if (!this.scoreRunId) throw new Error('Сервер не зарегистрировал начало забега.');
-      const response = await fetch(`${SCORE_RUN_API_BASE}/finish`, {
+      const response = await fetch(SCORE_SUBMIT_API_URL, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ runId: this.scoreRunId, name: nick, score, seconds, classId: this.player?.classId || this.selectedClassId })
+        body: JSON.stringify({ name: nick, score, seconds, version: GAME_VERSION, mode, players, classId: this.player?.classId || this.selectedClassId })
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || `сервер ответил ${response.status}`);

@@ -1,4 +1,4 @@
-# 1С:Фитнес Клуб КОРП — Survivors
+# 1С:Фитнес Клуб КОРП
 
 Browser game delivered as a single HTML file.
 

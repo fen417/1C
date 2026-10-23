@@ -262,21 +262,25 @@
     #btn-sound, #btn-music { display:none; }
     #pause-fullscreen { display:block; }
     #nav-status { display:none; }
-    #btn-dyn-update { position:fixed; z-index:125; left:50%; bottom:calc(env(safe-area-inset-bottom) + 10px); transform:translateX(-50%); width:min(260px, 38vw); min-width:190px; flex-basis:auto; padding:8px 10px; font-size:11px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:manipulation; }
+    #btn-dyn-update { position:fixed; z-index:125; left:auto; right:calc(clamp(185px,20vw,245px) + 56px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); transform:none; display:flex; align-items:center; justify-content:center; width:48px; min-width:48px; height:48px; min-height:48px; flex-basis:48px; padding:0; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92) !important; color:#fff; font-size:22px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:none; }
+    #btn-dyn-update::after { content:attr(data-cooldown); position:absolute; right:-3px; bottom:-3px; min-width:15px; height:15px; padding:0 2px; border:1px solid #111827; border-radius:8px; background:#ffd200; color:#111; font-size:9px; line-height:13px; text-align:center; }
+    #btn-dyn-update:not([data-cooldown])::after { display:none; }
     #nav-status { min-height:12px; font-size:9px; }
     #xp-bar-container { position:absolute; top:0; left:50%; transform:translateX(-50%); width:min(58vw,520px); height:12px; flex:0 0 12px; border:0; border-radius:0 0 6px 6px; background:transparent; pointer-events:none; }
     #xp-bar-text { font-size:8px; line-height:12px; }
-    #hud-active-skills { left:auto; right:10px; bottom:12px; width:148px; height:148px; transform:none; display:block; pointer-events:none; }
-    #hud-active-skills .active-slot { position:absolute; width:48px; height:48px; pointer-events:auto; border-radius:12px; }
-    #act-slot-0 { left:50px; top:0; } #act-slot-1 { left:100px; top:50px; }
-    #act-slot-2 { left:50px; top:100px; } #act-slot-3 { left:0; top:50px; }
+    #hud-active-skills { left:50%; right:auto; bottom:calc(env(safe-area-inset-bottom) + 10px); width:max-content; height:48px; transform:translateX(-50%); display:flex; gap:6px; pointer-events:none; z-index:118; }
+    #hud-active-skills .active-slot { position:relative; left:auto; top:auto; width:48px; min-width:48px; height:48px; min-height:48px; flex:0 0 48px; pointer-events:auto; border-radius:12px; touch-action:manipulation; }
     .active-slot .act-icon { font-size:20px; }
-    #hud-consumables { left:auto; right:6px; top:48px; bottom:auto; display:grid; grid-template-columns:repeat(2,28px); grid-template-rows:repeat(2,28px); gap:5px; z-index:110; }
-    #hud-consumables > .consumable-slot { width:28px; min-width:28px; height:28px; min-height:28px; padding:0; margin:0; font-size:13px; border-width:1px; border-radius:5px; }
-    .consumable-slot .consumable-key { top:0; left:2px; font-size:7px; }
-    .consumable-slot .consumable-count { right:1px; bottom:0; font-size:8px; }
+    #hud-consumables { left:auto; right:10px; top:auto; bottom:12px; width:148px; height:148px; display:block; z-index:110; pointer-events:none; }
+    #hud-consumables > .consumable-slot { position:absolute; width:48px; min-width:48px; height:48px; min-height:48px; padding:0; margin:0; font-size:20px; border-width:2px; border-radius:12px; pointer-events:auto; touch-action:manipulation; }
+    #hud-consumables > .consumable-slot:nth-child(1) { left:50px; top:0; }
+    #hud-consumables > .consumable-slot:nth-child(2) { left:100px; top:50px; }
+    #hud-consumables > .consumable-slot:nth-child(3) { left:50px; top:100px; }
+    #hud-consumables > .consumable-slot:nth-child(4) { left:0; top:50px; }
+    .consumable-slot .consumable-key { top:1px; left:3px; font-size:9px; }
+    .consumable-slot .consumable-count { right:2px; bottom:1px; font-size:10px; }
     #mobile-move-control { display:block; position:absolute; left:18px; bottom:20px; width:126px; height:126px; z-index:90; touch-action:none; }
-    #mobile-dash { display:block; position:absolute; left:auto; right:clamp(185px,20vw,245px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); width:48px; height:48px; z-index:115; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92); color:#fff; font-size:23px; pointer-events:auto; touch-action:manipulation; }
+    #mobile-dash { display:block; position:absolute; left:auto; right:clamp(185px,20vw,245px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); width:48px; height:48px; z-index:125; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92); color:#fff; font-size:23px; pointer-events:auto; touch-action:none; }
     #br-center-marker { top:51px; bottom:auto; }
     #dash-hud { display:none; }
     #br-center-marker { font-size:9px; }
@@ -291,6 +295,8 @@
     #modal-lvlup #upgrade-items { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
     #modal-lvlup .card-upgrade { min-height:0; padding:8px; }
     #modal-lvlup .card-upgrade p { font-size:10px; }
+    #modal-pause .pause-audio-controls { flex-direction:column; align-items:stretch; }
+    #modal-pause .pause-audio-controls .btn-1c { width:100%; flex:0 0 auto; text-align:left; }
   }
   @media (pointer: coarse) and (orientation: portrait) {
     body::before { content:'Поверните устройство горизонтально'; position:fixed; inset:0; z-index:9999; display:grid; place-items:center; padding:24px; background:#111; color:#fff; font:bold 20px sans-serif; text-align:center; }
@@ -2727,10 +2733,21 @@ class Game {
 
   syncMobileDynamicButtonLabel() {
     const button = document.getElementById('btn-dyn-update');
-    if (!button || this.dynUpdateCd > 0) return;
-    button.textContent = window.matchMedia('(max-width: 1300px)').matches
-      ? '⚡ Дин. обновление'
-      : '⚡ Дин. Обновление [ПРОБЕЛ]';
+    if (!button) return;
+    const mobile = window.matchMedia('(max-width: 1300px)').matches;
+    if (mobile) {
+      button.textContent = '🔄';
+      button.setAttribute('aria-label', 'Динамическое обновление');
+      button.title = this.dynUpdateCd > 0 ? `Обновление через ${Math.ceil(this.dynUpdateCd)} сек.` : 'Динамическое обновление';
+      if (this.dynUpdateCd > 0) button.dataset.cooldown = String(Math.ceil(this.dynUpdateCd));
+      else delete button.dataset.cooldown;
+      return;
+    }
+    if (this.dynUpdateCd > 0) return;
+    button.removeAttribute('aria-label');
+    button.removeAttribute('title');
+    delete button.dataset.cooldown;
+    button.textContent = '⚡ Дин. Обновление [ПРОБЕЛ]';
   }
 
   async toggleMobileFullscreen() {
@@ -2772,6 +2789,18 @@ class Game {
     dashButton?.addEventListener('click', event => {
       event.preventDefault();
       if (event.detail === 0) this.tryDash();
+    });
+    const dynButton = document.getElementById('btn-dyn-update');
+    dynButton?.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'mouse' || event.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      this.sound.init();
+      this.triggerDynamicUpdate();
+    });
+    dynButton?.addEventListener('click', event => {
+      event.preventDefault();
+      if (event.detail === 0) this.triggerDynamicUpdate();
     });
     const update = event => {
       const rect = pad.getBoundingClientRect();
@@ -7403,8 +7432,14 @@ class Game {
       if (this.dynUpdateCd === 0) {
         this.syncMobileDynamicButtonLabel();
         btn.style.background = "#55efc4";
+        btn.style.opacity = '1';
       } else {
-        btn.innerText = `⏳ Дин. Обновл. (${Math.ceil(this.dynUpdateCd)}с)`;
+        if (window.matchMedia('(max-width: 1300px)').matches) {
+          this.syncMobileDynamicButtonLabel();
+          btn.style.opacity = '.58';
+        } else {
+          btn.innerText = `⏳ Дин. Обновл. (${Math.ceil(this.dynUpdateCd)}с)`;
+        }
         btn.style.background = "#dfe6e9";
       }
     }

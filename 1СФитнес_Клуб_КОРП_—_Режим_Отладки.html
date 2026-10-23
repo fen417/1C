@@ -262,7 +262,7 @@
     #btn-sound, #btn-music { display:none; }
     #pause-fullscreen { display:block; }
     #nav-status { display:none; }
-    #btn-dyn-update { position:fixed; z-index:125; left:auto; right:calc(clamp(185px,20vw,245px) + 56px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); transform:none; display:flex; align-items:center; justify-content:center; width:48px; min-width:48px; height:48px; min-height:48px; flex-basis:48px; padding:0; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92) !important; color:#fff; font-size:22px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:none; }
+    #btn-dyn-update { position:fixed; z-index:125; left:auto; right:calc(clamp(185px,20vw,245px) - 30px); bottom:calc(env(safe-area-inset-bottom) + 34px); transform:none; display:flex; align-items:center; justify-content:center; width:48px; min-width:48px; height:48px; min-height:48px; flex-basis:48px; padding:0; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92) !important; color:#fff; font-size:22px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:none; }
     #btn-dyn-update::after { content:attr(data-cooldown); position:absolute; right:-3px; bottom:-3px; min-width:15px; height:15px; padding:0 2px; border:1px solid #111827; border-radius:8px; background:#ffd200; color:#111; font-size:9px; line-height:13px; text-align:center; }
     #btn-dyn-update:not([data-cooldown])::after { display:none; }
     #nav-status { min-height:12px; font-size:9px; }
@@ -271,6 +271,7 @@
     #hud-active-skills { left:50%; right:auto; bottom:calc(env(safe-area-inset-bottom) + 10px); width:max-content; height:48px; transform:translateX(-50%); display:flex; gap:6px; pointer-events:none; z-index:118; }
     #hud-active-skills .active-slot { position:relative; left:auto; top:auto; width:48px; min-width:48px; height:48px; min-height:48px; flex:0 0 48px; pointer-events:auto; border-radius:12px; touch-action:manipulation; }
     .active-slot .act-icon { font-size:20px; }
+    #hud-active-skills .act-key, #hud-consumables .consumable-key { display:none; }
     #hud-consumables { left:auto; right:10px; top:auto; bottom:12px; width:148px; height:148px; display:block; z-index:110; pointer-events:none; }
     #hud-consumables > .consumable-slot { position:absolute; width:48px; min-width:48px; height:48px; min-height:48px; padding:0; margin:0; font-size:20px; border-width:2px; border-radius:12px; pointer-events:auto; touch-action:manipulation; }
     #hud-consumables > .consumable-slot:nth-child(1) { left:50px; top:0; }

@@ -208,6 +208,15 @@
     color: #ffd200;
     font-weight: bold;
   }
+  .shop-active-slot {
+    padding: 0;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .shop-active-slot:disabled {
+    opacity: .58;
+    filter: grayscale(.55);
+  }
 
   /* Панель активных умений [1][2][3][4] */
   #hud-active-skills {
@@ -762,7 +771,7 @@
       <div id="hud-inventory"></div>
       <div id="hud-buffs"><div class="inv-slot" id="coffee-buff-icon"><span id="coffee-buff-symbol">☕</span><span class="inv-lvl" id="coffee-buff-timer"></span></div><span id="buff-indicator"></span></div>
       <button id="br-upgrade-button" onclick="game.openBattleRoyaleUpgrade()" aria-label="Открыть доступное улучшение">+</button>
-      <div id="hud-shop-passives" aria-label="Пассивные предметы" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;"></div>
+      <div id="hud-shop-passives" aria-label="Шесть слотов предметов: активные и пассивные" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; pointer-events:auto;"></div>
     </div>
     <div id="mobile-move-control" aria-label="Круговое сенсорное управление движением"><div class="mobile-stick-ring"></div><div id="mobile-stick-knob" class="mobile-stick-knob"></div></div>
     <button id="mobile-dash" onclick="game.tryDash()" aria-label="Рывок">💨</button>
@@ -862,7 +871,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.4.0 — «Комплект и контроль»</h3>
-              <p>Перебалансированы тикеты, улучшены подсказки активных умений и защита в онлайне. В рекордах сохраняется комплект игрока; добавлены карманник и обновлённый мобильный интерфейс.</p>
+              <p>Перебалансированы тикеты, улучшены подсказки активных умений и защита в онлайне. В рекордах сохраняется комплект игрока; добавлены карманник, новые предметы и рецепты, а мобильный интерфейс обновлён.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.3.0 — «Мобы не ушли в отпуск»</h3>
@@ -970,7 +979,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки показывают слот, клавишу и кнопку HUD. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В рекорд передаётся комплект игрока на финише. Карманник из отдела биллинга при касании забирает 5% кошелька; кража срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. На мобильных устройствах доступны полноэкранный горизонтальный режим, круговое управление движением, боевой HUD с активками ромбом и расходниками вдоль края экрана. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта.</p></details>
+        <details class="release-notes" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки показывают слот, клавишу и кнопку HUD. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В рекорд передаётся комплект игрока на финише. Карманник из отдела биллинга при касании забирает 5% кошелька; кража срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое. На мобильных устройствах доступны полноэкранный горизонтальный режим, круговое управление движением, боевой HUD с активками ромбом и расходниками вдоль края экрана. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта.</p></details>
         <details class="release-notes"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
         <details class="release-notes"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
         <details class="release-notes"><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два новых события, влияющих на игрока. В Battle Royale безопасная зона забирает 10% площади карты каждые 45 секунд; урон вне неё увеличен до 18,4% максимального HP в секунду. Стрелка направления и логотип 1С теперь указывают на корректный центр увеличенной карты. Рывок на ПКМ срабатывает и при удержании ЛКМ для движения. Неуязвимый преследователь RuDesktop, появляющийся с 15-й минуты, теперь выделяется белым квадратом с контрастной рамкой и заметной подписью.</p></details>
@@ -993,11 +1002,11 @@
     <div class="win-1c" style="width:790px;">
       <div class="win-1c-head"><span>💼 Коммерческое предложение · отдел продаж</span><span id="shop-currency">💰 Бюджет: 0 фиткоинов</span><button class="win-close-btn" onclick="game.closeShop()" aria-label="Закрыть магазин">✕</button></div>
       <div class="win-1c-body">
-        <p style="font-size:11px; color:#555; margin-bottom:9px;">Расходники занимают четыре быстрых слота (клавиши 7, 8, 9 и 0). Пассивные улучшения помещаются в отдельный инвентарь на шесть предметов и действуют до конца забега.</p>
+        <p style="font-size:11px; color:#555; margin-bottom:9px;">В инвентаре шесть слотов активных и пассивных предметов. Одинаковые предметы складываются, активные можно нажимать прямо в игре. Расходники остаются в четырёх быстрых слотах (клавиши 7, 8, 9 и 0).</p>
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;"><span style="font-size:11px; color:#555;">Витрину можно обновить за фиткоины.</span><button id="shop-refresh" class="btn-1c" onclick="game.refreshShopOffer()">🔄 Обновить предложение</button></div>
         <h3 style="font-size:13px; margin:10px 0 7px;">Расходники</h3>
         <div id="shop-products" class="shop-grid"></div>
-        <h3 style="font-size:13px; margin:14px 0 7px;">Пассивные предметы · инвентарь <span id="shop-passive-slots">0/6</span></h3>
+        <h3 style="font-size:13px; margin:14px 0 7px;">Предметы · 6 слотов <span id="shop-passive-slots">0/6</span></h3>
         <div id="shop-passive-products" class="shop-grid"></div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
           <span id="shop-message" style="font-size:11px; color:#555;">Предложение действует до завершения звонка.</span>
@@ -2297,12 +2306,19 @@ const STORE_PASSIVES_DEF = {
   coffee_thermos: { name: 'Термокружка из 308 кабинета', icon: '☕', cost: 400, stock: 3, desc: 'Умения и оружие перезаряжаются на 8% быстрее.', apply: p => { p.cdMult *= 0.92; } },
   hasp_license: { name: 'HASP-лицензия на уклонение', icon: '🗝️', cost: 360, stock: 3, desc: '+5% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.05); } },
   ergonomic_chair: { name: 'Кресло по охране труда', icon: '🪑', cost: 390, stock: 3, desc: 'Восстанавливает ещё 8 HP при каждом повышении уровня. Эффект суммируется до +24 HP за уровень.', apply: p => { p.levelUpHeal = Math.min(24, (p.levelUpHeal || 0) + 8); } },
-  toner_fax: { name: 'Факс с резервным тонером', icon: '📠', cost: 350, stock: 3, desc: '+15% фиткоинов с дискет. Бонус суммируется до +45%. Тонер не входит в комплект.', apply: p => { p.currencyMult = Math.min(1.45, (p.currencyMult || 1) + 0.15); } },
+  toner_fax: { name: 'Факс с резервным тонером', icon: '📠', cost: 460, stock: 3, desc: '+10% фиткоинов с дискет. Бонус суммируется до +20%. Тонер не входит в комплект.', apply: p => { p.currencyMult = Math.min(1.20, (p.currencyMult || 1) + 0.10); } },
   usb_adapter: { name: 'Переходник с переходника', icon: '🔌', cost: 330, stock: 3, desc: 'Сокращает перезарядку рывка на 20%. Эффект суммируется до 45%. Совместимость подтверждена устно.', apply: p => { p.dashCooldownMult = Math.max(0.55, (p.dashCooldownMult || 1) * 0.8); } },
   training_spreadsheet: { name: 'Excel «Обучение_финал_7.xlsx»', icon: '📊', cost: 370, stock: 3, desc: '+10% к получаемому опыту. Формулы защищены от редактирования.', apply: p => { p.xpMult += 0.10; } },
   access_badge: { name: 'Пропуск в серверную', icon: '🪪', cost: 410, stock: 3, desc: 'Снижает урон от атак боссов на 10%. Эффект суммируется до 30%. Охрана всё равно спросит, кто вы.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.10); } },
   network_filter: { name: 'Сетевой фильтр', icon: '🔌', cost: 460, stock: 2, desc: 'Раз в 38 секунд блокирует весь входящий урон на 0,7 секунды. В классическом PvP перезарядка — 55 секунд.', apply: p => { p.hasNetworkFilter = true; p.networkFilterCooldown = 0; p.networkFilterBlockTimer = 0; } },
   second_monitor: { name: 'Второй монитор', icon: '🖥️', cost: 430, stock: 2, desc: 'В PvP показывает синие стрелки на игроков и красные на боссов; в одиночной игре — до четырёх ближайших врагов. Наконец-то видно, кто занял всю оперативку.', apply: p => { p.hasSecondMonitor = true; } }
+};
+
+const STORE_ACTIVES_DEF = {
+  active_hotfix: { name: 'Экстренный хотфикс', icon: '🩹', cost: 390, type: 'active', cooldown: 24, desc: 'Мгновенно восстанавливает 30% здоровья и даёт короткий щит.', use: g => { const heal = Math.ceil(g.player.maxHp * 0.30); g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal); g.player.shieldTimer = Math.max(g.player.shieldTimer, 1.25); g.addPopup(g.player.x, g.player.y - 28, `🩹 +${heal} HP · ХОТФИКС`, '#55efc4'); return true; } },
+  active_firewall: { name: 'Мобильный межсетевой экран', icon: '🧱', cost: 430, type: 'active', cooldown: 30, desc: 'На 4 секунды блокирует урон и отбрасывает обычных противников вокруг.', use: g => { g.player.shieldTimer = Math.max(g.player.shieldTimer, 4); for (const e of g.enemies) { if (e.isBoss || e.is24hPursuer) continue; const dx = e.x - g.player.x, dy = e.y - g.player.y, d = Math.hypot(dx, dy); if (d > 220) continue; e.freezeTimer = Math.max(e.freezeTimer || 0, 1.2); e.x += dx / (d || 1) * 80; e.y += dy / (d || 1) * 80; } g.addPopup(g.player.x, g.player.y - 28, '🧱 ЭКРАН АКТИВЕН', '#74b9ff'); return true; } },
+  active_audit: { name: 'Аудит боевого контура', icon: '📡', cost: 470, type: 'active', cooldown: 27, desc: 'Наносит урон противникам в радиусе 240 и очищает вражеские снаряды.', use: g => { let hits = 0; for (const e of g.enemies) { if (e.is24hPursuer) continue; const d = Math.hypot(e.x - g.player.x, e.y - g.player.y); if (d > 240) continue; e.hp -= e.isBoss ? 70 : 125; e.freezeTimer = Math.max(e.freezeTimer || 0, 0.7); hits++; } g.enemyProjectiles = g.enemyProjectiles.filter(p => Math.hypot(p.x - g.player.x, p.y - g.player.y) > 240); g.addPopup(g.player.x, g.player.y - 28, `📡 АУДИТ · ЦЕЛЕЙ: ${hits}`, '#f1c40f'); return true; } },
+  active_overclock: { name: 'Разгон серверной', icon: '⚡', cost: 410, type: 'active', cooldown: 32, desc: 'На 10 секунд ускоряет героя и перезарядку оружия.', use: g => { g.player.speedBuffTimer = Math.max(g.player.speedBuffTimer, 10); g.player.turboBuffTimer = Math.max(g.player.turboBuffTimer, 10); g.addPopup(g.player.x, g.player.y - 28, '⚡ СЕРВЕР РАЗОГНАН', '#f1c40f'); return true; } }
 };
 
 const STORE_PASSIVE_COMBOS = {
@@ -2335,7 +2351,31 @@ const STORE_PASSIVE_COMBOS = {
     name: 'СКУД «Охрана пропускает охрану»', icon: '🛡️',
     desc: 'Бонус комплекта: +3% к шансу уклонения и +10 к максимальному здоровью. Исходные эффекты предметов сохраняются.',
     apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.03); p.maxHp += 10; p.hp = Math.min(p.maxHp, p.hp + 5); }
+  },
+  full_stack_team: {
+    parts: ['tech_gloves', 'coffee_thermos', 'training_spreadsheet'],
+    name: 'Набор «Полный стек»', icon: '🧰',
+    desc: 'Три предмета в одном слоте: ещё +8% к урону и +6% к опыту.',
+    apply: p => { p.dmgMult += 0.08; p.xpMult += 0.06; }
+  },
+  server_room: {
+    parts: ['stability_belt', 'backup_coil', 'network_filter'],
+    name: 'Комплекс «Серверная под охраной»', icon: '🏢',
+    desc: 'Три предмета в одном слоте: +25 HP и +1 HP регенерации в секунду.',
+    apply: p => { p.maxHp += 25; p.hp = Math.min(p.maxHp, p.hp + 15); p.regen += 1; }
+  },
+  it_architect_kit: {
+    parts: ['hasp_license', 'second_monitor', 'floppy_magnet'],
+    name: 'Набор «Архитектор ИТ»', icon: '🧠',
+    desc: 'Три предмета в одном слоте: +4% к уклонению и +10% к радиусу сбора.',
+    apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.04); p.magnetMult += 0.10; }
   }
+};
+
+const STORE_RECIPES = {
+  ...Object.fromEntries(Object.entries(STORE_PASSIVE_COMBOS).map(([key, combo]) => [key, combo])),
+  active_incident_response: { parts: ['active_hotfix', 'active_firewall'], name: 'Комплект «Реакция на инцидент»', icon: '🚨', type: 'active', cooldown: 22, desc: 'Объединяет хотфикс и защитный экран: восстановление 35% здоровья и щит на 3 секунды.', use: g => { const heal = Math.ceil(g.player.maxHp * 0.35); g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal); g.player.shieldTimer = Math.max(g.player.shieldTimer, 3); g.addPopup(g.player.x, g.player.y - 28, `🚨 +${heal} HP · ИНЦИДЕНТ ЗАКРЫТ`, '#55efc4'); return true; } },
+  triple_release: { parts: ['active_audit', 'active_overclock', 'training_spreadsheet'], name: 'Комплект «Релиз без отката»', icon: '🚀', type: 'active', cooldown: 25, desc: 'Аудит боевого контура, ускорение и повышенный урон по ближайшим противникам.', use: g => { STORE_ACTIVES_DEF.active_audit.use(g); g.player.speedBuffTimer = Math.max(g.player.speedBuffTimer, 8); g.player.turboBuffTimer = Math.max(g.player.turboBuffTimer, 8); return true; } }
 };
 
 const CONSUMABLES_DEF = {
@@ -2961,12 +3001,11 @@ class Game {
     this.fitcoinTheftCooldown = 0;
     this.consumables = Array(4).fill(null);
     this.shopPassives = [];
-    this.shopPurchased = new Set();
     this.nextShopTime = 180;
     this.shopVisit = 0;
-    this.shopStock = {};
     this.shopConsumableOffers = [];
     this.shopPassiveOffers = [];
+    this.shopActiveOffers = [];
     this.shopRefreshCount = 0;
     this.activeChallenge = null;
     this.challengeNoticeUntil = 0;
@@ -5314,37 +5353,52 @@ class Game {
   }
 
   getShopPassiveDef(key) {
-    return STORE_PASSIVES_DEF[key] || STORE_PASSIVE_COMBOS[key] || null;
+    return STORE_PASSIVES_DEF[key] || STORE_ACTIVES_DEF[key] || STORE_RECIPES[key] || null;
   }
 
   canCombinePassiveItem(key) {
-    return Object.values(STORE_PASSIVE_COMBOS).some(combo => {
-      if (!combo.parts.includes(key)) return false;
-      const otherKey = combo.parts.find(part => part !== key);
-      return this.shopPassives.some(slot => slot.key === otherKey);
+    return Object.values(STORE_RECIPES).some(recipe => {
+      if (!recipe.parts.includes(key)) return false;
+      const available = new Map();
+      for (const slot of this.shopPassives) available.set(slot.key, (available.get(slot.key) || 0) + (slot.count || 1));
+      available.set(key, (available.get(key) || 0) + 1);
+      return recipe.parts.every(part => {
+        const count = available.get(part) || 0;
+        if (count <= 0) return false;
+        available.set(part, count - 1);
+        return true;
+      });
     });
   }
 
   getShopPassiveComboHint(key) {
-    for (const combo of Object.values(STORE_PASSIVE_COMBOS)) {
+    for (const combo of Object.values(STORE_RECIPES)) {
       if (!combo.parts.includes(key)) continue;
-      const ownedKey = combo.parts.find(part => part !== key);
-      const ownedItem = this.shopPassives.some(slot => slot.key === ownedKey) ? STORE_PASSIVES_DEF[ownedKey] : null;
+      const ownedKey = combo.parts.find(part => part !== key && this.shopPassives.some(slot => slot.key === part && (slot.count || 1) > 0));
+      const ownedItem = ownedKey ? this.getShopPassiveDef(ownedKey) : null;
       if (ownedItem) return { ownedItem, combo };
     }
     return null;
   }
 
   combineShopPassives(key) {
-    for (const [comboKey, combo] of Object.entries(STORE_PASSIVE_COMBOS)) {
+    for (const [comboKey, combo] of Object.entries(STORE_RECIPES)) {
       if (!combo.parts.includes(key)) continue;
-      const otherKey = combo.parts.find(part => part !== key);
-      const firstIndex = this.shopPassives.findIndex(slot => slot.key === key);
-      const secondIndex = this.shopPassives.findIndex((slot, index) => index !== firstIndex && slot.key === otherKey);
-      if (firstIndex < 0 || secondIndex < 0) continue;
-      this.shopPassives.splice(Math.max(firstIndex, secondIndex), 1);
-      this.shopPassives.splice(Math.min(firstIndex, secondIndex), 1);
-      this.shopPassives.push({ key: comboKey });
+      const indices = [];
+      const used = new Set();
+      for (const part of combo.parts) {
+        const index = this.shopPassives.findIndex((slot, i) => !used.has(i) && slot.key === part && (slot.count || 1) > 0);
+        if (index < 0) break;
+        indices.push(index);
+        used.add(index);
+      }
+      if (indices.length !== combo.parts.length) continue;
+      for (const index of indices) this.shopPassives[index].count = (this.shopPassives[index].count || 1) - 1;
+      this.shopPassives = this.shopPassives.filter(slot => slot.count > 0);
+      const existing = this.shopPassives.find(slot => slot.key === comboKey);
+      if (existing) existing.count = (existing.count || 1) + 1;
+      else this.shopPassives.push({ key: comboKey, count: 1, cooldown: 0 });
+      if (combo.apply) this.applyShopPassiveEffect(combo);
       return combo;
     }
     return null;
@@ -5381,42 +5435,38 @@ class Game {
     for (const key of this.shopConsumableOffers) {
       const item = CONSUMABLES_DEF[key];
       const owned = this.consumables.find(slot => slot && slot.key === key);
-      const stackFull = owned && owned.count >= item.maxStack;
       const slotsFull = !owned && this.consumables.every(Boolean);
-      const stock = this.shopStock[key] || 0;
       const price = this.shopPrice[key] || item.cost;
-      const purchased = this.shopPurchased.has(key);
       const card = document.createElement('div');
       card.className = 'shop-card';
-      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>Лицензии: ${stock}${owned ? ` · подключено: ${owned.count}` : ''}</b></p>`;
+      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>В запасе: ${owned ? owned.count : 0}</b></p>`;
       const button = document.createElement('button');
       button.className = 'btn-1c';
-      button.innerText = purchased ? 'Уже куплено' : `Подключить · ${price} 💰`;
-      button.disabled = purchased || stock <= 0 || this.currency < price || stackFull || slotsFull;
+      button.innerText = `Купить ещё · ${price} 💰`;
+      button.disabled = this.currency < price || slotsFull;
       button.onclick = () => this.buyConsumable(key);
       card.appendChild(button);
       grid.appendChild(card);
     }
-    for (const key of this.shopPassiveOffers) {
-      const item = STORE_PASSIVES_DEF[key];
+    for (const key of [...this.shopPassiveOffers, ...this.shopActiveOffers]) {
+      const item = this.getShopPassiveDef(key);
       const stockKey = `passive_${key}`;
-      const stock = this.shopStock[stockKey] || 0;
       const price = this.shopPrice[stockKey] || item.cost;
-      const purchased = this.shopPurchased.has(stockKey);
       const card = document.createElement('div');
       card.className = 'shop-card';
-      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}</h3><p>${item.desc}<br><b>В инвентаре: ${this.shopPassives.filter(slot => slot.key === key).length} · Остаток: ${stock}</b></p>`;
+      card.innerHTML = `<div class="shop-icon">${item.icon}</div><h3>${item.name}${item.type === 'active' ? ' · активный' : ' · пассивный'}</h3><p>${item.desc}<br><b>В инвентаре: ${this.shopPassives.filter(slot => slot.key === key).reduce((sum, slot) => sum + (slot.count || 1), 0)}</b></p>`;
       const comboHint = this.getShopPassiveComboHint(key);
       if (comboHint) {
         const hint = document.createElement('div');
         hint.className = 'shop-combo-hint';
-        hint.textContent = `🔗 Объединится с ${comboHint.ownedItem.icon} ${comboHint.ownedItem.name} → ${comboHint.combo.name}`;
+        hint.textContent = `🔗 Рецепт: ${comboHint.combo.parts.map(part => { const component = this.getShopPassiveDef(part); return `${component?.icon || '📦'} ${component?.name || part}`; }).join(' + ')} → ${comboHint.combo.name}`;
         card.appendChild(hint);
       }
       const button = document.createElement('button');
       button.className = 'btn-1c';
-      button.innerText = purchased ? 'Уже куплено' : `Купить · ${price} 💰`;
-      button.disabled = purchased || stock <= 0 || this.currency < price || (this.shopPassives.length >= 6 && !this.canCombinePassiveItem(key));
+      button.innerText = `Купить ещё · ${price} 💰`;
+      const canStack = this.shopPassives.some(slot => slot.key === key);
+      button.disabled = this.currency < price || (this.shopPassives.length >= 6 && !canStack && !this.canCombinePassiveItem(key));
       button.onclick = () => this.buyPassiveItem(key);
       card.appendChild(button);
       passiveGrid.appendChild(card);
@@ -5440,20 +5490,21 @@ class Game {
     };
     this.shopConsumableOffers = drawOffer(Object.keys(CONSUMABLES_DEF), 4, this.shopConsumableOffers);
     this.shopPassiveOffers = drawOffer(Object.keys(STORE_PASSIVES_DEF), 5, this.shopPassiveOffers);
-    this.shopStock = {};
+    this.shopActiveOffers = drawOffer(Object.keys(STORE_ACTIVES_DEF), 3, this.shopActiveOffers);
     this.shopPrice = {};
-    this.shopPurchased = new Set();
-    const inflation = 1 + (this.shopVisit - 1) * 0.08;
+    const inflation = 1 + Math.min(0.45, (this.shopVisit - 1) * 0.05);
     for (const key of this.shopConsumableOffers) {
       const item = CONSUMABLES_DEF[key];
-      this.shopStock[key] = item.stock;
       this.shopPrice[key] = Math.round(item.cost * inflation);
     }
     for (const key of this.shopPassiveOffers) {
       const item = STORE_PASSIVES_DEF[key];
       const stockKey = `passive_${key}`;
-      this.shopStock[stockKey] = item.stock;
       this.shopPrice[stockKey] = Math.round(item.cost * inflation);
+    }
+    for (const key of this.shopActiveOffers) {
+      const item = STORE_ACTIVES_DEF[key];
+      this.shopPrice[`passive_${key}`] = Math.round(item.cost * inflation);
     }
   }
 
@@ -5471,20 +5522,21 @@ class Game {
     this.renderShop();
   }
   buyPassiveItem(key) {
-    const item = STORE_PASSIVES_DEF[key];
+    const item = this.getShopPassiveDef(key);
+    if (!item) return;
     const stockKey = `passive_${key}`;
     const price = this.shopPrice[stockKey] || item.cost;
-    if (!item || this.shopPurchased.has(stockKey) || (this.shopPassives.length >= 6 && !this.canCombinePassiveItem(key)) || (this.shopStock[stockKey] || 0) <= 0 || this.currency < price) return;
+    const canStack = this.shopPassives.some(slot => slot.key === key);
+    if ((this.shopPassives.length >= 6 && !canStack && !this.canCombinePassiveItem(key)) || this.currency < price) return;
     this.currency -= price;
-    this.shopStock[stockKey]--;
-    this.shopPurchased.add(stockKey);
-    this.shopPassives.push({ key });
-    this.applyShopPassiveEffect(item);
+    let slot = this.shopPassives.find(entry => entry.key === key);
+    if (slot) slot.count = (slot.count || 1) + 1;
+    else this.shopPassives.push({ key, count: 1, cooldown: 0 });
+    if (item.apply) this.applyShopPassiveEffect(item);
     const combo = this.combineShopPassives(key);
-    if (combo) this.applyShopPassiveEffect(combo);
     document.getElementById('shop-message').innerText = combo
-      ? `Сборка завершена: ${combo.name}. Эффекты исходных предметов сохранены, бонус комплекта применён.`
-      : `${item.name}: улучшение добавлено в инвентарь и сразу действует.`;
+      ? `Сборка завершена: ${combo.name}. Рецепт использовал компоненты, их эффекты сохранены.`
+      : `${item.name}: ${item.type === 'active' ? 'активный предмет добавлен в инвентарь.' : 'улучшение добавлено и сразу действует.'}`;
     this.updateInventoryHUD();
     this.updateHUD();
     this.renderShop();
@@ -5492,18 +5544,14 @@ class Game {
   buyConsumable(key) {
     const item = CONSUMABLES_DEF[key];
     const price = this.shopPrice[key] || item.cost;
-    const stock = this.shopStock[key] || 0;
     let slot = this.consumables.find(entry => entry && entry.key === key);
-    if (this.shopPurchased.has(key) || stock <= 0 || this.currency < price) return;
-    if (slot && slot.count >= item.maxStack) return;
+    if (this.currency < price) return;
     const freeSlot = this.consumables.findIndex(entry => !entry);
     if (!slot && freeSlot === -1) {
       document.getElementById('shop-message').innerText = 'В коммерческом предложении максимум четыре позиции одновременно. Уберите модуль из инвентаря или продлите уже подключённый.';
       return;
     }
     this.currency -= price;
-    this.shopStock[key]--;
-    this.shopPurchased.add(key);
     if (slot) slot.count++;
     else this.consumables[freeSlot] = { key, count: 1 };
     document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} подключена и добавлена в инвентарь. Отдел продаж благодарит за выбор.`;
@@ -5547,6 +5595,34 @@ class Game {
     this.log(`Использовано: ${item.name}`);
     this.updateConsumableHUD();
     this.updateHUD();
+  }
+
+  useShopActiveItem(slotIndex) {
+    if (this.paused || !this.player || this.player.hp <= 0 || this.player.stunTimer > 0) return;
+    const slot = this.shopPassives[slotIndex];
+    const item = slot && this.getShopPassiveDef(slot.key);
+    if (!slot || item?.type !== 'active') return;
+    if (slot.cooldown > 0) return;
+    const beforeDefense = { hp: this.player.hp, shield: this.player.shieldTimer };
+    if (!item.use(this)) return;
+    this.scalePvpDefenseGain(beforeDefense);
+    slot.cooldown = item.cooldown || 20;
+    this.sound.skillCast();
+    this.log(`Использован предмет: ${item.name}`);
+    this.updateInventoryHUD();
+    this.updateHUD();
+  }
+
+  updateShopItemCooldowns(dt) {
+    let redraw = false;
+    for (const slot of this.shopPassives || []) {
+      if (slot.cooldown > 0) {
+        const before = Math.ceil(slot.cooldown);
+        slot.cooldown = Math.max(0, slot.cooldown - dt);
+        if (Math.ceil(slot.cooldown) !== before || slot.cooldown === 0) redraw = true;
+      }
+    }
+    if (redraw) this.updateInventoryHUD();
   }
 
   updateConsumableHUD() {
@@ -5688,7 +5764,8 @@ class Game {
     ];
     const shopItems = (this.shopPassives || []).map(slot => {
       const item = this.getShopPassiveDef(slot.key);
-      return { icon: item?.icon || '📦', name: item?.name || slot.key, value: 'пассивный', detail: item?.desc || '' };
+      const kind = item?.type === 'active' ? `активный · КД ${Math.ceil(slot.cooldown || 0)}с` : 'пассивный';
+      return { icon: item?.icon || '📦', name: `${item?.name || slot.key}${slot.count > 1 ? ` ×${slot.count}` : ''}`, value: kind, detail: item?.desc || '' };
     });
     const weapons = Object.entries(this.weapons || {}).map(([key, weapon]) => ({
       icon: WEAPONS_DEF[key]?.icon || '🔫', name: WEAPONS_DEF[key]?.name || key, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key]?.desc || ''
@@ -7595,6 +7672,7 @@ class Game {
 
     // Логика врагов
     this.fitcoinTheftCooldown = Math.max(0, this.fitcoinTheftCooldown - dt);
+    this.updateShopItemCooldowns(dt);
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
       const worldAuthority = !this.pvp?.started || this.pvp.host;
@@ -7841,7 +7919,7 @@ class Game {
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
-        this.currency += Math.max(0, Math.round(g.xp * (this.player.currencyMult || 1)));
+        this.currency += Math.max(0, Math.round(g.xp * 0.5 * (this.player.currencyMult || 1)));
         document.getElementById('currency-display').innerText = this.currency;
         this.gems.splice(i, 1);
         if (this.paused) break;
@@ -8583,10 +8661,15 @@ class Game {
     for (let i = 0; i < 6; i++) {
       const slot = (this.shopPassives || [])[i];
       const item = slot ? this.getShopPassiveDef(slot.key) : null;
-      const entry = document.createElement('div');
-      entry.className = `inv-slot${item ? '' : ' empty'}`;
-      entry.title = item ? `${item.name}: ${item.desc}` : `Пустой слот пассивного инвентаря ${i + 1}/6`;
-      entry.innerHTML = item ? `${item.icon}<span class="inv-lvl">+</span>` : '<span>＋</span>';
+      const entry = document.createElement(item?.type === 'active' ? 'button' : 'div');
+      entry.className = `inv-slot${item ? '' : ' empty'}${item?.type === 'active' ? ' shop-active-slot' : ''}`;
+      entry.title = item ? `${item.name}${slot.count > 1 ? ` ×${slot.count}` : ''}: ${item.desc}${item.type === 'active' ? ` Перезарядка: ${Math.ceil(slot.cooldown || 0)} сек.` : ''}` : `Пустой слот предметов ${i + 1}/6`;
+      entry.innerHTML = item ? `${item.icon}<span class="inv-lvl">${slot.count > 1 ? `×${slot.count}` : item.type === 'active' && slot.cooldown > 0 ? `${Math.ceil(slot.cooldown)}с` : item.type === 'active' ? 'АКТ' : 'П'}</span>` : '<span>＋</span>';
+      if (item?.type === 'active') {
+        entry.type = 'button';
+        entry.disabled = slot.cooldown > 0;
+        entry.onclick = () => this.useShopActiveItem(i);
+      }
       passiveBox.appendChild(entry);
     }
   }

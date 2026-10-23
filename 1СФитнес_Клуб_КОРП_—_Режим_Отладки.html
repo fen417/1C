@@ -240,30 +240,34 @@
   #mobile-dyn-update { display:none; }
   .mobile-stick-ring { position:absolute; inset:0; border:2px solid rgba(255,255,255,.65); border-radius:50%; background:rgba(20,25,35,.48); box-shadow:0 2px 12px #0008; }
   .mobile-stick-knob { position:absolute; width:42%; height:42%; left:29%; top:29%; border:2px solid #fff; border-radius:50%; background:rgba(85,239,196,.72); box-shadow:0 1px 7px #0009; pointer-events:none; }
-  @media (pointer: coarse) and (max-width: 900px) {
+  @media (pointer: coarse) and (max-width: 1300px) {
     html, body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; touch-action:none; }
-    #app { width:100vw; height:100dvh; }
+    #app-window { width:100vw; height:100dvh; border:0; box-shadow:none; }
     #header-1c, #footer-1c { display:none; }
-    #nav-bar { height:38px; min-height:38px; flex-basis:38px; padding:2px 5px; flex-direction:row; align-items:center; overflow:visible; }
-    #nav-actions { width:100%; gap:6px; justify-content:flex-start; }
+    #nav-bar { position:absolute; top:0; left:0; width:0; height:0; min-height:0; flex-basis:0; padding:0; border:0; background:transparent; overflow:visible; z-index:120; pointer-events:none; }
+    #nav-actions { position:static; display:block; width:auto; }
     .nav-btn { padding:5px 8px; font-size:10px; }
+    #btn-pause { position:absolute; top:8px; left:8px; z-index:121; padding:6px 9px; background:rgba(17,24,39,.72); border:1px solid rgba(255,255,255,.45); border-radius:7px; color:#fff; font-size:0; box-shadow:0 2px 8px #0007; pointer-events:auto; }
+    #btn-pause::after { content:'☰ Меню'; font-size:11px; }
+    #btn-leaderboard { display:none; }
     #btn-sound, #btn-music { display:none; }
     #pause-fullscreen { display:block; }
     #nav-status { display:none; }
     #btn-dyn-update { position:fixed; z-index:95; left:50%; bottom:calc(env(safe-area-inset-bottom) + 10px); transform:translateX(-50%); width:min(260px, 38vw); min-width:190px; flex-basis:auto; padding:8px 10px; font-size:11px; box-shadow:0 2px 10px #0008; }
     #nav-status { min-height:12px; font-size:9px; }
-    #xp-bar-container { height:13px; flex-basis:13px; }
-    #xp-bar-text { font-size:9px; line-height:13px; }
+    #xp-bar-container { position:absolute; top:0; left:50%; transform:translateX(-50%); width:min(58vw,520px); height:12px; flex:0 0 12px; border:0; border-radius:0 0 6px 6px; background:transparent; pointer-events:none; }
+    #xp-bar-text { font-size:8px; line-height:12px; }
     #hud-active-skills { left:auto; right:10px; bottom:12px; width:148px; height:148px; transform:none; display:block; pointer-events:none; }
     #hud-active-skills .active-slot { position:absolute; width:48px; height:48px; pointer-events:auto; border-radius:12px; }
     #act-slot-0 { left:50px; top:0; } #act-slot-1 { left:100px; top:50px; }
     #act-slot-2 { left:50px; top:100px; } #act-slot-3 { left:0; top:50px; }
     .active-slot .act-icon { font-size:20px; }
-    #hud-consumables { left:auto; right:5px; bottom:max(168px, calc(env(safe-area-inset-bottom) + 160px)); flex-direction:column; gap:3px; }
-    .consumable-slot { width:32px; height:32px; font-size:15px; border-width:1px; }
-    .consumable-slot .consumable-key { top:0; left:2px; font-size:8px; }
+    #hud-consumables { left:auto; right:6px; top:48px; bottom:auto; display:grid; grid-template-columns:repeat(2,28px); grid-template-rows:repeat(2,28px); gap:3px; }
+    .consumable-slot { width:28px; height:28px; font-size:13px; border-width:1px; border-radius:5px; }
+    .consumable-slot .consumable-key { top:0; left:2px; font-size:7px; }
+    .consumable-slot .consumable-count { right:1px; bottom:0; font-size:8px; }
     #mobile-move-control { display:block; position:absolute; left:18px; bottom:20px; width:126px; height:126px; z-index:90; touch-action:none; }
-    #mobile-dash { display:block; position:absolute; left:58px; bottom:156px; width:48px; height:48px; z-index:91; border:2px solid #55efc4; border-radius:50%; background:#111d; color:#fff; font-size:23px; touch-action:manipulation; }
+    #mobile-dash { display:block; position:absolute; left:auto; right:clamp(185px,20vw,245px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); width:48px; height:48px; z-index:91; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.82); color:#fff; font-size:23px; touch-action:manipulation; }
     #br-center-marker { top:51px; bottom:auto; }
     #dash-hud { display:none; }
     #br-center-marker { font-size:9px; }
@@ -485,7 +489,7 @@
   #modal-lvlup { z-index: 150; }
   #modal-pause { z-index: 155; }
   #pause-fullscreen { display:none; }
-  @media (pointer: coarse) and (max-width: 900px) { #pause-fullscreen { display:block; } }
+  @media (pointer: coarse) and (max-width: 1300px) { #pause-fullscreen { display:block; } }
   #modal-pause .win-1c { width: min(820px, 94vw); max-height: calc(100% - 24px); overflow-y: auto; }
   .pause-layout { display: grid; grid-template-columns: minmax(190px, .8fr) minmax(0, 1.6fr); gap: 16px; text-align: left; }
   .pause-loadout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 48vh; overflow-y: auto; padding-right: 3px; }
@@ -732,8 +736,8 @@
   <!-- Меню -->
   <div id="nav-bar">
     <div id="nav-actions">
-      <button class="nav-btn special" id="btn-pause" onclick="game.togglePause()">⏸ Пауза [Esc / P]</button>
-      <button class="nav-btn" onclick="game.showLeaderboard()">🏆 Таблица рекордов</button>
+      <button class="nav-btn special" id="btn-pause" aria-label="Открыть меню игры" onclick="game.togglePause()">⏸ Пауза [Esc / P]</button>
+      <button class="nav-btn" id="btn-leaderboard" onclick="game.showLeaderboard()">🏆 Таблица рекордов</button>
       <button class="nav-btn" id="btn-sound" onclick="game.sound.toggleMute()">🔊 Звуки: ВКЛ</button>
       <button class="nav-btn active-music" id="btn-music" onclick="game.sound.toggleMusic()">🔥 Бит: ВКЛ</button>
       <button class="nav-btn" id="btn-dyn-update" onclick="game.triggerDynamicUpdate()" style="background:#55efc4; font-weight:bold;">⚡ Дин. Обновление [ПРОБЕЛ]</button>
@@ -2676,11 +2680,11 @@ class Game {
   resize() {
     this.canvas.width = this.canvas.parentElement.clientWidth;
     this.canvas.height = this.canvas.parentElement.clientHeight;
-    this.cameraZoom = window.matchMedia('(pointer: coarse) and (max-width: 900px)').matches ? 0.72 : 1;
+    this.cameraZoom = window.matchMedia('(pointer: coarse) and (max-width: 1300px)').matches ? 0.72 : 1;
   }
 
   async toggleMobileFullscreen() {
-    const root = document.getElementById('app');
+    const root = document.getElementById('app-window');
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
@@ -8027,14 +8031,17 @@ class Game {
           : this.activeSkills.findIndex(skill => skill === null))
         : -1;
       const activeHint = isActiveChoice
-        ? `⚡ Активное умение · слот ${activeSlot + 1} · клавиша ${activeSlot + 1} или кнопка ${activeSlot + 1} в HUD.`
+        ? `Слот ${activeSlot + 1} · клавиша ${activeSlot + 1} или кнопка ${activeSlot + 1} на панели умений.`
         : '';
       const comboText = ch.type === 'weapon_fusion' ? `Объединяет: ${ch.components.map(key => WEAPONS_DEF[key].name).join(' + ')}. Компоненты заменяются комбинацией.` : '';
       const baseDescription = comboText || (passiveLevel
         ? `${ch.def.levelDescriptions[passiveLevel - 1]} (уровень ${passiveLevel} из 5)`
         : (combatLevel || ch.def.desc || 'Улучшает характеристики героя.'));
       const description = isActiveChoice ? `${baseDescription} ${activeHint}` : baseDescription;
-      if (isActiveChoice) title = `⚡ АКТИВНОЕ · ${title}`;
+      if (isActiveChoice) {
+        const activeTitle = title.replace(/^Активное:\s*/i, '');
+        title = `⚡ [АКТИВНОЕ] ${activeTitle}`;
+      }
       card.innerHTML = `<div class="card-icon">${ch.def.icon}</div><div class="card-info"><h4>${title}</h4><p>${description}</p></div>`;
       card.onclick = () => {
         this.applyUpgrade(ch);

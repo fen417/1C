@@ -1,0 +1,116 @@
+{
+  "rules": {
+    "leaderboard": {
+      ".read": true,
+      ".write": false,
+      ".indexOn": ["score"],
+      "$recordId": {
+        ".validate": "newData.hasChildren(['uid', 'name', 'score', 'seconds', 'version', 'mode', 'createdAt']) && newData.child('score').isNumber() && newData.child('seconds').isNumber()",
+        "uid": { ".validate": "newData.isString()" },
+        "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+        "score": { ".validate": "newData.isNumber()" },
+        "seconds": { ".validate": "newData.isNumber()" },
+        "version": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 16" },
+        "mode": { ".validate": "newData.isString() && (newData.val() === 'solo' || newData.val() === 'pvp' || newData.val() === 'pve' || newData.val() === 'battle_royale')" },
+        "playerCount": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 8" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "loadout": { ".validate": "newData.isString() && newData.val().length <= 1200" },
+        "$other": { ".validate": false }
+      }
+    },
+    "pvpRooms": {
+      "$code": {
+        ".read": "auth != null && (!data.exists() || data.child('status').val() === 'waiting' || data.child('players').child(auth.uid).exists())",
+        ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.exists() && data.child('hostUid').val() === auth.uid && !newData.exists()))",
+        ".validate": "$code.matches(/^[0-9]{4}$/) && newData.hasChildren(['hostUid', 'status', 'mode', 'createdAt', 'rtcGeneration', 'maxPlayers', 'players']) && newData.child('maxPlayers').val() === 8",
+        "hostUid": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "status": {
+          ".write": "auth != null && root.child('pvpRooms').child($code).child('hostUid').val() === auth.uid",
+          ".validate": "newData.isString() && (newData.val() === 'waiting' || newData.val() === 'playing')"
+        },
+        "mode": { ".validate": "newData.isString() && (newData.val() === 'pvp' || newData.val() === 'pve' || newData.val() === 'battle_royale')" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "rtcGeneration": {
+          ".write": "auth != null && root.child('pvpRooms').child($code).child('hostUid').val() === auth.uid",
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1000000000"
+        },
+        "maxPlayers": { ".validate": "newData.isNumber() && newData.val() === 8" },
+        "startedAt": { ".validate": "newData.isNumber()" },
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (data.exists() || root.child('pvpRooms').child($code).child('status').val() === 'waiting')",
+            ".validate": "newData.hasChildren(['uid', 'name', 'online', 'state']) && newData.child('uid').val() === $uid && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 20 && newData.child('online').isBoolean()",
+            "uid": { ".validate": "newData.isString() && newData.val() === $uid" },
+            "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+            "classId": { ".validate": "newData.isString() && (newData.val() === 'technician' || newData.val() === 'courier' || newData.val() === 'developer' || newData.val() === 'support')" },
+            "slot": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 7" },
+            "online": { ".validate": "newData.isBoolean()" },
+            "paused": { ".validate": "newData.isBoolean()" },
+            "choosing": { ".validate": "newData.isString() && (newData.val() === 'shop' || newData.val() === 'levelup' || newData.val() === 'legendary')" },
+            "state": {
+              ".validate": "newData.hasChildren(['x', 'y', 'hp', 'maxHp', 'level', 'attackTotal', 'over'])",
+              "x": { ".validate": "newData.isNumber()" },
+              "y": { ".validate": "newData.isNumber()" },
+              "hp": { ".validate": "newData.isNumber()" },
+              "maxHp": { ".validate": "newData.isNumber()" },
+              "shield": { ".validate": "newData.isBoolean()" },
+              "level": { ".validate": "newData.isNumber()" },
+              "time": { ".validate": "newData.isNumber()" },
+              "attackTotal": { ".validate": "newData.isNumber()" },
+              "enemyAttackTotal": { ".validate": "newData.isNumber()" },
+              "over": { ".validate": "newData.isBoolean()" },
+              "enemyDamage": { "$enemyId": { ".validate": "newData.isNumber()" } },
+              "claimedDrops": { "$dropId": { ".validate": "newData.isBoolean() && newData.val() === true" } },
+              "$other": { ".validate": false }
+            },
+            "$other": { ".validate": false }
+          }
+        },
+        "rtc": {
+          ".read": "auth != null && root.child('pvpRooms').child($code).child('players').child(auth.uid).exists()",
+          "sessions": {
+            "$peerUid": {
+              ".read": "auth != null && root.child('pvpRooms').child($code).child('players').child(auth.uid).exists()",
+              ".write": "auth != null && root.child('pvpRooms').child($code).child('players').child(auth.uid).exists() && (auth.uid === $peerUid || auth.uid === root.child('pvpRooms').child($code).child('hostUid').val())",
+              "offer": {
+                ".validate": "newData.hasChildren(['type', 'sdp'])",
+                "type": { ".validate": "newData.val() === 'offer'" },
+                "sdp": { ".validate": "newData.isString()" },
+                "$other": { ".validate": false }
+              },
+              "answer": {
+                ".validate": "newData.hasChildren(['type', 'sdp'])",
+                "type": { ".validate": "newData.val() === 'answer'" },
+                "sdp": { ".validate": "newData.isString()" },
+                "$other": { ".validate": false }
+              },
+              "hostCandidates": {
+                "$candidateId": {
+                  ".validate": "newData.hasChildren(['candidate']) && newData.child('candidate').isString()"
+                }
+              },
+              "guestCandidates": {
+                "$candidateId": {
+                  ".validate": "newData.hasChildren(['candidate']) && newData.child('candidate').isString()"
+                }
+              },
+              "$other": { ".validate": false }
+            }
+          }
+        },
+        "world": {
+          ".write": "auth != null && root.child('pvpRooms').child($code).child('hostUid').val() === auth.uid",
+          ".validate": "newData.hasChildren(['revision'])",
+          "revision": { ".validate": "newData.isNumber() && newData.val() >= 1" },
+          "enemies": { ".validate": true },
+          "gems": { ".validate": true },
+          "pickups": { ".validate": true },
+          "enemyProjectiles": { ".validate": true },
+          "bossWarnings": { ".validate": true },
+          "$other": { ".validate": false }
+        },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

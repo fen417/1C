@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.cloudflare.com/wrangler/config.json",
+  "name": "fitness-leaderboard",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-20",
+  "account_id": "a003907713907ac02bdc1511db95ae8a",
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fitness-leaderboard",
+      "database_id": "ae2288c2-d485-4bfd-ae66-29d30d652a2d",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "LATENCY_PROBE",
+        "class_name": "LatencyProbe"
+      }
+    ]
+  },
+  "exports": {
+    "LatencyProbe": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  }
+}

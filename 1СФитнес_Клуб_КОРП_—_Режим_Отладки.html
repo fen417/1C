@@ -1084,11 +1084,10 @@
                 <th>Игроки</th>
                 <th>Очки (Баги + Строки)</th>
                 <th>Аптайм</th>
-                <th>Комплект на финише</th>
               </tr>
             </thead>
             <tbody id="lb-body">
-              <tr><td colspan="9" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
+              <tr><td colspan="8" style="text-align:center;">Подключение к регистру рекордов...</td></tr>
             </tbody>
           </table>
         </div>
@@ -8248,7 +8247,7 @@ class Game {
 
   async fetchLeaderboard() {
     const tbody = document.getElementById('lb-body');
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Загружаем таблицу рекордов...</td></tr>';
 
     try {
       if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён.');
@@ -8269,7 +8268,7 @@ class Game {
       this.leaderboardEntries = visibleScores;
       tbody.innerHTML = '';
       if (!visibleScores.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">${scores.length ? 'Все записи скрыты настройкой.' : 'Таблица пока пуста. Запишите первый результат!'}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">${scores.length ? 'Все записи скрыты настройкой.' : 'Таблица пока пуста. Запишите первый результат!'}</td></tr>`;
         return;
       }
 
@@ -8287,18 +8286,6 @@ class Game {
         const usernameTag = hasCheaterTag(entry)
           ? ' <span style="color:#c0392b;">(читерок)</span>' : '';
         const classLabel = classNames[String(entry.classId || '')] || '';
-        let loadout = typeof entry.loadout === 'string' ? entry.loadout : '';
-        if (loadout.trim().startsWith('{')) {
-          try {
-            const snapshot = JSON.parse(loadout);
-            const weapons = (snapshot.inventory?.weapons || []).map(item => item.name).filter(Boolean);
-            loadout = weapons.length ? weapons.join(', ') : (snapshot.className || 'Снимок сохранён');
-          } catch (_) { /* старый текст комплекта оставляем как есть */ }
-        } else if (entry.loadout && typeof entry.loadout === 'object') {
-          const weapons = (entry.loadout.inventory?.weapons || []).map(item => item.name).filter(Boolean);
-          loadout = weapons.length ? weapons.join(', ') : (entry.loadout.className || 'Снимок сохранён');
-        }
-        const loadoutTitle = this.escapeHtml(loadout).replace(/"/g, '&quot;');
         const tr = document.createElement('tr');
         tr.className = 'leaderboard-record';
         tr.tabIndex = 0;
@@ -8314,12 +8301,11 @@ class Game {
           <td>${playerCount}</td>
           <td style="color:#b33939; font-weight:bold;">${Math.max(0, Number(entry.score) || 0)}</td>
           <td>${m}:${s}</td>
-          <td title="${loadoutTitle}" style="max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${this.escapeHtml(loadout || '—')}</td>
         `;
         tbody.appendChild(tr);
       });
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="9" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Таблица недоступна: ${this.escapeHtml(err.message || 'проверьте подключение')}</td></tr>`;
     }
   }
 

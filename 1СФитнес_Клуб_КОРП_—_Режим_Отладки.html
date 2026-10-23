@@ -690,6 +690,10 @@
   .record-detail-section { margin:12px 0 5px; font-size:13px; }
   .record-detail-list { margin:0; padding-left:20px; }
   .record-detail-list li { margin:3px 0; }
+  .record-item { margin:6px 0 !important; }
+  .record-item-title { display:flex; justify-content:space-between; gap:10px; }
+  .record-item-title b { white-space:nowrap; }
+  .record-item small { display:block; margin:2px 0 0 24px; color:#666; font-size:11px; }
   @media (max-width:600px) { .record-detail-grid { grid-template-columns:1fr 1fr; gap:5px; } #record-detail-content { max-height:68vh; font-size:11px; } }
 
   .btn-1c {
@@ -8367,8 +8371,16 @@ class Game {
       for (const [key, label] of Object.entries(labels)) {
         const items = inventory[key];
         if (!Array.isArray(items) || !items.length) continue;
-        const lines = items.map(item => typeof item === 'string' ? item : Object.entries(item || {}).filter(([, value]) => value !== undefined && value !== null && typeof value !== 'object').map(([name, value]) => `${name}: ${value}`).join(' · ')).filter(Boolean);
-        if (lines.length) html += `<h3 class="record-detail-section">${h(label)}</h3><ul class="record-detail-list">${lines.map(line => `<li>${h(line)}</li>`).join('')}</ul>`;
+        const rows = items.map(item => {
+          if (typeof item === 'string') return `<li class="record-item">${h(item)}</li>`;
+          if (!item || typeof item !== 'object') return '';
+          const icon = item.icon ? `${h(item.icon)} ` : '';
+          const name = h(item.name || 'Предмет');
+          const value = item.value ? `<b>${h(item.value)}</b>` : '';
+          const detail = item.detail ? `<small>${h(item.detail)}</small>` : '';
+          return `<li class="record-item"><div class="record-item-title"><span>${icon}${name}</span>${value}</div>${detail}</li>`;
+        }).filter(Boolean);
+        if (rows.length) html += `<h3 class="record-detail-section">${h(label)}</h3><ul class="record-detail-list">${rows.join('')}</ul>`;
       }
     } else if (typeof rawLoadout === 'string' && rawLoadout.trim()) {
       html += `<h3 class="record-detail-section">Комплект, сохранённый рекордом</h3><p style="white-space:pre-wrap;overflow-wrap:anywhere;">${h(rawLoadout)}</p><p style="color:#777;font-size:11px;">Подробные снимки инвентаря сохраняются с версии 2.4.0.</p>`;

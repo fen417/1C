@@ -237,29 +237,36 @@
   }
   #mobile-move-control { display:none; }
   #mobile-dash { display:none; }
+  #mobile-dyn-update { display:none; }
   .mobile-stick-ring { position:absolute; inset:0; border:2px solid rgba(255,255,255,.65); border-radius:50%; background:rgba(20,25,35,.48); box-shadow:0 2px 12px #0008; }
   .mobile-stick-knob { position:absolute; width:42%; height:42%; left:29%; top:29%; border:2px solid #fff; border-radius:50%; background:rgba(85,239,196,.72); box-shadow:0 1px 7px #0009; pointer-events:none; }
   @media (pointer: coarse) and (max-width: 900px) {
     html, body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; touch-action:none; }
     #app { width:100vw; height:100dvh; }
-    #nav-bar { height:42px; min-height:42px; flex-basis:42px; padding:2px 5px; }
-    #nav-actions { gap:4px; }
-    .nav-btn { padding:4px 6px; font-size:10px; }
-    #btn-dyn-update { width:auto; flex-basis:auto; }
+    #header-1c, #footer-1c { display:none; }
+    #nav-bar { height:38px; min-height:38px; flex-basis:38px; padding:2px 5px; flex-direction:row; align-items:center; overflow:visible; }
+    #nav-actions { width:100%; gap:6px; justify-content:flex-start; }
+    .nav-btn { padding:5px 8px; font-size:10px; }
+    #btn-sound, #btn-music { display:none; }
+    #pause-fullscreen { display:block; }
+    #nav-status { display:none; }
+    #btn-dyn-update { position:fixed; z-index:95; left:50%; bottom:calc(env(safe-area-inset-bottom) + 10px); transform:translateX(-50%); width:min(260px, 38vw); min-width:190px; flex-basis:auto; padding:8px 10px; font-size:11px; box-shadow:0 2px 10px #0008; }
     #nav-status { min-height:12px; font-size:9px; }
     #xp-bar-container { height:13px; flex-basis:13px; }
     #xp-bar-text { font-size:9px; line-height:13px; }
-    #hud-active-skills { left:auto; right:14px; bottom:18px; width:116px; height:116px; transform:none; display:block; pointer-events:none; }
+    #hud-active-skills { left:auto; right:10px; bottom:12px; width:148px; height:148px; transform:none; display:block; pointer-events:none; }
     #hud-active-skills .active-slot { position:absolute; width:48px; height:48px; pointer-events:auto; border-radius:12px; }
-    #act-slot-0 { left:34px; top:0; } #act-slot-1 { left:68px; top:34px; }
-    #act-slot-2 { left:34px; top:68px; } #act-slot-3 { left:0; top:34px; }
+    #act-slot-0 { left:50px; top:0; } #act-slot-1 { left:100px; top:50px; }
+    #act-slot-2 { left:50px; top:100px; } #act-slot-3 { left:0; top:50px; }
     .active-slot .act-icon { font-size:20px; }
-    #hud-consumables { left:auto; right:5px; bottom:150px; flex-direction:column; gap:4px; }
-    .consumable-slot { width:38px; height:38px; font-size:18px; }
+    #hud-consumables { left:auto; right:5px; bottom:max(168px, calc(env(safe-area-inset-bottom) + 160px)); flex-direction:column; gap:3px; }
+    .consumable-slot { width:32px; height:32px; font-size:15px; border-width:1px; }
+    .consumable-slot .consumable-key { top:0; left:2px; font-size:8px; }
     #mobile-move-control { display:block; position:absolute; left:18px; bottom:20px; width:126px; height:126px; z-index:90; touch-action:none; }
     #mobile-dash { display:block; position:absolute; left:58px; bottom:156px; width:48px; height:48px; z-index:91; border:2px solid #55efc4; border-radius:50%; background:#111d; color:#fff; font-size:23px; touch-action:manipulation; }
+    #br-center-marker { top:51px; bottom:auto; }
     #dash-hud { display:none; }
-    #br-center-marker { bottom:145px; font-size:9px; }
+    #br-center-marker { font-size:9px; }
     #hud-health { top:7px; width:min(230px, 36vw); }
     #hud-stats { top:7px; right:7px; font-size:10px; gap:7px; }
     #hud-top-left { top:7px; left:7px; transform:scale(.82); transform-origin:top left; }
@@ -477,9 +484,13 @@
   .modal-overlay > .win-1c > .win-1c-head { position: sticky; top: -1px; z-index: 2; }
   #modal-lvlup { z-index: 150; }
   #modal-pause { z-index: 155; }
+  #pause-fullscreen { display:none; }
+  @media (pointer: coarse) and (max-width: 900px) { #pause-fullscreen { display:block; } }
   #modal-pause .win-1c { width: min(820px, 94vw); max-height: calc(100% - 24px); overflow-y: auto; }
   .pause-layout { display: grid; grid-template-columns: minmax(190px, .8fr) minmax(0, 1.6fr); gap: 16px; text-align: left; }
   .pause-loadout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 48vh; overflow-y: auto; padding-right: 3px; }
+  .pause-audio-controls { display:flex; flex-wrap:wrap; gap:7px; margin:8px 0 12px; }
+  .pause-audio-controls .btn-1c { flex:1 1 145px; }
   #pause-stats { grid-template-columns: minmax(0, 1fr); }
   #pause-stats .loadout-section { width: 100%; }
   .loadout-section { background: #f7f7f7; border: 1px solid #ccc; padding: 8px; min-width: 0; }
@@ -669,6 +680,17 @@
     padding: 6px 8px;
   }
   #lb-table tr:nth-child(even) { background: #f8f9fa; }
+  #lb-body tr.leaderboard-record { cursor:pointer; }
+  #lb-body tr.leaderboard-record:hover, #lb-body tr.leaderboard-record:focus { background:#fff2b3; outline:2px solid #d4af00; outline-offset:-2px; }
+  #modal-record-detail { z-index:270; }
+  #record-detail-content { max-height:min(72vh,720px); overflow:auto; }
+  .record-detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+  .record-detail-stat { padding:7px; border:1px solid #dfe6e9; background:#f8f9fa; }
+  .record-detail-stat b { display:block; color:#777; font-size:10px; margin-bottom:3px; }
+  .record-detail-section { margin:12px 0 5px; font-size:13px; }
+  .record-detail-list { margin:0; padding-left:20px; }
+  .record-detail-list li { margin:3px 0; }
+  @media (max-width:600px) { .record-detail-grid { grid-template-columns:1fr 1fr; gap:5px; } #record-detail-content { max-height:68vh; font-size:11px; } }
 
   .btn-1c {
     background: #eaeaea;
@@ -990,6 +1012,11 @@
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showMainMenu()">⌂ Главное меню</button>
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             </div>
+            <div class="pause-audio-controls">
+              <button class="btn-1c" id="pause-sound" onclick="game.sound.toggleMute()">🔊 Звуковые эффекты: ВКЛ</button>
+              <button class="btn-1c" id="pause-music" onclick="game.sound.toggleMusic()">🔥 Бит: ВКЛ</button>
+              <button class="btn-1c" id="pause-fullscreen" onclick="game.toggleMobileFullscreen()">⛶ Полный экран · горизонтально</button>
+            </div>
             <h2 style="font-size:14px; margin:14px 0 8px;">Характеристики героя</h2>
             <div id="pause-stats" class="pause-loadout" style="margin-bottom:12px;"></div>
           </div>
@@ -1066,6 +1093,14 @@
           <button class="btn-1c" style="background:#ffd200;" onclick="game.closeLeaderboard()">Закрыть окно [Esc]</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="modal-record-detail" class="modal-overlay" style="display:none;">
+    <div class="win-1c" style="width:min(760px,94vw);" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span id="record-detail-title">Карточка рекорда</span><button class="win-close-btn" onclick="game.closeLeaderboardRecord()" aria-label="Закрыть карточку рекорда">✕</button></div>
+      <div class="win-1c-body" id="record-detail-content"></div>
+      <div class="win-1c-body" style="padding-top:0;text-align:right;"><button class="btn-1c" onclick="game.closeLeaderboardRecord()">Закрыть [Esc]</button></div>
     </div>
   </div>
 
@@ -1223,6 +1258,8 @@ class SoundEngine {
     const settingsSound = document.getElementById('settings-sound');
     const musicButton = document.getElementById('btn-music');
     const settingsMusic = document.getElementById('settings-music');
+    const pauseSound = document.getElementById('pause-sound');
+    const pauseMusic = document.getElementById('pause-music');
     if (soundButton) soundButton.innerText = `${soundLabel} Звуки: ${soundState}`;
     if (settingsSound) settingsSound.innerText = `${soundLabel} Звуковые эффекты: ${soundState}`;
     if (musicButton) {
@@ -1230,6 +1267,11 @@ class SoundEngine {
       musicButton.classList.toggle('active-music', this.musicEnabled);
     }
     if (settingsMusic) settingsMusic.innerText = `${musicLabel} Музыка: ${musicState}`;
+    if (pauseSound) pauseSound.innerText = `${soundLabel} Звуковые эффекты: ${soundState}`;
+    if (pauseMusic) {
+      pauseMusic.innerText = `${this.musicEnabled ? '🔥' : '🎵'} Бит: ${musicState}`;
+      pauseMusic.classList.toggle('active-music', this.musicEnabled);
+    }
   }
 
   setVolume(channel, value) {
@@ -1249,26 +1291,19 @@ class SoundEngine {
   toggleMute() {
     this.mutedSFX = !this.mutedSFX;
     localStorage.setItem('1c_sfx_muted', String(this.mutedSFX));
-    document.getElementById('btn-sound').innerText = this.mutedSFX ? "🔇 Звуки: ВЫКЛ" : "🔊 Звуки: ВКЛ";
-    document.getElementById('settings-sound').innerText = this.mutedSFX ? "🔇 Звуковые эффекты: ВЫКЛ" : "🔊 Звуковые эффекты: ВКЛ";
+    this.syncToggleButtons();
     game.log(this.mutedSFX ? "Звуковые эффекты отключены" : "Звуковые эффекты включены!");
   }
 
   toggleMusic() {
     this.musicEnabled = !this.musicEnabled;
     localStorage.setItem('1c_music_enabled', String(this.musicEnabled));
-    const btn = document.getElementById('btn-music');
+    this.syncToggleButtons();
     if (this.musicEnabled) {
-      btn.innerText = "🔥 Бит: ВКЛ";
-      btn.classList.add('active-music');
-      document.getElementById('settings-music').innerText = "🎵 Музыка: ВКЛ";
       this.init();
       this.startMusic();
       game.log("Адреналиновый бит кластера запущен!");
     } else {
-      btn.innerText = "🎵 Бит: ВЫКЛ";
-      btn.classList.remove('active-music');
-      document.getElementById('settings-music').innerText = "🔇 Музыка: ВЫКЛ";
       this.stopMusic();
       game.log("Музыка остановлена.");
     }
@@ -2481,7 +2516,9 @@ class Game {
         return;
       }
       if (e.code === 'Escape') {
-        if (document.getElementById('modal-lb').style.display === 'flex') {
+        if (document.getElementById('modal-record-detail').style.display === 'flex') {
+          this.closeLeaderboardRecord();
+        } else if (document.getElementById('modal-lb').style.display === 'flex') {
           this.closeLeaderboard();
         } else if (document.getElementById('modal-shop').style.display === 'flex') {
           this.closeShop();
@@ -2593,6 +2630,21 @@ class Game {
         this.closeLeaderboard();
       }
     });
+    document.getElementById('lb-body').addEventListener('click', event => {
+      const row = event.target.closest('tr[data-record-index]');
+      if (row) this.openLeaderboardRecord(Number(row.dataset.recordIndex));
+    });
+    document.getElementById('lb-body').addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const row = event.target.closest('tr[data-record-index]');
+      if (!row) return;
+      event.preventDefault();
+      this.openLeaderboardRecord(Number(row.dataset.recordIndex));
+    });
+    document.getElementById('modal-record-detail').addEventListener('click', event => {
+      if (event.target.id === 'modal-record-detail') this.closeLeaderboardRecord();
+    });
+    document.addEventListener('fullscreenchange', () => this.syncMobileFullscreenButton());
 
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
     this.pvpMode = ['pvp', 'pve', 'battle_royale'].includes(localStorage.getItem('1c_pvp_mode')) ? localStorage.getItem('1c_pvp_mode') : 'pvp';
@@ -2621,6 +2673,30 @@ class Game {
   resize() {
     this.canvas.width = this.canvas.parentElement.clientWidth;
     this.canvas.height = this.canvas.parentElement.clientHeight;
+    this.cameraZoom = window.matchMedia('(pointer: coarse) and (max-width: 900px)').matches ? 0.72 : 1;
+  }
+
+  async toggleMobileFullscreen() {
+    const root = document.getElementById('app');
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        screen.orientation?.unlock?.();
+      } else if (root.requestFullscreen) {
+        await root.requestFullscreen();
+        try { await screen.orientation?.lock?.('landscape'); } catch (_) { /* устройство или браузер не поддерживает блокировку ориентации */ }
+      } else {
+        this.log('Этот браузер не поддерживает полноэкранный режим. Поверните устройство вручную.');
+      }
+    } catch (error) {
+      this.log(`Не удалось включить полноэкранный режим: ${error.message || 'браузер отказал'}`);
+    }
+    this.syncMobileFullscreenButton();
+  }
+
+  syncMobileFullscreenButton() {
+    const button = document.getElementById('pause-fullscreen');
+    if (button) button.textContent = document.fullscreenElement ? '⛶ Выйти из полного экрана' : '⛶ Полный экран · горизонтально';
   }
 
   setupMobileControls() {
@@ -4163,11 +4239,20 @@ class Game {
       this.sendPvpNetworkState(state);
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 2) this.sendPvpWorldPositions();
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.publishThreePlayerRoster();
-      if (this.pvp.host && this.isBattleRoyale && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
+      const brRosterReady = this.pvp.classSelectionPending !== true
+        && Number.isFinite(Number(this.pvp.spawnGraceUntil))
+        && performance.now() >= Number(this.pvp.spawnGraceUntil);
+      if (this.pvp.host && this.isBattleRoyale && brRosterReady && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
+        const participants = (this.pvp.matchPlayerUids || []).filter(uid => uid && uid !== this.pvp.uid);
         const alive = [{ uid: this.pvp.uid, name: this.pvp.name, over: p.hp <= 0 }];
-        for (const member of Object.values(this.pvp.remotePlayers || {})) alive.push({ uid: member.uid, name: member.name, over: !member.state || member.state.over || member.state.hp <= 0 });
+        for (const uid of participants) {
+          const member = this.pvp.remotePlayers?.[uid];
+          const state = member?.state || (uid === this.pvp.opponentUid ? this.pvp.remoteState : null);
+          if (!state) continue;
+          alive.push({ uid, name: member?.name || this.pvp.remotePlayer?.name || 'Игрок', over: state.over || state.hp <= 0 });
+        }
         const survivors = alive.filter(member => !member.over);
-        if (alive.length >= this.pvp.actualPlayerCount && survivors.length <= 1) {
+        if (alive.length === this.pvp.actualPlayerCount && survivors.length <= 1) {
           this.pvp.brWinnerSent = true;
           this.cleanupPvpRoom();
           const winner = survivors[0] || null;
@@ -5532,12 +5617,30 @@ class Game {
         : '<li style="color:#888;">Нет активных</li>';
       return `<section class="loadout-section"><h3>${esc(title)}</h3><ul>${rows}</ul></section>`;
     };
+    const snapshot = this.capturePlayerSnapshot();
+    if (!snapshot) return;
     const statsContainer = document.getElementById('pause-stats');
+    const { inventory } = snapshot;
+    if (statsContainer) statsContainer.innerHTML = section('Текущие параметры', snapshot.stats);
+    container.innerHTML = [
+      section('Оружие', inventory.weapons),
+      section('Пассивные улучшения', inventory.passives),
+      section(`Магазинные предметы · ${inventory.shopItems.length}/6`, inventory.shopItems),
+      section('Боевые модификаторы', inventory.combat),
+      section('Активные умения · 1–4', inventory.activeSkills),
+      section('Помощники на линии', inventory.summons),
+      section('Временные усиления', inventory.temporary),
+      section('Расходники в слотах', inventory.consumables)
+    ].join('');
+  }
+
+  capturePlayerSnapshot(reason = '') {
+    if (!this.player) return null;
     const player = this.player;
     const activeDamage = player.dmgMult * (player.damageBuffTimer > 0 ? player.damageBuffMult : 1);
     const activeSpeedMult = player.speedMult + (player.speedBuffTimer > 0 ? 0.5 : 0);
     const cooldown = player.cdMult * (player.turboBuffTimer > 0 ? 0.5 : 1);
-    const currentStats = [
+    const stats = [
       { icon: '🧑‍💻', name: 'Класс', value: player.className || 'Технарь' },
       { icon: '❤️', name: 'Здоровье', value: `${Math.ceil(player.hp)} / ${player.maxHp}` },
       { icon: '⚔️', name: 'Урон', value: `×${activeDamage.toFixed(2)}${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
@@ -5554,28 +5657,27 @@ class Game {
       { icon: '🪪', name: 'Защита от боссов', value: `${Math.round((player.bossDamageReduction || 0) * 100)}%` },
       { icon: '🛡️', name: 'Защита', value: player.shieldTimer > 0 ? `Щит · ${Math.ceil(player.shieldTimer)}с` : 'Без щита' }
     ];
-    if (statsContainer) statsContainer.innerHTML = section('Текущие параметры', currentStats);
     const shopItems = (this.shopPassives || []).map(slot => {
       const item = this.getShopPassiveDef(slot.key);
       return { icon: item?.icon || '📦', name: item?.name || slot.key, value: 'пассивный', detail: item?.desc || '' };
     });
-    const weapons = Object.entries(this.weapons).map(([key, weapon]) => ({
-      icon: WEAPONS_DEF[key].icon, name: WEAPONS_DEF[key].name, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key].desc
+    const weapons = Object.entries(this.weapons || {}).map(([key, weapon]) => ({
+      icon: WEAPONS_DEF[key]?.icon || '🔫', name: WEAPONS_DEF[key]?.name || key, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key]?.desc || ''
     }));
-    const passives = Object.entries(this.passives).map(([key, passive]) => ({
-      icon: PASSIVES_DEF[key].icon, name: PASSIVES_DEF[key].name, value: `ур. ${passive.lvl}/5`,
-      detail: PASSIVES_DEF[key].levelDescriptions[passive.lvl - 1]
+    const passives = Object.entries(this.passives || {}).map(([key, passive]) => ({
+      icon: PASSIVES_DEF[key]?.icon || '⬆️', name: PASSIVES_DEF[key]?.name || key, value: `ур. ${passive.lvl}/5`,
+      detail: PASSIVES_DEF[key]?.levelDescriptions?.[passive.lvl - 1] || ''
     }));
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
-    ].filter(([stat]) => this.player[stat] > 0).map(([stat, key]) => ({
-      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${this.player[stat]}`, detail: COMBAT_UPGRADES[key].levelDescriptions?.[this.player[stat] - 1] || COMBAT_UPGRADES[key].desc
+    ].filter(([stat]) => player[stat] > 0).map(([stat, key]) => ({
+      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${player[stat]}`, detail: COMBAT_UPGRADES[key].levelDescriptions?.[player[stat] - 1] || COMBAT_UPGRADES[key].desc
     }));
-    const active = this.activeSkills.filter(Boolean).map(skill => ({
-      icon: ACTIVE_SKILLS_DEF[skill.key].icon,
-      name: ACTIVE_SKILLS_DEF[skill.key].name,
-      value: `ур. ${skill.lvl} · ${skill.cdTimer > 0 ? `${Math.ceil(skill.cdTimer)}с` : 'готово'}`,
-      detail: ACTIVE_SKILLS_DEF[skill.key].desc
+    const activeSkills = (this.activeSkills || []).filter(Boolean).map(skill => ({
+      icon: ACTIVE_SKILLS_DEF[skill.key]?.icon || '⚡',
+      name: ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key,
+      value: `ур. ${skill.lvl}`,
+      detail: ACTIVE_SKILLS_DEF[skill.key]?.desc || ''
     }));
     Object.entries(this.repeatableUpgradeCounts || {}).forEach(([key, count]) => {
       const upgrade = REPEATABLE_UPGRADES.find(item => item.key === key);
@@ -5585,31 +5687,35 @@ class Game {
     const addTimer = (timer, name, icon, value) => {
       if (timer > 0) temporary.push({ icon, name, value: `${value} · ${Math.ceil(timer)}с` });
     };
-    addTimer(this.player.damageBuffTimer, 'Усиление урона', '💥', `×${(this.player.damageBuffMult || 1).toFixed(2)}`);
-    addTimer(this.player.xpBoostTimer, 'Удвоение опыта и фиткоинов', '📲', '×2');
-    addTimer(this.player.speedBuffTimer, 'Ускорение бега', '⚡', '+50%');
-    addTimer(this.player.turboBuffTimer, 'Турбо-режим: скорострельность', '🚀', '×2');
-    addTimer(this.player.coffeeBuffTimer, 'Кофе из 308 кабинета', '☕', 'ускорение');
-    addTimer(this.player.shieldTimer, 'Защитный щит', '🛡️', 'неуязвимость');
-    if (this.player.hasBackupShield) temporary.push({ icon: '☁️', name: 'Автоматический щит от бэкапа', value: `через ${Math.ceil(this.backupTimer)}с` });
-    const consumables = this.consumables.map((slot, index) => slot && ({
-      icon: CONSUMABLES_DEF[slot.key].icon,
-      name: `${CONSUMABLES_DEF[slot.key].name} · слот ${['7', '8', '9', '0'][index]}`,
+    addTimer(player.damageBuffTimer, 'Усиление урона', '💥', `×${(player.damageBuffMult || 1).toFixed(2)}`);
+    addTimer(player.xpBoostTimer, 'Удвоение опыта и фиткоинов', '📲', '×2');
+    addTimer(player.speedBuffTimer, 'Ускорение бега', '⚡', '+50%');
+    addTimer(player.turboBuffTimer, 'Турбо-режим: скорострельность', '🚀', '×2');
+    addTimer(player.coffeeBuffTimer, 'Кофе из 308 кабинета', '☕', 'ускорение');
+    addTimer(player.shieldTimer, 'Защитный щит', '🛡️', 'неуязвимость');
+    if (player.hasBackupShield) temporary.push({ icon: '☁️', name: 'Автоматический щит от бэкапа', value: `через ${Math.ceil(this.backupTimer)}с` });
+    const consumables = (this.consumables || []).map((slot, index) => slot && ({
+      icon: CONSUMABLES_DEF[slot.key]?.icon || '📦',
+      name: `${CONSUMABLES_DEF[slot.key]?.name || slot.key} · слот ${['7', '8', '9', '0'][index]}`,
       value: `×${slot.count}`
     })).filter(Boolean);
-    container.innerHTML = [
-      section('Оружие', weapons),
-      section('Пассивные улучшения', passives),
-      section(`Магазинные предметы · ${this.shopPassives.length}/6`, shopItems),
-      section('Боевые модификаторы', combat),
-      section('Активные умения · 1–4', active),
-      section('Помощники на линии', this.summons.map(s => ({
-        icon: s.icon, name: s.role === 'senior' ? 'Старший специалист второй линии' : s.role === 'drone' ? 'Дрон техспециалиста' : 'Специалист техподдержки',
+    const classId = player.classId || this.selectedClassId;
+    return {
+      schemaVersion: 1,
+      reason: String(reason || '').slice(0, 240),
+      run: {
+        seconds: Math.floor(this.time || 0), level: Number(this.level) || 1,
+        kills: Number(this.kills) || 0, gems: Number(this.gemsCollected) || 0,
+        currency: Number(this.currency) || 0, score: this.calcScore()
+      },
+      classId: String(classId || ''),
+      className: player.className || PLAYER_CLASSES[classId]?.name || 'Технарь',
+      stats,
+      inventory: { weapons, passives, shopItems, combat, activeSkills, summons: (this.summons || []).map(s => ({
+        icon: s.icon || '🧑‍💻', name: s.role === 'senior' ? 'Старший специалист второй линии' : s.role === 'drone' ? 'Дрон техспециалиста' : 'Специалист техподдержки',
         value: `${Math.ceil(s.hp)} HP · ${Math.ceil(s.life)}с`, detail: 'Следует за героем и помогает в бою.'
-      }))),
-      section('Временные усиления', temporary),
-      section('Расходники в слотах', consumables)
-    ].join('');
+      })), temporary, consumables }
+    };
   }
 
   resume() {
@@ -5644,12 +5750,14 @@ class Game {
     document.getElementById('modal-settings').style.display = 'none';
     document.getElementById('modal-changelog').style.display = 'none';
     const modal = document.getElementById('modal-lb');
+    document.getElementById('modal-record-detail').style.display = 'none';
     modal.style.display = 'flex';
     modal.focus();
     this.fetchLeaderboard();
   }
 
   closeLeaderboard() {
+    this.closeLeaderboardRecord();
     const modal = document.getElementById('modal-lb');
     if (modal.style.display !== 'flex') return;
     modal.style.display = 'none';
@@ -8047,7 +8155,7 @@ class Game {
     gameoverTitle.textContent = victory ? 'ВЫ ОСТАЛИСЬ ПОСЛЕДНИМ!' : 'СЕАНС ПРЕРВАН!';
     gameoverTitle.style.color = victory ? '#27ae60' : '#c0392b';
     this.sound.playTone(victory ? 660 : 60, victory ? 'sine' : 'sawtooth', 0.7, 0.45);
-    this.finalLoadout = this.getFinalLoadout();
+    this.finalLoadout = this.getFinalLoadout(reason);
 
     const totalScore = this.calcScore();
     const statsBox = document.getElementById('gameover-stats');
@@ -8071,27 +8179,11 @@ class Game {
     document.getElementById('modal-gameover').style.display = 'flex';
   }
 
-  getFinalLoadout() {
-    const items = [];
-    const className = PLAYER_CLASSES[this.player?.classId || this.selectedClassId]?.name;
-    if (className) items.push(`Класс: ${className}`);
-    for (const [key, weapon] of Object.entries(this.weapons || {})) {
-      const def = WEAPONS_DEF[key];
-      if (def) items.push(`${def.name} ур. ${weapon.lvl}`);
-    }
-    for (const [key, passive] of Object.entries(this.passives || {})) {
-      const def = PASSIVES_DEF[key];
-      if (def) items.push(`${def.name} ур. ${passive.lvl}`);
-    }
-    for (const slot of this.shopPassives || []) {
-      const def = STORE_PASSIVES_DEF[slot.key] || STORE_PASSIVE_COMBOS[slot.key];
-      if (def) items.push(def.name);
-    }
-    for (const skill of this.activeSkills || []) {
-      const def = skill && ACTIVE_SKILLS_DEF[skill.key];
-      if (def) items.push(`${def.name} ур. ${skill.lvl}`);
-    }
-    return items.join(' · ').slice(0, 1200) || 'Комплект не указан';
+  getFinalLoadout(reason = '') {
+    const snapshot = this.capturePlayerSnapshot(reason);
+    if (!snapshot) return '';
+    try { return JSON.stringify(snapshot).slice(0, 12000); }
+    catch (_) { return ''; }
   }
 
   async cleanupPvpRoom(pvp = this.pvp, attempt = 0) {
@@ -8170,6 +8262,7 @@ class Game {
         || String(entry.name || '').trim().toLowerCase() === 'username';
       const visibleScores = (this.hideCheatersFromLeaderboard ? scores.filter(entry => !hasCheaterTag(entry)) : scores)
         .sort((a, b) => Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds));
+      this.leaderboardEntries = visibleScores;
       tbody.innerHTML = '';
       if (!visibleScores.length) {
         tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">${scores.length ? 'Все записи скрыты настройкой.' : 'Таблица пока пуста. Запишите первый результат!'}</td></tr>`;
@@ -8190,9 +8283,24 @@ class Game {
         const usernameTag = hasCheaterTag(entry)
           ? ' <span style="color:#c0392b;">(читерок)</span>' : '';
         const classLabel = classNames[String(entry.classId || '')] || '';
-        const loadout = String(entry.loadout || '');
+        let loadout = typeof entry.loadout === 'string' ? entry.loadout : '';
+        if (loadout.trim().startsWith('{')) {
+          try {
+            const snapshot = JSON.parse(loadout);
+            const weapons = (snapshot.inventory?.weapons || []).map(item => item.name).filter(Boolean);
+            loadout = weapons.length ? weapons.join(', ') : (snapshot.className || 'Снимок сохранён');
+          } catch (_) { /* старый текст комплекта оставляем как есть */ }
+        } else if (entry.loadout && typeof entry.loadout === 'object') {
+          const weapons = (entry.loadout.inventory?.weapons || []).map(item => item.name).filter(Boolean);
+          loadout = weapons.length ? weapons.join(', ') : (entry.loadout.className || 'Снимок сохранён');
+        }
         const loadoutTitle = this.escapeHtml(loadout).replace(/"/g, '&quot;');
         const tr = document.createElement('tr');
+        tr.className = 'leaderboard-record';
+        tr.tabIndex = 0;
+        tr.setAttribute('role', 'button');
+        tr.dataset.recordIndex = String(idx);
+        tr.setAttribute('aria-label', `Открыть карточку рекорда ${idx + 1}: ${displayName}`);
         tr.innerHTML = `
           <td><b>${idx + 1}</b></td>
           <td><b>${displayName}</b>${usernameTag}</td>
@@ -8213,6 +8321,62 @@ class Game {
 
   escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  closeLeaderboardRecord() {
+    const modal = document.getElementById('modal-record-detail');
+    if (modal) modal.style.display = 'none';
+  }
+
+  openLeaderboardRecord(index) {
+    const entry = this.leaderboardEntries?.[index];
+    if (!entry) return;
+    const h = value => this.escapeHtml(String(value ?? '—'));
+    const seconds = Math.max(0, Number(entry.seconds) || 0);
+    const runTime = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    const classNames = { technician: 'Технарь', courier: 'Переносчик', developer: 'Разработчик', support: 'Чел с техпода' };
+    const modeNames = { solo: 'Одиночная', pvp: 'Сетевая · PvP', pve: 'Сетевая · PvE', battle_royale: 'Battle Royale' };
+    let snapshot = null;
+    const rawLoadout = entry.loadout;
+    if (rawLoadout && typeof rawLoadout === 'object') snapshot = rawLoadout;
+    else if (typeof rawLoadout === 'string' && rawLoadout.trim().startsWith('{')) {
+      try { snapshot = JSON.parse(rawLoadout); } catch (_) { snapshot = null; }
+    }
+    const content = document.getElementById('record-detail-content');
+    const title = document.getElementById('record-detail-title');
+    title.textContent = `Карточка рекорда · ${entry.name || 'Игрок'}`;
+    const cells = [
+      ['Игрок', entry.name], ['Класс', classNames[entry.classId] || snapshot?.className || '—'],
+      ['Режим', modeNames[entry.mode] || entry.mode || 'Одиночная'], ['Версия', entry.version || '—'],
+      ['Игроков', entry.playerCount || entry.players || 1], ['Очки', Math.max(0, Number(entry.score) || 0)],
+      ['Время выживания', runTime], ['Дата', entry.createdAt || entry.created_at ? new Date(Number(entry.createdAt || entry.created_at)).toLocaleString() : '—']
+    ];
+    let html = `<div class="record-detail-grid">${cells.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b>${h(value)}</div>`).join('')}</div>`;
+    if (snapshot && typeof snapshot === 'object') {
+      if (snapshot.reason) html += `<p><b>Причина завершения:</b> ${h(snapshot.reason)}</p>`;
+      const run = snapshot.run || {};
+      const stats = snapshot.stats || {};
+      const extra = [
+        ['Уровень', run.level], ['Убийства', run.kills], ['Гемы', run.gems],
+        ['Фиткоины', run.currency], ['Счёт снимка', run.score]
+      ].filter(([, value]) => value !== undefined && value !== null);
+      if (extra.length) html += `<h3 class="record-detail-section">Статы на момент смерти</h3><div class="record-detail-grid">${extra.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b>${h(value)}</div>`).join('')}</div>`;
+      if (Array.isArray(stats) && stats.length) html += `<h3 class="record-detail-section">Характеристики персонажа</h3><ul class="record-detail-list">${stats.map(item => `<li>${h(item.icon || '')} ${h(item.name || '')}: ${h(item.value || '')}</li>`).join('')}</ul>`;
+      const inventory = snapshot.inventory || {};
+      const labels = { weapons: 'Оружие', passives: 'Пассивные улучшения', shopItems: 'Предметы магазина', combat: 'Боевые характеристики', activeSkills: 'Активные навыки', summons: 'Призывы', temporary: 'Временные эффекты', consumables: 'Расходники' };
+      for (const [key, label] of Object.entries(labels)) {
+        const items = inventory[key];
+        if (!Array.isArray(items) || !items.length) continue;
+        const lines = items.map(item => typeof item === 'string' ? item : Object.entries(item || {}).filter(([, value]) => value !== undefined && value !== null && typeof value !== 'object').map(([name, value]) => `${name}: ${value}`).join(' · ')).filter(Boolean);
+        if (lines.length) html += `<h3 class="record-detail-section">${h(label)}</h3><ul class="record-detail-list">${lines.map(line => `<li>${h(line)}</li>`).join('')}</ul>`;
+      }
+    } else if (typeof rawLoadout === 'string' && rawLoadout.trim()) {
+      html += `<h3 class="record-detail-section">Комплект, сохранённый рекордом</h3><p style="white-space:pre-wrap;overflow-wrap:anywhere;">${h(rawLoadout)}</p><p style="color:#777;font-size:11px;">Подробные снимки инвентаря сохраняются с версии 2.4.0.</p>`;
+    } else {
+      html += '<p style="color:#777;">Для этого старого рекорда снимок инвентаря и статов не сохранялся.</p>';
+    }
+    content.innerHTML = html;
+    document.getElementById('modal-record-detail').style.display = 'flex';
   }
 
   log(msg) {
@@ -8431,18 +8595,23 @@ class Game {
   render(dt = 1 / 60) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    const camX = this.player.x - this.canvas.width / 2;
-    const camY = this.player.y - this.canvas.height / 2;
+    const zoom = this.cameraZoom || 1;
+    const viewWidth = this.canvas.width / zoom;
+    const viewHeight = this.canvas.height / zoom;
+    const camX = this.player.x - viewWidth / 2;
+    const camY = this.player.y - viewHeight / 2;
 
     this.ctx.save();
-    this.ctx.translate(-camX, -camY);
+    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+    this.ctx.scale(zoom, zoom);
+    this.ctx.translate(-this.player.x, -this.player.y);
 
     // Сетка
     const ts = 64;
     const startX = Math.floor(camX / ts) * ts;
     const startY = Math.floor(camY / ts) * ts;
-    for (let x = startX; x < camX + this.canvas.width + ts; x += ts) {
-      for (let y = startY; y < camY + this.canvas.height + ts; y += ts) {
+    for (let x = startX; x < camX + viewWidth + ts; x += ts) {
+      for (let y = startY; y < camY + viewHeight + ts; y += ts) {
         if (x >= this.BOUND_MIN && x <= this.BOUND_MAX && y >= this.BOUND_MIN && y <= this.BOUND_MAX) {
           this.ctx.fillStyle = ((x / ts + y / ts) % 2 === 0) ? '#22252a' : '#1a1c22';
         } else {
@@ -8488,7 +8657,7 @@ class Game {
       this.ctx.save();
       this.ctx.fillStyle = 'rgba(214, 48, 49, 0.20)';
       this.ctx.beginPath();
-      this.ctx.rect(camX, camY, this.canvas.width, this.canvas.height);
+      this.ctx.rect(camX, camY, viewWidth, viewHeight);
       this.ctx.arc(zoneCenter, zoneCenter, safeRadius, 0, Math.PI * 2);
       this.ctx.fill('evenodd');
       this.ctx.beginPath();
@@ -8972,8 +9141,8 @@ class Game {
       const candidates = [];
       const addMarker = (target, kind) => {
         if (!Number.isFinite(target?.x) || !Number.isFinite(target?.y)) return;
-        const screenX = target.x - camX;
-        const screenY = target.y - camY;
+        const screenX = (target.x - camX) * zoom;
+        const screenY = (target.y - camY) * zoom;
         if (screenX >= margin && screenX <= this.canvas.width - margin && screenY >= margin && screenY <= this.canvas.height - margin) return;
         const dx = screenX - centerX;
         const dy = screenY - centerY;

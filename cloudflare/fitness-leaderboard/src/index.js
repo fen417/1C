@@ -40,7 +40,9 @@ function cleanName(value) {
 
 function cleanLoadout(value) {
   if (typeof value !== 'string') return '';
-  return value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1200);
+  // Death snapshots are structured JSON and need room for a complete inventory.
+  // Keep accepting legacy one-line loadouts while bounding the stored payload.
+  return value.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim().slice(0, 12000);
 }
 
 function validMode(mode) {

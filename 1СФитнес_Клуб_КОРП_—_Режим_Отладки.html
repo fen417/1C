@@ -263,17 +263,18 @@
     #pause-fullscreen { display:block; }
     #nav-status { display:none; }
     #btn-dyn-update { position:fixed; z-index:125; left:auto; right:calc(clamp(185px,20vw,245px) - 10px); bottom:calc(env(safe-area-inset-bottom) + 34px); transform:none; display:flex; align-items:center; justify-content:center; width:48px; min-width:48px; height:48px; min-height:48px; flex-basis:48px; padding:0; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92) !important; color:#fff; font-size:22px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:none; }
-    #btn-dyn-update::after { content:attr(data-cooldown); position:absolute; right:-3px; bottom:-3px; min-width:15px; height:15px; padding:0 2px; border:1px solid #111827; border-radius:8px; background:#ffd200; color:#111; font-size:9px; line-height:13px; text-align:center; }
-    #btn-dyn-update:not([data-cooldown])::after { display:none; }
+    #btn-dyn-update::after, #mobile-dash::after { content:attr(data-cooldown); position:absolute; right:-3px; bottom:-3px; min-width:15px; height:15px; padding:0 2px; border:1px solid #111827; border-radius:8px; background:#ffd200; color:#111; font-size:9px; line-height:13px; text-align:center; }
+    #btn-dyn-update:not([data-cooldown])::after, #mobile-dash:not([data-cooldown])::after { display:none; }
     #nav-status { min-height:12px; font-size:9px; }
     #xp-bar-container { position:absolute; top:0; left:50%; transform:translateX(-50%); width:min(58vw,520px); height:12px; flex:0 0 12px; border:0; border-radius:0 0 6px 6px; background:transparent; pointer-events:none; }
     #xp-bar-text { font-size:8px; line-height:12px; }
     #hud-active-skills { left:50%; right:auto; bottom:calc(env(safe-area-inset-bottom) + 10px); width:max-content; height:48px; transform:translateX(-50%); display:flex; gap:6px; pointer-events:none; z-index:118; }
-    #hud-active-skills .active-slot { position:relative; left:auto; top:auto; width:48px; min-width:48px; height:48px; min-height:48px; flex:0 0 48px; pointer-events:auto; border-radius:12px; touch-action:manipulation; }
+    #hud-active-skills .active-slot { position:relative; left:auto; top:auto; width:48px; min-width:48px; height:48px; min-height:48px; flex:0 0 48px; pointer-events:auto; border-radius:12px; touch-action:none; }
+    .shop-active-slot { touch-action:none; }
     .active-slot .act-icon { font-size:20px; }
     #hud-active-skills .act-key, #hud-consumables .consumable-key { display:none; }
     #hud-consumables { left:auto; right:10px; top:auto; bottom:12px; width:148px; height:148px; display:block; z-index:110; pointer-events:none; }
-    #hud-consumables > .consumable-slot { position:absolute; width:48px; min-width:48px; height:48px; min-height:48px; padding:0; margin:0; font-size:20px; border-width:2px; border-radius:12px; pointer-events:auto; touch-action:manipulation; }
+    #hud-consumables > .consumable-slot { position:absolute; width:48px; min-width:48px; height:48px; min-height:48px; padding:0; margin:0; font-size:20px; border-width:2px; border-radius:12px; pointer-events:auto; touch-action:none; }
     #hud-consumables > .consumable-slot:nth-child(1) { left:50px; top:0; }
     #hud-consumables > .consumable-slot:nth-child(2) { left:100px; top:50px; }
     #hud-consumables > .consumable-slot:nth-child(3) { left:50px; top:100px; }
@@ -282,6 +283,7 @@
     .consumable-slot .consumable-count { right:2px; bottom:1px; font-size:10px; }
     #mobile-move-control { display:block; position:absolute; left:18px; bottom:20px; width:126px; height:126px; z-index:90; touch-action:none; }
     #mobile-dash { display:block; position:absolute; left:auto; right:clamp(185px,20vw,245px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); width:48px; height:48px; z-index:125; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92); color:#fff; font-size:23px; pointer-events:auto; touch-action:none; }
+    #mobile-dash[data-cooldown] { border-color:#888; }
     #br-center-marker { top:51px; bottom:auto; }
     #dash-hud { display:none; }
     #br-center-marker { font-size:9px; }
@@ -986,7 +988,7 @@
     <div class="win-1c" style="width:620px;">
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
-        <details class="release-notes" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения и расходники на удобных местах экрана. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки показывают слот, клавишу и кнопку HUD. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
+        <details class="release-notes" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения и расходники на удобных местах экрана. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
         <details class="release-notes"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
         <details class="release-notes"><summary><h3>2.1.0 — «Комплектация по акции»</h3></summary><p>Добавлены пять магазинных предметов с отдельными эффектами: кресло по охране труда лечит на 8 HP при повышении уровня (до +24 за уровень); факс с резервным тонером увеличивает фиткоины с дискет на 15% (до +45%); переходник с переходника сокращает перезарядку рывка на 20% (до 45%); Excel «Обучение_финал_7.xlsx» даёт +10% к опыту; пропуск в серверную снижает урон от атак боссов на 10% (до 30%). В сетевой PvP эффекты этих магазинных предметов ослаблены. Добавлены пять комплектов. При покупке второго предмета из пары они автоматически объединяются в один слот; эффекты обоих предметов сохраняются, а комплект добавляет бонус: «Курьер на SLA» (кроссовки + переходник) даёт ещё +5% скорости и +4% скорости перезарядки; «Резервный сервер под столом» (ремень + факс) — +12 к максимуму HP и +0,5 HP регенерации в секунду; «Аналитик на линии» (перчатки + индекс-карта MSSQL) — +7% урона и +3% к шансу крита; «Миграция без бэкапа» (магнит + Excel) — +8% к радиусу сбора и +5% к опыту; СКУД «Охрана пропускает охрану» (HASP-лицензия + пропуск) — +3% уклонения и +10 к максимуму HP. Комплект занимает один слот вместо двух. В Battle Royale автоатаки выбирают ближайшего соперника наравне с мобами, а урон игрокам приведён к коэффициенту PvP — 14% от обычного. Магнит для дискет ослаблен до +19% к радиусу сбора. Добавлены два новых события, влияющих на игрока. В Battle Royale безопасная зона забирает 10% площади карты каждые 45 секунд; урон вне неё увеличен до 18,4% максимального HP в секунду. Стрелка направления и логотип 1С теперь указывают на корректный центр увеличенной карты. Рывок на ПКМ срабатывает и при удержании ЛКМ для движения. Неуязвимый преследователь RuDesktop, появляющийся с 15-й минуты, теперь выделяется белым квадратом с контрастной рамкой и заметной подписью.</p></details>
@@ -2780,11 +2782,35 @@ class Game {
     if (button) button.textContent = document.fullscreenElement ? '⛶ Выйти из полного экрана' : '⛶ Полный экран · горизонтально';
   }
 
+  bindTouchHudAction(element, action) {
+    let handledTouch = false;
+    element.addEventListener('pointerdown', event => {
+      handledTouch = event.pointerType === 'touch' || event.pointerType === 'pen';
+      if (!handledTouch || event.button !== 0 || element.disabled) return;
+      // Второе касание тоже запускает действие, пока первый палец держит джойстик.
+      event.preventDefault();
+      event.stopPropagation();
+      this.sound.init();
+      action();
+    });
+    element.addEventListener('click', event => {
+      const touchClick = event.pointerType === 'touch' || event.pointerType === 'pen';
+      if (!handledTouch || (!touchClick && event.detail === 0)) return;
+      // Браузер может прислать click после pointerdown: не расходуем предмет дважды.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true);
+  }
+
   setupMobileControls() {
     const pad = document.getElementById('mobile-move-control');
     const knob = document.getElementById('mobile-stick-knob');
     if (!pad || !knob) return;
     this.mobileMove = { x: 0, y: 0 };
+    for (let i = 0; i < 4; i++) {
+      const slot = document.getElementById(`act-slot-${i}`);
+      if (slot) this.bindTouchHudAction(slot, () => this.useActiveSkill(i));
+    }
     const dashButton = document.getElementById('mobile-dash');
     dashButton?.addEventListener('pointerdown', event => {
       if (event.button !== 0) return;
@@ -2827,7 +2853,7 @@ class Game {
       knob.style.transform = '';
     };
     pad.addEventListener('pointerdown', event => {
-      if (event.pointerType === 'mouse' || this.paused || !this.player || this.player.hp <= 0) return;
+      if (event.pointerType === 'mouse' || this.mobileMovePointerId != null || this.paused || !this.player || this.player.hp <= 0) return;
       event.preventDefault();
       this.mobileMovePointerId = event.pointerId;
       pad.setPointerCapture(event.pointerId);
@@ -2839,6 +2865,7 @@ class Game {
     });
     pad.addEventListener('pointerup', release);
     pad.addEventListener('pointercancel', release);
+    pad.addEventListener('lostpointercapture', release);
     window.addEventListener('blur', () => release());
   }
 
@@ -3066,6 +3093,7 @@ class Game {
     this.updateHUD();
     this.updateInventoryHUD();
     this.updateActiveHUD();
+    this.updateDashHUD();
     this.updateConsumableHUD();
     this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
     if (!options.skipScoreSession) {
@@ -5686,6 +5714,7 @@ class Game {
       button.title = slot ? `${CONSUMABLES_DEF[slot.key].name} ×${slot.count} (клавиша ${keys[i]})` : `Пустая ячейка (${keys[i]})`;
       button.innerHTML = `<span class="consumable-key">${keys[i]}</span>${slot ? `<span>${CONSUMABLES_DEF[slot.key].icon}</span><span class="consumable-count">${slot.count}</span>` : '<span>＋</span>'}`;
       button.onclick = () => this.useConsumable(i);
+      this.bindTouchHudAction(button, () => this.useConsumable(i));
       hud.appendChild(button);
     }
   }
@@ -8012,6 +8041,14 @@ class Game {
       ? `💨 Рывок · ${this.player.dashCooldown.toFixed(1)}с`
       : '💨 Рывок · ПКМ / Shift';
     element.style.borderColor = this.player.dashCooldown > 0 ? '#888' : '#55efc4';
+    const mobileButton = document.getElementById('mobile-dash');
+    if (!mobileButton) return;
+    const cooldown = this.player.dashCooldown > 0 ? String(Math.ceil(this.player.dashCooldown)) : null;
+    if ((mobileButton.dataset.cooldown || null) !== cooldown) {
+      if (cooldown) mobileButton.dataset.cooldown = cooldown;
+      else delete mobileButton.dataset.cooldown;
+      mobileButton.setAttribute('aria-label', cooldown ? `Рывок: перезарядка ${cooldown} сек.` : 'Рывок');
+    }
   }
 
   addXP(val) {
@@ -8177,19 +8214,10 @@ class Game {
       const passiveLevel = ch.type === 'pass_new' ? 1 : (ch.type === 'pass_up' ? ch.lvl : 0);
       const combatLevel = ch.type === 'combat_up' ? ch.def.levelDescriptions?.[ch.lvl - 1] : '';
       const isActiveChoice = ch.type === 'active_new' || ch.type === 'active_up';
-      const activeSlot = isActiveChoice
-        ? (ch.type === 'active_up'
-          ? this.activeSkills.findIndex(skill => skill?.key === ch.key)
-          : this.activeSkills.findIndex(skill => skill === null))
-        : -1;
-      const activeHint = isActiveChoice
-        ? `Слот ${activeSlot + 1} · клавиша ${activeSlot + 1} или кнопка ${activeSlot + 1} на панели умений.`
-        : '';
       const comboText = ch.type === 'weapon_fusion' ? `Объединяет: ${ch.components.map(key => WEAPONS_DEF[key].name).join(' + ')}. Компоненты заменяются комбинацией.` : '';
-      const baseDescription = comboText || (passiveLevel
+      const description = comboText || (passiveLevel
         ? `${ch.def.levelDescriptions[passiveLevel - 1]} (уровень ${passiveLevel} из 5)`
         : (combatLevel || ch.def.desc || 'Улучшает характеристики героя.'));
-      const description = isActiveChoice ? `${baseDescription} ${activeHint}` : baseDescription;
       if (isActiveChoice) {
         const activeTitle = title.replace(/^Активное:\s*/i, '');
         title = `⚡ [АКТИВНОЕ] ${activeTitle}`;
@@ -8721,6 +8749,7 @@ class Game {
         entry.type = 'button';
         entry.disabled = slot.cooldown > 0;
         entry.onclick = () => this.useShopActiveItem(i);
+        this.bindTouchHudAction(entry, () => this.useShopActiveItem(i));
       }
       passiveBox.appendChild(entry);
     }

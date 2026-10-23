@@ -867,7 +867,7 @@
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
-            <button class="btn-1c" style="background:#55efc4;" onclick="game.start()">▶ Одиночная игра</button>
+            <button class="btn-1c" style="background:#55efc4;" onclick="game.startFromMainMenu()">▶ Одиночная игра</button>
             <button class="btn-1c" onclick="game.showPvpMenu()">🌐 Сетевая игра</button>
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
@@ -2837,15 +2837,24 @@ class Game {
 
   requestMobileFullscreen() {
     if (!window.matchMedia?.('(pointer: coarse)').matches) return;
-    const enter = document.documentElement.requestFullscreen?.();
     const lockLandscape = () => {
       try {
         const lock = screen.orientation?.lock?.('landscape');
         lock?.catch?.(() => {});
       } catch (_) {}
     };
+    if (document.fullscreenElement) {
+      lockLandscape();
+      return;
+    }
+    const enter = document.documentElement.requestFullscreen?.();
     if (enter?.then) enter.then(lockLandscape, lockLandscape);
     else lockLandscape();
+  }
+
+  startFromMainMenu() {
+    this.requestMobileFullscreen();
+    this.start();
   }
 
   setMouseMoveAim(clientX, clientY) {
@@ -3220,7 +3229,6 @@ class Game {
   }
 
   choosePlayerClass(classId) {
-    this.requestMobileFullscreen();
     const classDef = PLAYER_CLASSES[classId];
     if (!classDef || document.getElementById('modal-class-select').style.display !== 'flex') return;
     this.selectedClassId = classId;
@@ -3257,6 +3265,7 @@ class Game {
   }
 
   async createPvpRoom() {
+    this.requestMobileFullscreen();
     this.pvpStatus('Создаём комнату…');
     const maxPlayers = 8;
     const name = (this.savedNick || 'Архитектор 1С').slice(0, 20);
@@ -3295,6 +3304,7 @@ class Game {
   async joinPvpRoom() {
     const code = document.getElementById('pvp-room-code').value.trim();
     if (!/^[0-9]{4}$/.test(code)) { this.pvpStatus('Введите четырёхзначный код комнаты.', true); return; }
+    this.requestMobileFullscreen();
     this.pvpStatus('Подключаемся к комнате…');
     const name = (this.savedNick || 'Архитектор 1С').slice(0, 20);
     try {

@@ -262,7 +262,7 @@
     #btn-sound, #btn-music { display:none; }
     #pause-fullscreen { display:block; }
     #nav-status { display:none; }
-    #btn-dyn-update { position:fixed; z-index:125; left:auto; right:calc(clamp(185px,20vw,245px) - 30px); bottom:calc(env(safe-area-inset-bottom) + 34px); transform:none; display:flex; align-items:center; justify-content:center; width:48px; min-width:48px; height:48px; min-height:48px; flex-basis:48px; padding:0; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92) !important; color:#fff; font-size:22px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:none; }
+    #btn-dyn-update { position:fixed; z-index:125; left:auto; right:calc(clamp(185px,20vw,245px) - 10px); bottom:calc(env(safe-area-inset-bottom) + 34px); transform:none; display:flex; align-items:center; justify-content:center; width:48px; min-width:48px; height:48px; min-height:48px; flex-basis:48px; padding:0; border:2px solid #55efc4; border-radius:50%; background:rgba(17,24,39,.92) !important; color:#fff; font-size:22px; box-shadow:0 2px 10px #0008; pointer-events:auto; touch-action:none; }
     #btn-dyn-update::after { content:attr(data-cooldown); position:absolute; right:-3px; bottom:-3px; min-width:15px; height:15px; padding:0 2px; border:1px solid #111827; border-radius:8px; background:#ffd200; color:#111; font-size:9px; line-height:13px; text-align:center; }
     #btn-dyn-update:not([data-cooldown])::after { display:none; }
     #nav-status { min-height:12px; font-size:9px; }
@@ -2726,8 +2726,14 @@ class Game {
   }
 
   resize() {
-    this.canvas.width = this.canvas.parentElement.clientWidth;
-    this.canvas.height = this.canvas.parentElement.clientHeight;
+    const rect = this.canvas.getBoundingClientRect();
+    const pixelRatio = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    this.viewportWidth = rect.width || this.canvas.parentElement.clientWidth;
+    this.viewportHeight = rect.height || this.canvas.parentElement.clientHeight;
+    this.pixelRatio = pixelRatio;
+    this.canvas.width = Math.max(1, Math.round(this.viewportWidth * pixelRatio));
+    this.canvas.height = Math.max(1, Math.round(this.viewportHeight * pixelRatio));
+    this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     this.cameraZoom = window.matchMedia('(max-width: 1300px)').matches ? 0.72 : 1;
     this.syncMobileDynamicButtonLabel();
   }
@@ -2862,8 +2868,8 @@ class Game {
     const rect = this.canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     this.mouseMoveAim = {
-      x: (clientX - rect.left) * (this.canvas.width / rect.width),
-      y: (clientY - rect.top) * (this.canvas.height / rect.height)
+      x: (clientX - rect.left) * (this.viewportWidth / rect.width),
+      y: (clientY - rect.top) * (this.viewportHeight / rect.height)
     };
   }
 
@@ -7514,8 +7520,8 @@ class Game {
       my += this.mobileMove.y;
     }
     if (mx === 0 && my === 0 && this.mouseMoveAim) {
-      const dx = this.mouseMoveAim.x - this.canvas.width / 2;
-      const dy = this.mouseMoveAim.y - this.canvas.height / 2;
+      const dx = this.mouseMoveAim.x - this.viewportWidth / 2;
+      const dy = this.mouseMoveAim.y - this.viewportHeight / 2;
       const distance = Math.hypot(dx, dy);
       if (distance > 18) { mx = dx / distance; my = dy / distance; }
     }
@@ -8749,16 +8755,16 @@ class Game {
   }
 
   render(dt = 1 / 60) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
 
     const zoom = this.cameraZoom || 1;
-    const viewWidth = this.canvas.width / zoom;
-    const viewHeight = this.canvas.height / zoom;
+    const viewWidth = this.viewportWidth / zoom;
+    const viewHeight = this.viewportHeight / zoom;
     const camX = this.player.x - viewWidth / 2;
     const camY = this.player.y - viewHeight / 2;
 
     this.ctx.save();
-    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+    this.ctx.translate(this.viewportWidth / 2, this.viewportHeight / 2);
     this.ctx.scale(zoom, zoom);
     this.ctx.translate(-this.player.x, -this.player.y);
 
@@ -9291,15 +9297,15 @@ class Game {
 
     if (this.player.hasSecondMonitor) {
       const margin = 38;
-      const centerX = this.canvas.width / 2;
-      const centerY = this.canvas.height / 2;
+      const centerX = this.viewportWidth / 2;
+      const centerY = this.viewportHeight / 2;
       const isNetworkPvp = Boolean(this.pvp?.started && ['pvp', 'battle_royale'].includes(this.pvp.mode));
       const candidates = [];
       const addMarker = (target, kind) => {
         if (!Number.isFinite(target?.x) || !Number.isFinite(target?.y)) return;
         const screenX = (target.x - camX) * zoom;
         const screenY = (target.y - camY) * zoom;
-        if (screenX >= margin && screenX <= this.canvas.width - margin && screenY >= margin && screenY <= this.canvas.height - margin) return;
+        if (screenX >= margin && screenX <= this.viewportWidth - margin && screenY >= margin && screenY <= this.viewportHeight - margin) return;
         const dx = screenX - centerX;
         const dy = screenY - centerY;
         candidates.push({ kind, screenX, screenY, dx, dy, distance: Math.hypot(dx, dy) });
@@ -9327,7 +9333,7 @@ class Game {
       }
       for (const mark of candidates) {
         const angle = Math.atan2(mark.dy, mark.dx);
-        const reach = Math.min((this.canvas.width / 2 - margin) / Math.max(0.001, Math.abs(Math.cos(angle))), (this.canvas.height / 2 - margin) / Math.max(0.001, Math.abs(Math.sin(angle))));
+        const reach = Math.min((this.viewportWidth / 2 - margin) / Math.max(0.001, Math.abs(Math.cos(angle))), (this.viewportHeight / 2 - margin) / Math.max(0.001, Math.abs(Math.sin(angle))));
         const x = centerX + Math.cos(angle) * reach;
         const y = centerY + Math.sin(angle) * reach;
         this.ctx.save();
@@ -9357,12 +9363,12 @@ class Game {
       this.ctx.textAlign = 'center';
       const width = this.ctx.measureText(label).width + 28;
       this.ctx.fillStyle = 'rgba(18, 32, 48, 0.88)';
-      this.ctx.fillRect((this.canvas.width - width) / 2, 12, width, 30);
+      this.ctx.fillRect((this.viewportWidth - width) / 2, 12, width, 30);
       this.ctx.strokeStyle = '#74b9ff';
       this.ctx.lineWidth = 2;
-      this.ctx.strokeRect((this.canvas.width - width) / 2, 12, width, 30);
+      this.ctx.strokeRect((this.viewportWidth - width) / 2, 12, width, 30);
       this.ctx.fillStyle = '#fff';
-      this.ctx.fillText(label, this.canvas.width / 2, 32);
+      this.ctx.fillText(label, this.viewportWidth / 2, 32);
       this.ctx.restore();
     }
   }

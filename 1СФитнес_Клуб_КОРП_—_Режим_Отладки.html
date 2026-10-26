@@ -9303,7 +9303,7 @@ class Game {
       const patchVersion = entry => String(entry.version || '1.7.1').split('.').slice(0, 3).map(part => Number.parseInt(part, 10) || 0);
       const compareVersion = (a, b) => {
         const left = patchVersion(a), right = patchVersion(b);
-        for (let i = 0; i < 3; i++) if (left[i] !== right[i]) return right[i] - left[i];
+        for (let i = 0; i < 2; i++) if (left[i] !== right[i]) return right[i] - left[i];
         return 0;
       };
       const visibleScores = (this.hideCheatersFromLeaderboard ? scores.filter(entry => !hasCheaterTag(entry)) : scores)

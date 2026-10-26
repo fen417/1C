@@ -618,6 +618,13 @@
   .shop-build-node.owned { color:#9be0ab; border-color:#5dbb78; }
   .shop-build-node.missing { color:#d3dbe3; }
   .shop-build-children { margin-left:13px; padding-left:7px; border-left:1px solid #526477; }
+  .shop-build-options { display:grid; grid-template-columns:1fr; gap:4px; margin-top:9px; }
+  .shop-build-option { width:100%; display:flex; align-items:center; gap:6px; padding:6px; color:#e1e7ed; background:#263746; border:1px solid #455c70; font-size:10px; text-align:left; cursor:pointer; }
+  .shop-build-option:hover { background:#354b5e; border-color:#e5c66c; }
+  .shop-build-option.owned { border-color:#5dbb78; }
+  .shop-build-option-icon { flex:none; font-size:16px; }
+  .shop-build-option-info { min-width:0; flex:1; }
+  .shop-build-option-info small { display:block; margin-top:2px; color:#aab8c5; }
   .dota-shop-detail-actions { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:7px; }
   .dota-shop-detail-actions .btn-1c { padding:7px 5px; color:#fff; background:#536e85; border-color:#8ba2b7; }
   .dota-shop-detail-actions .btn-1c:first-child { background:#6d9a53; border-color:#a5cf8a; }
@@ -966,7 +973,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
-              <p>Каждые 13 минут обычные мобы получают +10% к урону и здоровью и +13% к опыту. После 20-й минуты появляются четыре новых усиленных мини-босса с разными атаками, призываемыми миньонами и видимыми опасными аурами. С 30-й минуты большие боссы преследуют игрока и обходят его по дуге. Магазин получил каталог, поиск, категории, рецепты, покупку недостающих компонентов и продажу предметов. На ПК активки и расходники используют клавиши шести общих слотов инвентаря. На телефонах включается мобильный интерфейс. В паузе доступны настройки, принятый тикет показывается под баффами с прогрессом. Урон больших боссов увеличен на 15%; тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления.</p>
+              <p>Обычные мобы постепенно становятся сильнее. Добавлены усиленные мини-боссы с особыми атаками, миньонами и видимыми аурами; поздние большие боссы преследуют игрока. Магазин расширен новыми предметами и комплектами для разных характеристик, а карточка предмета показывает возможные сборки из него. Доступны каталог, поиск, рецепты, покупка компонентов и продажа предметов. Активные копии делят перезарядку, расходники складываются в слот. На ПК переназначаются клавиши предметов. Мобильный интерфейс включается только на телефонах. В паузе доступны настройки, а принятый тикет отображается с задачей и прогрессом. Урон больших боссов увеличен; обновлены таблица рекордов и правила выдачи тикетов во время боя с ними.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.4.0 — «Комплект и контроль»</h3>
@@ -1081,7 +1088,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в слот. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, рецепты, быструю покупку компонентов и продажу предметов за половину цены. Исправлены покупки при заполненном инвентаре. На ПК можно переназначить клавиши для шести слотов предметов и расходников. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен на 15%; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут урон и здоровье обычных мобов (не боссов) повышаются на 10%, а опыт за них — на 13%. После 20-й минуты появляются четыре новых усиленных мини-босса с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока и обходить его по дуге.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в слот. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, рецепты, быструю покупку компонентов и продажу предметов за половину цены. Добавлено 26 предметов и 12 комплектов с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки при заполненном инвентаре. На ПК можно переназначить клавиши для шести слотов предметов и расходников. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен на 15%; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут урон и здоровье обычных мобов (не боссов) повышаются на 10%, а опыт за них — на 13%. После 20-й минуты появляются четыре новых усиленных мини-босса с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока и обходить его по дуге.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
@@ -2455,7 +2462,33 @@ const STORE_PASSIVES_DEF = {
   shop_ring: { name: 'Кольцо восстановления', icon: '💍', cost: 180, stock: 99, desc: '+0,7 HP регенерации в секунду.', apply: p => { p.regen += 0.7; } },
   shop_scope: { name: 'Прицельный модуль', icon: '🔭', cost: 200, stock: 99, desc: '+3% к шансу критического удара.', apply: p => { p.critChance += 0.03; } },
   shop_gloves: { name: 'Перчатки скоростной работы', icon: '🥊', cost: 210, stock: 99, desc: 'Оружие и навыки перезаряжаются на 5% быстрее.', apply: p => { p.cdMult *= 0.95; } },
-  shop_cloak: { name: 'Защитная накидка', icon: '🧥', cost: 190, stock: 99, desc: '+4% защиты от атак боссов.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.04); } }
+  shop_cloak: { name: 'Защитная накидка', icon: '🧥', cost: 190, stock: 99, desc: '+4% защиты от атак боссов.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.04); } },
+  shop_speed_tracker: { name: 'Трекер темпа', icon: '⌚', cost: 260, stock: 99, desc: '+6% к скорости бега.', apply: p => { p.speedMult += 0.06; } },
+  shop_sprint_module: { name: 'Модуль интервального бега', icon: '🏃', cost: 430, stock: 99, desc: '+12% к скорости бега.', apply: p => { p.speedMult += 0.12; } },
+  shop_damage_chip: { name: 'Усилитель сигнала', icon: '📶', cost: 280, stock: 99, desc: '+6% к урону.', apply: p => { p.dmgMult += 0.06; } },
+  shop_damage_matrix: { name: 'Боевая матрица', icon: '🧮', cost: 480, stock: 99, desc: '+14% к урону.', apply: p => { p.dmgMult += 0.14; } },
+  shop_crit_film: { name: 'Критическая плёнка', icon: '🔍', cost: 230, stock: 99, desc: '+2,5% к шансу критического удара.', apply: p => { p.critChance += 0.025; } },
+  shop_crit_console: { name: 'Консоль точного расчёта', icon: '🎛️', cost: 470, stock: 99, desc: '+7% к шансу критического удара.', apply: p => { p.critChance += 0.07; } },
+  shop_health_cache: { name: 'Кэш здоровья', icon: '🫀', cost: 270, stock: 99, desc: '+15 к максимальному здоровью и столько же сразу восстанавливает.', apply: p => { p.maxHp += 15; p.hp = Math.min(p.maxHp, p.hp + 15); } },
+  shop_health_reserve: { name: 'Резервный контур питания', icon: '🔋', cost: 460, stock: 99, desc: '+30 к максимальному здоровью и столько же сразу восстанавливает.', apply: p => { p.maxHp += 30; p.hp = Math.min(p.maxHp, p.hp + 30); } },
+  shop_cooldown_relay: { name: 'Ретранслятор перезарядки', icon: '🔁', cost: 300, stock: 99, desc: 'Умения и оружие перезаряжаются на 4% быстрее.', apply: p => { p.cdMult *= 0.96; } },
+  shop_cooldown_bus: { name: 'Шина параллельных задач', icon: '🧵', cost: 500, stock: 99, desc: 'Умения и оружие перезаряжаются на 9% быстрее.', apply: p => { p.cdMult *= 0.91; } },
+  shop_oxygen_canister: { name: 'Кислородный баллон', icon: '🫧', cost: 300, stock: 99, desc: '+1 HP регенерации в секунду.', apply: p => { p.regen += 1; } },
+  shop_medical_station: { name: 'Медицинский терминал', icon: '🏥', cost: 520, stock: 99, desc: '+2 HP регенерации в секунду.', apply: p => { p.regen += 2; } },
+  shop_xp_cache: { name: 'Кэш учебных материалов', icon: '📚', cost: 300, stock: 99, desc: '+6% к получаемому опыту.', apply: p => { p.xpMult += 0.06; } },
+  shop_xp_archive: { name: 'Архив сертификации', icon: '🗃️', cost: 500, stock: 99, desc: '+12% к получаемому опыту.', apply: p => { p.xpMult += 0.12; } },
+  shop_dodge_driver: { name: 'Драйвер уклонения', icon: '🌀', cost: 260, stock: 99, desc: '+2% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.02); } },
+  shop_dodge_grid: { name: 'Сетка предиктивной защиты', icon: '🕸️', cost: 490, stock: 99, desc: '+6% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.06); } },
+  shop_cash_terminal: { name: 'Терминал расчётов', icon: '💳', cost: 290, stock: 99, desc: '+8% к фиткоинам с дискет.', apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.08; } },
+  shop_cash_hub: { name: 'Расчётный узел', icon: '🏦', cost: 510, stock: 99, desc: '+15% к фиткоинам с дискет.', apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.15; } },
+  shop_magnet_extension: { name: 'Выносная магнитная катушка', icon: '🧲', cost: 280, stock: 99, desc: '+12% к радиусу сбора опыта и дискет.', apply: p => { p.magnetMult += 0.12; } },
+  shop_magnet_array: { name: 'Магнитная решётка', icon: '🧲', cost: 490, stock: 99, desc: '+25% к радиусу сбора опыта и дискет.', apply: p => { p.magnetMult += 0.25; } },
+  shop_boss_plating: { name: 'Бронепанель серверной', icon: '🛡️', cost: 330, stock: 99, desc: '+4% защиты от атак боссов. Общий предел защиты — 30%.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.04); } },
+  shop_bulkhead: { name: 'Противоударная переборка', icon: '🚪', cost: 540, stock: 99, desc: '+8% защиты от атак боссов. Общий предел защиты — 30%.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.08); } },
+  shop_dash_oil: { name: 'Смазка привода рывка', icon: '🛞', cost: 320, stock: 99, desc: 'Перезарядка рывка короче на 10%.', apply: p => { p.dashCooldownMult = Math.max(0.45, (p.dashCooldownMult || 1) * 0.90); } },
+  shop_dash_accumulator: { name: 'Накопитель импульса', icon: '⚡', cost: 530, stock: 99, desc: 'Перезарядка рывка короче на 22%.', apply: p => { p.dashCooldownMult = Math.max(0.40, (p.dashCooldownMult || 1) * 0.78); } },
+  shop_level_care: { name: 'Памятка наставника', icon: '📝', cost: 310, stock: 99, desc: '+6 HP к лечению при каждом повышении уровня. Общий предел — 24 HP.', apply: p => { p.levelUpHeal = Math.min(24, (p.levelUpHeal || 0) + 6); } },
+  shop_level_clinic: { name: 'Клиника повышения уровня', icon: '🩺', cost: 520, stock: 99, desc: '+12 HP к лечению при каждом повышении уровня. Общий предел — 24 HP.', apply: p => { p.levelUpHeal = Math.min(24, (p.levelUpHeal || 0) + 12); } }
 };
 
 const STORE_ACTIVES_DEF = {
@@ -2513,6 +2546,78 @@ const STORE_PASSIVE_COMBOS = {
     name: 'Набор «Архитектор ИТ»', icon: '🧠',
     desc: 'Итоговые характеристики: +9% к уклонению, +29% к радиусу сбора дискет; второй монитор показывает ближайших врагов или соперников.',
     apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.04); p.magnetMult += 0.10; }
+  },
+  precision_suite: {
+    parts: ['shop_crit_film', 'shop_crit_console', 'tech_gloves'],
+    name: 'Комплект «Прицельный контур»', icon: '🎯', tier: 3,
+    desc: 'Итоговые характеристики: +13,5% к шансу критического удара и +15% к урону.',
+    apply: p => { p.critChance += 0.04; p.dmgMult += 0.03; }
+  },
+  redline_kit: {
+    parts: ['shop_speed_tracker', 'shop_sprint_module', 'shop_dash_oil'],
+    name: 'Комплект «Красная линия»', icon: '🏃', tier: 3,
+    desc: 'Итоговые характеристики: +25% к скорости бега и ×0,81 к перезарядке рывка.',
+    apply: p => { p.speedMult += 0.07; p.dashCooldownMult = Math.max(0.45, (p.dashCooldownMult || 1) * 0.9); }
+  },
+  assault_overclock: {
+    parts: ['shop_damage_chip', 'shop_damage_matrix', 'shop_cooldown_relay'],
+    name: 'Комплект «Штурмовой разгон»', icon: '⚔️', tier: 3,
+    desc: 'Итоговые характеристики: +28% к урону и ×0,91 к перезарядке умений и оружия.',
+    apply: p => { p.dmgMult += 0.08; p.cdMult *= 0.95; }
+  },
+  vitality_node: {
+    parts: ['shop_health_cache', 'shop_oxygen_canister', 'shop_medical_station'],
+    name: 'Комплект «Узел жизнеобеспечения»', icon: '🫀', tier: 3,
+    desc: 'Итоговые характеристики: +35 к максимальному здоровью и +3,8 HP регенерации в секунду.',
+    apply: p => { p.maxHp += 20; p.hp = Math.min(p.maxHp, p.hp + 20); p.regen += 0.8; }
+  },
+  learning_datahub: {
+    parts: ['shop_xp_cache', 'shop_xp_archive', 'floppy_magnet'],
+    name: 'Комплект «Учебный дата-центр»', icon: '📚', tier: 3,
+    desc: 'Итоговые характеристики: +23% к получаемому опыту и +27% к радиусу сбора.',
+    apply: p => { p.xpMult += 0.05; p.magnetMult += 0.08; }
+  },
+  capital_flow: {
+    parts: ['shop_cash_terminal', 'shop_cash_hub', 'shop_xp_cache'],
+    name: 'Комплект «Капитал в потоке»', icon: '🏦', tier: 3,
+    desc: 'Итоговые характеристики: +31% к фиткоинам с дискет и +10% к опыту.',
+    apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.08; p.xpMult += 0.04; }
+  },
+  evasion_wall: {
+    parts: ['shop_dodge_driver', 'shop_dodge_grid', 'shop_boss_plating'],
+    name: 'Комплект «Сетка уклонения»', icon: '🕸️', tier: 3,
+    desc: 'Итоговые характеристики: +12% к уклонению и +8% защиты от атак боссов.',
+    apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.04); p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.04); }
+  },
+  shield_routine: {
+    parts: ['shop_boss_plating', 'shop_bulkhead', 'shop_health_cache'],
+    name: 'Комплект «Резервная переборка»', icon: '🚪', tier: 3,
+    desc: 'Итоговые характеристики: +35 к максимальному здоровью и +18% защиты от атак боссов.',
+    apply: p => { p.maxHp += 20; p.hp = Math.min(p.maxHp, p.hp + 20); p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.06); }
+  },
+  dash_protocol: {
+    parts: ['shop_dash_oil', 'shop_dash_accumulator', 'shop_speed_tracker'],
+    name: 'Комплект «Импульсный привод»', icon: '⚡', tier: 3,
+    desc: 'Итоговые характеристики: +10% к скорости бега и ×0,63 к перезарядке рывка.',
+    apply: p => { p.speedMult += 0.04; p.dashCooldownMult = Math.max(0.40, (p.dashCooldownMult || 1) * 0.90); }
+  },
+  levelup_clinic: {
+    parts: ['shop_level_care', 'shop_level_clinic', 'shop_health_cache'],
+    name: 'Комплект «Клиника роста»', icon: '🩺', tier: 3,
+    desc: 'Итоговые характеристики: +24 HP к лечению при повышении уровня и +40 к максимальному здоровью.',
+    apply: p => { p.levelUpHeal = Math.min(24, (p.levelUpHeal || 0) + 6); p.maxHp += 25; p.hp = Math.min(p.maxHp, p.hp + 25); }
+  },
+  rapid_recovery: {
+    parts: ['shop_oxygen_canister', 'shop_medical_station', 'shop_cooldown_bus'],
+    name: 'Комплект «Быстрое восстановление»', icon: '🧵', tier: 3,
+    desc: 'Итоговые характеристики: +4 HP регенерации в секунду и ×0,87 к перезарядке умений и оружия.',
+    apply: p => { p.regen += 1; p.cdMult *= 0.96; }
+  },
+  magnetic_exchange: {
+    parts: ['shop_magnet_extension', 'shop_magnet_array', 'shop_cash_terminal'],
+    name: 'Комплект «Магнитная касса»', icon: '🧲', tier: 3,
+    desc: 'Итоговые характеристики: +47% к радиусу сбора и +14% к фиткоинам с дискет.',
+    apply: p => { p.magnetMult += 0.10; p.currencyMult = (p.currencyMult || 1) + 0.06; }
   }
 };
 
@@ -5939,6 +6044,28 @@ class Game {
     return `${node}<div class="shop-build-children">${item.parts.map(part => this.renderShopBuildNode(part, depth + 1, nextSeen)).join('')}</div>`;
   }
 
+  renderShopRecipesUsingItem(key) {
+    const containsIngredient = (recipeKey, targetKey, seen = new Set()) => {
+      if (seen.has(recipeKey)) return false;
+      const recipe = STORE_RECIPES[recipeKey];
+      if (!recipe?.parts) return false;
+      const nextSeen = new Set(seen).add(recipeKey);
+      return recipe.parts.some(part => part === targetKey || containsIngredient(part, targetKey, nextSeen));
+    };
+    const recipes = Object.entries(STORE_RECIPES)
+      .filter(([recipeKey]) => recipeKey !== key && containsIngredient(recipeKey, key))
+      .map(([recipeKey, recipe]) => ({ key: recipeKey, ...recipe, direct: recipe.parts.includes(key) }))
+      .sort((a, b) => Number(b.direct) - Number(a.direct) || (a.tier || 1) - (b.tier || 1) || a.name.localeCompare(b.name, 'ru'));
+    if (!recipes.length) return '';
+    const options = recipes.map(recipe => {
+      const owned = this.getOwnedShopItemCount(recipe.key) > 0;
+      const remaining = this.getMissingShopCost(recipe.key, new Set(), true);
+      const relation = recipe.direct ? 'Нужен этот предмет' : 'Через промежуточный комплект';
+      return `<button type="button" class="shop-build-option${owned ? ' owned' : ''}" onclick="game.selectShopItem('${this.escapeHtml(recipe.key)}')"><span class="shop-build-option-icon">${recipe.icon || '📦'}</span><span class="shop-build-option-info">${this.escapeHtml(recipe.name)}<small>${relation} · осталось ${remaining} 💰${owned ? ' · есть в инвентаре' : ''}</small></span></button>`;
+    }).join('');
+    return `<div class="dota-shop-section-title" style="margin-top:10px;">Можно собрать из этого предмета</div><div class="shop-build-options">${options}</div>`;
+  }
+
   renderShopDetails() {
     const selected = this.selectedShopInventory;
     const slot = selected ? this.shopPassives[selected.index] : null;
@@ -5959,7 +6086,7 @@ class Game {
     const totalCost = this.getShopItemTotalCost(item.key);
     const remainingCost = item.parts ? this.getMissingShopCost(item.key, new Set(), true) : totalCost;
     box.innerHTML = `<div class="dota-shop-selected-icon">${item.icon || '📦'}</div><div><h3>${this.escapeHtml(item.name)}</h3><p>${this.escapeHtml(item.desc || '')}</p><p class="selected-price">${item.parts ? `Полная сборка · ${totalCost} 💰` : `${totalCost} 💰`}${this.getOwnedShopItemCount(item.key) ? ` · в инвентаре ${this.getOwnedShopItemCount(item.key)}` : ''}</p></div>`;
-    tree.innerHTML = item.parts ? `<div class="dota-shop-section-title">Состав рецепта · осталось ${remainingCost} 💰</div>${this.renderShopBuildNode(item.key)}` : '<div class="shop-empty-selection">Предмет можно купить напрямую.</div>';
+    tree.innerHTML = `${item.parts ? `<div class="dota-shop-section-title">Состав рецепта · осталось ${remainingCost} 💰</div>${this.renderShopBuildNode(item.key)}` : '<div class="shop-empty-selection">Предмет можно купить напрямую.</div>'}${this.renderShopRecipesUsingItem(item.key)}`;
     const missingKey = item.parts ? this.findMissingShopComponent(item.key, new Set(), true) : item.key;
     const missingItem = missingKey ? this.getShopCatalogItem(missingKey) : null;
     const missingCost = missingItem ? this.getShopItemTotalCost(missingKey) : 0;

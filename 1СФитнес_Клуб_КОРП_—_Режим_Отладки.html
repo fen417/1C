@@ -249,7 +249,7 @@
   #mobile-dyn-update { display:none; }
   .mobile-stick-ring { position:absolute; inset:0; border:2px solid rgba(255,255,255,.65); border-radius:50%; background:rgba(20,25,35,.48); box-shadow:0 2px 12px #0008; }
   .mobile-stick-knob { position:absolute; width:42%; height:42%; left:29%; top:29%; border:2px solid #fff; border-radius:50%; background:rgba(85,239,196,.72); box-shadow:0 1px 7px #0009; pointer-events:none; }
-  @media (max-width: 1300px) {
+  @media (max-width: 1300px) and (pointer: coarse) {
     html, body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; touch-action:none; }
     #app-window { width:100vw; height:100dvh; border:0; box-shadow:none; }
     #header-1c, #footer-1c { display:none; }
@@ -481,7 +481,7 @@
   }
   #footer-log { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #footer-1c > div:last-child { flex-shrink: 0; white-space: nowrap; margin-left: 10px; }
-  @media (max-width: 1300px) { #footer-1c { display:none; } }
+  @media (max-width: 1300px) and (pointer: coarse) { #footer-1c { display:none; } }
 
   /* Модалки */
   .modal-overlay {
@@ -506,7 +506,7 @@
   #modal-lvlup { z-index: 150; }
   #modal-pause { z-index: 155; }
   #pause-fullscreen { display:none; }
-  @media (max-width: 1300px) { #pause-fullscreen { display:block; } }
+  @media (max-width: 1300px) and (pointer: coarse) { #pause-fullscreen { display:block; } }
   #modal-pause .win-1c { width: min(900px, 94vw); height: calc(100% - 24px); max-height: calc(100% - 24px); display:flex; flex-direction:column; overflow:hidden; }
   #modal-pause .win-1c-body { display:flex; flex:1; min-height:0; overflow:hidden; }
   .pause-layout { display: grid; flex:1; min-height:0; grid-template-columns: minmax(240px, .85fr) minmax(0, 1.5fr); gap: 16px; align-items: stretch; text-align: left; }
@@ -524,7 +524,7 @@
   .loadout-section li { font-size: 11px; line-height: 1.4; padding: 2px 0; border-top: 1px solid #e5e5e5; overflow-wrap: anywhere; }
   .loadout-section li:first-child { border-top: 0; }
   .loadout-section li b { float: right; margin-left: 5px; color: #555; white-space: nowrap; }
-  @media (max-width: 600px) {
+  @media (max-width: 600px) and (pointer: coarse) {
     #modal-pause .win-1c { height:auto; max-height:calc(100% - 24px); overflow-y:auto; }
     #modal-pause .win-1c-body { display:block; overflow:visible; }
     .pause-layout { grid-template-columns: 1fr; }
@@ -750,7 +750,7 @@
   }
 
   /* После общих стилей: панели на телефоне растут только по содержимому. */
-  @media (max-width: 1300px) {
+  @media (max-width: 1300px) and (pointer: coarse) {
     #mega-boss-hud { top:18px; bottom:auto; left:50%; right:auto; transform:translateX(-50%); width:min(300px,42vw); padding:4px 7px; border-width:1px; }
     #mega-boss-title { display:flex; align-items:center; gap:5px; font-size:9px; line-height:1.2; }
     #mega-boss-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
@@ -770,7 +770,7 @@
     #challenge-actions .btn-1c { flex:1 1 0; min-width:0; min-height:30px; padding:5px 4px; font-size:10px; line-height:1.2; overflow-wrap:anywhere; }
     #mobile-challenge-summary { font-size:10px; }
   }
-  @media (max-width: 660px) {
+  @media (max-width: 660px) and (pointer: coarse) {
     #btn-dyn-update { right:calc(clamp(185px,20vw,245px) + 56px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); }
   }
 </style>
@@ -918,7 +918,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
-              <p>Предметы магазина занимают отдельные слоты, покупки можно продавать, управление настраивается, режим для небольших окон включается автоматически. В паузе выровнено меню и доступны все настройки; на мобильном принятый тикет показывается под баффами вместе с заданием и прогрессом. Обновлены рекорды и механики предметов.</p>
+              <p>Предметы магазина занимают отдельные слоты, покупки можно продавать, управление настраивается; на телефонах включается мобильный интерфейс, а на ПК остаётся обычный при любом размере окна. В паузе выровнено меню и доступны все настройки; на мобильном принятый тикет показывается под баффами вместе с заданием и прогрессом. Обновлены рекорды и механики предметов.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.4.0 — «Комплект и контроль»</h3>
@@ -1033,7 +1033,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Каждый магазинный предмет занимает отдельный слот; одинаковые копии больше не складываются, а рецепты сохраняют бонусы компонентов. В магазине появились отдельная витрина активных предметов и продажа вещей с возвратом половины цены. Исправлены покупки при заполненном инвентаре. На ПК можно переназначить клавиши; небольшое окно автоматически включает мобильный интерфейс. Таблица рекордов ставит результаты свежих версий выше старых. На ПК поле зрения слегка расширяется с ростом скорости передвижения. Меню паузы выровнено и дополнено всеми настройками игры. На мобильных устройствах после принятия тикет скрывается из окна уведомления, а его задание и прогресс отображаются без фона под баффами.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Каждый магазинный предмет занимает отдельный слот; одинаковые копии больше не складываются, а рецепты сохраняют бонусы компонентов. В магазине появились отдельная витрина активных предметов и продажа вещей с возвратом половины цены. Исправлены покупки при заполненном инвентаре. На ПК можно переназначить клавиши; мобильный интерфейс включается только на телефонах, а на ПК сохраняется обычный режим при любом размере окна. Таблица рекордов ставит результаты свежих версий выше старых. На ПК поле зрения слегка расширяется с ростом скорости передвижения. Меню паузы выровнено и дополнено всеми настройками игры. На телефонах после принятия тикет скрывается из окна уведомления, а его задание и прогресс отображаются без фона под баффами.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
@@ -2819,7 +2819,7 @@ class Game {
   syncMobileDynamicButtonLabel() {
     const button = document.getElementById('btn-dyn-update');
     if (!button) return;
-    const mobile = window.matchMedia('(max-width: 1300px)').matches;
+    const mobile = this.isPhoneDevice();
     if (mobile) {
       button.textContent = '🔄';
       button.setAttribute('aria-label', 'Динамическое обновление');
@@ -2835,12 +2835,17 @@ class Game {
     button.textContent = `⚡ Дин. Обновление [${this.keyCodeLabel?.(this.keyBindings?.dynamic || 'Space') || 'ПРОБЕЛ'}]`;
   }
 
+  isPhoneDevice() {
+    if (typeof navigator.userAgentData?.mobile === 'boolean') return navigator.userAgentData.mobile;
+    return /iPhone|iPod|Windows Phone|Android.*Mobile|Mobile.*Android/i.test(navigator.userAgent || '');
+  }
+
   isDesktopMode() {
-    return window.matchMedia('(min-width: 1301px) and (pointer: fine)').matches;
+    return !this.isPhoneDevice();
   }
 
   getCameraZoom() {
-    if (window.matchMedia('(max-width: 1300px)').matches) return 0.72;
+    if (this.isPhoneDevice()) return 0.72;
     if (!this.isDesktopMode()) return 1;
     const speed = this.currentMoveSpeed || ((this.player?.baseSpeed || 3.2) * (this.player?.speedMult || 1));
     return Math.max(0.97, Math.min(1.03, 1.03 - speed * 0.01));
@@ -5402,7 +5407,7 @@ class Game {
       if (mobileSummary) mobileSummary.style.display = 'none';
       return;
     }
-    const isMobile = window.matchMedia('(max-width: 1300px)').matches;
+    const isMobile = this.isPhoneDevice();
     const showMobileSummary = isMobile && challenge.status === 'active';
     card.style.display = showMobileSummary ? 'none' : 'block';
     if (mobileSummary) {
@@ -7748,7 +7753,7 @@ class Game {
         btn.style.background = "#55efc4";
         btn.style.opacity = '1';
       } else {
-        if (window.matchMedia('(max-width: 1300px)').matches) {
+        if (this.isPhoneDevice()) {
           this.syncMobileDynamicButtonLabel();
           btn.style.opacity = '.58';
         } else {

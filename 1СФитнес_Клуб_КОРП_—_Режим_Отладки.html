@@ -784,6 +784,12 @@
 
   /* После общих стилей: панели на телефоне растут только по содержимому. */
   @media (max-width: 1300px) and (pointer: coarse) {
+    html.mobile-menu-scroll, body.mobile-menu-scroll { touch-action:pan-y !important; }
+    #modal-pause .win-1c { height:auto; max-height:calc(100dvh - 12px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
+    #modal-pause .win-1c-body { display:block; flex:0 0 auto; min-height:auto; overflow:visible; touch-action:pan-y; }
+    #modal-pause .pause-layout { min-height:0; align-items:start; }
+    #modal-pause .pause-layout > div:last-child { display:block; min-height:0; }
+    #modal-pause .pause-loadout { max-height:none; overflow:visible; touch-action:pan-y; }
     #mega-boss-hud { top:18px; bottom:auto; left:50%; right:auto; transform:translateX(-50%); width:min(300px,42vw); padding:4px 7px; border-width:1px; }
     #mega-boss-title { display:flex; align-items:center; gap:5px; font-size:9px; line-height:1.2; }
     #mega-boss-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
@@ -2921,7 +2927,7 @@ class Game {
     if (this.isPhoneDevice()) return 0.72;
     if (!this.isDesktopMode()) return 1;
     const speed = this.currentMoveSpeed || ((this.player?.baseSpeed || 3.2) * (this.player?.speedMult || 1));
-    return Math.max(0.97, Math.min(1.03, 1.03 - speed * 0.01));
+    return Math.max(0.96, Math.min(1.02, 1.0 - (speed - 3.2) * 0.03));
   }
 
   updateCameraZoom(dt) {
@@ -3121,6 +3127,7 @@ class Game {
     document.getElementById('modal-shop').style.display = 'none';
     document.getElementById('modal-gameover').style.display = 'none';
     document.getElementById('modal-pause').style.display = 'none';
+    this.setMobileMenuScroll(false);
     document.getElementById('modal-lvlup').style.display = 'none';
     document.getElementById('modal-lb').style.display = 'none';
 
@@ -3293,6 +3300,7 @@ class Game {
       document.getElementById(id).style.display = 'none';
     }
     document.getElementById('modal-main-menu').style.display = 'flex';
+    this.setMobileMenuScroll(false);
   }
 
   pvpStatus(message, isError = false) {
@@ -5119,6 +5127,7 @@ class Game {
     if (!this.settingsReturnToPause) document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('settings-back-button').textContent = this.settingsReturnToPause ? 'Вернуться в паузу' : 'Назад в меню';
     document.getElementById('modal-settings').style.display = 'flex';
+    this.setMobileMenuScroll(true);
     document.getElementById('settings-sound').innerText = this.sound.mutedSFX ? '🔇 Звуковые эффекты: ВЫКЛ' : '🔊 Звуковые эффекты: ВКЛ';
     document.getElementById('settings-music').innerText = this.sound.musicEnabled ? '🎵 Музыка: ВКЛ' : '🔇 Музыка: ВЫКЛ';
     document.getElementById('music-volume').value = Math.round(this.sound.musicVolume * 100);
@@ -5211,6 +5220,7 @@ class Game {
       this.settingsReturnToPause = false;
       document.getElementById('modal-main-menu').style.display = 'flex';
     }
+    this.setMobileMenuScroll(this.settingsReturnToPause && document.getElementById('modal-pause').style.display === 'flex');
   }
 
   showChangelog() {
@@ -6216,6 +6226,11 @@ class Game {
   updateConsumableHUD() {
     this.updateInventoryHUD();
   }
+  setMobileMenuScroll(enabled) {
+    const active = Boolean(enabled && this.isPhoneDevice());
+    document.documentElement.classList.toggle('mobile-menu-scroll', active);
+    document.body.classList.toggle('mobile-menu-scroll', active);
+  }
   togglePause() {
     if (this.isBattleRoyale) return;
     if (this.paused || !this.player || this.player.hp <= 0) return;
@@ -6225,6 +6240,7 @@ class Game {
     this.mouseMovePointerId = null;
     this.renderPauseLoadout();
     document.getElementById('modal-pause').style.display = 'flex';
+    this.setMobileMenuScroll(true);
     this.setPvpManualPause(true);
   }
 
@@ -6399,6 +6415,7 @@ class Game {
   resume() {
     if (document.getElementById('modal-pause').style.display !== 'flex') return;
     document.getElementById('modal-pause').style.display = 'none';
+    this.setMobileMenuScroll(false);
     this.paused = false;
     this.setPvpManualPause(false);
     this.keys = {};
@@ -6423,6 +6440,7 @@ class Game {
     this.paused = battleRoyaleLive ? false : true;
     document.getElementById('modal-gameover').style.display = 'none';
     document.getElementById('modal-pause').style.display = 'none';
+    this.setMobileMenuScroll(false);
     document.getElementById('modal-lvlup').style.display = 'none';
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-settings').style.display = 'none';
@@ -6452,6 +6470,7 @@ class Game {
     document.getElementById('modal-main-menu').style.display = returnState?.mainMenu ? 'flex' : 'none';
     document.getElementById('modal-settings').style.display = returnState?.settings ? 'flex' : 'none';
     document.getElementById('modal-changelog').style.display = returnState?.changelog ? 'flex' : 'none';
+    this.setMobileMenuScroll(Boolean(returnState?.pause || returnState?.settings || returnState?.changelog || returnState?.mainMenu || returnState?.gameover));
 
     const shouldResume = returnState ? !returnState.paused : this.player && this.player.hp > 0;
     this.paused = !shouldResume;
@@ -8814,6 +8833,7 @@ class Game {
     this.clearChallenge();
     this.paused = !battleRoyaleElimination;
     document.getElementById('modal-pause').style.display = 'none';
+    this.setMobileMenuScroll(false);
     document.getElementById('modal-lvlup').style.display = 'none';
     document.getElementById('modal-shop').style.display = 'none';
     document.getElementById('modal-pvp-wait').style.display = 'none';

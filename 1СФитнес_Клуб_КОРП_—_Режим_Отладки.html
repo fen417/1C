@@ -2811,7 +2811,7 @@ class Game {
     this.canvas.width = Math.max(1, Math.round(this.viewportWidth * pixelRatio));
     this.canvas.height = Math.max(1, Math.round(this.viewportHeight * pixelRatio));
     this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    this.cameraZoom = this.getCameraZoom();
+    if (!Number.isFinite(this.cameraZoom)) this.cameraZoom = this.getCameraZoom();
     this.syncMobileDynamicButtonLabel();
     if (this.activeChallenge) this.updateChallengeUI();
   }
@@ -2849,6 +2849,16 @@ class Game {
     if (!this.isDesktopMode()) return 1;
     const speed = this.currentMoveSpeed || ((this.player?.baseSpeed || 3.2) * (this.player?.speedMult || 1));
     return Math.max(0.97, Math.min(1.03, 1.03 - speed * 0.01));
+  }
+
+  updateCameraZoom(dt) {
+    const targetZoom = this.getCameraZoom();
+    if (!Number.isFinite(this.cameraZoom)) {
+      this.cameraZoom = targetZoom;
+      return;
+    }
+    const blend = 1 - Math.exp(-2.5 * Math.max(0, dt));
+    this.cameraZoom += (targetZoom - this.cameraZoom) * blend;
   }
 
   async toggleMobileFullscreen() {
@@ -9720,7 +9730,7 @@ class Game {
     if (!this.paused) {
       this.update(dt);
     }
-    this.cameraZoom = this.getCameraZoom();
+    this.updateCameraZoom(dt);
     this.render(dt);
 
     requestAnimationFrame((t) => this.loop(t));

@@ -2935,20 +2935,7 @@ class Game {
   }
 
   getCameraZoom() {
-    if (this.isPhoneDevice()) return 0.72;
-    if (!this.isDesktopMode()) return 1;
-    const speed = this.currentMoveSpeed || ((this.player?.baseSpeed || 3.2) * (this.player?.speedMult || 1));
-    return Math.max(0.96, Math.min(1.02, 1.0 - (speed - 3.2) * 0.03));
-  }
-
-  updateCameraZoom(dt) {
-    const targetZoom = this.getCameraZoom();
-    if (!Number.isFinite(this.cameraZoom)) {
-      this.cameraZoom = targetZoom;
-      return;
-    }
-    const blend = 1 - Math.exp(-12 * Math.max(0, dt));
-    this.cameraZoom += (targetZoom - this.cameraZoom) * blend;
+    return this.isPhoneDevice() ? 0.72 : 1;
   }
 
   async toggleMobileFullscreen() {
@@ -10006,7 +9993,6 @@ class Game {
     if (!this.paused) {
       this.update(dt);
     }
-    this.updateCameraZoom(dt);
     this.render(dt);
 
     requestAnimationFrame((t) => this.loop(t));

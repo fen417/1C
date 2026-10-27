@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.5.3</title>
+<title>1С:Фитнес Клуб КОРП 2.5.4</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -165,6 +165,9 @@
   }
   #hud-item-loadout { position:absolute; left:16px; bottom:14px; z-index:15; display:flex; flex-direction:column; align-items:flex-start; gap:4px; pointer-events:none; }
   #hud-backpack, #hud-shop-passives { display:flex; flex-wrap:nowrap; gap:5px; pointer-events:auto; }
+  #hud-consumables { display:flex; flex-wrap:nowrap; gap:5px; pointer-events:auto; }
+  #hud-consumables .inv-slot { width:46px; height:46px; font-size:24px; border-color:#ffb347; }
+  #hud-consumables .inv-key { background:#ffb347; }
   #hud-backpack .inv-slot { width:38px; height:38px; font-size:20px; border-style:dashed; opacity:.76; }
   #hud-backpack .inv-lvl { font-size:9px; }
   #hud-shop-passives .inv-slot { width:54px; height:54px; font-size:28px; border-width:2px; }
@@ -281,6 +284,9 @@
     .active-slot .act-icon { font-size:20px; }
     #hud-active-skills .act-key { display:none; }
     #hud-item-loadout { left:50%; bottom:calc(env(safe-area-inset-bottom) + 14px); transform:translateX(-50%); align-items:center; gap:3px; }
+    #hud-consumables { gap:4px; }
+    #hud-consumables .inv-slot { width:36px; height:36px; font-size:19px; }
+    #hud-consumables .inv-key { top:1px; left:2px; padding:0 3px; font-size:8px; line-height:11px; }
     #hud-backpack, #hud-shop-passives { gap:4px; }
     #hud-backpack .inv-slot { width:30px; height:30px; font-size:17px; }
     #hud-backpack .inv-lvl { font-size:8px; }
@@ -613,15 +619,18 @@
   .dota-shop-categories .shop-tab.selected { color:#fff; background:#557a9e; border-color:#9bc1e5; }
   .dota-shop-search { width:min(230px,100%); padding:7px 9px; color:#e9f0f7; background:#101820; border:1px solid #53677a; }
   .dota-shop-main { display:grid; flex:1; min-height:0; grid-template-columns:minmax(0,1.3fr) minmax(280px,.8fr); gap:9px; }
-  .dota-shop-catalog,.dota-shop-details,.dota-shop-inventory-panel,.dota-shop-quickbuy-panel { min-width:0; min-height:0; padding:8px; background:#202c39; border:1px solid #3a4c5e; }
+  .dota-shop-catalog,.dota-shop-details,.dota-shop-inventory-panel { min-width:0; min-height:0; padding:8px; background:#202c39; border:1px solid #3a4c5e; }
   .dota-shop-catalog,.dota-shop-details { display:flex; flex-direction:column; }
   .dota-shop-section-title { margin-bottom:7px; color:#e5c66c; font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:.5px; }
   .dota-shop-items { display:grid; flex:1; min-height:0; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:5px; overflow:auto; align-content:start; }
-  .dota-shop-item { min-height:70px; padding:5px; display:grid; grid-template-columns:30px 1fr; grid-template-rows:1fr auto; gap:3px 5px; text-align:left; color:#e8edf2; background:#2a3948; border:1px solid #526477; cursor:pointer; }
+  .dota-shop-item-card { position:relative; min-width:0; min-height:70px; }
+  .dota-shop-item { width:100%; height:100%; min-height:70px; padding:5px 25px 5px 5px; display:grid; grid-template-columns:30px 1fr; grid-template-rows:1fr auto; gap:3px 5px; text-align:left; color:#e8edf2; background:#2a3948; border:1px solid #526477; cursor:pointer; }
   .dota-shop-item:hover,.dota-shop-item.selected { background:#3b5368; border-color:#e5c66c; }
   .dota-shop-item-icon { grid-row:1/3; width:30px; height:30px; display:grid; place-items:center; background:linear-gradient(145deg,#71859a,#243241); border:1px solid #9baaba; font-size:20px; }
   .dota-shop-item-name { font-size:9px; line-height:1.2; overflow-wrap:anywhere; }
   .dota-shop-item-price { align-self:end; color:#e5c66c; font-size:9px; }
+  .shop-favorite-toggle { position:absolute; top:3px; right:3px; z-index:1; width:20px; height:20px; padding:0; color:#e5c66c; background:#18232e; border:1px solid #65798b; font-size:15px; line-height:18px; cursor:pointer; }
+  .shop-favorite-toggle.selected { color:#ffd200; border-color:#ffd200; }
   .dota-shop-selected { display:flex; gap:9px; min-height:60px; padding:8px; background:#15202a; border:1px solid #3c5064; }
   .dota-shop-selected-icon { flex:0 0 46px; height:46px; display:grid; place-items:center; background:linear-gradient(145deg,#758ba1,#253444); border:1px solid #a2b3c3; font-size:28px; }
   .dota-shop-selected h3 { color:#fff; font-size:13px; margin:2px 0 4px; }
@@ -644,16 +653,14 @@
   .dota-shop-detail-actions .btn-1c { padding:7px 5px; color:#fff; background:#536e85; border-color:#8ba2b7; }
   .dota-shop-detail-actions .btn-1c:first-child { background:#6d9a53; border-color:#a5cf8a; }
   .dota-shop-detail-actions .btn-1c:disabled { opacity:.45; }
-  .dota-shop-bottom { display:grid; grid-template-columns:1.1fr 1fr; gap:9px; min-height:96px; }
-  .dota-shop-inventory,.dota-shop-quickbuy { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
   .dota-shop-inventory-slot { width:42px; height:42px; position:relative; display:grid; place-items:center; color:#fff; background:#2e3e4e; border:1px solid #718397; font-size:23px; cursor:pointer; }
   .dota-shop-inventory-slot { touch-action:none; user-select:none; }
   .dota-shop-inventory-slot.backpack-slot { width:34px; height:34px; font-size:19px; border-style:dashed; opacity:.8; }
   .dota-shop-inventory-slot.empty { color:#677787; background:#1a2530; }
   .dota-shop-inventory-slot.selected { border:2px solid #e5c66c; }
   .dota-shop-inventory-slot small { position:absolute; right:1px; bottom:0; color:#e5c66c; font-size:8px; }
-  .dota-shop-quickbuy { color:#afbecb; font-size:10px; }
-  #shop-buy-next { margin-left:auto; color:#fff; background:#6d9a53; }
+  .dota-shop-bottom { display:grid; grid-template-columns:1fr; gap:9px; min-height:96px; }
+  .dota-shop-inventory { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
   .dota-shop-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; color:#acbac8; font-size:10px; }
   .dota-shop-footer #shop-close-button { color:#fff; background:#536e85; border-color:#8ba2b7; }
   @media(max-width:760px) {
@@ -854,7 +861,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.5.3 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.5.4 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -892,7 +899,8 @@
       <button id="br-upgrade-button" onclick="game.openBattleRoyaleUpgrade()" aria-label="Открыть доступное улучшение">+</button>
 
     </div>
-    <div id="hud-item-loadout" aria-label="Инвентарь и рюкзак">
+    <div id="hud-item-loadout" aria-label="Инвентарь, расходники и рюкзак">
+      <div id="hud-consumables" aria-label="Четыре слота расходников"></div>
       <div id="hud-backpack" aria-label="Рюкзак: три неактивных слота"></div>
       <div id="hud-shop-passives" aria-label="Шесть активных слотов инвентаря"></div>
     </div>
@@ -949,7 +957,7 @@
       <div id="sales-call-head">📞 Mango Talker · входящий вызов</div>
       <div id="sales-call-body">
         <h3>Звонит отдел продаж</h3>
-        <p>Есть минутка обсудить платные интеграции? У нас как раз «уникальное предложение».</p>
+        <p>Есть минутка обсудить платные интеграции? У нас как раз «уникальное предложение». Даже если сбросить вызов, цены магазина вырастут на 5%.</p>
         <div id="sales-call-actions">
           <button id="sales-accept-button" class="btn-1c" style="background:#55efc4;" onclick="game.answerSalesCall()">☎ Ответить</button>
           <button id="sales-decline-button" class="btn-1c" onclick="game.declineSalesCall()">✖ Сбросить</button>
@@ -979,7 +987,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.5.3</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.5.4</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -988,12 +996,12 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.5.3</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+      <div class="main-menu-version">Текущая версия: <b>2.5.4</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
-              <p>Магазин получил новые предметы и комплекты с рецептами, быстрой покупкой и продажей; добавлены усиленные мини-боссы и умения, изменён баланс врагов. Обновлены мобильный интерфейс, меню паузы и работа с тикетами. Теперь комплект можно купить целиком, появились три неактивных слота рюкзака с перетаскиванием; клавиши тикетов и звонков отдела продаж настраиваются.</p>
+              <p>Магазин получил новые предметы и комплекты с рецептами, избранным и продажей; добавлены усиленные мини-боссы и умения, изменён баланс врагов. Обновлены мобильный интерфейс, меню паузы и работа с тикетами. Теперь комплект можно купить целиком, появились три слота рюкзака и четыре отдельные ячейки расходников; для предметов, расходников, тикетов и звонков можно настроить клавиши. После каждого звонка отдела продаж цены магазина растут.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.4.0 — «Комплект и контроль»</h3>
@@ -1087,7 +1095,7 @@
           </label>
         </div>
         <div class="release-notes">
-          <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Рывок:</b> Shift или ПКМ<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 7, 8, 9, 0<br><b>Пауза:</b> Esc / P<br><b>Завершить забег:</b> L (в одиночной игре в любое время; в сети после выбытия соперника)</p>
+          <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Рывок:</b> Shift или ПКМ<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 5, 6, Q, E (клавиши настраиваются)<br><b>Пауза:</b> Esc / P<br><b>Завершить забег:</b> L (в одиночной игре в любое время; в сети после выбытия соперника)</p>
         </div>
         <label class="release-notes" style="display:flex; align-items:center; gap:9px; margin-bottom:14px; font-size:12px;">
           <input id="collapse-accepted-tickets" type="checkbox" checked onchange="game.setCollapseAcceptedTickets(this.checked)">
@@ -1108,7 +1116,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в слот. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, рецепты, быструю покупку компонентов и продажу предметов за половину цены. Добавлено 26 предметов и 12 комплектов с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки при заполненном инвентаре. На ПК можно переназначить клавиши для шести слотов предметов и расходников. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен на 15%; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут урон и здоровье обычных мобов (не боссов) повышаются на 10%, а опыт за них — на 13%. После 20-й минуты появляются четыре новых усиленных мини-босса с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока и обходить его по дуге. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком. Для принятия и отказа от тикетов и звонков отдела продаж можно назначить свои клавиши.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.2.0 — «Релиз без согласования»</h3></summary><p>В Battle Royale каждые 30 секунд появляются поставки с одним случайным расходником; контейнер подсвечен, а если слоты заняты, его можно подобрать позже. Добавлены противники «Администратор только на чтение» и «Дубль клиента»: администраторский снаряд на 4 секунды снижает исходящий урон игрока на 45%, а дубль один раз создаёт ослабленную копию при потере половины здоровья. Событие «Пятничный релиз» заранее объявляет запуск и на 8 секунд ускоряет врагов; «Клиент нажал “Ответить всем”» вызывает пятерых клиентов Mango Talker. В магазин добавлены «Сетевой фильтр» (кратко блокирует входящий урон; перезарядка 38 секунд, в сетевом PvP — 55 секунд) и «Второй монитор» (в PvP показывает синие стрелки на игроков и красные на боссов; за пределами PvP — до четырёх ближайших врагов). Активное умение «Откат транзакций» возвращает героя примерно на 3–5 секунд назад, немного лечит и даёт короткий щит; перезарядка — 34 секунды. Карточки легендарного выбора теперь выстроены без наложений; у «Перехода на 8.5» квадратная иконка. Панель большого босса перенесена вниз над HUD расходников. Игра запоминает включённость музыки и звуковых эффектов; уровни громкости и настройка сворачивания тикетов также сохраняются. В истории изменений по умолчанию раскрыта только эта версия.</p></details>
@@ -1142,6 +1150,7 @@
             <button class="shop-tab" data-shop-view="upgrades" onclick="game.setShopView('upgrades')">Улучшения</button>
             <button class="shop-tab" data-shop-view="actives" onclick="game.setShopView('actives')">Активные</button>
             <button class="shop-tab" data-shop-view="consumables" onclick="game.setShopView('consumables')">Расходники</button>
+            <button class="shop-tab" data-shop-view="favorites" onclick="game.setShopView('favorites')">★ Избранное</button>
             <button class="shop-tab" data-shop-view="sell" onclick="game.setShopView('sell')">Продать</button>
           </div>
           <input id="shop-search" class="dota-shop-search" type="search" placeholder="Поиск предмета" oninput="game.setShopSearch(this.value)">
@@ -1155,14 +1164,12 @@
             <div class="dota-shop-detail-actions">
               <button id="shop-buy-selected" class="btn-1c" onclick="game.buySelectedShopItem()" disabled>Купить</button>
               <button id="shop-buy-full" class="btn-1c" onclick="game.buySelectedShopSet()" style="display:none" disabled>Купить весь комплект</button>
-              <button id="shop-quickbuy-add" class="btn-1c" onclick="game.addSelectedToQuickBuy()" disabled>В быструю покупку</button>
               <button id="shop-sell-selected" class="btn-1c" onclick="game.sellSelectedShopItem()" style="display:none">Продать</button>
             </div>
           </aside>
         </div>
         <div class="dota-shop-bottom">
-          <div class="dota-shop-inventory-panel"><div class="dota-shop-section-title">Инвентарь · <span id="shop-inventory-count">0/6</span></div><div id="shop-inventory" class="dota-shop-inventory"></div><div class="dota-shop-section-title" style="margin-top:8px;">Рюкзак · <span id="shop-backpack-count">0/3</span></div><div id="shop-backpack" class="dota-shop-inventory"></div></div>
-          <div class="dota-shop-quickbuy-panel"><div class="dota-shop-section-title">Быстрая покупка</div><div id="shop-quickbuy" class="dota-shop-quickbuy"><span>Добавьте предмет из сборки</span><button id="shop-buy-next" class="btn-1c" onclick="game.buyQuickBuyNext()" disabled>Купить следующий компонент</button><button id="shop-quickbuy-clear" class="btn-1c" onclick="game.clearQuickBuy()" style="display:none">Убрать</button></div></div>
+          <div class="dota-shop-inventory-panel"><div class="dota-shop-section-title">Инвентарь · <span id="shop-inventory-count">0/6</span></div><div id="shop-inventory" class="dota-shop-inventory"></div><div class="dota-shop-section-title" style="margin-top:8px;">Расходники · <span id="shop-consumables-count">0/4</span></div><div id="shop-consumables" class="dota-shop-inventory"></div><div class="dota-shop-section-title" style="margin-top:8px;">Рюкзак · <span id="shop-backpack-count">0/3</span></div><div id="shop-backpack" class="dota-shop-inventory"></div></div>
         </div>
         <div class="dota-shop-footer"><span id="shop-message">Магазин открылся по звонку отдела продаж.</span><button id="shop-close-button" class="btn-1c" onclick="game.closeShop()">Завершить звонок и продолжить</button></div>
       </div>
@@ -1283,7 +1290,7 @@
       </div>
       <div class="win-1c-body" style="text-align:center;">
         <h2 id="gameover-title" style="color:#c0392b; margin-bottom:8px;">СЕАНС ПРЕРВАН!</h2>
-        <div id="gameover-stats" style="font-size:12px; font-family:Courier New; background:#f8f9fa; border:1px solid #ccc; padding:10px; text-align:left; margin-bottom:12px;"></div>
+        <div id="gameover-stats" style="font-size:12px; font-family:Courier New; background:#f8f9fa; border:1px solid #ccc; padding:10px; text-align:left; margin-bottom:12px; max-height:min(42vh,360px); overflow-y:auto;"></div>
 
         <div style="background:#fffbe6; border:1px solid #ffeaa7; padding:10px; border-radius:4px; margin-bottom:12px; text-align:left;">
           <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:4px;">Имя специалиста для фиксации в регистре:</label>
@@ -1355,11 +1362,12 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.5.3';
+const GAME_VERSION = '2.5.4';
 const DEFAULT_KEY_BINDINGS = {
   moveUp: 'KeyW', moveDown: 'KeyS', moveLeft: 'KeyA', moveRight: 'KeyD', dash: 'ShiftLeft', dynamic: 'Space',
   skill1: 'Digit1', skill2: 'Digit2', skill3: 'Digit3', skill4: 'Digit4',
   inventory1: 'Digit7', inventory2: 'Digit8', inventory3: 'Digit9', inventory4: 'Digit0', inventory5: 'Minus', inventory6: 'Equal',
+  consumable1: 'Digit5', consumable2: 'Digit6', consumable3: 'KeyQ', consumable4: 'KeyE',
   ticketAccept: 'KeyY', ticketDecline: 'KeyN', salesAccept: 'KeyO', salesDecline: 'KeyI', pause: 'KeyP'
 };
 const KEY_BINDING_LABELS = {
@@ -1367,6 +1375,7 @@ const KEY_BINDING_LABELS = {
   dash: 'Рывок', dynamic: 'Динамическое обновление', skill1: 'Активное умение 1', skill2: 'Активное умение 2',
   skill3: 'Активное умение 3', skill4: 'Активное умение 4', inventory1: 'Предмет инвентаря 1', inventory2: 'Предмет инвентаря 2',
   inventory3: 'Предмет инвентаря 3', inventory4: 'Предмет инвентаря 4', inventory5: 'Предмет инвентаря 5', inventory6: 'Предмет инвентаря 6',
+  consumable1: 'Расходник 1', consumable2: 'Расходник 2', consumable3: 'Расходник 3', consumable4: 'Расходник 4',
   ticketAccept: 'Принять тикет', ticketDecline: 'Отклонить тикет', salesAccept: 'Ответить отделу продаж', salesDecline: 'Сбросить звонок', pause: 'Пауза'
 };
 const LEADERBOARD_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/leaderboard';
@@ -2876,12 +2885,7 @@ class Game {
     this.keys = {};
     try {
       const savedBindings = JSON.parse(localStorage.getItem('1c_key_bindings') || '{}');
-      const migratedBindings = { ...savedBindings };
-      for (let i = 1; i <= 4; i++) {
-        if (typeof migratedBindings[`inventory${i}`] !== 'string' && typeof savedBindings[`consumable${i}`] === 'string') migratedBindings[`inventory${i}`] = savedBindings[`consumable${i}`];
-        delete migratedBindings[`consumable${i}`];
-      }
-      this.keyBindings = { ...DEFAULT_KEY_BINDINGS, ...Object.fromEntries(Object.keys(DEFAULT_KEY_BINDINGS).filter(action => typeof migratedBindings[action] === 'string').map(action => [action, migratedBindings[action]])) };
+      this.keyBindings = { ...DEFAULT_KEY_BINDINGS, ...Object.fromEntries(Object.keys(DEFAULT_KEY_BINDINGS).filter(action => typeof savedBindings[action] === 'string').map(action => [action, savedBindings[action]])) };
     } catch (_) { this.keyBindings = { ...DEFAULT_KEY_BINDINGS }; }
     this.inventoryMoveSelection = null;
     this.inventoryPointerDrag = null;
@@ -2969,6 +2973,7 @@ class Game {
       // Активные умения 1 2 3 4
       for (let i = 0; i < 4; i++) if (this.isActionKey(e, `skill${i + 1}`)) this.useActiveSkill(i);
       for (let i = 0; i < 6; i++) if (this.isActionKey(e, `inventory${i + 1}`)) this.useInventorySlot(i);
+      for (let i = 0; i < 4; i++) if (this.isActionKey(e, `consumable${i + 1}`)) this.useConsumable(i);
 
     });
 
@@ -3047,6 +3052,10 @@ class Game {
     document.addEventListener('fullscreenchange', () => this.syncMobileFullscreenButton());
 
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
+    try {
+      const savedFavorites = JSON.parse(localStorage.getItem('1c_shop_favorites') || '[]');
+      this.favoriteShopItems = new Set(Array.isArray(savedFavorites) ? savedFavorites.filter(key => typeof key === 'string') : []);
+    } catch (_) { this.favoriteShopItems = new Set(); }
     this.pvpMode = ['pvp', 'pve', 'battle_royale'].includes(localStorage.getItem('1c_pvp_mode')) ? localStorage.getItem('1c_pvp_mode') : 'pvp';
     const savedClass = localStorage.getItem('1c_player_class');
     this.selectedClassId = PLAYER_CLASSES[savedClass] ? savedClass : 'technician';
@@ -3320,6 +3329,7 @@ class Game {
     this.challengeDeclines = 0;
     this.kills = 0;
     this.gemsCollected = 0;
+    this.damageDealtBySource = Object.create(null);
     this.level = 1;
     this.upgradeRerollsRemaining = 3;
     this.xp = 0;
@@ -3434,16 +3444,18 @@ class Game {
     this.transactionHistoryLastSample = -1;
     this.dynUpdateCd = 0;
     this.currency = 0;
+    this.shopPriceMultiplier = 1;
+    this.salesCallCount = 0;
     this.fitcoinTheftCooldown = 0;
     this.shopPassives = Array(6).fill(null);
     this.backpack = Array(3).fill(null);
+    this.consumables = Array(4).fill(null);
     this.nextShopTime = 180;
     this.shopVisit = 0;
     this.shopView = 'all';
     this.shopSearch = '';
     this.selectedShopItemKey = null;
     this.selectedShopInventory = null;
-    this.quickBuyItemKey = null;
     this.activeChallenge = null;
     this.challengeNoticeUntil = 0;
     this.nextChallengeTime = 120 + Math.random() * 40;
@@ -4387,13 +4399,42 @@ class Game {
     return target;
   }
 
+  recordDealtDamage(source, damage) {
+    const amount = Math.max(0, Number(damage) || 0);
+    if (!amount) return;
+    const label = String(source || 'Другой урон');
+    this.damageDealtBySource ||= Object.create(null);
+    this.damageDealtBySource[label] = (this.damageDealtBySource[label] || 0) + amount;
+  }
+
+  inferWeaponDamageSource(projectile) {
+    if (projectile?.source) return projectile.source;
+    const byIcon = {
+      '🗝️': 'Настройка считывателя IronLogic', '{;}': 'Синтаксис-Контроль', '📊': 'Сводная таблица',
+      '☎️': 'Телефон техподдержки', '💾': 'ККТ Атол', '☕': 'Активное умение: Чайный веер',
+      '🧾': 'АТОЛ: чековая очередь', '💳': 'Считыватель IronLogic', '🔁': 'ШТРИХ: повторная печать'
+    };
+    return byIcon[projectile?.icon] || 'Оружие';
+  }
+
+  damageEnemy(enemy, damage, source = 'Другой урон') {
+    if (!enemy || enemy.is24hPursuer) return 0;
+    const hpBefore = Math.max(0, Number(enemy.hp) || 0);
+    const requested = Math.max(0, Number(damage) || 0);
+    if (!hpBefore || !requested || !Number.isFinite(hpBefore)) return 0;
+    const dealt = Math.min(hpBefore, requested);
+    enemy.hp = Math.max(0, hpBefore - requested);
+    this.recordDealtDamage(source, dealt);
+    return dealt;
+  }
+
   dealWeaponTargetDamage(target, damage, source = 'Атака игрока') {
     if (!target || damage <= 0) return;
     if (!target.isPvpTarget && (target.is24hPursuer || target.ref?.is24hPursuer)) return;
     if (target.isPvpTarget) {
       if (this.isBattleRoyale) this.damageBattleRoyalePlayer(target.uid, damage, source);
       else this.damagePvpOpponent(damage);
-    } else if (target.ref) target.ref.hp -= damage;
+    } else if (target.ref) this.damageEnemy(target.ref, damage, source);
   }
 
   damageBattleRoyalePlayer(targetUid, damage, source = 'Атака игрока') {
@@ -5469,7 +5510,10 @@ class Game {
   }
 
   showSalesCallCard() {
+    if (this.salesCallActive) return;
     this.salesCallActive = true;
+    this.salesCallCount = (this.salesCallCount || 0) + 1;
+    this.shopPriceMultiplier = (this.shopPriceMultiplier || 1) * 1.05;
     this.salesCallX = 12;
     this.salesCallY = 12;
     this.salesCallVX = 48;
@@ -5482,6 +5526,7 @@ class Game {
     card.style.top = `${this.salesCallY}px`;
     this.log('Mango Talker: звонит отдел продаж. «У нас для вас платные интеграции и всего пара уточняющих вопросов».' );
     this.salesCallFrame = requestAnimationFrame((t) => this.animateSalesCall(t));
+    this.log(`Новый звонок отдела продаж: цены магазина повышены на 5% (звонков: ${this.salesCallCount}).`);
   }
 
   animateSalesCall(timestamp) {
@@ -5943,13 +5988,13 @@ class Game {
     if (seen.has(key)) return 0;
     const item = this.getShopCatalogItem(key);
     if (!item) return 0;
-    if (!item.parts) return Math.max(0, Number(item.cost) || 0);
+    if (!item.parts) return Math.ceil(Math.max(0, Number(item.cost) || 0) * (this.shopPriceMultiplier || 1));
     const nextSeen = new Set(seen).add(key);
     return item.parts.reduce((sum, part) => sum + this.getShopItemTotalCost(part, nextSeen), 0);
   }
 
   getOwnedShopItemCount(key) {
-    return (this.shopPassives || []).reduce((count, slot) => count + (slot?.key === key ? slot.count || 1 : 0), 0);
+    return [...(this.shopPassives || []), ...(this.backpack || [])].reduce((count, slot) => count + (slot?.key === key ? slot.count || 1 : 0), 0);
   }
 
   findInventoryFreeSlot() {
@@ -5984,36 +6029,21 @@ class Game {
     const item = CONSUMABLES_DEF[key];
     if (!item) return -1;
     const limit = Math.min(4, Number(item.maxStack) || 4);
-    return (this.shopPassives || []).findIndex(slot => this.isConsumableSlot(slot) && slot.key === key && (slot.count || 1) < limit);
-  }
-
-  findBackpackConsumableStackIndex(key) {
-    const item = CONSUMABLES_DEF[key];
-    if (!item) return -1;
-    const limit = Math.min(4, Number(item.maxStack) || 4);
-    return (this.backpack || []).findIndex(slot => this.isConsumableSlot(slot) && slot.key === key && (slot.count || 1) < limit);
+    return (this.consumables || []).findIndex(slot => this.isConsumableSlot(slot) && slot.key === key && (slot.count || 1) < limit);
   }
 
   canAddConsumableToInventory(key) {
-    return Boolean(CONSUMABLES_DEF[key]) && (this.findConsumableStackIndex(key) >= 0 || this.findInventoryFreeSlot() >= 0 || this.findBackpackConsumableStackIndex(key) >= 0 || this.findBackpackFreeSlot() >= 0);
+    return Boolean(CONSUMABLES_DEF[key]) && (this.findConsumableStackIndex(key) >= 0 || (this.consumables || []).some(slot => !slot));
   }
 
   addConsumableToInventory(key) {
     if (!CONSUMABLES_DEF[key]) return false;
     const stackIndex = this.findConsumableStackIndex(key);
-    if (stackIndex >= 0) this.shopPassives[stackIndex].count++;
+    if (stackIndex >= 0) this.consumables[stackIndex].count++;
     else {
-      const freeSlot = this.findInventoryFreeSlot();
-      if (freeSlot >= 0) this.shopPassives[freeSlot] = { key, count: 1, itemType: 'consumable', cooldown: 0 };
-      else {
-        const backpackStack = this.findBackpackConsumableStackIndex(key);
-        if (backpackStack >= 0) this.backpack[backpackStack].count++;
-        else {
-          const backpackFree = this.findBackpackFreeSlot();
-          if (backpackFree < 0) return false;
-          this.backpack[backpackFree] = { key, count: 1, itemType: 'consumable', cooldown: 0, inactive: true };
-        }
-      }
+      const freeSlot = this.consumables.findIndex(slot => !slot);
+      if (freeSlot < 0) return false;
+      this.consumables[freeSlot] = { key, count: 1, itemType: 'consumable', cooldown: 0 };
     }
     this.updateInventoryHUD();
     return true;
@@ -6021,21 +6051,21 @@ class Game {
   findMissingShopComponent(key, seen = new Set(), includeOwnedRoot = false) {
     if (seen.has(key)) return null;
     const item = this.getShopPassiveDef(key);
-    const owned = this.getOwnedShopItemCount(key) > 0;
-    if (!item?.parts) return owned ? null : item ? key : null;
-    if (owned && !includeOwnedRoot) return null;
-    const nextSeen = new Set(seen).add(key);
-    for (const part of item.parts) {
-      const missing = this.findMissingShopComponent(part, nextSeen);
-      if (missing) return missing;
-    }
-    return null;
+    if (!item) return null;
+    if (this.getOwnedShopItemCount(key) > 0 && !includeOwnedRoot) return null;
+    if (!item.parts) return this.getOwnedShopItemCount(key) > 0 ? null : key;
+
+    // Use the same count-aware plan as the full-set purchase. A boolean
+    // "owned" check loses duplicate requirements and must include backpack
+    // slots exactly once, otherwise the component button can buy duplicates.
+    const plan = this.getShopPurchasePlan(key);
+    return plan[0] || null;
   }
   canCombinePassiveItem(key) {
     return Object.values(STORE_RECIPES).some(recipe => {
       if (!recipe.parts.includes(key)) return false;
       const available = new Map();
-      for (const slot of this.shopPassives) if (slot) available.set(slot.key, (available.get(slot.key) || 0) + (slot.count || 1));
+      for (const slot of [...this.shopPassives, ...(this.backpack || [])]) if (slot) available.set(slot.key, (available.get(slot.key) || 0) + (slot.count || 1));
       available.set(key, (available.get(key) || 0) + 1);
       return recipe.parts.every(part => {
         const count = available.get(part) || 0;
@@ -6049,7 +6079,7 @@ class Game {
   getShopPassiveComboHint(key) {
     for (const combo of Object.values(STORE_RECIPES)) {
       if (!combo.parts.includes(key)) continue;
-      const ownedKey = combo.parts.find(part => part !== key && this.shopPassives.some(slot => slot?.key === part && (slot.count || 1) > 0));
+      const ownedKey = combo.parts.find(part => part !== key && [...this.shopPassives, ...(this.backpack || [])].some(slot => slot?.key === part && (slot.count || 1) > 0));
       const ownedItem = ownedKey ? this.getShopPassiveDef(ownedKey) : null;
       if (ownedItem) return { ownedItem, combo };
     }
@@ -6062,32 +6092,83 @@ class Game {
     while (changed) {
       changed = false;
       for (const [comboKey, combo] of Object.entries(STORE_RECIPES)) {
-        const indices = [];
-        const used = new Set();
+        const locations = [];
+        const used = new Map();
         for (const part of combo.parts) {
-          const index = this.shopPassives.findIndex((slot, i) => !used.has(i) && slot?.key === part && (slot.count || 1) > 0);
-          if (index < 0) break;
-          indices.push(index);
-          used.add(index);
+          const location = [
+            ...(this.shopPassives || []).map((slot, index) => ({ zone: 'main', index, slot })),
+            ...(this.backpack || []).map((slot, index) => ({ zone: 'backpack', index, slot }))
+          ].find(entry => (used.get(`${entry.zone}:${entry.index}`) || 0) < (entry.slot?.count || 1) && entry.slot?.key === part && (entry.slot.count || 1) > 0);
+          if (!location) break;
+          locations.push(location);
+          const locationKey = `${location.zone}:${location.index}`;
+          used.set(locationKey, (used.get(locationKey) || 0) + 1);
         }
-        if (indices.length !== combo.parts.length) continue;
-        const effectDelta = {};
-        for (const index of indices) {
-          for (const [prop, delta] of Object.entries(this.shopPassives[index].effectDelta || {})) {
+        if (locations.length !== combo.parts.length) continue;
+        const mainUses = new Map();
+        const backpackUses = new Map();
+        for (const location of locations) {
+          const uses = location.zone === 'main' ? mainUses : backpackUses;
+          uses.set(location.index, (uses.get(location.index) || 0) + 1);
+        }
+        const freeingMainIngredient = [...mainUses].find(([index, usedCount]) => (this.shopPassives[index]?.count || 1) <= usedCount);
+        const freeMainIndex = this.findInventoryFreeSlot();
+        const outputZone = freeingMainIngredient || freeMainIndex >= 0 ? 'main' : 'backpack';
+        const freeingBackpackIngredient = [...backpackUses].find(([index, usedCount]) => (this.backpack[index]?.count || 1) <= usedCount);
+        const outputIndex = outputZone === 'main'
+          ? (freeingMainIngredient?.[0] ?? freeMainIndex)
+          : (freeingBackpackIngredient?.[0] ?? this.findBackpackFreeSlot());
+        if (outputIndex < 0) continue;
+        let effectDelta = {};
+        for (const location of locations) {
+          for (const [prop, delta] of Object.entries(location.slot.effectDelta || {})) {
             if (typeof delta === 'number') effectDelta[prop] = (effectDelta[prop] || 0) + delta;
             else if (effectDelta[prop]) effectDelta[prop] = { before: effectDelta[prop].before, after: delta.after };
             else effectDelta[prop] = { ...delta };
           }
         }
-        for (const index of indices) {
-          this.shopPassives[index].count = (this.shopPassives[index].count || 1) - 1;
-          if (this.shopPassives[index].count <= 0) this.shopPassives[index] = null;
+        for (const [index, usedCount] of mainUses) {
+          const slot = this.shopPassives[index];
+          slot.count = (slot.count || 1) - usedCount;
+          if (slot.count <= 0) this.shopPassives[index] = null;
         }
-        const comboCooldown = this.shopPassives.reduce((cooldown, slot, index) => index !== indices[0] && slot?.key === comboKey && this.getShopPassiveDef(comboKey)?.type === 'active' ? Math.max(cooldown, slot.cooldown || 0) : cooldown, 0);
-        const comboSlot = { key: comboKey, count: 1, cooldown: comboCooldown, effectDelta };
-        this.shopPassives[indices[0]] = comboSlot;
-        while (this.shopPassives.length > 6 && !this.shopPassives[this.shopPassives.length - 1]) this.shopPassives.pop();
-        if (combo.apply) {
+        for (const [index, usedCount] of backpackUses) {
+          const slot = this.backpack[index];
+          slot.count = (slot.count || 1) - usedCount;
+          if (slot.count <= 0) this.backpack[index] = null;
+        }
+        if (outputZone === 'backpack') effectDelta = {};
+        const outputSlots = this.getInventoryZoneSlots(outputZone);
+        const destinationIndex = outputIndex;
+        if (destinationIndex < 0 || outputSlots[destinationIndex]) {
+          // This should only occur if the inventory changed during crafting;
+          // restore consumed components instead of silently deleting them.
+          for (const location of locations) {
+            const slots = this.getInventoryZoneSlots(location.zone);
+            const current = slots[location.index];
+            if (current?.key === location.slot.key) current.count = (current.count || 1) + 1;
+            else slots[location.index] = { ...location.slot, count: 1 };
+          }
+          changed = false;
+          continue;
+        }
+        const comboCooldown = [...this.shopPassives, ...(this.backpack || [])].reduce((cooldown, slot) => slot?.key === comboKey && this.getShopPassiveDef(comboKey)?.type === 'active' ? Math.max(cooldown, slot.cooldown || 0) : cooldown, 0);
+        const comboSlot = { key: comboKey, count: 1, cooldown: comboCooldown, effectDelta, ...(outputZone === 'backpack' ? { inactive: true } : {}) };
+        outputSlots[destinationIndex] = comboSlot;
+        if (outputZone === 'main') {
+          for (const location of locations) {
+            if (location.zone !== 'backpack') continue;
+            const component = this.getShopPassiveDef(location.slot.key);
+            if (!component?.apply) continue;
+            const componentDelta = this.applyShopPassiveEffect(component);
+            for (const [prop, delta] of Object.entries(componentDelta)) {
+              if (typeof delta === 'number') effectDelta[prop] = (effectDelta[prop] || 0) + delta;
+              else if (effectDelta[prop]) effectDelta[prop] = { before: effectDelta[prop].before, after: delta.after };
+              else effectDelta[prop] = { ...delta };
+            }
+          }
+        }
+        if (outputZone === 'main' && combo.apply) {
           const comboDelta = this.applyShopPassiveEffect(combo);
           for (const [prop, delta] of Object.entries(comboDelta)) {
             if (typeof delta === 'number') comboSlot.effectDelta[prop] = (comboSlot.effectDelta[prop] || 0) + delta;
@@ -6144,7 +6225,9 @@ class Game {
   }
 
   getInventoryZoneSlots(zone) {
-    return zone === 'backpack' ? this.backpack : this.shopPassives;
+    if (zone === 'backpack') return this.backpack;
+    if (zone === 'consumables') return this.consumables;
+    return this.shopPassives;
   }
 
   bindInventoryDrag(element, zone, index, occupied) {
@@ -6276,7 +6359,7 @@ class Game {
   }
 
   setShopView(view) {
-    this.shopView = ['all', 'basics', 'upgrades', 'actives', 'consumables', 'sell'].includes(view) ? view : 'all';
+    this.shopView = ['all', 'basics', 'upgrades', 'actives', 'consumables', 'favorites', 'sell'].includes(view) ? view : 'all';
     this.selectedShopInventory = null;
     if (this.shopView === 'sell') this.selectedShopItemKey = null;
     this.renderShop();
@@ -6295,7 +6378,7 @@ class Game {
 
   selectShopInventorySlot(type, index) {
     this.selectedShopInventory = { type, index };
-    const slot = this.shopPassives[index];
+    const slot = this.getInventoryZoneSlots(type === 'shop' ? 'main' : type)?.[index];
     if (slot) this.selectedShopItemKey = slot.key;
     this.renderShop();
   }
@@ -6336,20 +6419,18 @@ class Game {
 
   renderShopDetails() {
     const selected = this.selectedShopInventory;
-    const slot = selected ? this.shopPassives[selected.index] : null;
+    const slot = selected ? this.getInventoryZoneSlots(selected.type === 'shop' ? 'main' : selected.type)?.[selected.index] : null;
     const item = this.getShopCatalogItem(slot?.key || this.selectedShopItemKey);
     const box = document.getElementById('shop-selected-item');
     const tree = document.getElementById('shop-build-tree');
     const buy = document.getElementById('shop-buy-selected');
     const buyFull = document.getElementById('shop-buy-full');
-    const quick = document.getElementById('shop-quickbuy-add');
     const sell = document.getElementById('shop-sell-selected');
     if (!item) {
       box.innerHTML = '<div class="shop-empty-selection">Выберите предмет, чтобы посмотреть характеристики и сборку.</div>';
       tree.innerHTML = '';
       buy.disabled = true;
       buyFull.style.display = 'none';
-      quick.disabled = true;
       sell.style.display = 'none';
       return;
     }
@@ -6368,8 +6449,7 @@ class Game {
     buy.textContent = item.parts ? (missingItem ? `Купить компонент · ${missingCost} 💰` : 'Уже собрано') : `Купить · ${totalCost} 💰`;
     buyFull.style.display = item.parts && !selected ? '' : 'none';
     buyFull.textContent = `Купить весь комплект · ${remainingCost} 💰`;
-    buyFull.disabled = Boolean(selected) || !purchasePlan.length || this.currency < remainingCost || !this.canFitShopPurchasePlan(purchasePlan);
-    quick.disabled = Boolean(selected);
+    buyFull.disabled = Boolean(selected) || this.currency < remainingCost || !this.canFitShopPurchasePlan(purchasePlan);
     sell.style.display = selected ? '' : 'none';
     if (selected) sell.textContent = `Продать · ${Math.floor(this.getShopItemTotalCost(item.key) / 2)} 💰`;
   }
@@ -6386,7 +6466,7 @@ class Game {
 
   getShopPurchasePlan(key) {
     const counts = new Map();
-    for (const slot of this.shopPassives || []) if (slot) counts.set(slot.key, (counts.get(slot.key) || 0) + (slot.count || 1));
+    for (const slot of [...(this.shopPassives || []), ...(this.backpack || [])]) if (slot) counts.set(slot.key, (counts.get(slot.key) || 0) + (slot.count || 1));
     const plan = [];
     const obtain = itemKey => {
       const owned = counts.get(itemKey) || 0;
@@ -6404,35 +6484,48 @@ class Game {
   }
 
   canFitShopPurchasePlan(plan) {
-    const virtual = (this.shopPassives || []).map(slot => slot && ({ ...slot }));
+    const virtual = [
+      ...(this.shopPassives || []).map(slot => slot && ({ ...slot })),
+      ...(this.backpack || []).map(slot => slot && ({ ...slot }))
+    ];
     for (const key of plan) {
-      const free = virtual.findIndex(slot => !slot);
-      if (free >= 0) virtual[free] = { key, count: 1 };
-      else virtual.push({ key, count: 1 });
+      let free = virtual.slice(0, 6).findIndex(slot => !slot);
+      if (free < 0) {
+        const bagFree = virtual.slice(6, 9).findIndex(slot => !slot);
+        free = bagFree >= 0 ? bagFree + 6 : -1;
+      }
+      if (free < 0) { free = virtual.length; virtual.push(null); }
+      virtual[free] = { key, count: 1 };
       let combined = true;
       while (combined) {
         combined = false;
         for (const [comboKey, combo] of Object.entries(STORE_RECIPES)) {
-          const indices = [], used = new Set();
+          const indices = [], used = new Map();
           for (const part of combo.parts) {
-            const index = virtual.findIndex((slot, i) => !used.has(i) && slot?.key === part && (slot.count || 1) > 0);
+            const index = virtual.findIndex((slot, i) => (used.get(i) || 0) < (slot?.count || 1) && slot?.key === part && (slot.count || 1) > 0);
             if (index < 0) break;
-            indices.push(index); used.add(index);
+            indices.push(index); used.set(index, (used.get(index) || 0) + 1);
           }
           if (indices.length !== combo.parts.length) continue;
-          for (const index of indices) {
-            virtual[index].count = (virtual[index].count || 1) - 1;
+          for (const [index, usedCount] of used) {
+            virtual[index].count = (virtual[index].count || 1) - usedCount;
             if (virtual[index].count <= 0) virtual[index] = null;
           }
-          virtual[indices[0]] = { key: comboKey, count: 1 };
-          while (virtual.length > 6 && !virtual[virtual.length - 1]) virtual.pop();
+          const mainIndex = [...used].find(([index]) => index < 6 && !virtual[index])?.[0];
+          const freeMain = virtual.slice(0, 6).findIndex(slot => !slot);
+          const bagIngredient = [...used].find(([index]) => index >= 6 && !virtual[index])?.[0];
+          const freeBagOffset = virtual.slice(6, 9).findIndex(slot => !slot);
+          const destination = mainIndex ?? (freeMain >= 0 ? freeMain : bagIngredient ?? (freeBagOffset >= 0 ? freeBagOffset + 6 : -1));
+          if (destination < 0) continue;
+          virtual[destination] = { key: comboKey, count: 1 };
+          while (virtual.length > 9 && !virtual[virtual.length - 1]) virtual.pop();
           combined = true;
           break;
         }
       }
-      if (virtual.length > 6 || virtual.filter(Boolean).length > 6) return false;
+      if (virtual.filter(Boolean).length > 9) return false;
     }
-    return true;
+    return virtual.filter(Boolean).length <= 9;
   }
 
   canBuyConsumableItem(key) {
@@ -6446,17 +6539,18 @@ class Game {
     for (let i = 0; i < count; i++) {
       const slot = slots[i];
       const item = slot && this.getShopCatalogItem(slot.key);
-      const isSelected = zone === 'main' && this.selectedShopInventory?.type === 'shop' && this.selectedShopInventory.index === i;
+      const inventoryType = zone === 'main' ? 'shop' : zone;
+      const isSelected = this.selectedShopInventory?.type === inventoryType && this.selectedShopInventory.index === i;
       const entry = document.createElement('button');
       entry.type = 'button';
       entry.className = `dota-shop-inventory-slot${item ? '' : ' empty'}${isSelected ? ' selected' : ''}${zone === 'backpack' && item ? ' backpack-slot' : ''}`;
       entry.title = item ? `${item.name}: ${item.desc}${zone === 'backpack' ? ' · в рюкзаке не действует' : ''}` : `Пустая ячейка ${i + 1}`;
       entry.innerHTML = item ? `${item.icon}<small>${slot.count > 1 ? `×${slot.count}` : ''}</small>` : '＋';
-      if (zone === 'main') entry.onclick = () => {
+      entry.onclick = () => {
         if (this.inventorySuppressClickUntil > Date.now()) return;
-        if (slot) this.selectShopInventorySlot('shop', i);
+        if (slot) this.selectShopInventorySlot(inventoryType, i);
       };
-      this.bindInventoryDrag(entry, zone, i, Boolean(slot));
+      if (zone !== 'consumables') this.bindInventoryDrag(entry, zone, i, Boolean(slot));
       container.appendChild(entry);
     }
   }
@@ -6464,12 +6558,14 @@ class Game {
     const catalog = document.getElementById('shop-catalog');
     if (!catalog) return;
     catalog.replaceChildren();
-    document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов`;
+    document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов · наценка +${(((this.shopPriceMultiplier || 1) - 1) * 100).toFixed(1)}%`;
     const search = this.shopSearch;
     let items;
     if (this.shopView === 'sell') {
       items = [
-        ...this.shopPassives.map((slot, index) => slot && ({ ...this.getShopCatalogItem(slot.key), inventoryType: 'shop', inventoryIndex: index, count: slot.count })).filter(Boolean)
+        ...this.shopPassives.map((slot, index) => slot && ({ ...this.getShopCatalogItem(slot.key), inventoryType: 'shop', inventoryIndex: index, count: slot.count })).filter(Boolean),
+        ...(this.backpack || []).map((slot, index) => slot && ({ ...this.getShopCatalogItem(slot.key), inventoryType: 'backpack', inventoryIndex: index, count: slot.count })).filter(Boolean),
+        ...(this.consumables || []).map((slot, index) => slot && ({ ...this.getShopCatalogItem(slot.key), inventoryType: 'consumables', inventoryIndex: index, count: slot.count })).filter(Boolean)
       ].filter(item => item?.key);
     } else {
       items = this.getShopCatalogItems().filter(item => {
@@ -6477,6 +6573,7 @@ class Game {
         if (this.shopView === 'upgrades' && item.shopKind !== 'recipe') return false;
         if (this.shopView === 'actives' && item.shopKind !== 'active') return false;
         if (this.shopView === 'consumables' && item.shopKind !== 'consumable') return false;
+        if (this.shopView === 'favorites' && !this.favoriteShopItems?.has(item.key)) return false;
         return !search || `${item.name} ${item.desc}`.toLowerCase().includes(search);
       });
     }
@@ -6485,43 +6582,46 @@ class Game {
       const selected = this.selectedShopInventory
         ? this.selectedShopInventory.type === item.inventoryType && this.selectedShopInventory.index === item.inventoryIndex
         : this.selectedShopItemKey === item.key;
+      const card = document.createElement('div');
+      card.className = 'dota-shop-item-card';
       const button = document.createElement('button');
+      button.type = 'button';
       button.className = `dota-shop-item${selected ? ' selected' : ''}`;
       button.innerHTML = `<span class="dota-shop-item-icon">${item.icon || '📦'}</span><span class="dota-shop-item-name">${this.escapeHtml(item.name)}</span><span class="dota-shop-item-price">${this.shopView === 'sell' ? `×${item.count || 1} · продажа` : `${this.getShopItemTotalCost(item.key)} 💰`}</span>`;
       if (this.shopView === 'sell') button.onclick = () => this.selectShopInventorySlot(item.inventoryType, item.inventoryIndex);
-      else button.onclick = () => this.selectShopItem(item.key);
-      catalog.appendChild(button);
+      else {
+        button.onclick = () => this.selectShopItem(item.key);
+        const favorite = document.createElement('button');
+        favorite.type = 'button';
+        favorite.className = `shop-favorite-toggle${this.favoriteShopItems?.has(item.key) ? ' selected' : ''}`;
+        favorite.textContent = this.favoriteShopItems?.has(item.key) ? '★' : '☆';
+        favorite.title = this.favoriteShopItems?.has(item.key) ? 'Убрать из избранного' : 'Добавить в избранное';
+        favorite.setAttribute('aria-label', favorite.title);
+        favorite.onclick = event => { event.stopPropagation(); this.toggleShopFavorite(item.key); };
+        card.append(button, favorite);
+      }
+      if (this.shopView === 'sell') card.appendChild(button);
+      catalog.appendChild(card);
     }
     if (!items.length) catalog.innerHTML = `<div class="shop-empty-selection">${this.shopView === 'sell' ? 'Нет вещей для продажи.' : 'Предметы не найдены.'}</div>`;
 
     document.querySelectorAll('.shop-tab').forEach(button => button.classList.toggle('selected', button.dataset.shopView === this.shopView));
     this.renderShopInventorySlots('shop-inventory', 'main', 6);
+    this.renderShopInventorySlots('shop-consumables', 'consumables', 4);
     this.renderShopInventorySlots('shop-backpack', 'backpack', 3);
     document.getElementById('shop-inventory-count').textContent = `${this.getInventoryCount()}/6`;
+    document.getElementById('shop-consumables-count').textContent = `${(this.consumables || []).filter(Boolean).length}/4`;
     document.getElementById('shop-backpack-count').textContent = `${this.getBackpackCount()}/3`;
     this.renderShopDetails();
-    this.renderQuickBuy();
   }
 
-  renderQuickBuy() {
-    const box = document.getElementById('shop-quickbuy');
-    const button = document.getElementById('shop-buy-next');
-    const clear = document.getElementById('shop-quickbuy-clear');
-    if (!this.quickBuyItemKey) {
-      box.querySelector('span').textContent = 'Добавьте предмет из сборки';
-      button.disabled = true;
-      button.textContent = 'Купить следующий компонент';
-      clear.style.display = 'none';
-      return;
-    }
-    clear.style.display = '';
-    const target = this.getShopCatalogItem(this.quickBuyItemKey);
-    const nextKey = target?.parts ? this.findMissingShopComponent(target.key, new Set(), true) : target?.key;
-    const nextItem = nextKey && this.getShopCatalogItem(nextKey);
-    box.querySelector('span').textContent = target ? `${target.icon} ${target.name}${nextItem ? ` · следующий: ${nextItem.name} (${this.getShopItemTotalCost(nextKey)} 💰)` : ' · сборка завершена'}` : 'Предмет больше недоступен';
-    button.disabled = !nextItem || this.currency < this.getShopItemTotalCost(nextKey)
-      || (nextItem.shopKind === 'consumable' ? !this.canBuyConsumableItem(nextKey) : !this.hasInventorySpaceFor(nextKey));
-    button.textContent = nextItem ? `Купить · ${this.getShopItemTotalCost(nextKey)} 💰` : 'Сборка завершена';
+  toggleShopFavorite(key) {
+    if (!this.favoriteShopItems) this.favoriteShopItems = new Set();
+    if (this.favoriteShopItems.has(key)) this.favoriteShopItems.delete(key);
+    else this.favoriteShopItems.add(key);
+    try { localStorage.setItem('1c_shop_favorites', JSON.stringify([...this.favoriteShopItems])); }
+    catch (_) {}
+    this.renderShop();
   }
 
   buySelectedShopItem() {
@@ -6541,39 +6641,25 @@ class Game {
     if (!target?.parts) return;
     const plan = this.getShopPurchasePlan(target.key);
     const total = plan.reduce((sum, key) => sum + this.getShopItemTotalCost(key), 0);
-    if (!plan.length || total > this.currency || !this.canFitShopPurchasePlan(plan)) {
+    const targetCountBefore = this.getOwnedShopItemCount(target.key);
+    if (total > this.currency || !this.canFitShopPurchasePlan(plan)) {
       document.getElementById('shop-message').textContent = total > this.currency
         ? `Для полного комплекта не хватает ${total - this.currency} фиткоинов.`
-        : 'Не хватает свободного места в основном инвентаре для сборки комплекта.';
+        : 'Не хватает места в инвентаре и рюкзаке для компонентов комплекта.';
       return;
     }
     this.currency -= total;
-    for (const key of plan) this.buyPassiveItem(key, { prepaid: true });
-    document.getElementById('shop-message').textContent = `Комплект «${target.name}» собран одной покупкой.`;
+    let allPurchased = true;
+    for (const key of plan) allPurchased = this.buyPassiveItem(key, { prepaid: true }) && allPurchased;
+    this.combineShopPassives(target.key);
+    const assembled = this.getOwnedShopItemCount(target.key) > targetCountBefore;
+    if (!allPurchased) {
+      this.currency += total;
+      document.getElementById('shop-message').textContent = 'Не удалось разместить компоненты комплекта; фиткоины возвращены.';
+    } else document.getElementById('shop-message').textContent = assembled
+      ? `Комплект «${target.name}» собран одной покупкой.`
+      : `Компоненты комплекта «${target.name}» куплены; сборка завершится после размещения частей рецепта.`;
     this.updateHUD();
-    this.renderShop();
-  }
-
-  addSelectedToQuickBuy() {
-    if (this.selectedShopInventory || !this.getShopCatalogItem(this.selectedShopItemKey)) return;
-    this.quickBuyItemKey = this.selectedShopItemKey;
-    this.shopView = 'all';
-    document.getElementById('shop-message').textContent = 'Предмет добавлен в быструю покупку.';
-    this.renderShop();
-  }
-
-  buyQuickBuyNext() {
-    const target = this.getShopCatalogItem(this.quickBuyItemKey);
-    if (!target) return;
-    const key = target.parts ? this.findMissingShopComponent(target.key, new Set(), true) : target.key;
-    const item = key && this.getShopCatalogItem(key);
-    if (!item) return;
-    if (item.shopKind === 'consumable') this.buyConsumable(key);
-    else this.buyPassiveItem(key);
-  }
-
-  clearQuickBuy() {
-    this.quickBuyItemKey = null;
     this.renderShop();
   }
 
@@ -6582,7 +6668,7 @@ class Game {
     const selected = this.selectedShopInventory;
     this.selectedShopInventory = null;
     this.selectedShopItemKey = null;
-    this.sellShopItem(selected.index);
+    this.sellShopItem(selected.index, selected.type);
   }
   buyPassiveItem(key, { prepaid = false } = {}) {
     const item = this.getShopPassiveDef(key);
@@ -6591,21 +6677,23 @@ class Game {
     const freeSlot = this.findInventoryFreeSlot();
     const backpackSlot = this.findBackpackFreeSlot();
     const canCombine = this.canCombinePassiveItem(key);
-    if ((freeSlot < 0 && !canCombine && backpackSlot < 0) || (!prepaid && this.currency < price)) return false;
+    if ((freeSlot < 0 && backpackSlot < 0 && !canCombine) || (!prepaid && this.currency < price)) return false;
     if (!prepaid) this.currency -= price;
     const sharedCooldown = item.type === 'active'
       ? [...(this.shopPassives || []), ...(this.backpack || [])].reduce((cooldown, entry) => entry?.key === key ? Math.max(cooldown, entry.cooldown || 0) : cooldown, 0)
       : 0;
     const slot = { key, count: 1, cooldown: sharedCooldown, effectDelta: {} };
     let combo = null;
-    if (freeSlot >= 0 || canCombine) {
-      if (freeSlot >= 0) this.shopPassives[freeSlot] = slot;
-      else this.shopPassives.push(slot);
+    if (freeSlot >= 0) {
+      this.shopPassives[freeSlot] = slot;
       if (item.apply) slot.effectDelta = this.applyShopPassiveEffect(item);
       combo = this.combineShopPassives(key);
     } else {
       slot.inactive = true;
-      this.backpack[backpackSlot] = slot;
+      const destination = backpackSlot >= 0 ? backpackSlot : this.backpack.length;
+      this.backpack[destination] = slot;
+      combo = this.combineShopPassives(key);
+      while (this.backpack.length > 3 && !this.backpack[this.backpack.length - 1]) this.backpack.pop();
     }
     document.getElementById('shop-message').innerText = combo
       ? `Собран комплект «${combo.name}». Итоговые характеристики указаны в описании предмета.`
@@ -6616,33 +6704,35 @@ class Game {
     return true;
   }
 
-  sellShopItem(slotIndex) {
-    const slot = this.shopPassives[slotIndex];
-    if (this.isConsumableSlot(slot)) return this.sellConsumable(slotIndex);
+  sellShopItem(slotIndex, zone = 'shop') {
+    const slots = zone === 'backpack' ? this.backpack : zone === 'consumables' ? this.consumables : this.shopPassives;
+    const slot = slots[slotIndex];
+    if (this.isConsumableSlot(slot)) return this.sellConsumable(slotIndex, zone);
     const item = slot && this.getShopPassiveDef(slot.key);
     if (!slot || !item) return;
     this.currency += Math.floor(this.getShopItemTotalCost(slot.key) / 2);
-    for (const [key, delta] of Object.entries(slot.effectDelta || {})) {
+    for (const [key, delta] of Object.entries(zone === 'backpack' ? {} : slot.effectDelta || {})) {
       if (typeof delta === 'number' && typeof this.player[key] === 'number') this.player[key] -= delta;
       else if (delta && typeof delta === 'object') {
         const otherOwner = this.shopPassives.some((entry, index) => index !== slotIndex && entry.effectDelta?.[key]?.after === true);
         this.player[key] = otherOwner ? true : delta.before;
       }
     }
-    this.shopPassives[slotIndex] = null;
+    slots[slotIndex] = null;
     if (typeof this.player.maxHp === 'number' && typeof this.player.hp === 'number') this.player.hp = Math.max(0, Math.min(this.player.hp, this.player.maxHp));
     this.updateInventoryHUD();
     this.updateHUD();
     this.renderShop();
   }
 
-  sellConsumable(slotIndex) {
-    const slot = this.shopPassives[slotIndex];
+  sellConsumable(slotIndex, zone = 'shop') {
+    const slots = zone === 'consumables' ? this.consumables : zone === 'backpack' ? this.backpack : this.shopPassives;
+    const slot = slots[slotIndex];
     const item = slot && CONSUMABLES_DEF[slot.key];
     if (!slot || !item) return;
     this.currency += Math.floor(this.getShopItemTotalCost(slot.key) / 2);
     slot.count--;
-    if (slot.count <= 0) this.shopPassives[slotIndex] = null;
+    if (slot.count <= 0) slots[slotIndex] = null;
     this.updateConsumableHUD();
     this.updateHUD();
     this.renderShop();
@@ -6654,12 +6744,12 @@ class Game {
     const price = this.getShopItemTotalCost(key);
     if (this.currency < price) return;
     if (!this.canBuyConsumableItem(key)) {
-      document.getElementById('shop-message').textContent = `Все шесть слотов заняты, а стопки ${item.name} уже заполнены.`;
+      document.getElementById('shop-message').textContent = `Все четыре слота расходников заняты, а стопки ${item.name} уже заполнены.`;
       return;
     }
     this.currency -= price;
     this.addConsumableToInventory(key);
-    document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} добавлена в инвентарь. Отдел продаж благодарит за выбор.`;
+    document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} добавлена в слот расходников.`;
     this.updateHUD();
     this.renderShop();
   }
@@ -6683,7 +6773,7 @@ class Game {
 
   useConsumable(slotIndex) {
     if (this.paused || !this.player || this.player.hp <= 0 || this.player.stunTimer > 0) return;
-    const slot = this.shopPassives[slotIndex];
+    const slot = this.consumables?.[slotIndex];
     if (!this.isConsumableSlot(slot)) return;
     const item = CONSUMABLES_DEF[slot.key];
     if (!item) return;
@@ -6694,7 +6784,7 @@ class Game {
     }
     this.scalePvpDefenseGain(beforeDefense);
     slot.count--;
-    if (slot.count <= 0) this.shopPassives[slotIndex] = null;
+    if (slot.count <= 0) this.consumables[slotIndex] = null;
     this.sound.playTone(620, 'sine', 0.13, 0.14);
     this.log(`Использовано: ${item.name}`);
     this.updateInventoryHUD();
@@ -6704,7 +6794,6 @@ class Game {
   useInventorySlot(slotIndex) {
     const slot = this.shopPassives[slotIndex];
     if (!slot) return;
-    if (this.isConsumableSlot(slot)) return this.useConsumable(slotIndex);
     if (this.getShopPassiveDef(slot.key)?.type === 'active') return this.useShopActiveItem(slotIndex);
   }
 
@@ -6907,7 +6996,7 @@ class Game {
     addTimer(player.coffeeBuffTimer, 'Кофе из 308 кабинета', '☕', 'ускорение');
     addTimer(player.shieldTimer, 'Защитный щит', '🛡️', 'неуязвимость');
     if (player.hasBackupShield) temporary.push({ icon: '☁️', name: 'Автоматический щит от бэкапа', value: `через ${Math.ceil(this.backupTimer)}с` });
-    const consumables = (this.shopPassives || []).map((slot, index) => slot && this.isConsumableSlot(slot) && ({
+    const consumables = (this.consumables || []).map((slot, index) => slot && ({
       icon: CONSUMABLES_DEF[slot.key]?.icon || '📦',
       name: `${CONSUMABLES_DEF[slot.key]?.name || slot.key} · слот ${index + 1}`,
       value: `×${slot.count}`
@@ -7006,7 +7095,18 @@ class Game {
       const def = ACTIVE_SKILLS_DEF[skill.key];
       if (def) {
         const beforeDefense = { hp: this.player.hp, shield: this.player.shieldTimer };
+        const enemyHpBefore = new Map(this.enemies.map(enemy => [enemy, Number(enemy.hp) || 0]));
+        const projectileStart = this.projectiles.length;
+        const puddleStart = this.puddles.length;
+        const summonStart = this.summons.length;
         def.cast(this, skill.lvl);
+        for (const [enemy, hp] of enemyHpBefore) {
+          const dealt = Math.min(hp, Math.max(0, hp - Math.max(0, Number(enemy.hp) || 0)));
+          if (dealt > 0) this.recordDealtDamage(def.name, dealt);
+        }
+        for (const projectile of this.projectiles.slice(projectileStart)) projectile.source ||= def.name;
+        for (const puddle of this.puddles.slice(puddleStart)) puddle.source ||= def.name;
+        for (const summon of this.summons.slice(summonStart)) summon.source ||= def.name;
         this.scalePvpDefenseGain(beforeDefense);
         this.sendPvpActiveSkill(skill.key, skill.lvl);
         skill.cdTimer = def.baseCd * this.player.cdMult;
@@ -7049,7 +7149,7 @@ class Game {
         let hits = 0;
         for (const enemy of this.enemies) {
           if (enemy.hp <= 0 || Math.hypot(enemy.x - summon.x, enemy.y - summon.y) > 145) continue;
-          enemy.hp -= summon.dmg * (enemy.isBoss ? 0.48 : 1);
+          this.damageEnemy(enemy, summon.dmg * (enemy.isBoss ? 0.48 : 1), summon.source || 'Эскалация во вторую линию');
           this.applyProjectileSlow(enemy);
           this.createHitFX(enemy.x, enemy.y, '#f1c40f', 3);
           hits++;
@@ -7069,6 +7169,7 @@ class Game {
           this.projectiles.push({ x: summon.x, y: summon.y,
             vx: Math.cos(angle) * 8.2, vy: Math.sin(angle) * 8.2,
             dmg: summon.dmg, life: 1.8, icon: summon.role === 'drone' ? '🛠️' : '📞', color: summon.color || '#55efc4', size: summon.role === 'drone' ? 9 : 7,
+            source: summon.source || (summon.role === 'drone' ? 'Дрон техспециалиста' : 'Помощник техподдержки'),
             hitTargets: [], ricochetsRemaining: 0, isSummon: true });
         }
       }
@@ -7086,7 +7187,7 @@ class Game {
 
     for (let e of this.enemies) {
       e.freezeTimer = 3.5;
-      e.hp -= 95;
+      this.damageEnemy(e, 95, 'Динамическое обновление');
       this.createHitFX(e.x, e.y, '#ffd200', 6);
     }
     if (this.isBattleRoyale) {
@@ -7121,7 +7222,7 @@ class Game {
     if (roll === 0) {
       this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
-      for (const e of this.enemies) if (!e.is24hPursuer) e.hp *= 0.8;
+      for (const e of this.enemies) if (!e.is24hPursuer) this.damageEnemy(e, e.hp * 0.2, 'Офисное событие · уборка');
     } else if (roll === 1) {
       this.showBanner('🎁 «После обновления ничего не работает». Клиент нажал «Обновить» раньше инструкции. Опыт x2 — хоть что-то обновилось успешно.');
       this.player.xpEventMult = 2.0;
@@ -7129,7 +7230,7 @@ class Game {
     } else if (roll === 2) {
       this.showBanner('🧹 Уборка завершена. Табличка «мокрый пол» ушла в отпуск вместе с уборщицей.');
       for (let i = 0; i < 8; i++) {
-        this.puddles.push({ x: this.player.x + (Math.random() - 0.5) * 500, y: this.player.y + (Math.random() - 0.5) * 500, radius: 60, dmg: 8, life: 12, isTrail: true });
+        this.puddles.push({ x: this.player.x + (Math.random() - 0.5) * 500, y: this.player.y + (Math.random() - 0.5) * 500, radius: 60, dmg: 8, life: 12, isTrail: true, source: 'Офисное событие · мокрый пол' });
       }
     } else if (roll === 3) {
       this.showBanner('🎟️ Базу развернули через AnyDesk. Пароль нашли под клавиатурой — клиент прочитал его по телефону вверх ногами.');
@@ -7138,7 +7239,7 @@ class Game {
       this.showBanner('🖥️ Перезагрузка помогла. Правда, перезагрузили принтер, зато он теперь знает пароль от Wi-Fi.');
       for (const e of this.enemies) {
         if (e.is24hPursuer) continue;
-        e.hp -= e.isBoss ? 110 : 85;
+        this.damageEnemy(e, e.isBoss ? 110 : 85, 'Офисное событие · перезагрузка');
         e.freezeTimer = Math.max(e.freezeTimer || 0, e.isBoss ? 0.8 : 1.6);
       }
     } else if (roll === 5) {
@@ -7280,7 +7381,7 @@ class Game {
       for (const enemy of this.enemies) {
         if (enemy.hp <= 0 || enemy.is24hPursuer) continue;
         if (Math.hypot(enemy.x - hazard.x, enemy.y - hazard.y) <= hazard.radius + enemy.size) {
-          enemy.hp -= damage;
+          this.damageEnemy(enemy, damage, hazard.source || 'Офисное событие');
           this.createHitFX(enemy.x, enemy.y, hazard.kind === 'meteor' ? '#ff7b24' : '#ff7675', 3);
         }
       }
@@ -8283,19 +8384,20 @@ class Game {
     enemy.slowTimer = Math.max(enemy.slowTimer || 0, 2.2);
   }
 
-  applyProjectileBurn(enemy) {
+  applyProjectileBurn(enemy, source = 'Поджигающие снаряды') {
     const level = this.player.burnShotLevel || 0;
     if (level <= 0 || Math.random() >= Math.min(0.56, 0.24 + (level - 1) * 0.08)) return;
     enemy.burnTimer = Math.max(enemy.burnTimer || 0, 3);
     enemy.burnDamage = Math.max(enemy.burnDamage || 0, 2.5 + level * 0.3);
+    enemy.burnSource = source;
     enemy.burnTickTimer = Math.min(enemy.burnTickTimer ?? 0.5, 0.5);
   }
 
-  applyProjectileEffects(enemy, projectileDamage) {
+  applyProjectileEffects(enemy, projectileDamage, source = 'Поджигающие снаряды') {
     const maxBurnFreeze = (this.player.burnShotLevel || 0) >= 5 && (this.player.slowShotLevel || 0) >= 5;
     if (!maxBurnFreeze) {
       this.applyProjectileSlow(enemy);
-      this.applyProjectileBurn(enemy);
+      this.applyProjectileBurn(enemy, source);
       return;
     }
 
@@ -8304,10 +8406,11 @@ class Game {
     const burnDamage = (2.5 + this.player.burnShotLevel * 0.3) * 1.5;
     for (const target of this.enemies) {
       if (target.is24hPursuer || (target !== enemy && target.hp <= 0) || Math.hypot(target.x - enemy.x, target.y - enemy.y) > radius + target.size) continue;
-      target.hp -= burstDamage;
+      this.damageEnemy(target, burstDamage, `${source} · взрыв`);
       target.freezeTimer = Math.max(target.freezeTimer || 0, 0.1);
       target.burnTimer = Math.max(target.burnTimer || 0, 3);
       target.burnDamage = Math.max(target.burnDamage || 0, burnDamage);
+      target.burnSource = `${source} · горение`;
       target.burnTickTimer = Math.min(target.burnTickTimer ?? 0.5, 0.5);
     }
     this.createHitFX(enemy.x, enemy.y, '#ff7b24', 8);
@@ -8318,7 +8421,7 @@ class Game {
     enemy.burnTimer = Math.max(0, enemy.burnTimer - dt);
     enemy.burnTickTimer = (enemy.burnTickTimer ?? 0.5) - dt;
     while (enemy.burnTickTimer <= 0 && enemy.burnTimer > 0) {
-      enemy.hp -= enemy.burnDamage * (enemy.isBoss ? 0.5 : 1);
+      this.damageEnemy(enemy, enemy.burnDamage * (enemy.isBoss ? 0.5 : 1), enemy.burnSource || 'Поджигающие снаряды');
       enemy.burnTickTimer += 0.5;
       if (Math.random() < 0.35) this.createHitFX(enemy.x, enemy.y, '#ff7b24', 2);
     }
@@ -8349,7 +8452,7 @@ class Game {
         for (let e of this.enemies) {
           if (!e.is24hPursuer && Math.hypot(e.x - bx, e.y - by) < e.size + 15) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
-            e.hp -= hit.dmg * dt * 3.8;
+            this.damageEnemy(e, hit.dmg * dt * 3.8, WEAPONS_DEF.turnstile.name);
             this.createHitFX(bx, by, '#ffd200', 1);
             if (hit.isCrit && Math.random() < 0.2) {
               this.addPopup(e.x, e.y - 12, `КРИТ! ${Math.round(hit.dmg)}`, '#f1c40f');
@@ -8496,7 +8599,7 @@ class Game {
           y: this.player.y + Math.sin(ang) * dst,
           radius: 46 + w.lvl * 7,
           dmg: hit.dmg,
-          life: 3.5
+          life: 3.5, source: WEAPONS_DEF.protein.name
         });
       }
     }
@@ -8509,7 +8612,7 @@ class Game {
         if (e.is24hPursuer) continue;
         if (Math.hypot(e.x - this.player.x, e.y - this.player.y) < rad + e.size) {
           const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
-          e.hp -= hit.dmg * dt;
+          this.damageEnemy(e, hit.dmg * dt, WEAPONS_DEF.cache_aura.name);
         }
       }
       for (const target of this.getPvpWeaponTargets()) {
@@ -8637,7 +8740,7 @@ class Game {
         for (const enemy of this.enemies) {
           if (enemy.hp <= 0 || Math.hypot(enemy.x - this.player.x, enemy.y - this.player.y) > radius) continue;
           const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16);
-          enemy.hp -= hit.dmg;
+          this.damageEnemy(enemy, hit.dmg, WEAPONS_DEF.fusion_gate.name);
           const angle = Math.atan2(enemy.y - this.player.y, enemy.x - this.player.x);
           enemy.x += Math.cos(angle) * 42;
           enemy.y += Math.sin(angle) * 42;
@@ -8660,10 +8763,10 @@ class Game {
     for (let e of this.enemies) {
       if (e.is24hPursuer) continue;
       if (!e.isBoss) {
-        e.hp = 0;
+        this.damageEnemy(e, e.hp, 'Диск ИТС · массовое уничтожение');
         this.createHitFX(e.x, e.y, '#ffd200', 8);
       } else {
-        e.hp -= 900;
+        this.damageEnemy(e, 900, 'Диск ИТС · тестирование и исправление');
         this.addPopup(e.x, e.y - 30, "-900 (ИТС ТиИ)", "#f1c40f");
       }
     }
@@ -8811,7 +8914,7 @@ class Game {
         if (this.trailTimer <= 0) {
           this.puddles.push({
             x: this.player.x, y: this.player.y,
-            radius: 22, dmg: 5, life: 2.0, isTrail: true
+            radius: 22, dmg: 5, life: 2.0, isTrail: true, source: 'Следы от «Серых Кроссовок»'
           });
           this.trailTimer = 0.25;
         }
@@ -8857,8 +8960,8 @@ class Game {
         if (p.life > 0 && p.piercing) {
           for (let e of this.enemies) {
           if (!e.is24hPursuer && !p.hits.includes(e) && Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
-              e.hp -= p.dmg;
-              this.applyProjectileEffects(e, p.dmg);
+              this.damageEnemy(e, p.dmg, this.inferWeaponDamageSource(p));
+              this.applyProjectileEffects(e, p.dmg, this.inferWeaponDamageSource(p));
               p.hits.push(e);
               this.createHitFX(p.x, p.y, p.color, 4);
               this.sound.hit();
@@ -8869,8 +8972,8 @@ class Game {
           for (let e of this.enemies) {
             if (e.is24hPursuer || p.hitTargets?.includes(e)) continue;
             if (Math.hypot(e.x - p.x, e.y - p.y) < e.size + p.size) {
-              e.hp -= p.dmg;
-              this.applyProjectileEffects(e, p.dmg);
+              this.damageEnemy(e, p.dmg, this.inferWeaponDamageSource(p));
+              this.applyProjectileEffects(e, p.dmg, this.inferWeaponDamageSource(p));
               this.createHitFX(p.x, p.y, p.color);
               this.sound.hit();
               if (p.isCrit) {
@@ -8967,7 +9070,7 @@ class Game {
       pud.life -= dt;
       for (let e of this.enemies) {
         if (Math.hypot(e.x - pud.x, e.y - pud.y) < pud.radius + e.size) {
-          e.hp -= pud.dmg * dt;
+          this.damageEnemy(e, pud.dmg * dt, pud.source || 'Протеиновый Шейкер');
           if (pud.isTrail) e.x -= (e.x - this.player.x) * 0.01 * frameScale;
         }
       }
@@ -9157,7 +9260,7 @@ class Game {
           this.addPopup(e.x, e.y - 20, "💥 ХЛОПОК КАССЫ", "#d63031");
           for (let other of this.enemies) {
             if (other !== e && Math.hypot(other.x - e.x, other.y - e.y) < 75) {
-              other.hp -= 60;
+              this.damageEnemy(other, 60, 'Хлопок кассы');
               this.createHitFX(other.x, other.y, '#e17055', 4);
             }
           }
@@ -9191,6 +9294,7 @@ class Game {
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const item = this.pickups[i];
       if (Math.hypot(this.player.x - item.x, this.player.y - item.y) < 32) {
+        if (item.type === 'banana' && this.player.hp >= this.player.maxHp - 0.0001) continue;
         if ((item.type === 'br_supply' || item.type === 'consumable') && !this.canAddConsumableToInventory(item.consumableKey)) {
           if (!item.fullInventoryNotified) {
             this.addPopup(this.player.x, this.player.y - 25, 'Инвентарь забит', '#aaa');
@@ -9211,9 +9315,11 @@ class Game {
           this.sound.playTone(660, 'sine', 0.2, 0.15);
           this.addPopup(this.player.x, this.player.y - 25, "⚡ КОФЕИНОВЫЙ СПРИНТ!", "#e67e22");
         } else if (item.type === 'banana') {
+          const hpBefore = this.player.hp;
           this.player.hp = Math.min(this.player.maxHp, this.player.hp + (this.pvp?.mode === 'pvp' ? 10 : 20));
+          const healed = Math.round(this.player.hp - hpBefore);
           this.sound.playTone(520, 'triangle', 0.15, 0.12);
-          this.addPopup(this.player.x, this.player.y - 25, "+20 HP (Банан)", "#2ecc71");
+          this.addPopup(this.player.x, this.player.y - 25, `+${healed} HP (Банан)`, "#2ecc71");
         } else if (item.type === 'consumable') {
           this.addConsumableToInventory(item.consumableKey);
           this.addPopup(this.player.x, this.player.y - 25, `${CONSUMABLES_DEF[item.consumableKey].icon} Расходник найден`, '#ffcf70');
@@ -9652,6 +9758,16 @@ class Game {
     this.updateHUD();
   }
 
+  getDamageBreakdownMarkup() {
+    const entries = Object.entries(this.damageDealtBySource || {})
+      .filter(([, damage]) => Number(damage) > 0)
+      .sort((a, b) => b[1] - a[1]);
+    const total = entries.reduce((sum, [, damage]) => sum + Number(damage), 0);
+    const format = value => Number(value).toLocaleString('ru-RU', { maximumFractionDigits: 1 });
+    if (!entries.length) return '<br><b>Урон по врагам:</b> нет данных';
+    return `<br><br><b>Урон по врагам по источникам · всего ${format(total)} HP:</b><br>${entries.map(([source, damage]) => `• ${this.escapeHtml(source)}: <b>${format(damage)} HP</b>`).join('<br>')}`;
+  }
+
   gameOver(reason, { victory = false } = {}) {
     if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
     this.rudesktopSkillFrame = null;
@@ -9716,6 +9832,7 @@ class Game {
       • Остаток фиткоинов: <b>${this.currency}</b><br>
       • Достигнутый релиз: <b>Релиз ${this.level}.0</b><br>
       • <b>ИТОГОВЫЙ СЧЁТ РЕКОРДА: ${totalScore}</b>
+      ${this.getDamageBreakdownMarkup()}
     `;
 
     document.getElementById('submit-status').innerText = '';
@@ -10114,10 +10231,12 @@ class Game {
     const box = document.getElementById('hud-inventory');
     const passiveBox = document.getElementById('hud-shop-passives');
     const backpackBox = document.getElementById('hud-backpack');
-    if (!box || !passiveBox || !backpackBox) return;
+    const consumableBox = document.getElementById('hud-consumables');
+    if (!box || !passiveBox || !backpackBox || !consumableBox) return;
     box.innerHTML = '';
     passiveBox.innerHTML = '';
     backpackBox.innerHTML = '';
+    consumableBox.innerHTML = '';
     for (const key in this.weapons) box.innerHTML += `<div class="inv-slot">${WEAPONS_DEF[key].icon}<span class="inv-lvl">${this.weapons[key].lvl}</span></div>`;
     for (const key in this.passives) box.innerHTML += `<div class="inv-slot" style="border-color:#55efc4;">${PASSIVES_DEF[key].icon}<span class="inv-lvl">${this.passives[key].lvl}</span></div>`;
     for (let i = 0; i < 6; i++) {
@@ -10151,6 +10270,22 @@ class Game {
       entry.innerHTML = slot ? `${item?.icon || '📦'}${slot.count > 1 ? `<span class="inv-lvl">×${slot.count}</span>` : ''}` : '<span>＋</span>';
       this.bindInventoryDrag(entry, 'backpack', i, Boolean(slot));
       backpackBox.appendChild(entry);
+    }
+    for (let i = 0; i < 4; i++) {
+      const slot = this.consumables?.[i];
+      const item = slot ? CONSUMABLES_DEF[slot.key] : null;
+      const keyLabel = this.keyCodeLabel(this.keyBindings[`consumable${i + 1}`]);
+      const entry = document.createElement(slot ? 'button' : 'div');
+      entry.className = `inv-slot consumable-hud-slot${slot ? ' shop-active-slot' : ' empty'}`;
+      entry.title = slot ? `${item?.name || slot.key}${slot.count > 1 ? ` ×${slot.count}` : ''}: ${item?.desc || ''} · клавиша ${keyLabel}` : `Пустой слот расходников ${i + 1}/4 · клавиша ${keyLabel}`;
+      entry.innerHTML = slot
+        ? `${item?.icon || '📦'}<span class="inv-key">${keyLabel}</span><span class="inv-lvl">×${slot.count || 1}</span>`
+        : '<span>＋</span>';
+      if (slot) {
+        entry.type = 'button';
+        entry.onclick = () => this.useConsumable(i);
+      }
+      consumableBox.appendChild(entry);
     }
   }
   updateActiveHUD() {

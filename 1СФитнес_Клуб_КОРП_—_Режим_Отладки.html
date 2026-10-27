@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.5.4</title>
+<title>1С:Фитнес Клуб КОРП 2.6.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -284,6 +284,7 @@
     .active-slot .act-icon { font-size:20px; }
     #hud-active-skills .act-key { display:none; }
     #hud-item-loadout { left:50%; bottom:calc(env(safe-area-inset-bottom) + 14px); transform:translateX(-50%); align-items:center; gap:3px; }
+    #hud-backpack { display:none; }
     #hud-consumables { gap:4px; }
     #hud-consumables .inv-slot { width:36px; height:36px; font-size:19px; }
     #hud-consumables .inv-key { top:1px; left:2px; padding:0 3px; font-size:8px; line-height:11px; }
@@ -861,7 +862,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.5.4 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.6.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -987,7 +988,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.5.4</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.6.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -996,16 +997,16 @@
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-      <div class="main-menu-version">Текущая версия: <b>2.5.4</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.6.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
-              <p>Магазин получил новые предметы и комплекты с рецептами, избранным и продажей; добавлены усиленные мини-боссы и умения, изменён баланс врагов. Обновлены мобильный интерфейс, меню паузы и работа с тикетами. Теперь комплект можно купить целиком, появились три слота рюкзака и четыре отдельные ячейки расходников; для предметов, расходников, тикетов и звонков можно настроить клавиши. После каждого звонка отдела продаж цены магазина растут.</p>
+              <h3>Версия 2.6.0 — «ИИ-слоп на премиум-тарифе»</h3>
+              <p>ИИ-слоп признан премиальной услугой: магазин подорожал, а отдел продаж теперь накручивает цены ещё быстрее. Добавлены новые комплекты, фиткоины выпадают чуть реже; на мобильном HUD рюкзак скрыт, а расходники стоят на его месте.</p>
             </div>
             <div class="release-notes">
-              <h3>Версия 2.4.0 — «Комплект и контроль»</h3>
-              <p>Обновлён мобильный интерфейс и управление; добавлены активные предметы, комплекты и рецепты. В рекорды сохраняется комплект игрока, а тикеты стали полезнее на поздних этапах.</p>
+              <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
+              <p>Магазин получил новые предметы и комплекты, рецепты, избранное и продажу; добавлены рюкзак, настраиваемые клавиши, усиленные мини-боссы и изменения баланса.</p>
             </div>
           </div>
         </div>
@@ -1116,6 +1117,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
+        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина выросли на 18%, а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы, фиткоины выпадают на 3,14% реже. На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
@@ -1362,7 +1364,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.5.4';
+const GAME_VERSION = '2.6.0';
 const DEFAULT_KEY_BINDINGS = {
   moveUp: 'KeyW', moveDown: 'KeyS', moveLeft: 'KeyA', moveRight: 'KeyD', dash: 'ShiftLeft', dynamic: 'Space',
   skill1: 'Digit1', skill2: 'Digit2', skill3: 'Digit3', skill4: 'Digit4',
@@ -2679,6 +2681,36 @@ const STORE_PASSIVE_COMBOS = {
     name: 'Комплект «Магнитная касса»', icon: '🧲', tier: 3,
     desc: 'Итоговые характеристики: +47% к радиусу сбора и +14% к фиткоинам с дискет.',
     apply: p => { p.magnetMult += 0.10; p.currencyMult = (p.currencyMult || 1) + 0.06; }
+  },
+  precision_reserve: {
+    parts: ['shop_damage_chip', 'shop_health_cache', 'shop_cooldown_relay'],
+    name: 'Комплект «Резерв точности»', icon: '🧩', tier: 3,
+    desc: 'Итоговые характеристики: +10% к урону, +25 к максимальному здоровью и ×0,96 к перезарядке умений и оружия.',
+    apply: p => { p.dmgMult += 0.04; p.maxHp += 10; p.hp = Math.min(p.maxHp, p.hp + 10); }
+  },
+  critical_conveyor: {
+    parts: ['shop_crit_film', 'shop_crit_console', 'shop_speed_tracker'],
+    name: 'Комплект «Критический конвейер»', icon: '🎛️', tier: 3,
+    desc: 'Итоговые характеристики: +12% к шансу критического удара и +10% к скорости бега.',
+    apply: p => { p.critChance += 0.025; p.speedMult += 0.04; }
+  },
+  dash_architect: {
+    parts: ['shop_dash_oil', 'shop_dash_accumulator', 'shop_speed_tracker'],
+    name: 'Комплект «Архитектор рывка»', icon: '💨', tier: 3,
+    desc: 'Итоговые характеристики: +10% к скорости бега и примерно ×0,65 к перезарядке рывка.',
+    apply: p => { p.speedMult += 0.04; p.dashCooldownMult = Math.max(0.40, (p.dashCooldownMult || 1) * 0.92); }
+  },
+  financial_magnet: {
+    parts: ['shop_cash_terminal', 'shop_magnet_array', 'shop_xp_archive'],
+    name: 'Комплект «Финансовый магнит»', icon: '🧲', tier: 3,
+    desc: 'Итоговые характеристики: +13% к фиткоинам с дискет, +29% к радиусу сбора и +16% к опыту.',
+    apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.05; p.magnetMult += 0.04; p.xpMult += 0.04; }
+  },
+  health_firewall: {
+    parts: ['shop_health_reserve', 'shop_bulkhead', 'shop_oxygen_canister'],
+    name: 'Комплект «Медицинский файрвол»', icon: '🏥', tier: 3,
+    desc: 'Итоговые характеристики: +45 к максимальному здоровью, +1,5 HP регенерации в секунду и +12% защиты от боссов.',
+    apply: p => { p.maxHp += 15; p.hp = Math.min(p.maxHp, p.hp + 15); p.regen += 0.5; p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.04); }
   }
 };
 
@@ -3444,7 +3476,7 @@ class Game {
     this.transactionHistoryLastSample = -1;
     this.dynUpdateCd = 0;
     this.currency = 0;
-    this.shopPriceMultiplier = 1;
+    this.shopPriceMultiplier = 1.18;
     this.salesCallCount = 0;
     this.fitcoinTheftCooldown = 0;
     this.shopPassives = Array(6).fill(null);
@@ -5513,7 +5545,7 @@ class Game {
     if (this.salesCallActive) return;
     this.salesCallActive = true;
     this.salesCallCount = (this.salesCallCount || 0) + 1;
-    this.shopPriceMultiplier = (this.shopPriceMultiplier || 1) * 1.05;
+    this.shopPriceMultiplier = (this.shopPriceMultiplier || 1.18) * 1.0814;
     this.salesCallX = 12;
     this.salesCallY = 12;
     this.salesCallVX = 48;
@@ -5526,7 +5558,7 @@ class Game {
     card.style.top = `${this.salesCallY}px`;
     this.log('Mango Talker: звонит отдел продаж. «У нас для вас платные интеграции и всего пара уточняющих вопросов».' );
     this.salesCallFrame = requestAnimationFrame((t) => this.animateSalesCall(t));
-    this.log(`Новый звонок отдела продаж: цены магазина повышены на 5% (звонков: ${this.salesCallCount}).`);
+    this.log(`Новый звонок отдела продаж: цены магазина повышены на 8,14% (звонков: ${this.salesCallCount}).`);
   }
 
   animateSalesCall(timestamp) {
@@ -5988,7 +6020,7 @@ class Game {
     if (seen.has(key)) return 0;
     const item = this.getShopCatalogItem(key);
     if (!item) return 0;
-    if (!item.parts) return Math.ceil(Math.max(0, Number(item.cost) || 0) * (this.shopPriceMultiplier || 1));
+    if (!item.parts) return Math.ceil(Math.max(0, Number(item.cost) || 0) * (this.shopPriceMultiplier || 1.18));
     const nextSeen = new Set(seen).add(key);
     return item.parts.reduce((sum, part) => sum + this.getShopItemTotalCost(part, nextSeen), 0);
   }
@@ -6558,7 +6590,7 @@ class Game {
     const catalog = document.getElementById('shop-catalog');
     if (!catalog) return;
     catalog.replaceChildren();
-    document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов · наценка +${(((this.shopPriceMultiplier || 1) - 1) * 100).toFixed(1)}%`;
+    document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов · наценка +${(((this.shopPriceMultiplier || 1.18) - 1) * 100).toFixed(1)}%`;
     const search = this.shopSearch;
     let items;
     if (this.shopView === 'sell') {
@@ -9343,7 +9375,7 @@ class Game {
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
-        this.currency += Math.max(0, Math.round(g.xp * 0.5 * (this.player.currencyMult || 1)));
+        this.currency += Math.max(0, Math.round(g.xp * 0.5 * 0.9686 * (this.player.currencyMult || 1)));
         document.getElementById('currency-display').innerText = this.currency;
         this.gems.splice(i, 1);
         if (this.paused) break;

@@ -677,6 +677,43 @@
     .dota-shop-item { min-height:54px; }
     .dota-shop-item-icon { width:26px; height:26px; }
   }
+  @media (max-width: 760px) and (pointer: coarse) {
+    #modal-shop { align-items:flex-start; justify-content:center; padding:0; overflow:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    #modal-shop .dota-shop {
+      width:100%; max-width:none; height:auto; min-height:100%; max-height:none; margin:0;
+      border:0; border-radius:0; overflow:visible; box-shadow:none;
+    }
+    #modal-shop .win-1c-head { position:sticky; top:0; z-index:5; min-height:42px; padding:7px 10px; flex-wrap:nowrap; }
+    #modal-shop .dota-shop-body { display:flex; flex:0 0 auto; min-height:0; gap:7px; padding:8px; overflow:visible; }
+    .dota-shop-toolbar { display:flex; flex-direction:column; align-items:stretch; gap:6px; }
+    .dota-shop-categories { display:flex; flex-wrap:nowrap; gap:5px; max-width:100%; overflow-x:auto; overflow-y:hidden; padding-bottom:3px; scrollbar-width:thin; -webkit-overflow-scrolling:touch; }
+    .dota-shop-categories .shop-tab { flex:0 0 auto; min-height:36px; padding:7px 10px; font-size:11px; white-space:nowrap; touch-action:pan-x; }
+    .dota-shop-search { width:100%; min-height:38px; font-size:16px; }
+    .dota-shop-main { display:flex; flex-direction:column; flex:0 0 auto; min-height:0; gap:7px; }
+    .dota-shop-catalog { height:clamp(150px, 30dvh, 240px); flex:0 0 auto; }
+    .dota-shop-items { flex:1 1 auto; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:6px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    .dota-shop-item-card { min-height:68px; }
+    .dota-shop-item { min-height:68px; padding:6px 27px 6px 6px; grid-template-columns:32px minmax(0,1fr); gap:4px 6px; }
+    .dota-shop-item-icon { width:32px; height:32px; font-size:21px; }
+    .dota-shop-item-name { font-size:11px; }
+    .dota-shop-item-price { font-size:10px; }
+    .shop-favorite-toggle { width:28px; height:28px; font-size:19px; line-height:25px; }
+    .dota-shop-details { display:flex; flex:0 0 auto; min-height:0; }
+    .dota-shop-selected { min-height:58px; }
+    .dota-shop-selected h3 { font-size:14px; }
+    .dota-shop-selected p { font-size:11px; }
+    .dota-shop-build { flex:0 0 auto; max-height:150px; min-height:0; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    .dota-shop-detail-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .dota-shop-detail-actions .btn-1c { min-height:40px; font-size:11px; }
+    .dota-shop-bottom { display:block; min-height:0; }
+    .dota-shop-inventory-panel { min-height:0; padding:8px; }
+    .dota-shop-inventory { gap:6px; }
+    .dota-shop-inventory-slot { width:44px; height:44px; flex:0 0 44px; font-size:24px; touch-action:manipulation; }
+    .dota-shop-inventory-slot.backpack-slot { width:38px; height:38px; flex-basis:38px; }
+    .dota-shop-footer { position:sticky; bottom:0; z-index:4; flex-wrap:wrap; padding:7px; margin:0 -8px -8px; background:#18212d; border-top:1px solid #3a4c5e; }
+    .dota-shop-footer #shop-message { flex:1 1 150px; }
+    .dota-shop-footer #shop-close-button { flex:1 1 100%; min-height:42px; }
+  }
   #sales-call {
     position: absolute; display: none; left: 8px; top: 8px;
     width: min(300px, calc(100% - 16px)); z-index: 40;

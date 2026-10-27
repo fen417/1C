@@ -517,6 +517,15 @@
   #modal-gameover { z-index: 160; }
   #modal-gameover .win-1c-body > div:last-child { flex-wrap: wrap; gap: 8px; }
   #modal-gameover .win-1c-body > div:last-child > .btn-1c { flex: 1 1 180px; min-width: 0; }
+  #modal-rudesktop-rescue { z-index: 170; }
+  #modal-rudesktop-rescue .win-1c { width:min(440px,94vw); }
+  .rude-skill-ring { position:relative; width:min(190px,55vw); aspect-ratio:1; margin:12px auto; overflow:hidden; border:2px solid #243447; border-radius:50%; background:conic-gradient(from var(--zone-start), #55efc4 0deg var(--zone-size), #354457 var(--zone-size) 360deg); touch-action:manipulation; }
+  .rude-skill-ring::before { content:''; position:absolute; inset:17px; z-index:1; border:1px solid #607084; border-radius:50%; background:#18232e; }
+  .rude-skill-needle { position:absolute; inset:0; z-index:2; transform:rotate(var(--needle-angle,0deg)); }
+  .rude-skill-needle::before { content:''; position:absolute; left:calc(50% - 2px); top:8px; width:4px; height:calc(50% - 9px); border-radius:4px; background:#ff5d5d; box-shadow:0 0 7px #ff5d5d; }
+  .rude-skill-needle::after { content:''; position:absolute; left:calc(50% - 6px); top:calc(50% - 6px); width:12px; height:12px; border-radius:50%; background:#ffd200; border:2px solid #fff; }
+  #rudesktop-skill-ring:focus-visible { outline:3px solid #ffd200; outline-offset:3px; }
+  @media (max-width:500px) and (pointer:coarse) { #modal-rudesktop-rescue .win-1c { max-height:calc(100% - 18px); overflow-y:auto; } }
   #modal-lb { z-index: 250; }
   #modal-shop { z-index: 180; }
   #modal-shop .win-1c { width: min(790px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
@@ -1288,6 +1297,30 @@
         <div style="display:flex; justify-content:space-around;">
           <button class="btn-1c" id="gameover-primary-button" onclick="game.restartFromGameOver()">🔄 Сделать ТиИ и начать заново</button>
           <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Посмотреть таблицу</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal-rudesktop-rescue" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="rudesktop-rescue-title">
+    <div class="win-1c" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span>🖥️ Сброс кэша через AppData</span></div>
+      <div class="win-1c-body" style="text-align:center;">
+        <div id="rudesktop-rescue-prompt">
+          <h2 id="rudesktop-rescue-title" style="color:#900;margin-bottom:10px;">Попробовать сбросить кэш через AppData? (шанс 50%)</h2>
+          <p style="margin-bottom:14px;">RuDesktop уже завершает сеанс. Можно попытаться сбросить кэш, но процесс может сорваться.</p>
+          <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+            <button class="btn-1c" style="background:#55efc4;" onclick="game.attemptRudesktopCacheReset()">🧹 Попробовать</button>
+            <button class="btn-1c" onclick="game.acceptRudesktopDeath()">Принять поражение</button>
+          </div>
+        </div>
+        <div id="rudesktop-skill-check" style="display:none;">
+          <h2 style="color:#900;margin-bottom:6px;">СБРОС КЭША · ПРОВЕРКА</h2>
+          <p id="rudesktop-skill-status" style="margin:0 0 6px;">Нажмите пробел или коснитесь круга, когда стрелка в зелёной зоне.</p>
+          <b id="rudesktop-skill-stage">Проверка 1 из 5</b>
+          <div id="rudesktop-skill-ring" class="rude-skill-ring" role="button" tabindex="0" aria-label="Тайминг-проверка: нажмите, когда стрелка в зелёной зоне" onclick="game.performRudesktopSkillCheck()">
+            <span class="rude-skill-needle"></span>
+          </div>
+          <div id="rudesktop-skill-time" style="font-size:11px;color:#666;">Время не ограничено — дождитесь зелёной зоны.</div>
         </div>
       </div>
     </div>
@@ -2860,6 +2893,13 @@ class Game {
         this.setKeyBinding(this.remappingAction, e.code);
         return;
       }
+      if (this.rudesktopRescueState) {
+        if (this.rudesktopRescueState.phase === 'skill' && e.code === 'Space' && !e.repeat) {
+          e.preventDefault();
+          this.performRudesktopSkillCheck();
+        }
+        return;
+      }
       if (e.code === 'F9' && this.isBattleRoyale && this.pvp?.started) {
         e.preventDefault();
         this.toggleBattleRoyalePause();
@@ -3218,6 +3258,10 @@ class Game {
   }
 
   start(options = {}) {
+    if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
+    this.rudesktopSkillFrame = null;
+    this.rudesktopRescueState = null;
+    this.rudesktopRescueGraceUntil = 0;
     this.isBattleRoyale = this.pvp?.mode === 'battle_royale';
     this.isPvpMassUpgradeMode = () => Boolean(this.pvp?.started && this.pvp.mode === 'pvp' && Number(this.pvp.actualPlayerCount) > 3);
     const classicPvpExtraPlayers = this.pvp?.started && this.pvp.mode === 'pvp'
@@ -3262,6 +3306,7 @@ class Game {
     document.getElementById('modal-changelog').style.display = 'none';
     document.getElementById('modal-shop').style.display = 'none';
     document.getElementById('modal-gameover').style.display = 'none';
+    document.getElementById('modal-rudesktop-rescue').style.display = 'none';
     document.getElementById('modal-pause').style.display = 'none';
     this.setMobileMenuScroll(false);
     document.getElementById('modal-lvlup').style.display = 'none';
@@ -3409,6 +3454,9 @@ class Game {
     this.salesCallVY = 31;
     this.salesCallLastFrame = 0;
     this.salesCallFrame = null;
+    this.rudesktopRescueState = null;
+    this.rudesktopSkillFrame = null;
+    this.rudesktopRescueGraceUntil = 0;
 
     this.updateHUD();
     this.updateInventoryHUD();
@@ -3430,11 +3478,14 @@ class Game {
   }
 
   showMainMenu() {
+    if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
+    this.rudesktopSkillFrame = null;
+    this.rudesktopRescueState = null;
     this.closeSalesCall();
     this.clearChallenge();
     this.paused = true;
     this.keys = {};
-    for (const id of ['modal-pause', 'modal-lvlup', 'modal-gameover', 'modal-settings', 'modal-changelog', 'modal-shop']) {
+    for (const id of ['modal-pause', 'modal-lvlup', 'modal-gameover', 'modal-rudesktop-rescue', 'modal-settings', 'modal-changelog', 'modal-shop']) {
       document.getElementById(id).style.display = 'none';
     }
     document.getElementById('modal-main-menu').style.display = 'flex';
@@ -9027,9 +9078,14 @@ class Game {
           this.addPopup(this.player.x, this.player.y - 34, `🦝 УКРАДЕНО ${stolen} ФИТКОИНОВ`, '#f39c12');
           this.updateHUD();
         }
+        if (e.is24hPursuer && !target.isRemote && this.time < this.rudesktopRescueGraceUntil) continue;
         if (e.is24hPursuer && target.isRemote) {
           this.damageRemotePlayerFromEnemy((this.pvp.remoteState?.hp || 100) + 1, enemyAttackSource);
         } else if (e.is24hPursuer) {
+          if (!this.pvp?.started) {
+            this.beginRudesktopRescue(e);
+            return;
+          }
           this.recordPlayerDamage((this.player.hp || 0) + 1, enemyAttackSource);
           this.gameOver(`Сессия завершена: вас догнал ${e.name}.`);
           return;
@@ -9490,7 +9546,117 @@ class Game {
     this.log(`Успешно внедрена доработка: ${ch.def.name}`);
   }
 
+  beginRudesktopRescue(enemy) {
+    if (this.rudesktopRescueState || !this.player || this.player.hp <= 0) return;
+    this.rudesktopRescueState = { phase: 'prompt', enemy, reason: `Сессия завершена: вас догнал ${enemy?.name || 'RuDesktop'}.` };
+    this.paused = true;
+    this.keys = {};
+    document.getElementById('rudesktop-rescue-prompt').style.display = 'block';
+    document.getElementById('rudesktop-skill-check').style.display = 'none';
+    document.getElementById('modal-rudesktop-rescue').style.display = 'flex';
+  }
+
+  attemptRudesktopCacheReset() {
+    if (this.rudesktopRescueState?.phase !== 'prompt') return;
+    if (Math.random() >= 0.5) {
+      this.log('Сброс кэша через AppData не удался. RuDesktop завершил сеанс.');
+      this.finishRudesktopRescue(false);
+      return;
+    }
+    this.rudesktopRescueState.phase = 'skill';
+    this.rudesktopRescueState.stage = 1;
+    this.rudesktopRescueState.zoneSize = 72;
+    this.startRudesktopSkillCheck();
+    document.getElementById('rudesktop-rescue-prompt').style.display = 'none';
+    document.getElementById('rudesktop-skill-check').style.display = 'block';
+  }
+
+  startRudesktopSkillCheck() {
+    const state = this.rudesktopRescueState;
+    if (!state || state.phase !== 'skill') return;
+    if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
+    this.rudesktopSkillFrame = null;
+    state.zoneStart = Math.random() * 360;
+    state.startedAt = performance.now();
+    document.getElementById('rudesktop-skill-stage').textContent = `Проверка ${state.stage} из 5`;
+    document.getElementById('rudesktop-skill-status').textContent = 'Нажмите пробел или коснитесь круга, когда стрелка в зелёной зоне.';
+    document.getElementById('rudesktop-skill-time').textContent = 'Время не ограничено — дождитесь зелёной зоны.';
+    const ring = document.getElementById('rudesktop-skill-ring');
+    ring.style.setProperty('--zone-start', `${state.zoneStart}deg`);
+    ring.style.setProperty('--zone-size', `${state.zoneSize}deg`);
+    this.animateRudesktopSkillCheck();
+  }
+
+  animateRudesktopSkillCheck() {
+    const state = this.rudesktopRescueState;
+    if (!state || state.phase !== 'skill') return;
+    const now = performance.now();
+    const angle = ((now - state.startedAt) * 0.24) % 360;
+    const ring = document.getElementById('rudesktop-skill-ring');
+    const needle = ring?.querySelector('.rude-skill-needle');
+    if (needle) needle.style.setProperty('--needle-angle', `${angle}deg`);
+    this.rudesktopSkillFrame = requestAnimationFrame(() => this.animateRudesktopSkillCheck());
+  }
+
+  performRudesktopSkillCheck() {
+    const state = this.rudesktopRescueState;
+    if (!state || state.phase !== 'skill') return;
+    const now = performance.now();
+    const needleAngle = ((now - state.startedAt) * 0.24) % 360;
+    const zoneCenter = (state.zoneStart + state.zoneSize / 2) % 360;
+    const rawDiff = Math.abs(needleAngle - zoneCenter);
+    const difference = Math.min(rawDiff, 360 - rawDiff);
+    if (difference > state.zoneSize / 2) {
+      this.finishRudesktopRescue(false);
+      return;
+    }
+    state.stage++;
+    if (state.stage > 5) {
+      this.finishRudesktopRescue(true);
+      return;
+    }
+    state.zoneSize = Math.max(48, state.zoneSize - 6);
+    this.startRudesktopSkillCheck();
+  }
+
+  acceptRudesktopDeath() {
+    if (!this.rudesktopRescueState) return;
+    this.finishRudesktopRescue(false);
+  }
+
+  finishRudesktopRescue(survived) {
+    const state = this.rudesktopRescueState;
+    if (!state) return;
+    if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
+    this.rudesktopSkillFrame = null;
+    this.rudesktopRescueState = null;
+    document.getElementById('modal-rudesktop-rescue').style.display = 'none';
+    if (!survived) {
+      const hpBefore = Math.max(0, Number(this.player?.hp) || 0);
+      if (this.player) this.player.hp = 0;
+      this.lastPlayerDamage = { source: state.enemy?.name || 'RuDesktop: 24ч ЛИМИТ', damage: hpBefore + 1, applied: hpBefore };
+      this.gameOver(state.reason);
+      return;
+    }
+    const enemy = state.enemy;
+    if (enemy && this.player) {
+      const angle = Math.random() * Math.PI * 2;
+      enemy.x = Math.max(this.BOUND_MIN + 60, Math.min(this.BOUND_MAX - 60, this.player.x + Math.cos(angle) * 620));
+      enemy.y = Math.max(this.BOUND_MIN + 60, Math.min(this.BOUND_MAX - 60, this.player.y + Math.sin(angle) * 620));
+    }
+    this.rudesktopRescueGraceUntil = this.time + 6;
+    this.paused = false;
+    this.lastTime = performance.now();
+    this.log('Сброс кэша через AppData выполнен. Пять проверок пройдены — RuDesktop временно отступил.');
+    this.addPopup(this.player.x, this.player.y - 32, 'КЭШ СБРОШЕН · СЕАНС СПАСЁН', '#55efc4');
+    this.updateHUD();
+  }
+
   gameOver(reason, { victory = false } = {}) {
+    if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
+    this.rudesktopSkillFrame = null;
+    this.rudesktopRescueState = null;
+    document.getElementById('modal-rudesktop-rescue').style.display = 'none';
     const battleRoyaleElimination = Boolean(this.isBattleRoyale && this.pvp?.started && this.player?.hp <= 0);
     if (battleRoyaleElimination && this.pvp.eliminated) return;
     this.closeSalesCall();

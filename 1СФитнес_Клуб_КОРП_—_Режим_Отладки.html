@@ -3859,7 +3859,7 @@ class Game {
     document.getElementById('pvp-copy-room-code').style.display = this.pvp?.host ? 'block' : 'none';
     const modeSelect = document.getElementById('pvp-mode-select');
     modeSelect.value = this.pvp?.mode || this.pvpMode;
-    modeSelect.disabled = Boolean(this.pvp);
+    modeSelect.disabled = Boolean(this.pvp && (!this.pvp.host || this.pvp.started || this.pvp.modeUpdateInProgress));
     const nicknameInput = document.getElementById('pvp-player-nickname');
     nicknameInput.value = this.savedNick;
     nicknameInput.disabled = true;
@@ -3986,11 +3986,63 @@ class Game {
     }
   }
 
-  setPvpMode(mode) {
-    if (this.pvp) return;
-    this.pvpMode = ['pve', 'battle_royale'].includes(mode) ? mode : 'pvp';
-    localStorage.setItem('1c_pvp_mode', this.pvpMode);
-    document.getElementById('pvp-mode-select').value = this.pvpMode;
+  async setPvpMode(mode) {
+    const nextMode = ['pve', 'battle_royale'].includes(mode) ? mode : 'pvp';
+    const pvp = this.pvp;
+    const modeSelect = document.getElementById('pvp-mode-select');
+    if (pvp && (!pvp.host || pvp.started)) {
+      modeSelect.value = pvp.mode || this.pvpMode;
+      return;
+    }
+    const previousMode = pvp?.mode || this.pvpMode;
+    if (nextMode === previousMode) return;
+    if (!pvp) {
+      this.pvpMode = nextMode;
+      localStorage.setItem('1c_pvp_mode', nextMode);
+      modeSelect.value = nextMode;
+      return;
+    }
+    pvp.modeUpdateInProgress = true;
+    modeSelect.disabled = true;
+    let fb = null;
+    let roomModeWasWritten = false;
+    try {
+      fb = await window.firebaseLeaderboardReady;
+      await fb.set(fb.ref(fb.db, `pvpRooms/${pvp.code}/mode`), nextMode);
+      roomModeWasWritten = true;
+      pvp.mode = nextMode;
+      pvp.roomCache = { ...(pvp.roomCache || {}), mode: nextMode };
+      const players = Object.values(pvp.roomCache.players || {});
+      const directoryEntry = {
+        hostUid: pvp.uid,
+        hostName: String(pvp.name || 'Хост').slice(0, 20),
+        status: pvp.roomCache.status === 'playing' ? 'playing' : 'waiting',
+        mode: nextMode,
+        playerCount: Math.min(Number(pvp.roomCache.maxPlayers) || 8, players.filter(player => player?.online !== false).length),
+        maxPlayers: Number(pvp.roomCache.maxPlayers) || 8,
+        createdAt: Number(pvp.roomCache.createdAt) || Date.now()
+      };
+      await fb.set(fb.ref(fb.db, `pvpRoomDirectory/${pvp.code}`), directoryEntry);
+      pvp.directorySummary = JSON.stringify(directoryEntry);
+      this.pvpMode = nextMode;
+      localStorage.setItem('1c_pvp_mode', nextMode);
+      modeSelect.value = nextMode;
+      pvp.modeUpdateInProgress = false;
+      modeSelect.disabled = false;
+      this.pvpStatus(`Режим комнаты изменён: ${modeSelect.options[modeSelect.selectedIndex]?.text || nextMode}.`);
+    } catch (error) {
+      pvp.mode = previousMode;
+      pvp.roomCache = { ...(pvp.roomCache || {}), mode: previousMode };
+      this.pvpMode = previousMode;
+      localStorage.setItem('1c_pvp_mode', previousMode);
+      modeSelect.value = previousMode;
+      pvp.modeUpdateInProgress = false;
+      if (roomModeWasWritten && fb) {
+        await fb.set(fb.ref(fb.db, `pvpRooms/${pvp.code}/mode`), previousMode).catch(() => {});
+      }
+      modeSelect.disabled = !pvp.host || pvp.started;
+      this.pvpStatus(`Не удалось обновить режим комнаты. Проверьте RTDB Rules для pvpRooms/$code/mode: ${error.message || 'нет доступа'}`, true);
+    }
   }
 
   updateClassSelectionUI() {
@@ -4543,6 +4595,9 @@ class Game {
         matchOver: false, opponentLost: false, mode: room.mode, classId: this.selectedClassId, roomCache: room,
         threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
       this.pvpMode = room.mode; localStorage.setItem('1c_pvp_mode', this.pvpMode);
+      const modeSelect = document.getElementById('pvp-mode-select');
+      modeSelect.value = room.mode;
+      modeSelect.disabled = true;
       await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
       this.logPvpDiagnostic(this.pvp, 'WebRTC', 'подключение к Firebase-комнате', { mode: this.pvp.mode, slot });
       this.attachPvpRoom();
@@ -5407,6 +5462,16 @@ class Game {
         this.waitForPvpOpponent(pvp, 'Комната соперника временно недоступна.');
       }
       return;
+    }
+    if (['pvp', 'pve', 'battle_royale'].includes(room.mode)) {
+      pvp.mode = room.mode;
+      this.pvpMode = room.mode;
+      localStorage.setItem('1c_pvp_mode', room.mode);
+      const modeSelect = document.getElementById('pvp-mode-select');
+      if (modeSelect) {
+        modeSelect.value = room.mode;
+        modeSelect.disabled = !pvp.host || pvp.started || pvp.modeUpdateInProgress;
+      }
     }
     this.syncPvpRoomDirectory(room);
     const players = Object.values(room.players || {});

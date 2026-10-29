@@ -9744,6 +9744,17 @@ class Game {
         continue;
       }
       if (e.hp <= 0) {
+        let guestGotKillCredit = false;
+        if (this.pvp?.started && this.pvp.host && e.syncId && !this.pvp.opponentLost) {
+          const guestDamage = Number(this.pvp.processedEnemyDamage?.[e.syncId] || 0);
+          const hostDamage = Number(this.pvp.hostDamageTotals?.[e.syncId] || 0);
+          if (guestDamage > hostDamage) {
+            this.pvp.guestKillCount = (this.pvp.guestKillCount || 0) + 1;
+            guestGotKillCredit = true;
+          } else {
+            this.pvp.hostKillCount = (this.pvp.hostKillCount || 0) + 1;
+          }
+        }
         if (e.isBoss && !guestGotKillCredit && this.firebaseUser) {
           this.achievementProgress.bossesKilled = (Number(this.achievementProgress.bossesKilled) || 0) + 1;
           this.checkAchievementUnlocks();
@@ -9757,17 +9768,6 @@ class Game {
           this.enemyProjectiles = [];
           if (!this.legendaryOffered && !this.pvp?.started) this.offerLegendaryMigrations(false);
           else if (!this.legendaryOffered && this.pvp?.host) this.offerLegendaryMigrations(true);
-        }
-        let guestGotKillCredit = false;
-        if (this.pvp?.started && this.pvp.host && e.syncId && !this.pvp.opponentLost) {
-          const guestDamage = Number(this.pvp.processedEnemyDamage?.[e.syncId] || 0);
-          const hostDamage = Number(this.pvp.hostDamageTotals?.[e.syncId] || 0);
-          if (guestDamage > hostDamage) {
-            this.pvp.guestKillCount = (this.pvp.guestKillCount || 0) + 1;
-            guestGotKillCredit = true;
-          } else {
-            this.pvp.hostKillCount = (this.pvp.hostKillCount || 0) + 1;
-          }
         }
         if (!guestGotKillCredit) {
           this.kills++;

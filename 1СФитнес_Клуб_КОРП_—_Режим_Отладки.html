@@ -11391,10 +11391,14 @@ class Game {
     passiveBox.innerHTML = '';
     backpackBox.innerHTML = '';
     consumableBox.innerHTML = '';
+    passiveBox.style.display = (this.shopPassives || []).some(Boolean) ? '' : 'none';
+    backpackBox.style.display = (this.backpack || []).some(Boolean) ? '' : 'none';
+    consumableBox.style.display = (this.consumables || []).some(Boolean) ? '' : 'none';
     for (const key in this.weapons) box.innerHTML += `<div class="inv-slot">${WEAPONS_DEF[key].icon}<span class="inv-lvl">${this.weapons[key].lvl}</span></div>`;
     for (const key in this.passives) box.innerHTML += `<div class="inv-slot" style="border-color:#55efc4;">${PASSIVES_DEF[key].icon}<span class="inv-lvl">${this.passives[key].lvl}</span></div>`;
     for (let i = 0; i < 6; i++) {
       const slot = (this.shopPassives || [])[i];
+      if (!slot) continue;
       const item = slot ? this.getShopCatalogItem(slot.key) : null;
       const consumable = this.isConsumableSlot(slot);
       const usable = Boolean(slot && (consumable || item?.type === 'active'));
@@ -11417,6 +11421,7 @@ class Game {
     }
     for (let i = 0; i < 3; i++) {
       const slot = this.backpack?.[i];
+      if (!slot) continue;
       const item = slot ? this.getShopCatalogItem(slot.key) : null;
       const entry = document.createElement('div');
       entry.className = `inv-slot backpack-slot${slot ? '' : ' empty'}`;
@@ -11427,6 +11432,7 @@ class Game {
     }
     for (let i = 0; i < 4; i++) {
       const slot = this.consumables?.[i];
+      if (!slot) continue;
       const item = slot ? CONSUMABLES_DEF[slot.key] : null;
       const keyLabel = this.keyCodeLabel(this.keyBindings[`consumable${i + 1}`]);
       const entry = document.createElement(slot ? 'button' : 'div');

@@ -606,6 +606,16 @@
   #modal-changelog .win-1c { width: min(760px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-main-menu { z-index: 300; }
   #modal-pvp { z-index: 320; }
+  #modal-pvp .win-1c { width:min(720px,96vw) !important; max-height:calc(100% - 20px); overflow-y:auto; }
+  .pvp-room-browser { margin:0 0 12px; padding:9px; border:1px solid #bbb; background:#f8f9fa; }
+  .pvp-room-browser-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; color:#333; font-size:12px; }
+  .pvp-room-browser-head button { padding:3px 8px; }
+  #pvp-room-directory { display:grid; gap:5px; max-height:210px; overflow-y:auto; }
+  .pvp-room-entry { width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px; padding:7px 9px; border:1px solid #9ba9b5; background:#fff; color:#222; text-align:left; cursor:pointer; }
+  .pvp-room-entry:hover:not(:disabled) { border-color:#238b73; background:#e9fff8; }
+  .pvp-room-entry:disabled { color:#777; background:#eceff1; cursor:not-allowed; }
+  .pvp-room-entry small { display:block; margin-top:2px; color:#66717a; font-size:10px; }
+  .pvp-room-entry-status { flex:none; text-align:right; font-size:10px; font-weight:bold; }
   #modal-class-select { z-index: 350; padding: 12px; }
   #modal-class-select .win-1c { width: min(860px, 96vw); max-height: calc(100% - 24px); overflow-y: auto; }
   .class-select-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
@@ -1178,11 +1188,12 @@
     <div class="win-1c" style="width:min(460px,94vw);">
       <div class="win-1c-head"><span>🌐 Сетевая игра</span><button class="win-close-btn" onclick="game.closePvpMenu()" aria-label="Закрыть">✕</button></div>
       <div class="win-1c-body">
-        <p style="font-size:12px; margin-bottom:12px;">Создайте комнату и передайте код сопернику или введите код комнаты.</p>
+        <p style="font-size:12px; margin-bottom:12px;">Выберите открытую комнату или создайте свою. Подключение по коду тоже доступно.</p>
         <label id="pvp-mode-label" style="display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff; border:1px solid #ccc; padding:9px; margin-bottom:12px; font-size:12px;"><b>Режим</b><select id="pvp-mode-select" class="input-1c" style="width:190px;" onchange="game.setPvpMode(this.value)"><option value="pvp">PvP · командный хаос</option><option value="pve">PvE · вместе против мобов</option><option value="battle_royale">Battle Royale · каждый сам за себя</option></select></label>
         <label style="display:block; margin-bottom:12px; font-size:12px;">Ваш ник в сети
           <input id="pvp-player-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="width:100%; margin-top:5px;" placeholder="Архитектор_1С">
         </label>
+        <div class="pvp-room-browser"><div class="pvp-room-browser-head"><b>Открытые комнаты</b><button class="btn-1c" type="button" onclick="game.refreshPvpRooms()">↻ Обновить</button></div><div id="pvp-room-directory" aria-live="polite"><div style="font-size:11px;color:#66717a;">Загружаем комнаты…</div></div></div>
         <button class="btn-1c" style="width:100%; background:#55efc4; margin-bottom:12px;" onclick="game.createPvpRoom()">＋ Создать комнату</button>
         <div style="display:flex; gap:8px;">
           <input id="pvp-room-code" class="input-1c" maxlength="4" placeholder="КОД" autocomplete="off" style="text-transform:uppercase; letter-spacing:4px; text-align:center; width:120px;">
@@ -3362,6 +3373,8 @@ class Game {
       this.favoriteShopItems = new Set(Array.isArray(savedFavorites) ? savedFavorites.filter(key => typeof key === 'string') : []);
     } catch (_) { this.favoriteShopItems = new Set(); }
     this.pvpMode = ['pvp', 'pve', 'battle_royale'].includes(localStorage.getItem('1c_pvp_mode')) ? localStorage.getItem('1c_pvp_mode') : 'pvp';
+    this.pvpDirectoryUnsub = null;
+    this.pvpDirectoryLoadToken = 0;
     const savedClass = localStorage.getItem('1c_player_class');
     this.selectedClassId = PLAYER_CLASSES[savedClass] ? savedClass : 'technician';
     this.collapseAcceptedTickets = localStorage.getItem('1c_collapse_accepted_tickets') !== 'false';
@@ -3805,6 +3818,7 @@ class Game {
   }
 
   showMainMenu() {
+    this.unsubscribePvpRoomDirectory();
     if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
     this.rudesktopSkillFrame = null;
     this.rudesktopRescueState = null;
@@ -3840,6 +3854,7 @@ class Game {
   showPvpMenu() {
     document.getElementById('modal-main-menu').style.display = 'none';
     document.getElementById('modal-pvp').style.display = 'flex';
+    this.subscribePvpRoomDirectory();
     document.getElementById('pvp-leave-button').style.display = this.pvp ? 'block' : 'none';
     document.getElementById('pvp-copy-room-code').style.display = this.pvp?.host ? 'block' : 'none';
     const modeSelect = document.getElementById('pvp-mode-select');
@@ -3854,8 +3869,93 @@ class Game {
   }
 
   closePvpMenu() {
+    this.unsubscribePvpRoomDirectory();
     document.getElementById('modal-pvp').style.display = 'none';
     document.getElementById('modal-main-menu').style.display = 'flex';
+  }
+
+  unsubscribePvpRoomDirectory() {
+    this.pvpDirectoryLoadToken++;
+    this.pvpDirectoryUnsub?.();
+    this.pvpDirectoryUnsub = null;
+  }
+
+  async subscribePvpRoomDirectory() {
+    const token = ++this.pvpDirectoryLoadToken;
+    this.pvpDirectoryUnsub?.();
+    this.pvpDirectoryUnsub = null;
+    const container = document.getElementById('pvp-room-directory');
+    if (container) container.innerHTML = '<div style="font-size:11px;color:#66717a;">Подключаемся к списку комнат…</div>';
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      if (token !== this.pvpDirectoryLoadToken) return;
+      this.pvpDirectoryUnsub = fb.onValue(fb.ref(fb.db, 'pvpRoomDirectory'), snapshot => {
+        if (token === this.pvpDirectoryLoadToken) this.renderPvpRoomDirectory(snapshot.val());
+      }, error => {
+        if (token !== this.pvpDirectoryLoadToken || !container) return;
+        container.innerHTML = `<div style="font-size:11px;color:#a33;">Не удалось загрузить список комнат: ${this.escapeHtml(error.message || 'нет доступа')}</div>`;
+      });
+    } catch (error) {
+      if (token === this.pvpDirectoryLoadToken && container) {
+        container.innerHTML = `<div style="font-size:11px;color:#a33;">Не удалось загрузить список комнат: ${this.escapeHtml(error.message || 'нет соединения')}</div>`;
+      }
+    }
+  }
+
+  refreshPvpRooms() {
+    if (this.pvp?.host) {
+      this.pvp.directorySummary = null;
+      this.syncPvpRoomDirectory(this.pvp.roomCache);
+    }
+    this.subscribePvpRoomDirectory();
+  }
+
+  renderPvpRoomDirectory(directory) {
+    const container = document.getElementById('pvp-room-directory');
+    if (!container) return;
+    const modeNames = { pvp:'PvP · командный хаос', pve:'PvE · вместе против мобов', battle_royale:'Battle Royale' };
+    const rooms = Object.entries(directory || {}).filter(([code, room]) =>
+      /^[0-9]{4}$/.test(code) && room && ['waiting', 'playing'].includes(room.status) && modeNames[room.mode]
+    ).map(([code, room]) => ({
+      code,
+      room,
+      playerCount: Math.max(0, Math.min(8, Number(room.playerCount) || 0)),
+      createdAt: Number(room.createdAt) || 0
+    })).sort((a, b) => Number(a.room.status !== 'waiting') - Number(b.room.status !== 'waiting') || b.createdAt - a.createdAt);
+    if (!rooms.length) {
+      container.innerHTML = '<div style="font-size:11px;color:#66717a;">Открытых комнат пока нет. Создайте свою!</div>';
+      return;
+    }
+    container.innerHTML = rooms.slice(0, 50).map(({ code, room, playerCount }) => {
+      const joinable = room.status === 'waiting' && playerCount < 8;
+      const status = room.status === 'playing' ? 'Матч идёт' : joinable ? 'Ожидает игроков' : 'Комната заполнена';
+      return `<button type="button" class="pvp-room-entry" data-room-code="${code}" ${joinable ? '' : 'disabled'}><span><b>Комната ${code}</b><small>${this.escapeHtml(String(room.hostName || 'Хост'))} · ${modeNames[room.mode]}</small></span><span class="pvp-room-entry-status">${status}<small>${playerCount}/8 игроков</small></span></button>`;
+    }).join('');
+    container.querySelectorAll('[data-room-code]').forEach(button => button.addEventListener('click', () => {
+      const input = document.getElementById('pvp-room-code');
+      input.value = button.dataset.roomCode;
+      this.joinPvpRoom();
+    }));
+  }
+
+  syncPvpRoomDirectory(room) {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.code || !room) return;
+    const players = Object.values(room.players || {});
+    const summary = {
+      hostUid: pvp.uid,
+      hostName: String(pvp.name || 'Хост').slice(0, 20),
+      status: room.status === 'playing' ? 'playing' : 'waiting',
+      mode: ['pvp', 'pve', 'battle_royale'].includes(room.mode) ? room.mode : pvp.mode,
+      playerCount: Math.min(Number(room.maxPlayers) || 8, players.filter(player => player?.online !== false).length),
+      maxPlayers: Number(room.maxPlayers) || 8,
+      createdAt: Number(room.createdAt) || Date.now()
+    };
+    const fingerprint = JSON.stringify(summary);
+    if (pvp.directorySummary === fingerprint) return;
+    pvp.directorySummary = fingerprint;
+    window.firebaseLeaderboardReady.then(fb => fb.set(fb.ref(fb.db, `pvpRoomDirectory/${pvp.code}`), summary))
+      .catch(error => this.logPvpDiagnostic(pvp, 'Комнаты', 'не удалось обновить строку каталога', { message: error.message }));
   }
 
   async copyPvpRoomCode() {
@@ -4365,14 +4465,23 @@ class Game {
       }
       if (!code) throw new Error('Не удалось подобрать свободный код. Попробуйте ещё раз.');
       const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
+      const createdAt = Date.now();
       const state = { x: 2000, y: 2000, hp: classDef.stats.hp, maxHp: classDef.stats.maxHp, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
-      await set(ref(db, `pvpRooms/${code}`), { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt: Date.now(), rtcGeneration: 1, maxPlayers,
+      const roomRef = ref(db, `pvpRooms/${code}`);
+      const directoryRef = ref(db, `pvpRoomDirectory/${code}`);
+      const directoryEntry = { hostUid: uid, hostName: name, status: 'waiting', mode: this.pvpMode, playerCount: 1, maxPlayers, createdAt };
+      let directoryPublishError = null;
+      await set(roomRef, { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt, rtcGeneration: 1, maxPlayers,
         players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state } } });
-      await onDisconnect(ref(db, `pvpRooms/${code}`)).remove();
+      await onDisconnect(roomRef).remove();
+      try {
+        await set(directoryRef, directoryEntry);
+        await onDisconnect(directoryRef).remove();
+      } catch (error) { directoryPublishError = error; }
       this.pvp = { code, host: true, initialRole: 'host', uid, name, started: false,
         maxPlayers, slot: 0, choosing: null, remoteChoosing: null, remoteState: null, remotePlayer: null, opponentUid: null,
         remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0, matchOver: false, opponentLost: false, mode: this.pvpMode,
-        classId: this.selectedClassId, roomCache: { status: 'waiting', hostUid: uid, players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state } } },
+        classId: this.selectedClassId, directorySummary: directoryPublishError ? null : JSON.stringify(directoryEntry), roomCache: { status: 'waiting', hostUid: uid, players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state } } },
         threePeers: {}, remotePlayers: {}, peerConnections: {}, signalingCleanups: [] };
       await onDisconnect(ref(db, `pvpRooms/${code}/players/${uid}`)).update({ online: false });
       this.logPvpDiagnostic(this.pvp, 'WebRTC', 'комната создана через Firebase-сигнализацию', { mode: this.pvpMode, maxPlayers });
@@ -4381,7 +4490,9 @@ class Game {
       document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${code}`;
       document.getElementById('pvp-copy-room-code').style.display = 'block';
       document.getElementById('pvp-leave-button').style.display = 'block';
-      this.pvpStatus('Лобби создано. Подключайте до семи игроков; матч запускает хост вручную.');
+      this.pvpStatus(directoryPublishError
+        ? `Комната создана и доступна по коду ${code}, но не попала в общий список. Добавьте RTDB Rules для pvpRoomDirectory: ${directoryPublishError.message || 'нет доступа'}`
+        : 'Лобби создано. Подключайте до семи игроков; матч запускает хост вручную.', Boolean(directoryPublishError));
       this.updatePvpLobby();
     } catch (err) { this.pvpStatus(`Не удалось создать комнату: ${err.message || 'ошибка сервера'}`, true); }
   }
@@ -5278,6 +5389,7 @@ class Game {
       }
       return;
     }
+    this.syncPvpRoomDirectory(room);
     const players = Object.values(room.players || {});
     const opponents = players.filter(player => player.uid !== pvp.uid);
     const opponent = pvp.host ? opponents[0] : opponents.find(player => player.uid === room.hostUid);
@@ -5347,6 +5459,7 @@ class Game {
         pvp.achievementMatchRecorded = true;
         this.recordAchievementCounter(pvp.mode === 'battle_royale' ? 'brMatches' : 'pvpMatches');
       }
+      this.unsubscribePvpRoomDirectory();
       document.getElementById('modal-pvp').style.display = 'none';
       this.start();
       this.startPvpSync();
@@ -6009,7 +6122,10 @@ class Game {
       for (const peer of Object.values(pvp.peerConnections || {})) peer.pc?.close();
       pvp.rtc?.pc?.close();
       const fb = await window.firebaseLeaderboardReady;
-      if (pvp.host) await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`));
+      if (pvp.host) await Promise.allSettled([
+        fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`)),
+        fb.remove(fb.ref(fb.db, `pvpRoomDirectory/${pvp.code}`))
+      ]);
       else {
         await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}/players/${pvp.uid}`));
       }
@@ -10789,7 +10905,12 @@ class Game {
     pvp.roomCleanupStarted = true;
     try {
       const fb = await window.firebaseLeaderboardReady;
-      await fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`));
+      const [roomRemoval, directoryRemoval] = await Promise.allSettled([
+        fb.remove(fb.ref(fb.db, `pvpRooms/${pvp.code}`)),
+        fb.remove(fb.ref(fb.db, `pvpRoomDirectory/${pvp.code}`))
+      ]);
+      if (roomRemoval.status === 'rejected') throw roomRemoval.reason;
+      if (directoryRemoval.status === 'rejected') this.logPvpDiagnostic(pvp, 'Комнаты', 'не удалось удалить запись из каталога', { message: directoryRemoval.reason?.message });
     } catch (error) {
       pvp.roomCleanupStarted = false;
       this.logPvpDiagnostic(pvp, 'Комната', 'не удалось удалить завершённую комнату', { message: error.message });

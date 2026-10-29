@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.6.1</title>
+<title>1С:Фитнес Клуб КОРП 2.6.2</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -740,32 +740,32 @@
     .achievement-card { padding:10px; }
     #modal-achievements .win-1c-head { flex-wrap:nowrap; }
   }
-  @media (max-width: 760px) and (pointer: coarse) {
-    #modal-shop { align-items:flex-start; justify-content:center; padding:0; overflow:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  @media (max-width: 1024px) and (pointer: coarse) {
+    #modal-shop { align-items:stretch; justify-content:center; padding:0; overflow:hidden; overscroll-behavior:contain; }
     #modal-shop .dota-shop {
-      width:100%; max-width:none; height:auto; min-height:100%; max-height:none; margin:0;
-      border:0; border-radius:0; overflow:visible; box-shadow:none;
+      width:100%; max-width:none; height:100dvh; min-height:100dvh; max-height:100dvh; margin:0;
+      border:0; border-radius:0; overflow:hidden; box-shadow:none;
     }
     #modal-shop .win-1c-head { position:sticky; top:0; z-index:5; min-height:42px; padding:7px 10px; flex-wrap:nowrap; }
-    #modal-shop .dota-shop-body { display:flex; flex:0 0 auto; min-height:0; gap:7px; padding:8px; overflow:visible; }
+    #modal-shop .dota-shop-body { display:grid; flex:1 1 auto; min-height:0; grid-template-rows:auto minmax(0,1fr) auto auto; gap:7px; padding:8px; overflow:hidden; }
     .dota-shop-toolbar { display:flex; flex-direction:column; align-items:stretch; gap:6px; }
     .dota-shop-categories { display:flex; flex-wrap:nowrap; gap:5px; max-width:100%; overflow-x:auto; overflow-y:hidden; padding-bottom:3px; scrollbar-width:thin; -webkit-overflow-scrolling:touch; }
     .dota-shop-categories .shop-tab { flex:0 0 auto; min-height:36px; padding:7px 10px; font-size:11px; white-space:nowrap; touch-action:pan-x; }
     .dota-shop-search { width:100%; min-height:38px; font-size:16px; }
-    .dota-shop-main { display:flex; flex-direction:column; flex:0 0 auto; min-height:0; gap:7px; }
-    .dota-shop-catalog { height:clamp(150px, 30dvh, 240px); flex:0 0 auto; }
-    .dota-shop-items { flex:1 1 auto; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:6px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    .dota-shop-main { display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1.1fr) minmax(0,.9fr); flex:none; min-height:0; gap:7px; overflow:hidden; }
+    .dota-shop-catalog { height:auto; min-height:0; flex:none; }
+    .dota-shop-items { flex:1 1 auto; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:6px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
     .dota-shop-item-card { min-height:68px; }
     .dota-shop-item { min-height:68px; padding:6px 27px 6px 6px; grid-template-columns:32px minmax(0,1fr); gap:4px 6px; }
     .dota-shop-item-icon { width:32px; height:32px; font-size:21px; }
     .dota-shop-item-name { font-size:11px; }
     .dota-shop-item-price { font-size:10px; }
     .shop-favorite-toggle { width:28px; height:28px; font-size:19px; line-height:25px; }
-    .dota-shop-details { display:flex; flex:0 0 auto; min-height:0; }
+    .dota-shop-details { display:flex; flex:0 0 auto; min-height:0; overflow:hidden; }
     .dota-shop-selected { min-height:58px; }
     .dota-shop-selected h3 { font-size:14px; }
     .dota-shop-selected p { font-size:11px; }
-    .dota-shop-build { flex:0 0 auto; max-height:150px; min-height:0; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    .dota-shop-build { flex:1 1 0; max-height:none; min-height:48px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
     .dota-shop-detail-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .dota-shop-detail-actions .btn-1c { min-height:40px; font-size:11px; }
     .dota-shop-bottom { display:grid; grid-template-columns:max-content max-content max-content; min-height:0; overflow-x:auto; gap:6px; padding-bottom:3px; -webkit-overflow-scrolling:touch; }
@@ -773,7 +773,7 @@
     .dota-shop-inventory { gap:6px; }
     .dota-shop-inventory-slot { width:44px; height:44px; flex:0 0 44px; font-size:24px; touch-action:manipulation; }
     .dota-shop-inventory-slot.backpack-slot { width:38px; height:38px; flex-basis:38px; }
-    .dota-shop-footer { position:sticky; bottom:0; z-index:4; flex-wrap:wrap; padding:7px; margin:0 -8px -8px; background:#18212d; border-top:1px solid #3a4c5e; }
+    .dota-shop-footer { position:relative; z-index:4; flex-wrap:wrap; padding:7px; margin:0 -8px -8px; background:#18212d; border-top:1px solid #3a4c5e; }
     .dota-shop-footer #shop-message { flex:1 1 150px; }
     .dota-shop-footer #shop-close-button { flex:1 1 100%; min-height:42px; }
   }
@@ -962,7 +962,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.6.1 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.6.2 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1137,7 +1137,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.6.1</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.6.2</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1147,12 +1147,12 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.6.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.6.2</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 2.6.0 — «ИИ-слоп на премиум-тарифе»</h3>
-              <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а фиткоины с дискет выпадают реже. Исправлены интерфейсы магазина и достижений, зависание игрового кадра и отображение большого босса на ПК. Добавлены новые комплекты, вход через Google или email с паролем, профиль с изменяемым ником, достижения за забеги, PvP, Battle Royale и спасение от RuDesktop, медали, рейтинг и просмотр наград других игроков.</p>
+              <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а фиткоины с дискет выпадают реже. Добавлены хаотичные тикеты Максима Воронина, дебаффы оружейных улучшений и сильных комплектов. Характеристики теперь показаны понятными процентами; мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
@@ -1277,7 +1277,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры. Добавлены хаотичные тикеты Максима Воронина: отказ или игнор сразу вызывает М.В., три провала принятых тикетов — тоже; задания могут инвертировать или поворачивать управление, усиливать и множить мобов, отключать рывок. Усилены недостатки мощных предметов и комплектов; рикошет, мультивыстрел, замедление и поджог дают боевой бонус с соответствующим штрафом к перезарядке, урону или скорости. Характеристики способностей и снаряжения описаны понятными процентами и величинами. Мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
@@ -1554,7 +1554,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.6.1';
+const GAME_VERSION = '2.6.2';
 const ACHIEVEMENT_MEDALS = ['Бронза', 'Серебро', 'Золото', 'Платина'];
 const ACHIEVEMENT_DEFINITIONS = [
   { id:'survivor', icon:'⏳', title:'Рабочая смена', description:'Продержитесь в одном забеге как можно дольше.', metric:'bestSurvival', targets:[1200,2400,3600,5400], format:v=>`${Math.floor(v/60)} мин` },
@@ -2247,16 +2247,31 @@ const WEAPON_FUSIONS = [
 /* ============================================================
    ПАССИВКИ
    ============================================================ */
+function formatPercent(value) {
+  return Number(Number(value).toFixed(1)).toLocaleString('ru-RU', { maximumFractionDigits: 1 });
+}
+
+function formatCooldownDelta(multiplier, subject = 'Перезарядка') {
+  const delta = Math.abs((Number(multiplier) || 1) - 1) * 100;
+  if (!delta) return `${subject} без изменений`;
+  return `${subject} ${multiplier < 1 ? 'короче' : 'дольше'} на ${formatPercent(delta)}%`;
+}
+
+function formatMultiplierDelta(multiplier, subject) {
+  const delta = Math.abs((Number(multiplier) || 1) - 1) * 100;
+  return `${multiplier < 1 ? '−' : '+'}${formatPercent(delta)}% ${subject}`;
+}
+
 const PASSIVES_DEF = {
   sql_indexes: {
     name: 'Индексы MSSQL',
     icon: '⚡',
     desc: '+18% шанс критического урона (x2.5), но тяжёлые запросы немного замедляют атаки.',
     levels: [
-      { critChance: 0.12, cdMult: 1.02 }, { critChance: 0.18, cdMult: 1.03 },
-      { critChance: 0.24, cdMult: 1.05 }, { critChance: 0.30, cdMult: 1.07 }, { critChance: 0.36, cdMult: 1.10 }
+      { critChance: 0.12, cdMult: 1.03 }, { critChance: 0.18, cdMult: 1.05 },
+      { critChance: 0.24, cdMult: 1.08 }, { critChance: 0.30, cdMult: 1.12 }, { critChance: 0.36, cdMult: 1.16 }
     ],
-    levelDescriptions: ['+12% к шансу крита; перезарядка ×1,02.', '+18% к шансу крита; перезарядка ×1,03.', '+24% к шансу крита; перезарядка ×1,05.', '+30% к шансу крита; перезарядка ×1,07.', '+36% к шансу крита; перезарядка ×1,10.']
+    levelDescriptions: ['+12% к шансу крита; перезарядка дольше на 3%.', '+18% к шансу крита; перезарядка дольше на 5%.', '+24% к шансу крита; перезарядка дольше на 8%.', '+30% к шансу крита; перезарядка дольше на 12%.', '+36% к шансу крита; перезарядка дольше на 16%.']
   },
   coffee_machine: {
     name: 'Кофе из 308 кабинета',
@@ -2342,10 +2357,10 @@ const PASSIVES_DEF = {
     icon: '💸',
     desc: 'Техспец подключил платную интеграцию Эвотор и настроил обмен. Урон выше, перезарядка дольше.',
     levels: [
-      { dmgMult: 0.12, cdMult: 1.04 }, { dmgMult: 0.18, cdMult: 1.07 },
-      { dmgMult: 0.24, cdMult: 1.10 }, { dmgMult: 0.30, cdMult: 1.13 }, { dmgMult: 0.36, cdMult: 1.16 }
+      { dmgMult: 0.12, cdMult: 1.05 }, { dmgMult: 0.18, cdMult: 1.09 },
+      { dmgMult: 0.24, cdMult: 1.14 }, { dmgMult: 0.30, cdMult: 1.19 }, { dmgMult: 0.36, cdMult: 1.24 }
     ],
-    levelDescriptions: ['+12% урона, перезарядка ×1,04.', '+18% урона, перезарядка ×1,07.', '+24% урона, перезарядка ×1,10.', '+30% урона, перезарядка ×1,13.', '+36% урона, перезарядка ×1,16.']
+    levelDescriptions: ['+12% урона, перезарядка дольше на 5%.', '+18% урона, перезарядка дольше на 9%.', '+24% урона, перезарядка дольше на 14%.', '+30% урона, перезарядка дольше на 19%.', '+36% урона, перезарядка дольше на 24%.']
   },
   try_except: {
     name: 'Попытка...Исключение',
@@ -2369,10 +2384,10 @@ const PASSIVES_DEF = {
     icon: '🖱️',
     desc: 'Пока экран обновляет один пиксель, специалист успевает сделать больше. Скорость выше, перезарядка чуть дольше.',
     levels: [
-      { speedMult: 0.04, cdMult: 1.02 }, { speedMult: 0.07, cdMult: 1.04 },
-      { speedMult: 0.10, cdMult: 1.06 }, { speedMult: 0.13, cdMult: 1.08 }, { speedMult: 0.16, cdMult: 1.10 }
+      { speedMult: 0.04, cdMult: 1.03 }, { speedMult: 0.07, cdMult: 1.06 },
+      { speedMult: 0.10, cdMult: 1.10 }, { speedMult: 0.13, cdMult: 1.14 }, { speedMult: 0.16, cdMult: 1.18 }
     ],
-    levelDescriptions: ['+4% скорости, перезарядка ×1,02.', '+7% скорости, перезарядка ×1,04.', '+10% скорости, перезарядка ×1,06.', '+13% скорости, перезарядка ×1,08.', '+16% скорости, перезарядка ×1,10.']
+    levelDescriptions: ['+4% скорости, перезарядка дольше на 3%.', '+7% скорости, перезарядка дольше на 6%.', '+10% скорости, перезарядка дольше на 10%.', '+13% скорости, перезарядка дольше на 14%.', '+16% скорости, перезарядка дольше на 18%.']
   }
 };
 
@@ -2734,11 +2749,11 @@ const STORE_PASSIVES_DEF = {
   shop_gloves: { name: 'Перчатки скоростной работы', icon: '🥊', cost: 210, stock: 99, desc: 'Оружие и навыки перезаряжаются на 5% быстрее.', apply: p => { p.cdMult *= 0.95; } },
   shop_cloak: { name: 'Защитная накидка', icon: '🧥', cost: 190, stock: 99, desc: '+4% защиты от атак боссов.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.04); } },
   shop_speed_tracker: { name: 'Трекер темпа', icon: '⌚', cost: 260, stock: 99, desc: '+6% к скорости бега.', apply: p => { p.speedMult += 0.06; } },
-  shop_sprint_module: { name: 'Модуль интервального бега', icon: '🏃', cost: 430, stock: 99, desc: '+12% к скорости бега.', apply: p => { p.speedMult += 0.12; } },
+  shop_sprint_module: { name: 'Модуль интервального бега', icon: '🏃', cost: 430, stock: 99, desc: '+12% к скорости бега, но −4% к урону.', apply: p => { p.speedMult += 0.12; p.dmgMult -= 0.04; } },
   shop_damage_chip: { name: 'Усилитель сигнала', icon: '📶', cost: 280, stock: 99, desc: '+6% к урону.', apply: p => { p.dmgMult += 0.06; } },
-  shop_damage_matrix: { name: 'Боевая матрица', icon: '🧮', cost: 480, stock: 99, desc: '+14% к урону.', apply: p => { p.dmgMult += 0.14; } },
+  shop_damage_matrix: { name: 'Боевая матрица', icon: '🧮', cost: 480, stock: 99, desc: '+14% к урону, но −3% к скорости бега.', apply: p => { p.dmgMult += 0.14; p.speedMult -= 0.03; } },
   shop_crit_film: { name: 'Критическая плёнка', icon: '🔍', cost: 230, stock: 99, desc: '+2,5% к шансу критического удара.', apply: p => { p.critChance += 0.025; } },
-  shop_crit_console: { name: 'Консоль точного расчёта', icon: '🎛️', cost: 470, stock: 99, desc: '+7% к шансу критического удара.', apply: p => { p.critChance += 0.07; } },
+  shop_crit_console: { name: 'Консоль точного расчёта', icon: '🎛️', cost: 470, stock: 99, desc: '+7% к шансу критического удара, но −3% к урону.', apply: p => { p.critChance += 0.07; p.dmgMult -= 0.03; } },
   shop_health_cache: { name: 'Кэш здоровья', icon: '🫀', cost: 270, stock: 99, desc: '+15 к максимальному здоровью и столько же сразу восстанавливает.', apply: p => { p.maxHp += 15; p.hp = Math.min(p.maxHp, p.hp + 15); } },
   shop_health_reserve: { name: 'Резервный контур питания', icon: '🔋', cost: 460, stock: 99, desc: '+30 к максимальному здоровью и столько же сразу восстанавливает.', apply: p => { p.maxHp += 30; p.hp = Math.min(p.maxHp, p.hp + 30); } },
   shop_cooldown_relay: { name: 'Ретранслятор перезарядки', icon: '🔁', cost: 300, stock: 99, desc: 'Умения и оружие перезаряжаются на 4% быстрее.', apply: p => { p.cdMult *= 0.96; } },
@@ -2772,7 +2787,7 @@ const STORE_PASSIVE_COMBOS = {
   sla_courier_kit: {
     parts: ['fast_service_shoes', 'usb_adapter'],
     name: 'Комплект «Курьер на SLA»', icon: '🛵',
-    desc: 'Итоговые характеристики: +15% к скорости бега, ×0,96 к перезарядке умений и оружия, ×0,80 к перезарядке рывка.',
+    desc: 'Итоговые характеристики: +15% к скорости бега; перезарядка умений и оружия короче на 4%, рывка — на 20%.',
     apply: p => { p.speedMult += 0.05; p.cdMult *= 0.96; }
   },
   backup_server: {
@@ -2802,7 +2817,7 @@ const STORE_PASSIVE_COMBOS = {
   full_stack_team: {
     parts: ['tech_gloves', 'coffee_thermos', 'training_spreadsheet'],
     name: 'Набор «Полный стек»', icon: '🧰',
-    desc: 'Итоговые характеристики: +20% к урону, +16% к опыту и ×0,92 к перезарядке умений и оружия.',
+    desc: 'Итоговые характеристики: +20% к урону, +16% к опыту; перезарядка умений и оружия короче на 8%.',
     apply: p => { p.dmgMult += 0.08; p.xpMult += 0.06; }
   },
   server_room: {
@@ -2820,20 +2835,20 @@ const STORE_PASSIVE_COMBOS = {
   precision_suite: {
     parts: ['shop_crit_film', 'shop_crit_console', 'tech_gloves'],
     name: 'Комплект «Прицельный контур»', icon: '🎯', tier: 3,
-    desc: 'Итоговые характеристики: +13,5% к шансу критического удара и +15% к урону.',
+    desc: 'Итоговые характеристики: +13,5% к шансу критического удара и +15% к урону, но прицел снижает урон на 3%.',
     apply: p => { p.critChance += 0.04; p.dmgMult += 0.03; }
   },
   redline_kit: {
     parts: ['shop_speed_tracker', 'shop_sprint_module', 'shop_dash_oil'],
     name: 'Комплект «Красная линия»', icon: '🏃', tier: 3,
-    desc: 'Итоговые характеристики: +25% к скорости бега и ×0,81 к перезарядке рывка.',
-    apply: p => { p.speedMult += 0.07; p.dashCooldownMult = Math.max(0.45, (p.dashCooldownMult || 1) * 0.9); }
+    desc: 'Итоговые характеристики: +25% к скорости бега, перезарядка рывка короче на 19%, но урон ниже на 8%.',
+    apply: p => { p.speedMult += 0.07; p.dmgMult -= 0.04; p.dashCooldownMult = Math.max(0.45, (p.dashCooldownMult || 1) * 0.9); }
   },
   assault_overclock: {
     parts: ['shop_damage_chip', 'shop_damage_matrix', 'shop_cooldown_relay'],
     name: 'Комплект «Штурмовой разгон»', icon: '⚔️', tier: 3,
-    desc: 'Итоговые характеристики: +28% к урону и ×0,91 к перезарядке умений и оружия.',
-    apply: p => { p.dmgMult += 0.08; p.cdMult *= 0.95; }
+    desc: 'Итоговые характеристики: +28% к урону, перезарядка умений и оружия короче на 9%, скорость бега ниже на 8%.',
+    apply: p => { p.dmgMult += 0.08; p.speedMult -= 0.05; p.cdMult *= 0.95; }
   },
   vitality_node: {
     parts: ['shop_health_cache', 'shop_oxygen_canister', 'shop_medical_station'],
@@ -2844,14 +2859,14 @@ const STORE_PASSIVE_COMBOS = {
   learning_datahub: {
     parts: ['shop_xp_cache', 'shop_xp_archive', 'floppy_magnet'],
     name: 'Комплект «Учебный дата-центр»', icon: '📚', tier: 3,
-    desc: 'Итоговые характеристики: +23% к получаемому опыту и +27% к радиусу сбора.',
-    apply: p => { p.xpMult += 0.05; p.magnetMult += 0.08; }
+    desc: 'Итоговые характеристики: +23% к получаемому опыту и +27% к радиусу сбора, но скорость бега ниже на 6%.',
+    apply: p => { p.xpMult += 0.05; p.magnetMult += 0.08; p.speedMult -= 0.06; }
   },
   capital_flow: {
     parts: ['shop_cash_terminal', 'shop_cash_hub', 'shop_xp_cache'],
     name: 'Комплект «Капитал в потоке»', icon: '🏦', tier: 3,
-    desc: 'Итоговые характеристики: +31% к фиткоинам с дискет и +10% к опыту.',
-    apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.08; p.xpMult += 0.04; }
+    desc: 'Итоговые характеристики: +31% к фиткоинам с дискет и +10% к опыту, но урон ниже на 6%.',
+    apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.08; p.xpMult += 0.04; p.dmgMult -= 0.06; }
   },
   evasion_wall: {
     parts: ['shop_dodge_driver', 'shop_dodge_grid', 'shop_boss_plating'],
@@ -2868,8 +2883,8 @@ const STORE_PASSIVE_COMBOS = {
   dash_protocol: {
     parts: ['shop_dash_oil', 'shop_dash_accumulator', 'shop_speed_tracker'],
     name: 'Комплект «Импульсный привод»', icon: '⚡', tier: 3,
-    desc: 'Итоговые характеристики: +10% к скорости бега и ×0,63 к перезарядке рывка.',
-    apply: p => { p.speedMult += 0.04; p.dashCooldownMult = Math.max(0.40, (p.dashCooldownMult || 1) * 0.90); }
+    desc: 'Итоговые характеристики: +10% к скорости бега, перезарядка рывка короче на 37%, но урон ниже на 10%.',
+    apply: p => { p.speedMult += 0.04; p.dmgMult -= 0.10; p.dashCooldownMult = Math.max(0.40, (p.dashCooldownMult || 1) * 0.90); }
   },
   levelup_clinic: {
     parts: ['shop_level_care', 'shop_level_clinic', 'shop_health_cache'],
@@ -2880,38 +2895,38 @@ const STORE_PASSIVE_COMBOS = {
   rapid_recovery: {
     parts: ['shop_oxygen_canister', 'shop_medical_station', 'shop_cooldown_bus'],
     name: 'Комплект «Быстрое восстановление»', icon: '🧵', tier: 3,
-    desc: 'Итоговые характеристики: +4 HP регенерации в секунду и ×0,87 к перезарядке умений и оружия.',
-    apply: p => { p.regen += 1; p.cdMult *= 0.96; }
+    desc: 'Итоговые характеристики: +4 HP регенерации в секунду, перезарядка умений и оружия короче на 13%, но −6% к скорости бега.',
+    apply: p => { p.regen += 1; p.speedMult -= 0.06; p.cdMult *= 0.96; }
   },
   magnetic_exchange: {
     parts: ['shop_magnet_extension', 'shop_magnet_array', 'shop_cash_terminal'],
     name: 'Комплект «Магнитная касса»', icon: '🧲', tier: 3,
-    desc: 'Итоговые характеристики: +47% к радиусу сбора и +14% к фиткоинам с дискет.',
-    apply: p => { p.magnetMult += 0.10; p.currencyMult = (p.currencyMult || 1) + 0.06; }
+    desc: 'Итоговые характеристики: +47% к радиусу сбора и +14% к фиткоинам с дискет, но скорость бега ниже на 5%.',
+    apply: p => { p.magnetMult += 0.10; p.currencyMult = (p.currencyMult || 1) + 0.06; p.speedMult -= 0.05; }
   },
   precision_reserve: {
     parts: ['shop_damage_chip', 'shop_health_cache', 'shop_cooldown_relay'],
     name: 'Комплект «Резерв точности»', icon: '🧩', tier: 3,
-    desc: 'Итоговые характеристики: +10% к урону, +25 к максимальному здоровью и ×0,96 к перезарядке умений и оружия.',
-    apply: p => { p.dmgMult += 0.04; p.maxHp += 10; p.hp = Math.min(p.maxHp, p.hp + 10); }
+    desc: 'Итоговые характеристики: +10% к урону, +25 к максимальному здоровью, перезарядка короче на 4%, но скорость ниже на 4%.',
+    apply: p => { p.dmgMult += 0.04; p.speedMult -= 0.04; p.maxHp += 10; p.hp = Math.min(p.maxHp, p.hp + 10); }
   },
   critical_conveyor: {
     parts: ['shop_crit_film', 'shop_crit_console', 'shop_speed_tracker'],
     name: 'Комплект «Критический конвейер»', icon: '🎛️', tier: 3,
-    desc: 'Итоговые характеристики: +12% к шансу критического удара и +10% к скорости бега.',
+    desc: 'Итоговые характеристики: +12% к шансу критического удара, +10% к скорости бега, но урон ниже на 3%.',
     apply: p => { p.critChance += 0.025; p.speedMult += 0.04; }
   },
   dash_architect: {
     parts: ['shop_dash_oil', 'shop_dash_accumulator', 'shop_speed_tracker'],
     name: 'Комплект «Архитектор рывка»', icon: '💨', tier: 3,
-    desc: 'Итоговые характеристики: +10% к скорости бега и примерно ×0,65 к перезарядке рывка.',
+    desc: 'Итоговые характеристики: +10% к скорости бега, перезарядка рывка короче примерно на 35%.',
     apply: p => { p.speedMult += 0.04; p.dashCooldownMult = Math.max(0.40, (p.dashCooldownMult || 1) * 0.92); }
   },
   financial_magnet: {
     parts: ['shop_cash_terminal', 'shop_magnet_array', 'shop_xp_archive'],
     name: 'Комплект «Финансовый магнит»', icon: '🧲', tier: 3,
-    desc: 'Итоговые характеристики: +13% к фиткоинам с дискет, +29% к радиусу сбора и +16% к опыту.',
-    apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.05; p.magnetMult += 0.04; p.xpMult += 0.04; }
+    desc: 'Итоговые характеристики: +13% к фиткоинам с дискет, +29% к радиусу сбора и +16% к опыту, но урон ниже на 6%.',
+    apply: p => { p.currencyMult = (p.currencyMult || 1) + 0.05; p.magnetMult += 0.04; p.xpMult += 0.04; p.dmgMult -= 0.06; }
   },
   health_firewall: {
     parts: ['shop_health_reserve', 'shop_bulkhead', 'shop_oxygen_canister'],
@@ -2928,9 +2943,9 @@ const STORE_RECIPES = {
   training_bracers: { parts: ['shop_blade', 'shop_wraps'], name: 'Наручи силового темпа', icon: '🦾', tier: 2, desc: 'Итоговые характеристики: +13% к урону и +4% к скорости бега.', apply: p => { p.dmgMult += 0.05; } },
   recovery_belt: { parts: ['shop_whey', 'shop_ring'], name: 'Пояс восстановления', icon: '🧰', tier: 2, desc: 'Итоговые характеристики: +22 к максимальному здоровью и +1,2 HP регенерации в секунду.', apply: p => { p.maxHp += 12; p.hp = Math.min(p.maxHp, p.hp + 12); p.regen += 0.5; } },
   precision_scope: { parts: ['shop_scope', 'mssql_card'], name: 'Оптический модуль', icon: '🎯', tier: 2, desc: 'Итоговая характеристика: +12% к шансу критического удара.', apply: p => { p.critChance += 0.03; } },
-  assault_protocol: { parts: ['training_bracers', 'shop_gloves', 'coffee_thermos'], name: 'Протокол штурма', icon: '⚔️', tier: 3, desc: 'Итоговые характеристики: +21% к урону, +9% к скорости бега и ×0,87 к перезарядке умений и оружия.', apply: p => { p.dmgMult += 0.08; p.speedMult += 0.05; } },
+  assault_protocol: { parts: ['training_bracers', 'shop_gloves', 'coffee_thermos'], name: 'Протокол штурма', icon: '⚔️', tier: 3, desc: 'Итоговые характеристики: +21% к урону, перезарядка умений и оружия короче на 13%, но скорость бега ниже на 6%.', apply: p => { p.dmgMult += 0.08; p.speedMult -= 0.06; } },
   guardian_protocol: { parts: ['recovery_belt', 'shop_cloak', 'hasp_license'], name: 'Протокол неуязвимости', icon: '🛡️', tier: 3, desc: 'Итоговые характеристики: +22 к максимальному здоровью, +1,2 HP регенерации в секунду, +12% защиты от боссов и +8% к уклонению.', apply: p => { p.bossDamageReduction = Math.min(0.30, (p.bossDamageReduction || 0) + 0.08); p.dodge = Math.min(0.75, p.dodge + 0.03); } },
-  execution_protocol: { parts: ['precision_scope', 'tech_gloves', 'training_spreadsheet'], name: 'Протокол точечного удара', icon: '💥', tier: 3, desc: 'Итоговые характеристики: +20% к урону, +16% к шансу критического удара и +10% к опыту.', apply: p => { p.dmgMult += 0.08; p.critChance += 0.04; } }
+  execution_protocol: { parts: ['precision_scope', 'tech_gloves', 'training_spreadsheet'], name: 'Протокол точечного удара', icon: '💥', tier: 3, desc: 'Итоговые характеристики: +20% к урону, +16% к шансу критического удара и +10% к опыту, но скорость бега ниже на 8%.', apply: p => { p.dmgMult += 0.08; p.critChance += 0.04; p.speedMult -= 0.08; } }
 };
 
 const CONSUMABLES_DEF = {
@@ -2998,20 +3013,23 @@ const CONSUMABLES_DEF = {
 const COMBAT_UPGRADES = {
   ricochet: {
     name: 'Рикошет снаряда', icon: '↗️',
-    desc: 'Снаряды отскакивают ещё к одному противнику за каждый уровень. Максимум 5 рикошетов.'
+    desc: 'Снаряды отскакивают ещё к одному противнику за уровень, но каждый рикошет замедляет перезарядку оружия и умений.',
+    levelDescriptions: ['+1 рикошет; перезарядка дольше на 3%.', '+2 рикошета; перезарядка дольше на 6%.', '+3 рикошета; перезарядка дольше на 9%.', '+4 рикошета; перезарядка дольше на 12%.', '+5 рикошетов; перезарядка дольше на 15%.']
   },
   multishot: {
     name: 'Мультивыстрел', icon: '🎯',
-    desc: 'Каждый уровень добавляет один снаряд к залпу. Максимум +5 снарядов.'
+    desc: 'Каждый уровень добавляет снаряд к залпу, но снижает общий урон героя.',
+    levelDescriptions: ['+1 снаряд к залпу; общий урон −4%.', '+2 снаряда к залпу; общий урон −8%.', '+3 снаряда к залпу; общий урон −12%.', '+4 снаряда к залпу; общий урон −16%.', '+5 снарядов к залпу; общий урон −20%.']
   },
   slowshot: {
     name: 'Замедляющие снаряды', icon: '❄️',
-    desc: 'Попадания замедляют противников сильнее с каждым уровнем. На 5-м уровне вместе с поджогом 5-го уровня эффекты превращаются во взрыв. Максимум 5 уровней.'
+    desc: 'Попадания замедляют противников сильнее с каждым уровнем, но сами замедляющие модули утяжеляют героя. На 5-м уровне вместе с поджогом 5-го уровня эффекты превращаются во взрыв.',
+    levelDescriptions: ['Сильнее замедление; скорость бега −2%.', 'Ещё сильнее замедление; скорость бега −4%.', 'Ещё сильнее замедление; скорость бега −6%.', 'Ещё сильнее замедление; скорость бега −8%.', 'Максимальное замедление; скорость бега −10%.']
   },
   burnshot: {
     name: 'Поджигающие снаряды', icon: '🔥',
-    desc: 'Снаряды поджигают врагов и наносят периодический урон. На 5-м уровне вместе с замедлением 5-го уровня эффекты превращаются во взрыв. Максимум 5 уровней.',
-    levelDescriptions: ['Шанс поджога — 24%.', 'Шанс поджога — 32%.', 'Шанс поджога — 40%.', 'Шанс поджога — 48%.', 'Шанс поджога — 56%.']
+    desc: 'Снаряды поджигают врагов и наносят периодический урон, но перезаряжаются дольше. На 5-м уровне вместе с замедлением 5-го уровня эффекты превращаются во взрыв.',
+    levelDescriptions: ['Шанс поджога — 24%; перезарядка дольше на 2,5%.', 'Шанс поджога — 32%; перезарядка дольше на 5%.', 'Шанс поджога — 40%; перезарядка дольше на 7,5%.', 'Шанс поджога — 48%; перезарядка дольше на 10%.', 'Шанс поджога — 56%; перезарядка дольше на 12,5%.']
   }
 };
 
@@ -3032,7 +3050,7 @@ const REPEATABLE_UPGRADES = [
     key: 'rep_espresso',
     name: '☕ Кофе перед утренней сменой',
     icon: '☕',
-    desc: 'Откат умений ускорен на -6%, скорость бега +5%, исцеление +40 HP.',
+    desc: 'Перезарядка умений и оружия короче на 6%, скорость бега выше на 5%, лечение +40 HP.',
     apply: (g) => {
       g.player.hp = Math.min(g.player.maxHp, g.player.hp + 40);
       g.player.speedMult += 0.05;
@@ -3585,6 +3603,7 @@ class Game {
     this.pursuerSpawnCountdown = null;
     this.lastPlayerDamage = null;
     this.challengeDeclines = 0;
+    this.challengeFailures = 0;
     this.kills = 0;
     this.achievementRunKillSnapshot = 0;
     this.gemsCollected = 0;
@@ -3841,7 +3860,7 @@ class Game {
     const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
     const weapon = WEAPONS_DEF[classDef.weapon];
     const stats = classDef.stats;
-    const summary = `${stats.hp} HP · скорость ${stats.baseSpeed.toFixed(1)} · урон ${Math.round(stats.dmgMult * 100)}% · КД ${Math.round(stats.cdMult * 100)}% · крит ${Math.round(stats.critChance * 100)}% · защита от боссов ${Math.round(stats.bossDamageReduction * 100)}% · опыт ${Math.round(stats.xpMult * 100)}% · фиткоины ${Math.round(stats.currencyMult * 100)}% · оружие ${weapon.icon} ${weapon.name}`;
+    const summary = `${stats.hp} HP · скорость ${stats.baseSpeed.toFixed(1)} · урон ${Math.round(stats.dmgMult * 100)}% · ${formatCooldownDelta(stats.cdMult)} · крит ${Math.round(stats.critChance * 100)}% · защита от боссов ${Math.round(stats.bossDamageReduction * 100)}% · опыт ${Math.round(stats.xpMult * 100)}% · фиткоины ${Math.round(stats.currencyMult * 100)}% · оружие ${weapon.icon} ${weapon.name}`;
     for (const [selectId, summaryId] of [['solo-class-select', 'solo-class-summary'], ['pvp-class-select', 'pvp-class-summary']]) {
       const select = document.getElementById(selectId);
       const summaryNode = document.getElementById(summaryId);
@@ -3889,7 +3908,7 @@ class Game {
       name.textContent = classDef.name;
       const statsLine = document.createElement('span');
       statsLine.className = 'class-select-stats';
-      statsLine.textContent = `❤️ ${stats.hp} HP · ⚡ скорость ${stats.baseSpeed.toFixed(1)} · ⚔️ урон ${Math.round(stats.dmgMult * 100)}% · ⏱️ перезарядка ${Math.round(stats.cdMult * 100)}% · 🎯 крит ${Math.round(stats.critChance * 100)}% · 🪪 защита от боссов ${Math.round(stats.bossDamageReduction * 100)}% · 📈 опыт ${Math.round(stats.xpMult * 100)}% · 💰 фиткоины ${Math.round(stats.currencyMult * 100)}%`;
+      statsLine.textContent = `❤️ ${stats.hp} HP · ⚡ скорость ${stats.baseSpeed.toFixed(1)} · ⚔️ урон ${Math.round(stats.dmgMult * 100)}% · ⏱️ ${formatCooldownDelta(stats.cdMult).toLowerCase()} · 🎯 крит ${Math.round(stats.critChance * 100)}% · 🪪 защита от боссов ${Math.round(stats.bossDamageReduction * 100)}% · 📈 опыт ${Math.round(stats.xpMult * 100)}% · 💰 фиткоины ${Math.round(stats.currencyMult * 100)}%`;
       const weaponLine = document.createElement('span');
       weaponLine.className = 'class-select-weapon';
       weaponLine.textContent = `${weapon.icon} ${weapon.name} · ${weapon.baseDmg} базового урона · перезарядка ${weapon.baseCooldown} с`;
@@ -4665,6 +4684,7 @@ class Game {
       this.syncPvpWait();
     } else if (message.type === 'world' && message.world) this.applyPvpSharedWorld(message.world);
     else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
+    else if (message.type === 'mv-ticket-trigger' && pvp.host) this.spawnMVBoss(['declined','ignored','three-failures'].includes(message.reason) ? message.reason : 'three-failures');
     else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
     else if (message.type === 'office-event-notice' && !pvp.host && pvp.started) this.showBanner(String(message.text || 'Офисное событие'));
     else if (message.type === 'friday-release-start' && !pvp.host && pvp.started) this.fridayReleaseUntil = this.time + Math.max(1, Number(message.duration) || 8);
@@ -6323,8 +6343,38 @@ class Game {
       {
         objectives: [{ type: 'surviveInverted', target: 45, label: 'пережить инверсию управления' }], duration: 45,
         reward: demandingTicketReward, invertControls: true,
-        title: 'Тикет от Максима Воронина',
-        description: 'Управление инвертировано. Максим на линии и ждёт подтверждения.'
+        title: 'М.В.: «Офис вверх ногами»',
+        description: 'Максим Воронин инвертировал управление и ждёт, пока ты подтвердишь, что так удобнее.'
+      },
+      {
+        objectives: [{ type: 'kills', target: Math.max(22, killsTarget - 8), label: 'устранить багов под усилением' }], duration: 48,
+        reward: demandingTicketReward, mobStatChaos: true,
+        title: 'М.В.: «Внеплановый буст мобов»',
+        description: 'Максим случайно поднял характеристики мобов. Показатели выберутся при принятии тикета.'
+      },
+      {
+        objectives: [{ type: 'survive', target: 38, label: 'пережить хаотичную навигацию' }], duration: 42,
+        reward: demandingTicketReward, chaoticMobs: true,
+        title: 'М.В.: «Маршрут согласован»',
+        description: 'Мобы бегут в случайные стороны карты и меняют направление на ходу.'
+      },
+      {
+        objectives: [{ type: 'kills', target: Math.max(24, killsTarget - 5), label: 'устранить багов без рывка' }], duration: 50,
+        reward: demandingTicketReward, disableDash: true,
+        title: 'М.В.: «Рывок требует заявку»',
+        description: 'Рывок отключён на время тикета. Максим просит дождаться согласования.'
+      },
+      {
+        objectives: [{ type: 'survive', target: 40, label: 'пережить поворот координат' }], duration: 44,
+        reward: demandingTicketReward, rotateControls: true,
+        title: 'М.В.: «Оси переехали»',
+        description: 'Управление повёрнуто на 90 градусов. Так, по словам Максима, понятнее.'
+      },
+      {
+        objectives: [{ type: 'kills', target: Math.max(30, killsTarget - 4), label: 'разобрать очередь мобов' }], duration: 52,
+        reward: demandingTicketReward, mobSwarm: true,
+        title: 'М.В.: «Создал общий чат»',
+        description: 'Пока тикет активен, Максим регулярно добавляет на карту новые группы мобов.'
       },
       {
         objectives: [{ type: 'shooters', target: shooterTarget, label: 'нейтрализовать удалённых специалистов' }], duration: 55,
@@ -6344,8 +6394,8 @@ class Game {
       {
         objectives: [{ type: 'survive', target: 24, label: 'искать пропавшую кнопку, сек.' }], duration: 30,
         reward: demandingTicketReward,
-        title: 'Клиент: «У меня пропала кнопка»',
-        description: 'Кнопка отключена на время диагностики. Клиент уверяет, что вчера она была «где-то здесь».' , missingButton: true
+        title: 'М.В.: «Кнопка снова пропала»',
+        description: 'Кнопка динамического обновления скрыта до конца тикета. Максим утверждает, что ничего не трогал.', missingButton: true
       }
     ];
     const available = options.filter(option => !option.objectives.some(objective => objective.type === 'shooters') || this.time >= 120);
@@ -6353,7 +6403,7 @@ class Game {
     const challenge = {
       ...challengeTemplate,
       objectives: challengeTemplate.objectives.map(objective => ({ ...objective, progress: 0 })),
-      status: 'pending'
+      status: 'pending', responseRemaining: 20, lastPendingSeconds: null
     };
     this.activeChallenge = challenge;
     this.challengeNoticeUntil = 0;
@@ -6377,7 +6427,7 @@ class Game {
       mobileSummary.style.display = showMobileSummary ? 'block' : 'none';
       const task = mobileSummary.querySelector('.mobile-challenge-task');
       const mobileProgress = mobileSummary.querySelector('.mobile-challenge-progress');
-      if (task) task.textContent = challenge.objectives?.map(objective => objective.label).filter(Boolean).join(' · ') || challenge.description || challenge.title || '';
+      if (task) task.textContent = `${challenge.effectStatus ? `${challenge.effectStatus} · ` : ''}${challenge.objectives?.map(objective => objective.label).filter(Boolean).join(' · ') || challenge.description || challenge.title || ''}`;
       if (mobileProgress) {
         const amounts = (challenge.objectives || []).map(objective => {
           const isTimed = objective.type === 'survive' || objective.type === 'surviveInverted';
@@ -6408,7 +6458,7 @@ class Game {
 
     if (challenge.status === 'pending') {
       head.textContent = '📩 У Вас новый тикет:';
-      progress.textContent = 'Беритесь за задачу или вежливо откажитесь.';
+      progress.textContent = `Примите или отклоните тикет за ${Math.ceil(challenge.responseRemaining ?? 20)} сек. Игнор тоже считается отказом.`;
       actions.style.display = 'flex';
       addAction(this.actionButtonLabel('Принять', 'ticketAccept'), () => this.acceptChallenge(), '#55efc4');
       addAction(this.actionButtonLabel('Отказаться', 'ticketDecline'), () => this.declineChallenge());
@@ -6420,7 +6470,7 @@ class Game {
         const current = isTimed ? Math.floor(objective.progress) : objective.progress;
         return `${objective.label}: ${Math.min(objective.target, current)}/${objective.target}${isTimed ? ' сек.' : ''}`;
       });
-      progress.textContent = `${challenge.invertControls ? '🔀 Управление инвертировано · ' : ''}${amounts.join(' · ')} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
+      progress.textContent = `${challenge.effectStatus ? `${challenge.effectStatus} · ` : ''}${challenge.invertControls ? '🔀 Управление инвертировано · ' : ''}${amounts.join(' · ')} · Осталось ${Math.ceil(challenge.remaining)} сек.`;
     } else if (challenge.status === 'reward') {
       head.textContent = '🎁 Выберите награду';
       progress.textContent = 'Испытание завершено. Выберите один бонус:';
@@ -6446,23 +6496,84 @@ class Game {
       status: 'active',
       lastHp: this.player.hp
     });
+    this.initializeChallengeEffects(challenge);
     if (challenge.missingButton) document.getElementById('btn-dyn-update').style.visibility = 'hidden';
     this.updateChallengeUI();
     this.log(`Тикет принят: ${challenge.title}`);
   }
 
+  initializeChallengeEffects(challenge) {
+    if (challenge.mobStatChaos) {
+      challenge.mobChaos = {
+        speed: 1.25 + Math.random() * 0.35,
+        damage: 1.15 + Math.random() * 0.30,
+        health: 1.10 + Math.random() * 0.30
+      };
+      challenge.effectStatus = `Мобы: скорость +${Math.round((challenge.mobChaos.speed - 1) * 100)}%, урон +${Math.round((challenge.mobChaos.damage - 1) * 100)}%, HP +${Math.round((challenge.mobChaos.health - 1) * 100)}%`;
+      this.applyChallengeMobChaos();
+    } else if (challenge.chaoticMobs) {
+      challenge.effectStatus = 'Мобы хаотично меняют направление';
+    } else if (challenge.mobSwarm) {
+      challenge.effectStatus = 'М.В. подсылает новые группы мобов';
+      challenge.mobSpawnRemaining = 4;
+    } else if (challenge.disableDash) {
+      challenge.effectStatus = 'Рывок временно отключён';
+    } else if (challenge.rotateControls) {
+      challenge.effectStatus = 'Управление повёрнуто на 90°';
+    } else if (challenge.invertControls) {
+      challenge.effectStatus = 'Управление инвертировано';
+    } else if (challenge.missingButton) {
+      challenge.effectStatus = 'Динамическое обновление отключено';
+    }
+  }
+
+  applyChallengeMobChaos() {
+    const challenge = this.activeChallenge;
+    if (!challenge?.mobStatChaos || !challenge.mobChaos || (this.pvp?.started && !this.pvp.host)) return;
+    for (const enemy of this.enemies || []) {
+      if (!enemy || enemy.isBoss || enemy.is24hPursuer || enemy.ticketChaosBoost) continue;
+      const multipliers = challenge.mobChaos;
+      enemy.ticketChaosBoost = multipliers;
+      enemy.speed *= multipliers.speed;
+      enemy.dmg *= multipliers.damage;
+      enemy.hp *= multipliers.health;
+      enemy.maxHp *= multipliers.health;
+    }
+  }
+
+  removeChallengeMobChaos() {
+    for (const enemy of this.enemies || []) {
+      const boost = enemy?.ticketChaosBoost;
+      if (!boost) continue;
+      enemy.speed /= boost.speed;
+      enemy.dmg /= boost.damage;
+      enemy.hp /= boost.health;
+      enemy.maxHp /= boost.health;
+      delete enemy.ticketChaosBoost;
+    }
+  }
+
+  recordChallengeFailure(reason) {
+    if (reason === 'declined' || reason === 'ignored') {
+      this.challengeFailures = 0;
+      this.spawnMVBoss(reason);
+      return;
+    }
+    this.challengeFailures = (this.challengeFailures || 0) + 1;
+    if (this.challengeFailures >= 3) {
+      this.challengeFailures = 0;
+      this.spawnMVBoss('three-failures');
+    }
+  }
+
   declineChallenge() {
     if (!this.activeChallenge || this.activeChallenge.status !== 'pending') return;
     this.log('Тикет отклонён. Клиент сказал, что «там дел на пять минут» и попробует сам.');
-    this.challengeDeclines = (this.challengeDeclines || 0) + 1;
-    if (this.challengeDeclines >= 3) {
-      this.challengeDeclines = 0;
-      this.spawnMVBoss();
-    }
     this.activeChallenge = null;
     this.challengeNoticeUntil = 0;
     this.nextChallengeTime = this.time + 115 + Math.random() * 45;
     this.updateChallengeUI();
+    this.recordChallengeFailure('declined');
   }
 
   recordChallengeProgress(type, amount = 1) {
@@ -6504,7 +6615,37 @@ class Game {
       }
       return;
     }
+    if (challenge.status === 'pending') {
+      challenge.responseRemaining = Math.max(0, (Number(challenge.responseRemaining) || 0) - dt);
+      if (challenge.responseRemaining <= 0) {
+        this.log('Тикет проигнорирован. Максим Воронин уже поставил встречу в календарь.');
+        this.activeChallenge = null;
+        this.challengeNoticeUntil = 0;
+        this.nextChallengeTime = this.time + 115 + Math.random() * 45;
+        this.updateChallengeUI();
+        this.recordChallengeFailure('ignored');
+      } else {
+        const seconds = Math.ceil(challenge.responseRemaining);
+        if (seconds !== challenge.lastPendingSeconds) {
+          challenge.lastPendingSeconds = seconds;
+          this.updateChallengeUI();
+        }
+      }
+      return;
+    }
     if (challenge.status === 'active') {
+      if (challenge.mobStatChaos) this.applyChallengeMobChaos();
+      if (challenge.mobSwarm) {
+        challenge.mobSpawnRemaining -= dt;
+        if (challenge.mobSpawnRemaining <= 0) {
+          if (!this.pvp?.started || this.pvp.host) {
+            const allowed = Math.max(0, Math.min(4, 68 - this.enemies.length));
+            const spawnCount = Math.min(allowed, 2 + Math.floor(Math.random() * 3));
+            for (let i = 0; i < spawnCount; i++) this.spawnEnemy();
+          }
+          challenge.mobSpawnRemaining = 5 + Math.random() * 3;
+        }
+      }
       if (challenge.objectives.some(objective => objective.type === 'survive')) {
         if (this.player.hp < challenge.lastHp - 0.01) {
           this.closeChallenge(false);
@@ -6538,15 +6679,18 @@ class Game {
   closeChallenge(success) {
     const challenge = this.activeChallenge;
     if (!challenge || challenge.status !== 'active') return;
+    this.removeChallengeMobChaos();
     challenge.status = success ? 'reward' : 'failed';
     if (challenge.missingButton) document.getElementById('btn-dyn-update').style.visibility = '';
     this.challengeNoticeUntil = this.time + 4;
     if (success) {
+      this.challengeFailures = 0;
       this.challengeNoticeUntil = 0;
       this.log('Тикет закрыт. Выберите награду.');
       this.addPopup(this.player.x, this.player.y - 32, '✅ ТИКЕТ ЗАКРЫТ · ВЫБЕРИТЕ НАГРАДУ', '#55efc4');
     } else {
       this.log('Тикет просрочен. Клиент прислал «напоминаю» через четыре секунды.');
+      this.recordChallengeFailure('failed');
     }
     this.updateChallengeUI();
   }
@@ -7560,16 +7704,16 @@ class Game {
     const stats = [
       { icon: '🧑‍💻', name: 'Класс', value: player.className || 'Технарь' },
       { icon: '❤️', name: 'Здоровье', value: `${Math.ceil(player.hp)} / ${player.maxHp}` },
-      { icon: '⚔️', name: 'Урон', value: `×${activeDamage.toFixed(2)}${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
-      { icon: '⚡', name: 'Скорость бега', value: `${(player.baseSpeed * activeSpeedMult).toFixed(2)} · ×${activeSpeedMult.toFixed(2)}` },
-      { icon: '🎯', name: 'Шанс крита', value: `${Math.round(player.critChance * 100)}% · урон ×2,5` },
+      { icon: '⚔️', name: 'Урон', value: `${formatMultiplierDelta(activeDamage, 'к урону')}${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
+      { icon: '⚡', name: 'Скорость бега', value: `${(player.baseSpeed * activeSpeedMult).toFixed(2)} · ${formatMultiplierDelta(activeSpeedMult, 'к скорости')}` },
+      { icon: '🎯', name: 'Шанс крита', value: `${Math.round(player.critChance * 100)}% · крит наносит 250% обычного урона` },
       { icon: '🌀', name: 'Уклонение', value: `${Math.round(player.dodge * 100)}%` },
       { icon: '🩹', name: 'Регенерация', value: `${player.regen.toFixed(1)} HP/с` },
-      { icon: '⏱️', name: 'Перезарядка', value: `×${cooldown.toFixed(2)}` },
-      { icon: '🧲', name: 'Радиус сбора', value: `×${player.magnetMult.toFixed(2)}` },
-      { icon: '📈', name: 'Опыт', value: `×${(player.xpMult * player.xpEventMult * (player.xpBoostTimer > 0 ? 2 : 1)).toFixed(2)}` },
-      { icon: '💰', name: 'Фиткоины с дискет', value: `×${(player.currencyMult || 1).toFixed(2)}` },
-      { icon: '💨', name: 'Перезарядка рывка', value: `×${(player.dashCooldownMult || 1).toFixed(2)}` },
+      { icon: '⏱️', name: 'Перезарядка умений и оружия', value: formatCooldownDelta(cooldown) },
+      { icon: '🧲', name: 'Радиус сбора', value: formatMultiplierDelta(player.magnetMult, 'к радиусу') },
+      { icon: '📈', name: 'Опыт', value: formatMultiplierDelta(player.xpMult * player.xpEventMult * (player.xpBoostTimer > 0 ? 2 : 1), 'опыта') },
+      { icon: '💰', name: 'Фиткоины с дискет', value: formatMultiplierDelta(player.currencyMult || 1, 'фиткоинов') },
+      { icon: '💨', name: 'Перезарядка рывка', value: formatCooldownDelta(player.dashCooldownMult || 1, 'Перезарядка рывка') },
       { icon: '🪑', name: 'Лечение при повышении уровня', value: `+${Math.round(player.levelUpHeal || 0)} HP` },
       { icon: '🪪', name: 'Защита от боссов', value: `${Math.round((player.bossDamageReduction || 0) * 100)}%` },
       { icon: '🛡️', name: 'Защита', value: player.shieldTimer > 0 ? `Щит · ${Math.ceil(player.shieldTimer)}с` : 'Без щита' }
@@ -7605,11 +7749,11 @@ class Game {
     const addTimer = (timer, name, icon, value) => {
       if (timer > 0) temporary.push({ icon, name, value: `${value} · ${Math.ceil(timer)}с` });
     };
-    addTimer(player.damageBuffTimer, 'Усиление урона', '💥', `×${(player.damageBuffMult || 1).toFixed(2)}`);
-    addTimer(player.xpBoostTimer, 'Удвоение опыта и фиткоинов', '📲', '×2');
+    addTimer(player.damageBuffTimer, 'Усиление урона', '💥', formatMultiplierDelta(player.damageBuffMult || 1, 'к урону'));
+    addTimer(player.xpBoostTimer, 'Удвоение опыта и фиткоинов', '📲', '+100% опыта и фиткоинов');
     addTimer(player.speedBuffTimer, 'Ускорение бега', '⚡', '+50%');
-    addTimer(player.turboBuffTimer, 'Турбо-режим: скорострельность', '🚀', '×2');
-    addTimer(player.coffeeBuffTimer, 'Кофе из 308 кабинета', '☕', 'ускорение');
+    addTimer(player.turboBuffTimer, 'Турбо-режим: скорострельность', '🚀', 'скорость стрельбы +100%');
+    addTimer(player.coffeeBuffTimer, 'Кофе из 308 кабинета', '☕', 'скорость бега +50%');
     addTimer(player.shieldTimer, 'Защитный щит', '🛡️', 'неуязвимость');
     if (player.hasBackupShield) temporary.push({ icon: '☁️', name: 'Автоматический щит от бэкапа', value: `через ${Math.ceil(this.backupTimer)}с` });
     const consumables = (this.consumables || []).map((slot, index) => slot && ({
@@ -8334,8 +8478,12 @@ class Game {
     this.sound.boss();
   }
 
-  spawnMVBoss() {
+  spawnMVBoss(trigger = 'three-failures') {
     if (!this.player || this.player.hp <= 0) return;
+    if (this.pvp?.started && !this.pvp.host) {
+      this.sendPvpNetworkMessage({ type: 'mv-ticket-trigger', reason: trigger }, null, true);
+      return;
+    }
     const center = this.getPvpSpawnCenter();
     const angle = Math.random() * Math.PI * 2;
     const x = Math.max(200, Math.min(3800, center.x + Math.cos(angle) * 560));
@@ -8345,9 +8493,14 @@ class Game {
       speed: 3.6, dmg: 92, icon: '📞', col: '#ff4757', xp: 240, isBoss: true,
       isMegaBoss: false, bossType: 'mv_chaser', freezeTimer: 0, bossTimer1: 0, bossTimer2: 0 };
     this.enemies.push(boss);
-    this.showBanner('🚨 ТРИ ОТКАЗА — М.В. ВЫШЕЛ НА ЛИНИЮ!');
+    const announcement = trigger === 'declined'
+      ? '🚨 ОДИН ОТКАЗ ОТ ТИКЕТА — М.В. ВЫШЕЛ НА ЛИНИЮ!'
+      : trigger === 'ignored'
+        ? '🚨 ТИКЕТ ПРОИГНОРИРОВАН — М.В. ВЫШЕЛ НА ЛИНИЮ!'
+        : '🚨 ТРИ ПРОВАЛЕННЫХ ТИКЕТА — М.В. ВЫШЕЛ НА ЛИНИЮ!';
+    this.showBanner(announcement);
     this.addPopup(x, y - boss.size - 20, '📞 М.В. НАГОНЯЕТ!', '#ff4757');
-    this.log('После трёх отказов от тикетов появился М.В. Он быстро догоняет героя и наносит большой урон.');
+    this.log(`${announcement.replace('🚨 ', '')} Он быстро догоняет героя и наносит большой урон.`);
     this.sound.boss();
   }
   spawnBananaSupply() {
@@ -8358,7 +8511,7 @@ class Game {
       const distance = 170 + Math.random() * 380;
       const x = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.x + Math.cos(angle) * distance));
       const y = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.y + Math.sin(angle) * distance));
-      this.pickups.push({ x, y, type: 'banana', icon: '🍌' });
+      this.pickups.push({ x, y, type: 'banana', icon: '🍌', age: 0 });
     }
     if (supplyCount > 0) this.addPopup(this.player.x, this.player.y - 38, '🍌 Запас из 308 кабинета!', '#f1c40f');
   }
@@ -9517,6 +9670,11 @@ class Game {
       mx *= -1;
       my *= -1;
     }
+    if (this.activeChallenge?.status === 'active' && this.activeChallenge.rotateControls) {
+      const previousX = mx;
+      mx = my;
+      my = -previousX;
+    }
     if ((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && this.pvp?.choosing === 'levelup') { mx = 0; my = 0; this.mouseMoveAim = null; }
 
     if (this.pvpControlTimer <= 0 && this.player.stunTimer <= 0 && (mx !== 0 || my !== 0)) {
@@ -9732,7 +9890,15 @@ class Game {
       }
 
       const target = this.getPvpEnemyTarget(e);
-      const ang = Math.atan2(target.y - e.y, target.x - e.x);
+      let ang = Math.atan2(target.y - e.y, target.x - e.x);
+      if (worldAuthority && this.activeChallenge?.status === 'active' && this.activeChallenge.chaoticMobs && !e.isBoss && !e.is24hPursuer) {
+        e.ticketWanderTimer = (e.ticketWanderTimer || 0) - dt;
+        if (e.ticketWanderTimer <= 0) {
+          e.ticketWanderAngle = Math.random() * Math.PI * 2;
+          e.ticketWanderTimer = 0.75 + Math.random() * 1.5;
+        }
+        ang = e.ticketWanderAngle;
+      }
       if (worldAuthority && e.isClientDuplicate && !e.duplicateTriggered && e.hp <= e.maxHp * 0.5) {
         e.duplicateTriggered = true;
         const cloneHp = Math.max(1, e.maxHp * 0.28);
@@ -9909,9 +10075,9 @@ class Game {
         } else if (!hasNukeOnMap && (e.xp >= 8 || e.isBoss) && dropRoll < 0.009) {
           this.pickups.push({ x: e.x, y: e.y, type: 'its_box', icon: '📦' });
         } else if (dropRoll < 0.04) {
-          this.pickups.push({ x: e.x, y: e.y, type: 'coffee', icon: '☕' });
+          this.pickups.push({ x: e.x, y: e.y, type: 'coffee', icon: '☕', age: 0 });
         } else if (dropRoll < 0.07) {
-          this.pickups.push({ x: e.x, y: e.y, type: 'banana', icon: '🍌' });
+          this.pickups.push({ x: e.x, y: e.y, type: 'banana', icon: '🍌', age: 0 });
         }
 
         this.enemies.splice(i, 1);
@@ -9921,6 +10087,13 @@ class Game {
     // Лут
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const item = this.pickups[i];
+      if (item.type === 'banana' || item.type === 'coffee') {
+        item.age = Math.max(0, (Number(item.age) || 0) + dt);
+        if (item.age >= 180) {
+          this.pickups.splice(i, 1);
+          continue;
+        }
+      }
       if (Math.hypot(this.player.x - item.x, this.player.y - item.y) < 32) {
         if (item.type === 'banana' && this.player.hp >= this.player.maxHp - 0.0001) continue;
         if ((item.type === 'br_supply' || item.type === 'consumable') && !this.canAddConsumableToInventory(item.consumableKey)) {
@@ -10006,6 +10179,7 @@ class Game {
   }
 
   tryDash() {
+    if (this.activeChallenge?.status === 'active' && this.activeChallenge.disableDash) return;
     if (this.paused || !this.player || this.player.hp <= 0 || this.player.stunTimer > 0 || this.player.dashCooldown > 0) return;
     this.player.dashX = this.player.facingX || 1;
     this.player.dashY = this.player.facingY || 0;
@@ -10278,7 +10452,13 @@ class Game {
     } else if (ch.type === 'combat_up') {
       const statByKey = { ricochet: 'ricochetLevel', multishot: 'multishotLevel', slowshot: 'slowShotLevel', burnshot: 'burnShotLevel' };
       const stat = statByKey[ch.key];
-      if (stat) this.player[stat] = Math.min(5, this.player[stat] + 1);
+      if (stat) {
+        this.player[stat] = Math.min(5, this.player[stat] + 1);
+        if (ch.key === 'ricochet') this.player.cdMult += 0.03;
+        else if (ch.key === 'multishot') this.player.dmgMult -= 0.04;
+        else if (ch.key === 'slowshot') this.player.speedMult -= 0.02;
+        else if (ch.key === 'burnshot') this.player.cdMult += 0.025;
+      }
     } else if (ch.type === 'repeatable') {
       if (ch.key !== 'rep_salary_index' || (this.repeatableUpgradeCounts[ch.key] || 0) < 8) {
         ch.applyFn(this);

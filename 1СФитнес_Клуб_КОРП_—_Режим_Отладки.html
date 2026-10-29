@@ -4310,7 +4310,9 @@ class Game {
     this.achievementToastActive = true;
     const { achievement, tier } = this.achievementToastQueue.shift();
     const toast = document.getElementById('achievement-toast');
-    toast.innerHTML = `<div class="achievement-toast-card tier-${tier + 1}"><div class="achievement-icon">${achievement.icon}</div><div><small>Получено достижение · ${ACHIEVEMENT_MEDALS[tier]}</small><b>${achievement.title}</b><span>${achievement.description}</span></div></div>`;
+    const stageTarget = achievement.targets?.[tier];
+    const stageDetails = stageTarget !== undefined ? `Этап: ${achievement.format(stageTarget)}` : achievement.description;
+    toast.innerHTML = `<div class="achievement-toast-card tier-${tier + 1}"><div class="achievement-icon">${achievement.icon}</div><div><small>Получено достижение · ${ACHIEVEMENT_MEDALS[tier]}</small><b>${achievement.title}</b><span>${this.escapeHtml(stageDetails)}</span><span>${this.escapeHtml(achievement.description)}</span></div></div>`;
     toast.classList.add('show');
     setTimeout(() => {
       toast.classList.remove('show');

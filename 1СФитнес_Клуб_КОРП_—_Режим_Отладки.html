@@ -9960,6 +9960,12 @@ class Game {
           moveSpeed *= 0.62;
         }
       }
+      if (e.bossType === 'mv_chaser') {
+        const playerSpeed = Number.isFinite(this.currentMoveSpeed)
+          ? this.currentMoveSpeed
+          : this.player.baseSpeed * (this.player.speedMult || 1);
+        moveSpeed = Math.min(moveSpeed, Math.max(0, playerSpeed - 0.01));
+      }
       if (worldAuthority && !e.isMegaBoss) {
         e.x += Math.cos(ang) * moveSpeed * frameScale;
         e.y += Math.sin(ang) * moveSpeed * frameScale;
@@ -10715,8 +10721,8 @@ class Game {
       primaryButton.textContent = '⌂ Выйти в главное меню';
       primaryButton.onclick = () => this.leavePvpRoom();
     } else {
-      primaryButton.textContent = '🔄 Сделать ТиИ и начать заново';
-      primaryButton.onclick = () => this.restartFromGameOver();
+      primaryButton.textContent = '⌂ Выйти в главное меню';
+      primaryButton.onclick = () => this.showMainMenu();
     }
     if (this.pvp) {
       if (battleRoyaleElimination) this.pvp.eliminated = true;

@@ -540,7 +540,7 @@
   @media (max-width:500px) and (pointer:coarse) { #modal-rudesktop-rescue .win-1c { max-height:calc(100% - 18px); overflow-y:auto; } }
   #modal-lb { z-index: 250; }
   #modal-shop { z-index: 180; }
-  #modal-shop .win-1c { width: min(790px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
+  #modal-shop .win-1c { width: min(1440px, 96vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-settings, #modal-changelog { z-index: 280; }
   #modal-achievements { z-index: 310; }
   #modal-google-auth { z-index: 1000; background:rgba(7,10,17,.94); }
@@ -677,7 +677,7 @@
   .shop-combo-hint { margin-top: 6px; padding: 5px 6px; background: #fff2cf; border: 1px solid #c78b26; border-radius: 3px; color: #754500; font-size: 10px; line-height: 1.3; font-weight: bold; }
   .shop-card button { margin-top: 8px; }
   .shop-card button:disabled { opacity: .45; cursor: not-allowed; }
-  #modal-shop .dota-shop { width:min(1120px,96vw); height:min(760px,94vh); display:flex; flex-direction:column; background:#18212d; color:#e4eaf0; border-color:#65778b; }
+  #modal-shop .dota-shop { width:100%; max-width:1440px; height:min(760px,94vh); display:flex; flex-direction:column; background:#18212d; color:#e4eaf0; border-color:#65778b; }
   #modal-shop .win-1c-head { flex:0 0 auto; background:#d8a927; border-color:#7e601b; }
   #modal-shop .dota-shop-body { display:flex; flex:1; min-height:0; flex-direction:column; gap:9px; padding:10px; }
   .dota-shop-toolbar { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
@@ -685,11 +685,11 @@
   .dota-shop-categories .shop-tab { padding:6px 10px; color:#dbe3ec; background:#293849; border:1px solid #52687e; cursor:pointer; }
   .dota-shop-categories .shop-tab.selected { color:#fff; background:#557a9e; border-color:#9bc1e5; }
   .dota-shop-search { width:min(230px,100%); padding:7px 9px; color:#e9f0f7; background:#101820; border:1px solid #53677a; }
-  .dota-shop-main { display:grid; flex:1; min-height:0; grid-template-columns:minmax(0,1.3fr) minmax(280px,.8fr); gap:9px; }
+  .dota-shop-main { display:grid; flex:1; min-height:0; grid-template-columns:minmax(0,1.8fr) minmax(300px,.8fr); gap:9px; }
   .dota-shop-catalog,.dota-shop-details,.dota-shop-inventory-panel { min-width:0; min-height:0; padding:8px; background:#202c39; border:1px solid #3a4c5e; }
   .dota-shop-catalog,.dota-shop-details { display:flex; flex-direction:column; }
   .dota-shop-section-title { margin-bottom:7px; color:#e5c66c; font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:.5px; }
-  .dota-shop-items { display:grid; flex:1; min-height:0; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:5px; overflow:auto; align-content:start; }
+  .dota-shop-items { display:grid; flex:1; min-height:0; grid-template-columns:repeat(auto-fill,minmax(125px,1fr)); gap:5px; overflow:auto; align-content:start; }
   .dota-shop-item-card { position:relative; min-width:0; min-height:70px; }
   .dota-shop-item { width:100%; height:100%; min-height:70px; padding:5px 25px 5px 5px; display:grid; grid-template-columns:30px 1fr; grid-template-rows:1fr auto; gap:3px 5px; text-align:left; color:#e8edf2; background:#2a3948; border:1px solid #526477; cursor:pointer; }
   .dota-shop-item:hover,.dota-shop-item.selected { background:#3b5368; border-color:#e5c66c; }

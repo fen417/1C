@@ -4450,6 +4450,11 @@ class Game {
   }
 
   async createPvpRoom() {
+    if (this.pvp?.started) {
+      this.pvpStatus('Сначала завершите текущий матч, затем можно будет создать комнату.', true);
+      return;
+    }
+    if (this.pvp) await this.leavePvpRoom({ keepMenuOpen: true });
     this.requestMobileFullscreen();
     this.pvpStatus('Создаём комнату…');
     const maxPlayers = 8;
@@ -4500,6 +4505,15 @@ class Game {
   async joinPvpRoom() {
     const code = document.getElementById('pvp-room-code').value.trim();
     if (!/^[0-9]{4}$/.test(code)) { this.pvpStatus('Введите четырёхзначный код комнаты.', true); return; }
+    if (this.pvp?.started) {
+      this.pvpStatus('Сначала завершите текущий матч, затем можно будет войти в другую комнату.', true);
+      return;
+    }
+    if (this.pvp?.code === code) {
+      this.pvpStatus('Вы уже подключены к этой комнате.');
+      return;
+    }
+    if (this.pvp) await this.leavePvpRoom({ keepMenuOpen: true });
     this.requestMobileFullscreen();
     this.pvpStatus('Подключаемся к комнате…');
     const name = (this.savedNick || 'Архитектор 1С').slice(0, 20);
@@ -4511,10 +4525,15 @@ class Game {
       if (!snapshot.exists()) throw new Error('Комната не найдена.');
       const room = snapshot.val();
       if (room.status !== 'waiting') throw new Error('Матч уже начался.');
-      if (uid === room.hostUid || room.players?.[uid]) throw new Error('Вы уже подключены к этой комнате.');
-      const currentPlayers = Object.values(room.players || {});
+      const existingPlayer = room.players?.[uid];
+      if (uid === room.hostUid || (existingPlayer && existingPlayer.online !== false)) throw new Error('Вы уже подключены к этой комнате.');
+      const currentPlayers = Object.values(room.players || {}).filter(player => player?.online !== false);
       if (currentPlayers.length >= 8) throw new Error('Лобби заполнено (максимум 8 игроков).');
-      const slot = currentPlayers.length;
+      const usedSlots = new Set(currentPlayers.map(player => Number(player.slot)).filter(slot => Number.isInteger(slot) && slot >= 0 && slot < 8));
+      const oldSlot = Number(existingPlayer?.slot);
+      const nextFreeSlot = Array.from({ length: 8 }, (_, index) => index).find(index => !usedSlots.has(index));
+      const slot = Number.isInteger(oldSlot) && oldSlot >= 0 && oldSlot < 8 && !usedSlots.has(oldSlot) ? oldSlot : nextFreeSlot;
+      if (slot === undefined) throw new Error('В лобби нет свободного места.');
       const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
       const state = { x: 2000, y: 2000, hp: classDef.stats.hp, maxHp: classDef.stats.maxHp, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
       await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, classId: this.selectedClassId, slot, online: true, state });
@@ -6110,7 +6129,7 @@ class Game {
     }
   }
 
-  async leavePvpRoom() {
+  async leavePvpRoom({ keepMenuOpen = false } = {}) {
     const pvp = this.pvp;
     if (!pvp) return;
     pvp.leaving = true;
@@ -6133,7 +6152,7 @@ class Game {
     this.pvp = null;
     this.pvpPausedByRemote = false;
     document.getElementById('modal-pvp-wait').style.display = 'none';
-    document.getElementById('modal-pvp').style.display = 'none';
+    if (!keepMenuOpen) document.getElementById('modal-pvp').style.display = 'none';
     document.getElementById('pvp-leave-button').style.display = 'none';
     document.getElementById('pvp-room-code-display').style.display = 'none';
     document.getElementById('pvp-copy-room-code').style.display = 'none';
@@ -6141,7 +6160,11 @@ class Game {
     document.getElementById('pvp-lobby-players').style.display = 'none';
     document.getElementById('pvp-start-button').style.display = 'none';
     this.paused = true;
-    this.showMainMenu();
+    if (keepMenuOpen) {
+      document.getElementById('pvp-mode-select').disabled = false;
+      this.subscribePvpRoomDirectory();
+      this.pvpStatus('Вы вышли из предыдущей комнаты. Можно создать новую или подключиться к другой.');
+    } else this.showMainMenu();
   }
   showSettings() {
     this.settingsReturnToPause = document.getElementById('modal-pause').style.display === 'flex';

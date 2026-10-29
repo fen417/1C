@@ -1477,27 +1477,33 @@
   const db = getDatabase(app);
   const googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: 'select_account' });
+  const makeFirebaseContext = user => ({
+    app, auth, user, db, uid: user.uid,
+    ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect
+  });
+  let resolveFirebaseLeaderboard;
+  window.firebaseLeaderboardReady = new Promise((resolve, reject) => {
+    resolveFirebaseLeaderboard = resolve;
+    onAuthStateChanged(auth, user => {
+      if (user && !user.isAnonymous) resolve(makeFirebaseContext(user));
+    }, reject);
+  });
   window.firebaseAuthActions = {
     signInGoogle: async () => {
       const mobile = window.matchMedia?.('(pointer: coarse)').matches;
+      let result;
       if (auth.currentUser?.isAnonymous) {
         if (mobile) return linkWithRedirect(auth.currentUser, googleProvider);
-        return linkWithPopup(auth.currentUser, googleProvider);
+        result = await linkWithPopup(auth.currentUser, googleProvider);
+      } else {
+        if (mobile) return signInWithRedirect(auth, googleProvider);
+        result = await signInWithPopup(auth, googleProvider);
       }
-      if (mobile) return signInWithRedirect(auth, googleProvider);
-      return signInWithPopup(auth, googleProvider);
+      if (result?.user && !result.user.isAnonymous) resolveFirebaseLeaderboard(makeFirebaseContext(result.user));
+      return result;
     },
     signOut: () => signOut(auth)
   };
-  window.firebaseLeaderboardReady = new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, user => {
-      if (!user || user.isAnonymous) return;
-      resolve({
-        app, auth, user, db, uid: user.uid,
-        ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect
-      });
-    }, reject);
-  });
 </script>
 
 <script>
@@ -3885,7 +3891,12 @@ class Game {
   showGoogleAuthError(error) {
     const status = document.getElementById('google-auth-status');
     if (!status) return;
-    status.textContent = `Не удалось войти: ${error?.message || 'проверьте подключение и настройки Firebase.'}`;
+    const message = String(error?.message || '');
+    if (/permission|permission_denied/i.test(message)) {
+      status.textContent = 'Google-вход выполнен, но RTDB запрещает чтение профиля. Опубликуйте database.rules.json в Firebase → Realtime Database → Rules.';
+      return;
+    }
+    status.textContent = `Не удалось войти: ${message || 'проверьте подключение и настройки Firebase.'}`;
   }
 
   async signInWithGoogle() {
@@ -3893,12 +3904,16 @@ class Game {
     status.textContent = 'Открываем вход Google…';
     try {
       await window.firebaseAuthActions.signInGoogle();
+      const fb = await window.firebaseLeaderboardReady;
+      await this.onFirebaseAuthenticated(fb);
     } catch (error) {
       this.showGoogleAuthError(error);
     }
   }
 
   async onFirebaseAuthenticated(fb) {
+    if (this.firebaseAuthSetupUid === fb.uid) return;
+    this.firebaseAuthSetupUid = fb.uid;
     this.firebaseUser = fb.user;
     try {
       const profileSnapshot = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/profile`));
@@ -3927,6 +3942,7 @@ class Game {
       await this.syncAchievementLeaderboard();
       this.renderAchievements();
     } catch (error) {
+      this.firebaseAuthSetupUid = null;
       this.showGoogleAuthError(error);
     }
   }

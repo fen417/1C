@@ -507,6 +507,11 @@
   .pause-audio-controls .btn-1c { flex:1 1 145px; }
   #pause-stats { grid-template-columns: minmax(0, 1fr); }
   #pause-stats .loadout-section { width: 100%; }
+  #pause-stats .loadout-section li {
+    display:grid; grid-template-columns:minmax(0,1fr) max-content; align-items:baseline; column-gap:8px;
+    padding:3px 0; line-height:1.25; overflow-wrap:anywhere;
+  }
+  #pause-stats .loadout-section li b { float:none; margin:0; white-space:nowrap; text-align:right; }
   #pause-loadout { flex:1; }
   .loadout-section { background: #f7f7f7; border: 1px solid #ccc; padding: 8px; min-width: 0; }
   .loadout-section h3 { color: #900; font-size: 12px; margin: 0 0 5px; }
@@ -7704,16 +7709,16 @@ class Game {
     const stats = [
       { icon: '🧑‍💻', name: 'Класс', value: player.className || 'Технарь' },
       { icon: '❤️', name: 'Здоровье', value: `${Math.ceil(player.hp)} / ${player.maxHp}` },
-      { icon: '⚔️', name: 'Урон', value: `${formatMultiplierDelta(activeDamage, 'к урону')}${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
-      { icon: '⚡', name: 'Скорость бега', value: `${(player.baseSpeed * activeSpeedMult).toFixed(2)} · ${formatMultiplierDelta(activeSpeedMult, 'к скорости')}` },
-      { icon: '🎯', name: 'Шанс крита', value: `${Math.round(player.critChance * 100)}% · крит наносит 250% обычного урона` },
+      { icon: '⚔️', name: 'Урон', value: `${formatPercent(activeDamage * 100)}%${player.damageBuffTimer > 0 ? ` · ${Math.ceil(player.damageBuffTimer)}с` : ''}` },
+      { icon: '⚡', name: 'Скорость бега', value: `${(player.baseSpeed * activeSpeedMult).toFixed(2)} · ${formatPercent(activeSpeedMult * 100)}%` },
+      { icon: '🎯', name: 'Шанс крита', value: `${Math.round(player.critChance * 100)}% · урон крита 250%` },
       { icon: '🌀', name: 'Уклонение', value: `${Math.round(player.dodge * 100)}%` },
       { icon: '🩹', name: 'Регенерация', value: `${player.regen.toFixed(1)} HP/с` },
-      { icon: '⏱️', name: 'Перезарядка умений и оружия', value: formatCooldownDelta(cooldown) },
-      { icon: '🧲', name: 'Радиус сбора', value: formatMultiplierDelta(player.magnetMult, 'к радиусу') },
-      { icon: '📈', name: 'Опыт', value: formatMultiplierDelta(player.xpMult * player.xpEventMult * (player.xpBoostTimer > 0 ? 2 : 1), 'опыта') },
-      { icon: '💰', name: 'Фиткоины с дискет', value: formatMultiplierDelta(player.currencyMult || 1, 'фиткоинов') },
-      { icon: '💨', name: 'Перезарядка рывка', value: formatCooldownDelta(player.dashCooldownMult || 1, 'Перезарядка рывка') },
+      { icon: '⏱️', name: 'Перезарядка умений и оружия', value: `${formatPercent(cooldown * 100)}%` },
+      { icon: '🧲', name: 'Радиус сбора', value: `${formatPercent(player.magnetMult * 100)}%` },
+      { icon: '📈', name: 'Опыт', value: `${formatPercent(player.xpMult * player.xpEventMult * (player.xpBoostTimer > 0 ? 2 : 1) * 100)}%` },
+      { icon: '💰', name: 'Фиткоины с дискет', value: `${formatPercent((player.currencyMult || 1) * 100)}%` },
+      { icon: '💨', name: 'Перезарядка рывка', value: `${formatPercent((player.dashCooldownMult || 1) * 100)}%` },
       { icon: '🪑', name: 'Лечение при повышении уровня', value: `+${Math.round(player.levelUpHeal || 0)} HP` },
       { icon: '🪪', name: 'Защита от боссов', value: `${Math.round((player.bossDamageReduction || 0) * 100)}%` },
       { icon: '🛡️', name: 'Защита', value: player.shieldTimer > 0 ? `Щит · ${Math.ceil(player.shieldTimer)}с` : 'Без щита' }

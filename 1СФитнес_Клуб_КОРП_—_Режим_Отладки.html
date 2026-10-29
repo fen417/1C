@@ -562,7 +562,7 @@
   .achievement-rank-table { max-height:300px; overflow:auto; border:1px solid #34475c; border-radius:6px; }
   .achievement-rank-head,.achievement-rank-row { display:grid; grid-template-columns:60px minmax(0,1fr) 100px; gap:8px; align-items:center; padding:8px 10px; font-size:11px; }
   .achievement-rank-head { position:sticky; top:0; background:#26384c; color:#e9cc76; font-weight:bold; }
-  .achievement-rank-row { border-top:1px solid #2d3e52; color:#dce5ef; padding:0; }
+  .achievement-rank-row { display:block; border-top:1px solid #2d3e52; color:#dce5ef; padding:0; }
   .achievement-rank-row:nth-child(odd) { background:#1d2b3c; }
   .achievement-rank-row.own { background:#3a3524; color:#ffe18a; }
   .achievement-rank-row button { width:100%; display:grid; grid-template-columns:60px minmax(0,1fr) 100px; gap:8px; align-items:center; padding:8px 10px; border:0; border-top:1px solid #2d3e52; background:transparent; color:inherit; text-align:left; cursor:pointer; font:inherit; }
@@ -4091,7 +4091,7 @@ class Game {
       const snapshot = await fb.get(fb.ref(fb.db, 'achievementLeaderboard'));
       const rows = snapshot.exists() ? Object.entries(snapshot.val()).map(([uid, data]) => ({ uid, name:String(data?.name || 'Игрок').slice(0,15), count:Math.max(0,Number(data?.medalCount)||0) })) : [];
       rows.sort((a,b) => b.count - a.count || a.name.localeCompare(b.name,'ru'));
-      container.innerHTML = rows.length ? `<div class="achievement-rank-table"><div class="achievement-rank-head"><span>Место</span><span>Игрок</span><span>Медали</span></div>${rows.slice(0,100).map((row,index)=>`<div class="achievement-rank-row${row.uid===fb.uid?' own':''}"><button type="button" data-player-uid="${this.escapeHtml(row.uid)}" aria-label="Посмотреть достижения игрока ${this.escapeHtml(row.name)}"><b>${index+1}</b><span>${this.escapeHtml(row.name)}</span><strong>🏅 ${row.count}</strong></button></div>`).join('')}</div>` : '<div class="achievement-summary">Рейтинг пока пуст. Получите первую медаль!</div>';
+      container.innerHTML = rows.length ? `<div class="achievement-rank-table"><div class="achievement-rank-head"><span>Место</span><span>Игрок</span><span>Медали</span></div>${rows.slice(0,100).map((row,index)=>{const rank=index+1;const placeMedal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';return `<div class="achievement-rank-row${row.uid===fb.uid?' own':''}"><button type="button" data-player-uid="${this.escapeHtml(row.uid)}" aria-label="Посмотреть достижения игрока ${this.escapeHtml(row.name)}"><b>${placeMedal?`${placeMedal} `:''}${rank}</b><span>${this.escapeHtml(row.name)}</span><strong>🏅 ${row.count}</strong></button></div>`;}).join('')}</div>` : '<div class="achievement-summary">Рейтинг пока пуст. Получите первую медаль!</div>';
       container.querySelectorAll('[data-player-uid]').forEach(button => button.addEventListener('click', () => this.openPlayerAchievements(button.dataset.playerUid)));
     } catch (error) { container.innerHTML = `<div class="achievement-summary">Не удалось загрузить рейтинг: ${this.escapeHtml(error.message || 'ошибка')}</div>`; }
   }

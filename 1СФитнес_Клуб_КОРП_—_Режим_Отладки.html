@@ -574,6 +574,10 @@
   .achievement-stage-list { display:flex; gap:4px; margin-top:8px; }
   .achievement-stage { flex:1; padding:4px 2px; border:1px solid #3c4a5a; border-radius:4px; color:#728196; font-size:9px; text-align:center; }
   .achievement-stage.unlocked { color:#fff; border-color:#b99543; background:#40391f; }
+  .achievement-stage.unlocked.tier-1 { border-color:#bd7b42; background:#493323; box-shadow:inset 0 0 8px #bd7b4233; }
+  .achievement-stage.unlocked.tier-2 { border-color:#c5d1df; background:#34404e; box-shadow:inset 0 0 8px #c5d1df33; }
+  .achievement-stage.unlocked.tier-3 { border-color:#e7bd42; background:#49401f; box-shadow:inset 0 0 8px #e7bd4233; }
+  .achievement-stage.unlocked.tier-4 { border-color:#c99aff; background:#3d2d52; box-shadow:inset 0 0 8px #c99aff44; }
   .achievement-leaderboard { grid-column:1/-1; padding:12px; border:1px solid #40536a; border-radius:8px; background:#172333; }
   .achievement-leaderboard h2 { margin-bottom:8px; color:#f2d27b; font-size:14px; }
   .achievement-rank-table { max-height:300px; overflow:auto; border:1px solid #34475c; border-radius:6px; }
@@ -4269,7 +4273,7 @@ class Game {
       grid.innerHTML = ACHIEVEMENT_DEFINITIONS.map(item => {
         const stage = Math.max(0, Math.min(item.targets.length, Number(unlocked[item.id]) || 0));
         const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
-        const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?' unlocked':''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
+        const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?` unlocked tier-${index + 1}`:''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
         return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-stage-list">${stages}</div></article>`;
       }).join('');
     } catch (error) {
@@ -4291,7 +4295,7 @@ class Game {
       const target = item.targets[stage] || item.targets[item.targets.length - 1];
       const progress = stage >= item.targets.length ? 100 : Math.min(100, value / target * 100);
       const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
-      const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?' unlocked':''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
+      const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?` unlocked tier-${index + 1}`:''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
       return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-progress"><span style="width:${progress}%"></span></div><p>${stage>=item.targets.length?'Все этапы завершены':`Прогресс: ${item.format(value)} · цель ${item.format(target)}`}</p><div class="achievement-stage-list">${stages}</div></article>`;
     }).join('');
   }

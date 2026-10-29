@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.6.0</title>
+<title>1С:Фитнес Клуб КОРП 2.6.1</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -541,12 +541,24 @@
   #modal-google-auth { z-index: 1000; background:rgba(7,10,17,.94); }
   #modal-google-auth .win-1c { width:min(430px,94vw); border:1px solid #536277; background:#111a27; color:#eef4fb; }
   #modal-google-auth .win-1c-head { background:#192638; border-color:#34445b; }
+  .auth-mode-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:0 0 10px; }
+  .auth-mode-tabs .btn-1c { min-height:38px; color:#dce6f0; background:#26374a; border-color:#4c6075; }
+  .auth-mode-tabs .btn-1c.selected { color:#fff; background:#426583; border-color:#9bc1e5; }
+  .auth-field { display:block; margin:0 0 9px; color:#cbd7e4; font-size:11px; }
+  .auth-field input { display:block; width:100%; min-height:40px; margin-top:4px; padding:8px 10px; color:#eef4fb; background:#0d1520; border:1px solid #53677a; border-radius:4px; font:inherit; font-size:14px; }
+  .auth-divider { display:flex; align-items:center; gap:8px; margin:10px 0; color:#8797a8; font-size:11px; }
+  .auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:#34475c; }
+  #auth-reset-password { display:block; width:100%; margin-top:8px; padding:4px; color:#a9c9e7; background:transparent; border:0; cursor:pointer; font-size:11px; text-decoration:underline; }
   .achievements-window { width:min(900px,96vw); max-height:min(780px,94vh); display:flex; flex-direction:column; background:#111a27; color:#ecf2fa; border:1px solid #536277; }
   #modal-achievements .win-1c-head { background:#192638; border-color:#34445b; }
   .achievements-body { min-height:0; overflow:auto; background:radial-gradient(ellipse at top,#1d2c40,#101722 70%); }
   .achievement-summary { margin-bottom:12px; padding:12px 14px; border:1px solid #40536a; border-radius:8px; background:#1a2736; color:#c9d6e4; font-size:12px; }
   .achievement-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .achievement-card { min-width:0; padding:12px; border:1px solid #35475c; border-radius:8px; background:linear-gradient(145deg,#1d2a39,#151e2a); }
+  .achievement-card.tier-1 { border-color:#bd7b42; box-shadow:0 0 8px #bd7b4233; }
+  .achievement-card.tier-2 { border-color:#c5d1df; box-shadow:0 0 8px #c5d1df33; }
+  .achievement-card.tier-3 { border-color:#e7bd42; box-shadow:0 0 9px #e7bd4244; }
+  .achievement-card.tier-4 { border-color:#c99aff; box-shadow:0 0 10px #c99aff55; }
   .achievement-card-top { display:flex; align-items:center; gap:10px; }
   .achievement-icon { width:44px; height:44px; flex:0 0 44px; display:grid; place-items:center; border:1px solid #65778b; border-radius:10px; background:#26374b; font-size:24px; }
   .achievement-card h3 { color:#f2d27b; font-size:13px; }
@@ -573,6 +585,10 @@
   #achievement-toast { position:absolute; z-index:500; top:48px; left:50%; width:min(360px,calc(100% - 24px)); display:none; transform:translateX(-50%); pointer-events:none; }
   #achievement-toast.show { display:block; animation:achievement-toast-in .35s ease-out both; }
   .achievement-toast-card { display:flex; align-items:center; gap:12px; padding:12px 15px; border:2px solid #d8b457; border-radius:10px; background:linear-gradient(145deg,#26384c,#111a27); color:#fff; box-shadow:0 8px 30px #000b, inset 0 0 18px #d8b45722; }
+  .achievement-toast-card.tier-1 { border-color:#bd7b42; box-shadow:0 8px 30px #000b,inset 0 0 18px #bd7b4233; }
+  .achievement-toast-card.tier-2 { border-color:#c5d1df; box-shadow:0 8px 30px #000b,inset 0 0 18px #c5d1df33; }
+  .achievement-toast-card.tier-3 { border-color:#e7bd42; box-shadow:0 8px 30px #000b,inset 0 0 18px #e7bd4244; }
+  .achievement-toast-card.tier-4 { border-color:#c99aff; box-shadow:0 8px 30px #000b,inset 0 0 18px #c99aff55; }
   .achievement-toast-card .achievement-icon { border-color:#e0bd61; background:#4a4025; }
   .achievement-toast-card small { display:block; margin-bottom:3px; color:#e8cc7a; font-size:10px; font-weight:bold; letter-spacing:.6px; text-transform:uppercase; }
   .achievement-toast-card b { font-size:13px; }
@@ -946,7 +962,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.6.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.6.1 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1074,13 +1090,26 @@
       <div class="win-1c-head"><span>🔐 Вход в кластер</span></div>
       <div class="win-1c-body">
         <div id="google-auth-signin">
-          <p style="font-size:13px;line-height:1.5;margin-bottom:14px;">Для игры, сетевых комнат и сохранения достижений войдите через Google. Прогресс будет привязан к вашему аккаунту.</p>
-          <button class="btn-1c" style="width:100%;min-height:44px;background:#55efc4;" onclick="game.signInWithGoogle()">Войти через Google</button>
+          <p style="font-size:13px;line-height:1.5;margin-bottom:12px;">Выберите способ входа. Прогресс, сетевые комнаты и достижения привязываются к аккаунту.</p>
+          <div class="auth-mode-tabs">
+            <button id="auth-tab-login" class="btn-1c selected" type="button" onclick="game.setEmailAuthMode('login')">Войти</button>
+            <button id="auth-tab-register" class="btn-1c" type="button" onclick="game.setEmailAuthMode('register')">Создать аккаунт</button>
+          </div>
+          <form id="auth-email-form" onsubmit="event.preventDefault(); game.submitEmailAuth();">
+            <label class="auth-field">Email<input id="auth-email" type="email" autocomplete="email" maxlength="254" required placeholder="name@example.com"></label>
+            <label class="auth-field">Пароль<input id="auth-password" type="password" autocomplete="current-password" minlength="6" maxlength="128" required placeholder="Не менее 6 символов"></label>
+            <label id="auth-confirm-field" class="auth-field" style="display:none;">Повторите пароль<input id="auth-password-confirm" type="password" autocomplete="new-password" minlength="6" maxlength="128" placeholder="Повторите пароль"></label>
+            <button id="auth-email-submit" class="btn-1c" style="width:100%;min-height:42px;background:#55efc4;" type="submit">Войти по email</button>
+          </form>
+          <button id="auth-reset-password" type="button" onclick="game.resetEmailPassword()">Забыли пароль? Отправить письмо для сброса</button>
+          <div class="auth-divider">или</div>
+          <button class="btn-1c" style="width:100%;min-height:42px;" type="button" onclick="game.signInWithGoogle()">Войти через Google</button>
+          <p style="margin-top:8px;color:#9aaabd;font-size:10px;line-height:1.4;">Email подтверждать не нужно. Письмо отправится только при запросе сброса пароля.</p>
         </div>
         <div id="google-auth-nickname-step" style="display:none;">
           <p style="font-size:13px;line-height:1.5;margin-bottom:12px;">Придумайте ник, который будет отображаться в таблице рекордов и сетевой игре.</p>
           <input id="google-auth-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="width:100%;margin-bottom:10px;" placeholder="Ваш ник">
-          <button class="btn-1c" style="width:100%;min-height:42px;background:#55efc4;" onclick="game.completeGoogleRegistration()">Сохранить ник и продолжить</button>
+          <button class="btn-1c" style="width:100%;min-height:42px;background:#55efc4;" onclick="game.completeAccountRegistration()">Сохранить ник и продолжить</button>
         </div>
         <p id="google-auth-status" role="status" style="min-height:18px;margin-top:10px;color:#ffb3a8;font-size:11px;"></p>
       </div>
@@ -1091,7 +1120,7 @@
     <div class="win-1c achievements-window" onclick="event.stopPropagation()">
       <div class="win-1c-head"><span>🏅 Достижения</span><button class="win-close-btn" onclick="game.closeAchievements()" aria-label="Закрыть достижения">✕</button></div>
       <div class="win-1c-body achievements-body">
-        <div id="achievement-summary" class="achievement-summary">Ваши награды синхронизируются с Google-аккаунтом.</div>
+        <div id="achievement-summary" class="achievement-summary">Ваши награды синхронизируются с аккаунтом.</div>
         <div id="achievement-grid" class="achievement-grid"></div>
         <section class="achievement-leaderboard"><h2>🏆 Рейтинг достижений</h2><div id="achievement-leaderboard"></div></section>
       </div>
@@ -1108,7 +1137,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.6.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.6.1</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1118,12 +1147,12 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.6.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.6.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 2.6.0 — «ИИ-слоп на премиум-тарифе»</h3>
-              <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а отдел продаж теперь накручивает цены быстрее. Добавлены новые комплекты, фиткоины выпадают чуть реже; на мобильном HUD рюкзак скрыт, а расходники стоят на его месте. Добавлены вход через Google, профиль с изменяемым ником, достижения за забеги, PvP, Battle Royale и спасение от RuDesktop, медали, рейтинг и просмотр наград других игроков.</p>
+              <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а фиткоины с дискет выпадают реже. Исправлены интерфейсы магазина и достижений, зависание игрового кадра и отображение большого босса на ПК. Добавлены новые комплекты, вход через Google или email с паролем, профиль с изменяемым ником, достижения за забеги, PvP, Battle Royale и спасение от RuDesktop, медали, рейтинг и просмотр наград других игроков.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
@@ -1190,13 +1219,13 @@
         <p style="font-size:12px; margin-bottom:12px;">Звук и управление</p>
         <div class="release-notes" style="margin-bottom:14px;">
           <b style="display:block;font-size:12px;margin-bottom:8px;">👤 Аккаунт</b>
-          <div id="settings-account-email" style="margin-bottom:7px;color:#666;font-size:11px;">Google не подключён</div>
+          <div id="settings-account-email" style="margin-bottom:7px;color:#666;font-size:11px;">Аккаунт не подключён</div>
           <div style="display:flex;gap:6px;">
             <input id="settings-account-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="min-width:0;flex:1;" aria-label="Игровой ник">
             <button class="btn-1c" onclick="game.saveAccountNickname()">Сохранить ник</button>
           </div>
           <div id="settings-account-status" style="min-height:14px;margin-top:5px;color:#666;font-size:10px;"></div>
-          <button class="btn-1c" style="margin-top:6px;" onclick="game.signOutGoogle()">Выйти из Google-аккаунта</button>
+          <button class="btn-1c" style="margin-top:6px;" onclick="game.signOutGoogle()">Выйти из аккаунта</button>
         </div>
         <div class="release-notes" style="margin-bottom:14px;">
           <b style="display:block;font-size:12px;margin-bottom:8px;">⌨️ Клавиши для ПК</b>
@@ -1248,7 +1277,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 22% (в сумме на 43,96% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы, фиткоины выпадают на 3,14% реже. На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлены обязательный вход через Google, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
@@ -1473,7 +1502,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, linkWithPopup, linkWithRedirect, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, linkWithPopup, linkWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
   import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
@@ -1517,12 +1546,15 @@
       if (result?.user && !result.user.isAnonymous) resolveFirebaseLeaderboard(makeFirebaseContext(result.user));
       return result;
     },
+    signInEmail: (email, password) => signInWithEmailAndPassword(auth, email, password),
+    createEmailAccount: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+    resetEmailPassword: email => sendPasswordResetEmail(auth, email),
     signOut: () => signOut(auth)
   };
 </script>
 
 <script>
-const GAME_VERSION = '2.6.0';
+const GAME_VERSION = '2.6.1';
 const ACHIEVEMENT_MEDALS = ['Бронза', 'Серебро', 'Золото', 'Платина'];
 const ACHIEVEMENT_DEFINITIONS = [
   { id:'survivor', icon:'⏳', title:'Рабочая смена', description:'Продержитесь в одном забеге как можно дольше.', metric:'bestSurvival', targets:[1200,2400,3600,5400], format:v=>`${Math.floor(v/60)} мин` },
@@ -2449,7 +2481,7 @@ const ACTIVE_SKILLS_DEF = {
   act_lavender_raf: {
     name: 'Активное: Чай из травы, которую собрал Владик на огороде',
     icon: '☕',
-    desc: 'Чайный вакуум: моментально всасывает ВСЕ дискеты с карты в карман и взрывает ауру!',
+    desc: 'Чайный вакуум: моментально всасывает все дискеты и взрывает ауру. Пока навык есть в сборке, радиус сбора опыта растёт по уровню: 10%, 25%, 50%, 75% и 100% радиуса карты.',
     baseCd: 26,
     cast: (g, lvl) => {
       g.sound.playTone(850, 'triangle', 0.4, 0.25);
@@ -3671,7 +3703,7 @@ class Game {
     this.transactionHistoryLastSample = -1;
     this.dynUpdateCd = 0;
     this.currency = 0;
-    this.shopPriceMultiplier = 1.4396;
+    this.shopPriceMultiplier = 1.626748;
     this.salesCallCount = 0;
     this.fitcoinTheftCooldown = 0;
     this.shopPassives = Array(6).fill(null);
@@ -3925,6 +3957,70 @@ class Game {
     status.textContent = `Не удалось войти: ${message || 'проверьте подключение и настройки Firebase.'}`;
   }
 
+  setEmailAuthMode(mode) {
+    this.emailAuthMode = mode === 'register' ? 'register' : 'login';
+    const registering = this.emailAuthMode === 'register';
+    document.getElementById('auth-tab-login').classList.toggle('selected', !registering);
+    document.getElementById('auth-tab-register').classList.toggle('selected', registering);
+    document.getElementById('auth-confirm-field').style.display = registering ? 'block' : 'none';
+    document.getElementById('auth-password-confirm').required = registering;
+    document.getElementById('auth-password').autocomplete = registering ? 'new-password' : 'current-password';
+    document.getElementById('auth-email-submit').textContent = registering ? 'Создать аккаунт по email' : 'Войти по email';
+    document.getElementById('auth-reset-password').style.display = registering ? 'none' : 'block';
+    document.getElementById('google-auth-status').textContent = '';
+  }
+
+  async submitEmailAuth() {
+    const email = String(document.getElementById('auth-email').value || '').trim();
+    const password = document.getElementById('auth-password').value || '';
+    const status = document.getElementById('google-auth-status');
+    const registering = this.emailAuthMode === 'register';
+    if (!email || password.length < 6) {
+      status.textContent = 'Введите корректный email и пароль длиной не менее 6 символов.';
+      return;
+    }
+    if (registering && password !== document.getElementById('auth-password-confirm').value) {
+      status.textContent = 'Пароли не совпадают.';
+      return;
+    }
+    status.textContent = registering ? 'Создаём аккаунт…' : 'Входим…';
+    document.getElementById('auth-email-submit').disabled = true;
+    try {
+      const action = registering ? window.firebaseAuthActions.createEmailAccount : window.firebaseAuthActions.signInEmail;
+      await action(email, password);
+      const fb = await window.firebaseLeaderboardReady;
+      await this.onFirebaseAuthenticated(fb);
+    } catch (error) {
+      const code = String(error?.code || '');
+      const messages = {
+        'auth/invalid-email': 'Проверьте формат email.',
+        'auth/invalid-credential': 'Неверный email или пароль.',
+        'auth/wrong-password': 'Неверный email или пароль.',
+        'auth/user-not-found': 'Неверный email или пароль.',
+        'auth/email-already-in-use': 'Этот email уже зарегистрирован. Попробуйте войти или выбрать Google.',
+        'auth/weak-password': 'Пароль слишком простой; используйте не менее 6 символов.',
+        'auth/too-many-requests': 'Слишком много попыток. Подождите и попробуйте снова.',
+        'auth/operation-not-allowed': 'В Firebase не включён вход по Email/Password.'
+      };
+      status.textContent = messages[code] || `Не удалось войти: ${String(error?.message || 'ошибка Firebase')}`;
+    } finally {
+      document.getElementById('auth-email-submit').disabled = false;
+    }
+  }
+
+  async resetEmailPassword() {
+    const email = String(document.getElementById('auth-email').value || '').trim();
+    const status = document.getElementById('google-auth-status');
+    if (!email) { status.textContent = 'Сначала укажите email для сброса пароля.'; return; }
+    status.textContent = 'Отправляем письмо для сброса пароля…';
+    try {
+      await window.firebaseAuthActions.resetEmailPassword(email);
+      status.textContent = 'Если для этого email есть аккаунт, Firebase отправит письмо для сброса пароля.';
+    } catch (error) {
+      status.textContent = `Не удалось отправить письмо: ${String(error?.message || 'ошибка Firebase')}`;
+    }
+  }
+
   async signInWithGoogle() {
     const status = document.getElementById('google-auth-status');
     status.textContent = 'Открываем вход Google…';
@@ -3956,7 +4052,7 @@ class Game {
         document.getElementById('modal-google-auth').style.display = 'flex';
         document.getElementById('google-auth-status').textContent = '';
       }
-      document.getElementById('settings-account-email').textContent = fb.user.email || 'Google-аккаунт подключён';
+      document.getElementById('settings-account-email').textContent = fb.user.email || 'Аккаунт подключён';
       const nicknameInput = document.getElementById('settings-account-nickname');
       if (nicknameInput) nicknameInput.value = this.savedNick;
       const achievementSnapshot = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/achievements`));
@@ -3973,7 +4069,7 @@ class Game {
     }
   }
 
-  async completeGoogleRegistration() {
+  async completeAccountRegistration() {
     const nickname = String(document.getElementById('google-auth-nickname').value || '').trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15);
     if (nickname.length < 2) {
       document.getElementById('google-auth-status').textContent = 'Ник должен содержать от 2 до 15 букв, цифр, «_» или «-».';
@@ -3986,11 +4082,13 @@ class Game {
       this.setPlayerNickname(nickname);
       document.getElementById('google-auth-status').textContent = '';
       document.getElementById('modal-google-auth').style.display = 'none';
-      document.getElementById('settings-account-email').textContent = fb.user.email || 'Google-аккаунт подключён';
+      document.getElementById('settings-account-email').textContent = fb.user.email || 'Аккаунт подключён';
       await this.persistAchievementState();
       await this.syncAchievementLeaderboard();
     } catch (error) { this.showGoogleAuthError(error); }
   }
+
+  completeGoogleRegistration() { return this.completeAccountRegistration(); }
 
   async saveAccountNickname() {
     const input = document.getElementById('settings-account-nickname');
@@ -4120,7 +4218,7 @@ class Game {
         const stage = Math.max(0, Math.min(item.targets.length, Number(unlocked[item.id]) || 0));
         const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
         const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?' unlocked':''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
-        return `<article class="achievement-card"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-stage-list">${stages}</div></article>`;
+        return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-stage-list">${stages}</div></article>`;
       }).join('');
     } catch (error) {
       grid.innerHTML = `<div class="achievement-summary">Не удалось загрузить достижения: ${this.escapeHtml(error.message || 'ошибка')}</div>`;
@@ -4134,7 +4232,7 @@ class Game {
     if (!grid) return;
     const total = Object.values(this.achievementUnlocked || {}).reduce((sum,count)=>sum+(Number(count)||0),0);
     const summary = document.getElementById('achievement-summary');
-    if (summary) summary.textContent = `${this.savedNick} · получено медалей: ${total} из ${ACHIEVEMENT_DEFINITIONS.reduce((sum,item)=>sum+item.targets.length,0)}. Прогресс синхронизируется с Google-аккаунтом.`;
+    if (summary) summary.textContent = `${this.savedNick} · получено медалей: ${total} из ${ACHIEVEMENT_DEFINITIONS.reduce((sum,item)=>sum+item.targets.length,0)}. Прогресс синхронизируется с аккаунтом.`;
     grid.innerHTML = ACHIEVEMENT_DEFINITIONS.map(item => {
       const value = this.achievementMetricValue(item);
       const stage = Math.min(item.targets.length, Number(this.achievementUnlocked[item.id]) || 0);
@@ -4142,7 +4240,7 @@ class Game {
       const progress = stage >= item.targets.length ? 100 : Math.min(100, value / target * 100);
       const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
       const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?' unlocked':''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
-      return `<article class="achievement-card"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-progress"><span style="width:${progress}%"></span></div><p>${stage>=item.targets.length?'Все этапы завершены':`Прогресс: ${item.format(value)} · цель ${item.format(target)}`}</p><div class="achievement-stage-list">${stages}</div></article>`;
+      return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-progress"><span style="width:${progress}%"></span></div><p>${stage>=item.targets.length?'Все этапы завершены':`Прогресс: ${item.format(value)} · цель ${item.format(target)}`}</p><div class="achievement-stage-list">${stages}</div></article>`;
     }).join('');
   }
 
@@ -4156,7 +4254,7 @@ class Game {
     this.achievementToastActive = true;
     const { achievement, tier } = this.achievementToastQueue.shift();
     const toast = document.getElementById('achievement-toast');
-    toast.innerHTML = `<div class="achievement-toast-card"><div class="achievement-icon">${achievement.icon}</div><div><small>Получено достижение · ${ACHIEVEMENT_MEDALS[tier]}</small><b>${achievement.title}</b><span>${achievement.description}</span></div></div>`;
+    toast.innerHTML = `<div class="achievement-toast-card tier-${tier + 1}"><div class="achievement-icon">${achievement.icon}</div><div><small>Получено достижение · ${ACHIEVEMENT_MEDALS[tier]}</small><b>${achievement.title}</b><span>${achievement.description}</span></div></div>`;
     toast.classList.add('show');
     setTimeout(() => {
       toast.classList.remove('show');
@@ -6031,7 +6129,7 @@ class Game {
     if (this.salesCallActive) return;
     this.salesCallActive = true;
     this.salesCallCount = (this.salesCallCount || 0) + 1;
-    this.shopPriceMultiplier = (this.shopPriceMultiplier || 1.4396) * 1.0814;
+    this.shopPriceMultiplier = (this.shopPriceMultiplier || 1.626748) * 1.0814;
     this.salesCallX = 12;
     this.salesCallY = 12;
     this.salesCallVX = 48;
@@ -6506,7 +6604,7 @@ class Game {
     if (seen.has(key)) return 0;
     const item = this.getShopCatalogItem(key);
     if (!item) return 0;
-    if (!item.parts) return Math.ceil(Math.max(0, Number(item.cost) || 0) * (this.shopPriceMultiplier || 1.4396));
+    if (!item.parts) return Math.ceil(Math.max(0, Number(item.cost) || 0) * (this.shopPriceMultiplier || 1.626748));
     const nextSeen = new Set(seen).add(key);
     return item.parts.reduce((sum, part) => sum + this.getShopItemTotalCost(part, nextSeen), 0);
   }
@@ -7076,7 +7174,7 @@ class Game {
     const catalog = document.getElementById('shop-catalog');
     if (!catalog) return;
     catalog.replaceChildren();
-    document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов · наценка +${(((this.shopPriceMultiplier || 1.4396) - 1) * 100).toFixed(1)}%`;
+    document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов · наценка +${(((this.shopPriceMultiplier || 1.626748) - 1) * 100).toFixed(1)}%`;
     const search = this.shopSearch;
     let items;
     if (this.shopView === 'sell') {
@@ -9859,7 +9957,12 @@ class Game {
     }
 
     // Магнит
-    const magnetRange = 100 * this.player.magnetMult;
+    const teaSkill = (this.activeSkills || []).find(skill => skill?.key === 'act_lavender_raf');
+    const teaRadiusFractions = [0, 0.10, 0.25, 0.50, 0.75, 1.00];
+    const mapRadius = Math.hypot((this.BOUND_MAX - this.BOUND_MIN) / 2, (this.BOUND_MAX - this.BOUND_MIN) / 2);
+    const teaLevel = Math.max(1, Math.min(5, Number(teaSkill?.lvl) || 1));
+    const teaMagnetRange = teaSkill ? mapRadius * teaRadiusFractions[teaLevel] : 0;
+    const magnetRange = Math.max(100 * this.player.magnetMult, teaMagnetRange);
     for (let i = this.gems.length - 1; i >= 0; i--) {
       const g = this.gems[i];
       const d = Math.hypot(this.player.x - g.x, this.player.y - g.y);
@@ -9873,7 +9976,7 @@ class Game {
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
-        const fitcoins = Math.max(0, Math.round(g.xp * 0.5 * 0.9686 * (this.player.currencyMult || 1)));
+        const fitcoins = Math.max(0, Math.round(g.xp * 0.3 * (this.player.currencyMult || 1)));
         this.currency += fitcoins;
         if (fitcoins && this.firebaseUser) {
           this.achievementProgress.fitcoinsEarned = (Number(this.achievementProgress.fitcoinsEarned) || 0) + fitcoins;

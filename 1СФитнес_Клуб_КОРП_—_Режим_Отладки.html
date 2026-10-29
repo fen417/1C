@@ -7824,11 +7824,13 @@ class Game {
 
   updateShopItemCooldowns(dt) {
     let redraw = false;
-    for (const slot of [...(this.shopPassives || []), ...(this.backpack || [])]) {
-      if (slot && slot.cooldown > 0) {
-        const before = Math.ceil(slot.cooldown);
-        slot.cooldown = Math.max(0, slot.cooldown - dt);
-        if (Math.ceil(slot.cooldown) !== before || slot.cooldown === 0) redraw = true;
+    for (const slots of [this.shopPassives || [], this.backpack || []]) {
+      for (const slot of slots) {
+        if (slot && slot.cooldown > 0) {
+          const before = Math.ceil(slot.cooldown);
+          slot.cooldown = Math.max(0, slot.cooldown - dt);
+          if (Math.ceil(slot.cooldown) !== before || slot.cooldown === 0) redraw = true;
+        }
       }
     }
     if (redraw) this.updateInventoryHUD();
@@ -11230,18 +11232,18 @@ class Game {
     this.updateBattleRoyaleCenterMarker();
     const pct = Math.min(100, (this.xp / this.nextXp) * 100);
     document.getElementById('xp-bar-fill').style.width = pct + '%';
-    document.getElementById('xp-bar-text').innerText = `РЕЛИЗ ${this.heroReleaseVersion()} [${this.xp} / ${this.nextXp} СТРОК КОДА]`;
+    this.setHudText(document.getElementById('xp-bar-text'), `РЕЛИЗ ${this.heroReleaseVersion()} [${this.xp} / ${this.nextXp} СТРОК КОДА]`);
 
     const m = Math.floor(this.time / 60).toString().padStart(2, '0');
     const s = Math.floor(this.time % 60).toString().padStart(2, '0');
-    document.getElementById('time-display').innerText = `${m}:${s}`;
-    document.getElementById('kill-display').innerText = this.kills;
-    document.getElementById('score-display').innerText = this.calcScore();
+    this.setHudText(document.getElementById('time-display'), `${m}:${s}`);
+    this.setHudText(document.getElementById('kill-display'), this.kills);
+    this.setHudText(document.getElementById('score-display'), this.calcScore());
 
-    document.getElementById('hp-val').innerText = `${Math.max(0, Math.round(this.player.hp))}/${this.player.maxHp} HP`;
-    document.getElementById('currency-display').innerText = this.currency || 0;
+    this.setHudText(document.getElementById('hp-val'), `${Math.max(0, Math.round(this.player.hp))}/${this.player.maxHp} HP`);
+    this.setHudText(document.getElementById('currency-display'), this.currency || 0);
     const shopRemaining = Math.max(0, Math.ceil((this.nextShopTime - this.time)));
-    document.getElementById('shop-timer').innerText = `☎ ${Math.floor(shopRemaining / 60).toString().padStart(2, '0')}:${(shopRemaining % 60).toString().padStart(2, '0')}`;
+    this.setHudText(document.getElementById('shop-timer'), `☎ ${Math.floor(shopRemaining / 60).toString().padStart(2, '0')}:${(shopRemaining % 60).toString().padStart(2, '0')}`);
     const hpRatio = Math.max(0, Math.min(1, this.player.hp / this.player.maxHp));
     const hpFill = document.getElementById('hud-health-fill');
     hpFill.style.width = `${hpRatio * 100}%`;
@@ -11258,14 +11260,14 @@ class Game {
     megaHud.classList.toggle('is-visible', Boolean(megaBoss));
     if (megaBoss) {
       const ratio = Math.max(0, Math.min(1, megaBoss.hp / megaBoss.maxHp));
-      document.getElementById('mega-boss-name').innerText = `🧿 ${megaBoss.name}`;
-      document.getElementById('mega-boss-health').innerText = ` · ${Math.ceil(megaBoss.hp)} / ${megaBoss.maxHp} HP`;
+      this.setHudText(document.getElementById('mega-boss-name'), `🧿 ${megaBoss.name}`);
+      this.setHudText(document.getElementById('mega-boss-health'), ` · ${Math.ceil(megaBoss.hp)} / ${megaBoss.maxHp} HP`);
       document.getElementById('mega-boss-fill').style.width = `${ratio * 100}%`;
       const directionGlyphs = ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'];
       const angle = (Math.atan2(megaBoss.y - this.player.y, megaBoss.x - this.player.x) + Math.PI * 2) % (Math.PI * 2);
       const direction = directionGlyphs[Math.round(angle / (Math.PI / 4)) % 8];
       const distance = Math.round(Math.hypot(megaBoss.x - this.player.x, megaBoss.y - this.player.y));
-      document.getElementById('mega-boss-direction').innerText = `Курс ${direction} · ${distance} м до центра карты`;
+      this.setHudText(document.getElementById('mega-boss-direction'), `Курс ${direction} · ${distance} м до центра карты`);
     }
 
     // Грейд архитектора
@@ -11273,8 +11275,14 @@ class Game {
     if (this.level >= 15) grade = "ИТ-Директор Холдинга";
     else if (this.level >= 10) grade = "Эксперт по тех. вопросам";
     else if (this.level >= 5) grade = "Ведущий Разработчик КОРП";
-    document.getElementById('arch-grade').innerText = grade;
+    this.setHudText(document.getElementById('arch-grade'), grade);
     this.updateBuffHUD();
+  }
+
+  setHudText(element, value) {
+    if (!element) return;
+    const text = String(value);
+    if (element.textContent !== text) element.textContent = text;
   }
 
   updateBattleRoyaleCenterMarker() {
@@ -11352,25 +11360,25 @@ class Game {
     if (stunTimer > 0 || slowTimer > 0) {
       const isStunned = stunTimer > 0;
       panel.style.display = 'flex';
-      document.getElementById('coffee-buff-symbol').innerText = isStunned ? '⛔' : '🧠';
-      document.getElementById('coffee-buff-timer').innerText = `${(isStunned ? stunTimer : slowTimer).toFixed(1)}с`;
-      document.getElementById('buff-indicator').innerText = isStunned ? 'СЕРВЕР 70 · СВЯЗЬ ПОТЕРЯНА' : 'СЕРВЕР 59 · НЕТ ОПЕРАТИВКИ';
+      this.setHudText(document.getElementById('coffee-buff-symbol'), isStunned ? '⛔' : '🧠');
+      this.setHudText(document.getElementById('coffee-buff-timer'), `${(isStunned ? stunTimer : slowTimer).toFixed(1)}с`);
+      this.setHudText(document.getElementById('buff-indicator'), isStunned ? 'СЕРВЕР 70 · СВЯЗЬ ПОТЕРЯНА' : 'СЕРВЕР 59 · НЕТ ОПЕРАТИВКИ');
       return;
     }
     if (readOnlyTimer > 0 || filterTimer > 0) {
       const isReadOnly = readOnlyTimer > 0;
       panel.style.display = 'flex';
-      document.getElementById('coffee-buff-symbol').innerText = isReadOnly ? '🔒' : '🔌';
-      document.getElementById('coffee-buff-timer').innerText = `${(isReadOnly ? readOnlyTimer : filterTimer).toFixed(1)}с`;
-      document.getElementById('buff-indicator').innerText = isReadOnly ? 'ТОЛЬКО ЧТЕНИЕ · УРОН −45%' : 'СЕТЕВОЙ ФИЛЬТР';
+      this.setHudText(document.getElementById('coffee-buff-symbol'), isReadOnly ? '🔒' : '🔌');
+      this.setHudText(document.getElementById('coffee-buff-timer'), `${(isReadOnly ? readOnlyTimer : filterTimer).toFixed(1)}с`);
+      this.setHudText(document.getElementById('buff-indicator'), isReadOnly ? 'ТОЛЬКО ЧТЕНИЕ · УРОН −45%' : 'СЕТЕВОЙ ФИЛЬТР');
       return;
     }
     const coffeeActive = coffeeTimer > 0;
     const timer = coffeeActive ? coffeeTimer : speedTimer;
     panel.style.display = 'flex';
-    document.getElementById('coffee-buff-symbol').innerText = coffeeActive ? '☕' : '⚡';
-    document.getElementById('coffee-buff-timer').innerText = `${Math.ceil(timer)}с`;
-    document.getElementById('buff-indicator').innerText = coffeeActive ? 'КОФЕ ИЗ 308' : 'УСКОРЕНИЕ';
+    this.setHudText(document.getElementById('coffee-buff-symbol'), coffeeActive ? '☕' : '⚡');
+    this.setHudText(document.getElementById('coffee-buff-timer'), `${Math.ceil(timer)}с`);
+    this.setHudText(document.getElementById('buff-indicator'), coffeeActive ? 'КОФЕ ИЗ 308' : 'УСКОРЕНИЕ');
   }
 
   updateInventoryHUD() {
@@ -11438,11 +11446,16 @@ class Game {
     for (let i = 0; i < 4; i++) {
       const el = document.getElementById(`act-slot-${i}`);
       const skill = this.activeSkills[i];
+      const keyLabel = this.keyCodeLabel(this.keyBindings[`skill${i + 1}`]);
+      const cooldownLabel = skill?.cdTimer > 0 ? `${Math.ceil(skill.cdTimer)}с` : '';
+      const signature = `${skill?.key || ''}|${skill?.lvl || ''}|${keyLabel}|${cooldownLabel}`;
+      if (el.dataset.hudState === signature) continue;
+      el.dataset.hudState = signature;
       const iconEl = el.querySelector('.act-icon');
       const lvlEl = el.querySelector('.act-lvl');
       const overlay = el.querySelector('.act-cd-overlay');
       const keyEl = el.querySelector('.act-key');
-      if (keyEl) keyEl.textContent = this.keyCodeLabel(this.keyBindings[`skill${i + 1}`]);
+      if (keyEl && keyEl.textContent !== keyLabel) keyEl.textContent = keyLabel;
 
       if (!skill) {
         el.className = 'active-slot empty';
@@ -11457,7 +11470,7 @@ class Game {
 
         if (skill.cdTimer > 0) {
           overlay.style.display = 'flex';
-          overlay.innerText = `${Math.ceil(skill.cdTimer)}с`;
+          if (overlay.textContent !== cooldownLabel) overlay.textContent = cooldownLabel;
         } else {
           overlay.style.display = 'none';
         }
@@ -11473,6 +11486,12 @@ class Game {
     const viewHeight = this.viewportHeight / zoom;
     const camX = this.player.x - viewWidth / 2;
     const camY = this.player.y - viewHeight / 2;
+    const camRight = camX + viewWidth;
+    const camBottom = camY + viewHeight;
+    // Skip canvas work for off-screen entities. The margin accounts for labels,
+    // auras and effects that extend beyond an entity's position.
+    const isRenderVisible = (x, y, margin = 0) =>
+      x + margin >= camX && x - margin <= camRight && y + margin >= camY && y - margin <= camBottom;
 
     this.ctx.save();
     this.ctx.translate(this.viewportWidth / 2, this.viewportHeight / 2);
@@ -11562,6 +11581,7 @@ class Game {
 
     // Лужи
     for (let pud of this.puddles) {
+      if (!isRenderVisible(pud.x, pud.y, pud.radius || 0)) continue;
       this.ctx.beginPath();
       this.ctx.arc(pud.x, pud.y, pud.radius, 0, Math.PI * 2);
       this.ctx.fillStyle = pud.isTrail ? 'rgba(120, 72, 34, 0.42)' : 'rgba(255, 234, 167, 0.35)';
@@ -11571,6 +11591,7 @@ class Game {
     // Красные телеграфируемые зоны атак центрального босса.
     for (const warning of this.bossWarnings) {
       const pos = this.getPvpRenderPosition(warning.syncId, warning.x, warning.y);
+      if (!isRenderVisible(pos.x, pos.y, (warning.radius || 0) + 24)) continue;
       const urgency = 1 - warning.life / warning.maxLife;
       this.ctx.save();
       this.ctx.globalAlpha = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(urgency * Math.PI * 12));
@@ -11594,6 +11615,7 @@ class Game {
     // Дискеты
     for (let g of this.gems) {
       const pos = this.getPvpRenderPosition(g.syncId, g.x, g.y);
+      if (!isRenderVisible(pos.x, pos.y, 8)) continue;
       this.ctx.fillStyle = g.col;
       this.ctx.fillRect(pos.x - 4, pos.y - 4, 8, 8);
     }
@@ -11601,6 +11623,7 @@ class Game {
     // Лут
     for (let item of this.pickups) {
       const pos = this.getPvpRenderPosition(item.syncId, item.x, item.y);
+      if (!isRenderVisible(pos.x, pos.y, 40)) continue;
       if (item.type === 'br_supply') {
         const pulse = 0.5 + 0.5 * Math.sin(this.time * 4);
         this.ctx.save();
@@ -11639,6 +11662,7 @@ class Game {
         continue;
       }
       const pos = this.getPvpRenderPosition(hazard.syncId, hazard.x, hazard.y);
+      if (!isRenderVisible(pos.x, pos.y, (hazard.radius || 0) + 128)) continue;
       const falling = this.time < hazard.impactAt;
       const pulse = 0.5 + 0.5 * Math.sin(this.time * 18);
       this.ctx.save();
@@ -11706,6 +11730,7 @@ class Game {
     // Враги и боссы
     for (let e of this.enemies) {
       const pos = this.getPvpRenderPosition(e.syncId, e.x, e.y);
+      if (!isRenderVisible(pos.x, pos.y, Math.max(e.size || 0, e.auraRadius || 0) + 80)) continue;
       this.ctx.save();
       this.ctx.translate(pos.x, pos.y);
 
@@ -11819,6 +11844,7 @@ class Game {
 
     // Вызванные специалисты: показываем и здоровье, и оставшееся время.
     for (const summon of (this.summons || [])) {
+      if (!isRenderVisible(summon.x, summon.y, (summon.size || 0) + 16)) continue;
       this.ctx.save();
       this.ctx.translate(summon.x, summon.y);
       this.ctx.beginPath();
@@ -11863,15 +11889,18 @@ class Game {
     // Снаряды
     for (let p of this.projectiles) {
       if (p.type === 'laser_visual') {
+        // Laser lines may cross the viewport even when both endpoints are outside it.
         this.ctx.strokeStyle = '#ff4757';
         this.ctx.lineWidth = 3;
         for (let l of p.lines) {
+          if (Math.max(l.x1, l.x2) < camX || Math.min(l.x1, l.x2) > camRight || Math.max(l.y1, l.y2) < camY || Math.min(l.y1, l.y2) > camBottom) continue;
           this.ctx.beginPath();
           this.ctx.moveTo(l.x1, l.y1);
           this.ctx.lineTo(l.x2, l.y2);
           this.ctx.stroke();
         }
       } else {
+        if (!isRenderVisible(p.x, p.y, (p.size || 0) + 12)) continue;
         this.ctx.font = `${p.size * 1.5}px monospace`;
         this.ctx.fillStyle = p.color;
         this.ctx.textAlign = 'center';
@@ -11900,6 +11929,7 @@ class Game {
         }
         const x = Number(shot.x) + Number(shot.vx || 0) * 60 * elapsed;
         const y = Number(shot.y) + Number(shot.vy || 0) * 60 * elapsed;
+        if (!isRenderVisible(x, y, (Number(shot.size) || 10) + 12)) continue;
         this.ctx.font = `${Math.max(8, Number(shot.size) || 10) * 1.5}px monospace`;
         this.ctx.fillStyle = shot.color || '#fff';
         this.ctx.textAlign = 'center';
@@ -11912,6 +11942,7 @@ class Game {
     // Пули врагов
     for (let ep of this.enemyProjectiles) {
       const pos = this.getPvpRenderPosition(ep.syncId, ep.x, ep.y);
+      if (!isRenderVisible(pos.x, pos.y, 16)) continue;
       this.ctx.font = '16px monospace';
       this.ctx.fillStyle = ep.color;
       this.ctx.textAlign = 'center';
@@ -11923,6 +11954,7 @@ class Game {
     const remote = this.pvp?.remoteState;
     if (remote && Number.isFinite(remote.x) && Number.isFinite(remote.y)) {
       const remotePos = this.getPvpRenderPosition('@remote', remote.x, remote.y);
+      if (isRenderVisible(remotePos.x, remotePos.y, 48)) {
       this.ctx.save();
       this.ctx.translate(remotePos.x, remotePos.y);
       this.ctx.globalAlpha = remote.over ? 0.42 : 1;
@@ -11947,6 +11979,7 @@ class Game {
       this.ctx.fillStyle = '#55efc4';
       this.ctx.fillRect(-24, -28, 48 * Math.max(0, Math.min(1, (remote.hp || 0) / Math.max(1, remote.maxHp || 100))), 5);
       this.ctx.restore();
+      }
     }
 
     if (this.pvp?.maxPlayers >= 3) {
@@ -11955,6 +11988,7 @@ class Game {
         const state = player.state;
         if (!Number.isFinite(state.x) || !Number.isFinite(state.y)) continue;
         const pos = this.getPvpRenderPosition(`@remote-${player.uid}`, state.x, state.y);
+        if (!isRenderVisible(pos.x, pos.y, 48)) continue;
         this.ctx.save();
         this.ctx.translate(pos.x, pos.y);
         this.ctx.globalAlpha = state.over ? 0.42 : 1;
@@ -12026,6 +12060,7 @@ class Game {
 
     // Частицы
     for (let pt of this.particles) {
+      if (!isRenderVisible(pt.x, pt.y, 4)) continue;
       this.ctx.fillStyle = pt.col;
       this.ctx.beginPath();
       this.ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
@@ -12034,6 +12069,7 @@ class Game {
 
     // Текстовые попапы
     for (let t of this.texts) {
+      if (!isRenderVisible(t.x, t.y, 180)) continue;
       this.ctx.font = 'bold 13px monospace';
       this.ctx.fillStyle = t.color;
       this.ctx.fillText(t.text, t.x, t.y);

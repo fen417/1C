@@ -537,6 +537,42 @@
   #modal-shop { z-index: 180; }
   #modal-shop .win-1c { width: min(790px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-settings, #modal-changelog { z-index: 280; }
+  #modal-achievements { z-index: 310; }
+  #modal-google-auth { z-index: 1000; background:rgba(7,10,17,.94); }
+  #modal-google-auth .win-1c { width:min(430px,94vw); border:1px solid #536277; background:#111a27; color:#eef4fb; }
+  #modal-google-auth .win-1c-head { background:#192638; border-color:#34445b; }
+  .achievements-window { width:min(900px,96vw); max-height:min(780px,94vh); display:flex; flex-direction:column; background:#111a27; color:#ecf2fa; border:1px solid #536277; }
+  #modal-achievements .win-1c-head { background:#192638; border-color:#34445b; }
+  .achievements-body { min-height:0; overflow:auto; background:radial-gradient(ellipse at top,#1d2c40,#101722 70%); }
+  .achievement-summary { margin-bottom:12px; padding:12px 14px; border:1px solid #40536a; border-radius:8px; background:#1a2736; color:#c9d6e4; font-size:12px; }
+  .achievement-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .achievement-card { min-width:0; padding:12px; border:1px solid #35475c; border-radius:8px; background:linear-gradient(145deg,#1d2a39,#151e2a); }
+  .achievement-card-top { display:flex; align-items:center; gap:10px; }
+  .achievement-icon { width:44px; height:44px; flex:0 0 44px; display:grid; place-items:center; border:1px solid #65778b; border-radius:10px; background:#26374b; font-size:24px; }
+  .achievement-card h3 { color:#f2d27b; font-size:13px; }
+  .achievement-card p { margin-top:5px; color:#aebdce; font-size:11px; line-height:1.4; }
+  .achievement-rank { margin-left:auto; color:#e8d7ac; font-size:10px; text-align:right; }
+  .achievement-progress { height:7px; margin-top:10px; overflow:hidden; border-radius:5px; background:#0d131c; }
+  .achievement-progress > span { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#43c7a5,#e9c45c); }
+  .achievement-stage-list { display:flex; gap:4px; margin-top:8px; }
+  .achievement-stage { flex:1; padding:4px 2px; border:1px solid #3c4a5a; border-radius:4px; color:#728196; font-size:9px; text-align:center; }
+  .achievement-stage.unlocked { color:#fff; border-color:#b99543; background:#40391f; }
+  .achievement-leaderboard { grid-column:1/-1; padding:12px; border:1px solid #40536a; border-radius:8px; background:#172333; }
+  .achievement-leaderboard h2 { margin-bottom:8px; color:#f2d27b; font-size:14px; }
+  .achievement-rank-table { max-height:300px; overflow:auto; border:1px solid #34475c; border-radius:6px; }
+  .achievement-rank-head,.achievement-rank-row { display:grid; grid-template-columns:60px minmax(0,1fr) 100px; gap:8px; align-items:center; padding:8px 10px; font-size:11px; }
+  .achievement-rank-head { position:sticky; top:0; background:#26384c; color:#e9cc76; font-weight:bold; }
+  .achievement-rank-row { border-top:1px solid #2d3e52; color:#dce5ef; }
+  .achievement-rank-row:nth-child(odd) { background:#1d2b3c; }
+  .achievement-rank-row.own { background:#3a3524; color:#ffe18a; }
+  #achievement-toast { position:absolute; z-index:500; top:48px; left:50%; width:min(360px,calc(100% - 24px)); display:none; transform:translateX(-50%); pointer-events:none; }
+  #achievement-toast.show { display:block; animation:achievement-toast-in .35s ease-out both; }
+  .achievement-toast-card { display:flex; align-items:center; gap:12px; padding:12px 15px; border:2px solid #d8b457; border-radius:10px; background:linear-gradient(145deg,#26384c,#111a27); color:#fff; box-shadow:0 8px 30px #000b, inset 0 0 18px #d8b45722; }
+  .achievement-toast-card .achievement-icon { border-color:#e0bd61; background:#4a4025; }
+  .achievement-toast-card small { display:block; margin-bottom:3px; color:#e8cc7a; font-size:10px; font-weight:bold; letter-spacing:.6px; text-transform:uppercase; }
+  .achievement-toast-card b { font-size:13px; }
+  .achievement-toast-card span { display:block; margin-top:3px; color:#bdc9d6; font-size:10px; }
+  @keyframes achievement-toast-in { from { opacity:0; transform:translate(-50%,-14px) scale(.96); } to { opacity:1; transform:translate(-50%,0) scale(1); } }
   #modal-changelog .win-1c { width: min(760px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-main-menu { z-index: 300; }
   #modal-pvp { z-index: 320; }
@@ -676,6 +712,11 @@
     .dota-shop-build { max-height:100px; }
     .dota-shop-item { min-height:54px; }
     .dota-shop-item-icon { width:26px; height:26px; }
+  }
+  @media(max-width:640px) {
+    .achievement-grid { grid-template-columns:1fr; }
+    .achievement-card { padding:10px; }
+    #modal-achievements .win-1c-head { flex-wrap:nowrap; }
   }
   @media (max-width: 760px) and (pointer: coarse) {
     #modal-shop { align-items:flex-start; justify-content:center; padding:0; overflow:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
@@ -1022,6 +1063,36 @@
 
   <!-- МОДАЛКИ -->
 
+  <div id="modal-google-auth" class="modal-overlay">
+    <div class="win-1c" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span>🔐 Вход в кластер</span></div>
+      <div class="win-1c-body">
+        <div id="google-auth-signin">
+          <p style="font-size:13px;line-height:1.5;margin-bottom:14px;">Для игры, сетевых комнат и сохранения достижений войдите через Google. Прогресс будет привязан к вашему аккаунту.</p>
+          <button class="btn-1c" style="width:100%;min-height:44px;background:#55efc4;" onclick="game.signInWithGoogle()">Войти через Google</button>
+        </div>
+        <div id="google-auth-nickname-step" style="display:none;">
+          <p style="font-size:13px;line-height:1.5;margin-bottom:12px;">Придумайте ник, который будет отображаться в таблице рекордов и сетевой игре.</p>
+          <input id="google-auth-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="width:100%;margin-bottom:10px;" placeholder="Ваш ник">
+          <button class="btn-1c" style="width:100%;min-height:42px;background:#55efc4;" onclick="game.completeGoogleRegistration()">Сохранить ник и продолжить</button>
+        </div>
+        <p id="google-auth-status" role="status" style="min-height:18px;margin-top:10px;color:#ffb3a8;font-size:11px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-achievements" class="modal-overlay" onclick="if(event.target===this) game.closeAchievements()">
+    <div class="win-1c achievements-window" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span>🏅 Достижения</span><button class="win-close-btn" onclick="game.closeAchievements()" aria-label="Закрыть достижения">✕</button></div>
+      <div class="win-1c-body achievements-body">
+        <div id="achievement-summary" class="achievement-summary">Ваши награды синхронизируются с Google-аккаунтом.</div>
+        <div id="achievement-grid" class="achievement-grid"></div>
+        <section class="achievement-leaderboard"><h2>🏆 Рейтинг достижений</h2><div id="achievement-leaderboard"></div></section>
+      </div>
+    </div>
+  </div>
+  <div id="achievement-toast" aria-live="polite" role="status"></div>
+
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
@@ -1032,6 +1103,7 @@
             <button class="btn-1c" style="background:#55efc4;" onclick="game.startFromMainMenu()">▶ Одиночная игра</button>
             <button class="btn-1c" onclick="game.showPvpMenu()">🌐 Сетевая игра</button>
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
+            <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
             <div class="main-menu-version">Текущая версия: <b>2.6.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
@@ -1039,7 +1111,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.6.0 — «ИИ-слоп на премиум-тарифе»</h3>
-              <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а отдел продаж теперь накручивает цены быстрее. Добавлены новые комплекты, фиткоины выпадают чуть реже; на мобильном HUD рюкзак скрыт, а расходники стоят на его месте.</p>
+              <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а отдел продаж теперь накручивает цены быстрее. Добавлены новые комплекты, фиткоины выпадают чуть реже; на мобильном HUD рюкзак скрыт, а расходники стоят на его месте. Добавлены вход через Google, профиль с изменяемым ником, синхронизация достижений, медали и рейтинг игроков.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.5.0 — «Осенняя чистка»</h3>
@@ -1105,6 +1177,16 @@
       <div class="win-1c-body">
         <p style="font-size:12px; margin-bottom:12px;">Звук и управление</p>
         <div class="release-notes" style="margin-bottom:14px;">
+          <b style="display:block;font-size:12px;margin-bottom:8px;">👤 Аккаунт</b>
+          <div id="settings-account-email" style="margin-bottom:7px;color:#666;font-size:11px;">Google не подключён</div>
+          <div style="display:flex;gap:6px;">
+            <input id="settings-account-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="min-width:0;flex:1;" aria-label="Игровой ник">
+            <button class="btn-1c" onclick="game.saveAccountNickname()">Сохранить ник</button>
+          </div>
+          <div id="settings-account-status" style="min-height:14px;margin-top:5px;color:#666;font-size:10px;"></div>
+          <button class="btn-1c" style="margin-top:6px;" onclick="game.signOutGoogle()">Выйти из Google-аккаунта</button>
+        </div>
+        <div class="release-notes" style="margin-bottom:14px;">
           <b style="display:block;font-size:12px;margin-bottom:8px;">⌨️ Клавиши для ПК</b>
           <div id="key-bindings" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
           <div id="key-bind-status" style="font-size:10px;color:#666;margin-top:7px;">Нажмите кнопку действия и затем нужную клавишу.</div>
@@ -1154,7 +1236,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 22% (в сумме на 43,96% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы, фиткоины выпадают на 3,14% реже. На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 22% (в сумме на 43,96% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы, фиткоины выпадают на 3,14% реже. На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлены обязательный вход через Google, профиль с изменяемым ником, облачные достижения с медалями и рейтинг игроков по числу наград.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor" open><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.3.0 — «Мобы не ушли в отпуск»</h3></summary><p>В начале каждого забега появился отдельный экран выбора класса с характеристиками и стартовым оружием. Считыватель IronLogic переделан из ближней ударной дуги в автоматический стреляющий тип: он наводится на ближайшего противника и выпускает пропуск-снаряд; базовые урон (42), перезарядка (1,35 с) и прибавка урона за уровень сохранены. В онлайне матч ждёт на общей паузе, пока каждый участник не выберет класс; после выбора класса игроком открывается общий экран ожидания, а когда готовы все, матч продолжается. Добавлены классы: «Технарь» (100 HP, скорость 3,2, урон 100%, IronLogic), «Переносчик» (120 HP, скорость 3,0, урон 80%, крит 15%, защита от боссов 10%, «Сводная таблица» — 32 базового урона, перезарядка 1 с), «Разработчик» (80 HP, скорость 3,4, урон 110%, перезарядка 110%, «Синтаксис-Контроль») и «Чел с техпода» (60 HP, скорость 3,5, урон 80%, перезарядка 120%, опыт и фиткоины 120%, «Телефон техподдержки» — 38 базового урона, перезарядка 1 с). При появлении большого босса обычные мобы остаются на карте; пока он жив, новые обычные волны и мини-боссы не появляются, после победы спавн продолжается. Оглушение от события «70-й сервер» сокращено до 1 секунды. Принудительное завершение забега клавишей L работает при русской раскладке. Добавлены три офисных события: «Клиент сгорел и уходит с 1С» — ковровая бомбардировка с последовательными ударами; «Клиент: опять ваши интеграции не работают» — метеоритный дождь в течение 6 секунд с горящими зонами на 3 секунды; «Клиент громко дышит в трубку» — 3-секундный порыв ветра, сдувающий игроков и мобов к случайному краю карты. Удары показывают зоны предупреждения и наносят урон игрокам, мобам и боссам в сетевой игре. В таблице рекордов отображается выбранный класс, у старых результатов поле пустое; записи с подписью «Читерок» можно скрыть в настройках, при этом позиции остальных игроков пересчитываются. Для одиночной игры и онлайн PvP/PvE по умолчанию оставлен прежний бит, для Battle Royale выбран новый трек «Последний круг». В настройках можно выбирать музыку независимо для каждого из этих трёх режимов. Новый BR-бит — оригинальная синтезированная half-time композиция с низким пульсом, редкой перкуссией и холодной подложкой; при спавне босса к ней постепенно добавляется мотив, а при большом боссе — тяжёлые индустриальные акценты и более плотный ритм.</p></details>
@@ -1229,6 +1311,7 @@
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showMainMenu()">⌂ Главное меню</button>
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
           <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.showSettings()">⚙️ Настройки</button>
+          <button class="btn-1c" style="width:100%; text-align:left;" onclick="game.openAchievements()">🏅 Достижения</button>
             </div>
             <div class="pause-audio-controls">
               <button class="btn-1c" id="pause-sound" onclick="game.sound.toggleMute()">🔊 Звуковые эффекты: ВКЛ</button>
@@ -1375,7 +1458,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
-  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, linkWithPopup, linkWithRedirect, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
   import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
@@ -1388,20 +1471,47 @@
     appId: '1:712022218463:web:3a1b863a6118f1a3e57b6a'
   };
 
-  window.firebaseLeaderboardReady = (async () => {
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const credential = await signInAnonymously(auth);
-    return {
-      db: getDatabase(app),
-      uid: credential.user.uid,
-      ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect
-    };
-  })();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  auth.languageCode = 'ru';
+  const db = getDatabase(app);
+  const googleProvider = new GoogleAuthProvider();
+  googleProvider.setCustomParameters({ prompt: 'select_account' });
+  window.firebaseAuthActions = {
+    signInGoogle: async () => {
+      const mobile = window.matchMedia?.('(pointer: coarse)').matches;
+      if (auth.currentUser?.isAnonymous) {
+        if (mobile) return linkWithRedirect(auth.currentUser, googleProvider);
+        return linkWithPopup(auth.currentUser, googleProvider);
+      }
+      if (mobile) return signInWithRedirect(auth, googleProvider);
+      return signInWithPopup(auth, googleProvider);
+    },
+    signOut: () => signOut(auth)
+  };
+  window.firebaseLeaderboardReady = new Promise((resolve, reject) => {
+    onAuthStateChanged(auth, user => {
+      if (!user || user.isAnonymous) return;
+      resolve({
+        app, auth, user, db, uid: user.uid,
+        ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect
+      });
+    }, reject);
+  });
 </script>
 
 <script>
 const GAME_VERSION = '2.6.0';
+const ACHIEVEMENT_MEDALS = ['Бронза', 'Серебро', 'Золото', 'Платина'];
+const ACHIEVEMENT_DEFINITIONS = [
+  { id:'survivor', icon:'⏳', title:'Рабочая смена', description:'Продержитесь в одном забеге как можно дольше.', metric:'bestSurvival', targets:[1200,2400,3600,5400], format:v=>`${Math.floor(v/60)} мин` },
+  { id:'mob_hunter', icon:'👾', title:'Уборщик кластера', description:'Уничтожьте мобов за все забеги.', metric:'mobsKilled', targets:[1000,10000,50000,200000], format:v=>`${Math.floor(v).toLocaleString('ru-RU')} мобов` },
+  { id:'boss_hunter', icon:'👹', title:'Аудитор аудиторов', description:'Победите боссов и мини-боссов.', metric:'bossesKilled', targets:[1,5,20,50], format:v=>`${Math.floor(v)} боссов` },
+  { id:'power_build', icon:'⚔️', title:'Тяжёлая конфигурация', description:'Соберите множитель урона за один забег.', metric:'bestDamage', targets:[2,3,5,8], format:v=>`×${Number(v).toFixed(2)} урона` },
+  { id:'health_stack', icon:'❤️', title:'Запас прочности', description:'Увеличьте максимум здоровья за один забег.', metric:'bestMaxHp', targets:[150,250,400,600], format:v=>`${Math.floor(v)} HP` },
+  { id:'fitcoin_saver', icon:'💰', title:'Фиткоиновый магнат', description:'Подберите фиткоины за все забеги.', metric:'fitcoinsEarned', targets:[5000,50000,250000,1000000], format:v=>`${Math.floor(v).toLocaleString('ru-RU')} фиткоинов` },
+  { id:'sharp_eye', icon:'🎯', title:'Точный расчёт', description:'Поднимите шанс критического удара за один забег.', metric:'bestCrit', targets:[0.15,0.30,0.50,0.75], format:v=>`${Math.round(v*100)}% крит. шанса` }
+];
 const DEFAULT_KEY_BINDINGS = {
   moveUp: 'KeyW', moveDown: 'KeyS', moveLeft: 'KeyA', moveRight: 'KeyD', dash: 'ShiftLeft', dynamic: 'Space',
   skill1: 'Digit1', skill2: 'Digit2', skill3: 'Digit3', skill4: 'Digit4',
@@ -2547,7 +2657,7 @@ const STORE_PASSIVES_DEF = {
   mssql_card: { name: 'Индекс-карта MSSQL', icon: '🎯', cost: 340, stock: 4, desc: '+6% к шансу критического удара.', apply: p => { p.critChance += 0.06; } },
   floppy_magnet: { name: 'Магнит для дискет', icon: '🧲', cost: 290, stock: 4, desc: '+19% к радиусу сбора опыта.', apply: p => { p.magnetMult += 0.19; } },
   backup_coil: { name: 'Контур автоматического бэкапа', icon: '🩹', cost: 420, stock: 3, desc: '+1,5 HP регенерации в секунду.', apply: p => { p.regen += 1.5; } },
-  coffee_thermos: { name: 'Термокружка из 308 кабинета', icon: '☕', cost: 400, stock: 3, desc: 'Умения и оружие перезаряжаются на 8% быстрее.', apply: p => { p.cdMult *= 0.92; } },
+  coffee_thermos: { name: 'Термокружка', icon: '☕', cost: 400, stock: 3, desc: 'Умения и оружие перезаряжаются на 8% быстрее.', apply: p => { p.cdMult *= 0.92; } },
   hasp_license: { name: 'HASP-лицензия на уклонение', icon: '🗝️', cost: 360, stock: 3, desc: '+5% к шансу уклониться от удара.', apply: p => { p.dodge = Math.min(0.75, p.dodge + 0.05); } },
   ergonomic_chair: { name: 'Кресло по охране труда', icon: '🪑', cost: 390, stock: 3, desc: 'Восстанавливает ещё 8 HP при каждом повышении уровня. Эффект суммируется до +24 HP за уровень.', apply: p => { p.levelUpHeal = Math.min(24, (p.levelUpHeal || 0) + 8); } },
   toner_fax: { name: 'Факс с резервным тонером', icon: '📠', cost: 460, stock: 3, desc: '+10% фиткоинов с дискет. Бонус суммируется до +20%. Тонер не входит в комплект.', apply: p => { p.currencyMult = Math.min(1.20, (p.currencyMult || 1) + 0.10); } },
@@ -2989,6 +3099,8 @@ class Game {
           this.closeSettings();
         } else if (document.getElementById('modal-changelog').style.display === 'flex') {
           this.closeChangelog();
+        } else if (document.getElementById('modal-achievements').style.display === 'flex') {
+          this.closeAchievements();
         } else if (document.getElementById('modal-pause').style.display === 'flex') {
           this.resume();
         } else if (document.getElementById('modal-main-menu').style.display === 'flex') {
@@ -3121,6 +3233,15 @@ class Game {
     document.addEventListener('fullscreenchange', () => this.syncMobileFullscreenButton());
 
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
+    this.firebaseUser = null;
+    this.profileReady = false;
+    this.achievementProgress = { bestSurvival:0, mobsKilled:0, bossesKilled:0, bestDamage:1, bestMaxHp:0, fitcoinsEarned:0, bestCrit:0 };
+    this.achievementUnlocked = {};
+    this.achievementSaveTimer = null;
+    this.achievementToastQueue = [];
+    this.achievementToastActive = false;
+    this.achievementRunKillSnapshot = 0;
+    this.achievementLastMetricSample = 0;
     try {
       const savedFavorites = JSON.parse(localStorage.getItem('1c_shop_favorites') || '[]');
       this.favoriteShopItems = new Set(Array.isArray(savedFavorites) ? savedFavorites.filter(key => typeof key === 'string') : []);
@@ -3132,9 +3253,9 @@ class Game {
     this.hideCheatersFromLeaderboard = localStorage.getItem('1c_hide_cheaters_leaderboard') === 'true';
     document.getElementById('player-nickname').value = this.savedNick;
     document.getElementById('pvp-player-nickname').value = this.savedNick;
+    document.getElementById('player-nickname').readOnly = true;
+    document.getElementById('pvp-player-nickname').readOnly = true;
     this.updateClassSelectionUI();
-    document.getElementById('player-nickname').addEventListener('input', event => this.setPlayerNickname(event.target.value));
-    document.getElementById('pvp-player-nickname').addEventListener('input', event => this.setPlayerNickname(event.target.value));
     document.getElementById('pvp-room-code').addEventListener('input', (event) => {
       event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 4);
     });
@@ -3144,8 +3265,12 @@ class Game {
     document.getElementById('menu-version').innerText = `v${GAME_VERSION}`;
     document.title = `1С:Фитнес Клуб КОРП ${GAME_VERSION}`;
     document.getElementById('modal-main-menu').style.display = 'flex';
+    document.getElementById('modal-google-auth').style.display = 'flex';
     this.lastTime = performance.now();
     requestAnimationFrame((t) => this.loop(t));
+    const attachAuth = () => window.firebaseLeaderboardReady?.then(fb => this.onFirebaseAuthenticated(fb)).catch(error => this.showGoogleAuthError(error));
+    if (window.firebaseLeaderboardReady) attachAuth();
+    else window.addEventListener('load', attachAuth, { once:true });
   }
 
   resize() {
@@ -3397,6 +3522,7 @@ class Game {
     this.lastPlayerDamage = null;
     this.challengeDeclines = 0;
     this.kills = 0;
+    this.achievementRunKillSnapshot = 0;
     this.gemsCollected = 0;
     this.damageDealtBySource = Object.create(null);
     this.level = 1;
@@ -3601,7 +3727,7 @@ class Game {
     modeSelect.disabled = Boolean(this.pvp);
     const nicknameInput = document.getElementById('pvp-player-nickname');
     nicknameInput.value = this.savedNick;
-    nicknameInput.disabled = Boolean(this.pvp);
+    nicknameInput.disabled = true;
     document.getElementById('pvp-room-code-display').style.display = this.pvp?.host ? 'block' : 'none';
     if (this.pvp?.host) document.getElementById('pvp-room-code-display').textContent = `КОД КОМНАТЫ: ${this.pvp.code}`;
     this.pvpStatus(this.pvp ? 'Лобби открыто. Подключайте игроков и запускайте матч, когда будете готовы.' : 'Создайте лобби, отправьте код друзьям и запустите матч вручную.');
@@ -3748,8 +3874,241 @@ class Game {
   setPlayerNickname(value) {
     this.savedNick = String(value || '').replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15);
     localStorage.setItem('1c_nick', this.savedNick);
-    document.getElementById('player-nickname').value = this.savedNick;
-    document.getElementById('pvp-player-nickname').value = this.savedNick;
+    const scoreNick = document.getElementById('player-nickname');
+    const pvpNick = document.getElementById('pvp-player-nickname');
+    const settingsNick = document.getElementById('settings-account-nickname');
+    if (scoreNick) scoreNick.value = this.savedNick;
+    if (pvpNick) pvpNick.value = this.savedNick;
+    if (settingsNick) settingsNick.value = this.savedNick;
+  }
+
+  showGoogleAuthError(error) {
+    const status = document.getElementById('google-auth-status');
+    if (!status) return;
+    status.textContent = `Не удалось войти: ${error?.message || 'проверьте подключение и настройки Firebase.'}`;
+  }
+
+  async signInWithGoogle() {
+    const status = document.getElementById('google-auth-status');
+    status.textContent = 'Открываем вход Google…';
+    try {
+      await window.firebaseAuthActions.signInGoogle();
+    } catch (error) {
+      this.showGoogleAuthError(error);
+    }
+  }
+
+  async onFirebaseAuthenticated(fb) {
+    this.firebaseUser = fb.user;
+    try {
+      const profileSnapshot = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/profile`));
+      const profile = profileSnapshot.exists() ? profileSnapshot.val() : null;
+      if (profile?.nickname) {
+        this.profileReady = true;
+        this.setPlayerNickname(profile.nickname);
+        document.getElementById('modal-google-auth').style.display = 'none';
+      } else {
+        this.profileReady = false;
+        document.getElementById('google-auth-signin').style.display = 'none';
+        document.getElementById('google-auth-nickname-step').style.display = 'block';
+        document.getElementById('google-auth-nickname').value = this.savedNick === 'Архитектор_1С' ? '' : this.savedNick;
+        document.getElementById('modal-google-auth').style.display = 'flex';
+        document.getElementById('google-auth-status').textContent = '';
+      }
+      document.getElementById('settings-account-email').textContent = fb.user.email || 'Google-аккаунт подключён';
+      const nicknameInput = document.getElementById('settings-account-nickname');
+      if (nicknameInput) nicknameInput.value = this.savedNick;
+      const achievementSnapshot = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/achievements`));
+      const cloudData = achievementSnapshot.exists() ? achievementSnapshot.val() : {};
+      this.achievementProgress = { ...this.achievementProgress, ...(cloudData.progress || {}) };
+      this.achievementUnlocked = { ...(cloudData.unlocked || {}) };
+      this.checkAchievementUnlocks(false);
+      await this.persistAchievementState();
+      await this.syncAchievementLeaderboard();
+      this.renderAchievements();
+    } catch (error) {
+      this.showGoogleAuthError(error);
+    }
+  }
+
+  async completeGoogleRegistration() {
+    const nickname = String(document.getElementById('google-auth-nickname').value || '').trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15);
+    if (nickname.length < 2) {
+      document.getElementById('google-auth-status').textContent = 'Ник должен содержать от 2 до 15 букв, цифр, «_» или «-».';
+      return;
+    }
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      await fb.set(fb.ref(fb.db, `playerData/${fb.uid}/profile`), { nickname, updatedAt: Date.now() });
+      this.profileReady = true;
+      this.setPlayerNickname(nickname);
+      document.getElementById('google-auth-status').textContent = '';
+      document.getElementById('modal-google-auth').style.display = 'none';
+      document.getElementById('settings-account-email').textContent = fb.user.email || 'Google-аккаунт подключён';
+      await this.persistAchievementState();
+      await this.syncAchievementLeaderboard();
+    } catch (error) { this.showGoogleAuthError(error); }
+  }
+
+  async saveAccountNickname() {
+    const input = document.getElementById('settings-account-nickname');
+    const status = document.getElementById('settings-account-status');
+    const nickname = String(input.value || '').trim().replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '').slice(0, 15);
+    if (nickname.length < 2) { status.textContent = 'Ник должен содержать от 2 до 15 допустимых символов.'; return; }
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      await fb.set(fb.ref(fb.db, `playerData/${fb.uid}/profile`), { nickname, updatedAt: Date.now() });
+      this.profileReady = true;
+      this.setPlayerNickname(nickname);
+      status.style.color = '#278344';
+      status.textContent = 'Ник сохранён.';
+      await this.syncAchievementLeaderboard();
+    } catch (error) {
+      status.style.color = '#c0392b';
+      status.textContent = `Не удалось сохранить: ${error.message || 'ошибка Firebase'}`;
+    }
+  }
+
+  async signOutGoogle() {
+    try {
+      await window.firebaseAuthActions.signOut();
+      window.location.reload();
+    } catch (error) {
+      const status = document.getElementById('settings-account-status');
+      status.style.color = '#c0392b';
+      status.textContent = `Не удалось выйти: ${error.message || 'ошибка'}`;
+    }
+  }
+
+  openAchievements() {
+    document.getElementById('modal-achievements').style.display = 'flex';
+    this.renderAchievements();
+    this.loadAchievementLeaderboard();
+  }
+
+  closeAchievements() { document.getElementById('modal-achievements').style.display = 'none'; }
+
+  achievementMetricValue(definition) {
+    return Math.max(0, Number(this.achievementProgress?.[definition.metric]) || 0);
+  }
+
+  checkAchievementUnlocks(showToast = true) {
+    let changed = false;
+    for (const achievement of ACHIEVEMENT_DEFINITIONS) {
+      const metric = this.achievementMetricValue(achievement);
+      const earned = achievement.targets.filter(target => metric >= target).length;
+      const previous = Math.max(0, Math.min(achievement.targets.length, Number(this.achievementUnlocked[achievement.id]) || 0));
+      if (earned <= previous) continue;
+      this.achievementUnlocked[achievement.id] = earned;
+      changed = true;
+      if (showToast) for (let tier = previous; tier < earned; tier++) this.queueAchievementToast(achievement, tier);
+    }
+    if (changed) this.scheduleAchievementSave();
+    if (document.getElementById('modal-achievements').style.display === 'flex') this.renderAchievements();
+  }
+
+  scheduleAchievementSave() {
+    if (!this.firebaseUser || this.achievementSaveTimer) return;
+    this.achievementSaveTimer = setTimeout(() => {
+      this.achievementSaveTimer = null;
+      this.persistAchievementState();
+    }, 10000);
+  }
+
+  async persistAchievementState() {
+    if (!this.firebaseUser || !this.profileReady) return;
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      await fb.update(fb.ref(fb.db, `playerData/${fb.uid}`), {
+        achievements: { progress:this.achievementProgress, unlocked:this.achievementUnlocked, updatedAt:Date.now() }
+      });
+      await this.syncAchievementLeaderboard();
+    } catch (error) { console.warn('Не удалось синхронизировать достижения', error); }
+  }
+
+  async syncAchievementLeaderboard() {
+    if (!this.firebaseUser || !this.profileReady) return;
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      const medalCount = Object.values(this.achievementUnlocked || {}).reduce((sum, count) => sum + Math.max(0, Number(count) || 0), 0);
+      await fb.set(fb.ref(fb.db, `achievementLeaderboard/${fb.uid}`), { name:this.savedNick, medalCount, updatedAt:Date.now() });
+    } catch (error) { console.warn('Не удалось обновить рейтинг достижений', error); }
+  }
+
+  async loadAchievementLeaderboard() {
+    const container = document.getElementById('achievement-leaderboard');
+    if (!container) return;
+    container.innerHTML = '<div class="achievement-summary">Загружаем рейтинг…</div>';
+    try {
+      const fb = await window.firebaseLeaderboardReady;
+      const snapshot = await fb.get(fb.ref(fb.db, 'achievementLeaderboard'));
+      const rows = snapshot.exists() ? Object.entries(snapshot.val()).map(([uid, data]) => ({ uid, name:String(data?.name || 'Игрок').slice(0,15), count:Math.max(0,Number(data?.medalCount)||0) })) : [];
+      rows.sort((a,b) => b.count - a.count || a.name.localeCompare(b.name,'ru'));
+      container.innerHTML = rows.length ? `<div class="achievement-rank-table"><div class="achievement-rank-head"><span>Место</span><span>Игрок</span><span>Медали</span></div>${rows.slice(0,100).map((row,index)=>`<div class="achievement-rank-row${row.uid===fb.uid?' own':''}"><b>${index+1}</b><span>${this.escapeHtml(row.name)}</span><strong>🏅 ${row.count}</strong></div>`).join('')}</div>` : '<div class="achievement-summary">Рейтинг пока пуст. Получите первую медаль!</div>';
+    } catch (error) { container.innerHTML = `<div class="achievement-summary">Не удалось загрузить рейтинг: ${this.escapeHtml(error.message || 'ошибка')}</div>`; }
+  }
+
+  renderAchievements() {
+    const grid = document.getElementById('achievement-grid');
+    if (!grid) return;
+    const total = Object.values(this.achievementUnlocked || {}).reduce((sum,count)=>sum+(Number(count)||0),0);
+    const summary = document.getElementById('achievement-summary');
+    if (summary) summary.textContent = `${this.savedNick} · получено медалей: ${total} из ${ACHIEVEMENT_DEFINITIONS.reduce((sum,item)=>sum+item.targets.length,0)}. Прогресс синхронизируется с Google-аккаунтом.`;
+    grid.innerHTML = ACHIEVEMENT_DEFINITIONS.map(item => {
+      const value = this.achievementMetricValue(item);
+      const stage = Math.min(item.targets.length, Number(this.achievementUnlocked[item.id]) || 0);
+      const target = item.targets[stage] || item.targets[item.targets.length - 1];
+      const progress = stage >= item.targets.length ? 100 : Math.min(100, value / target * 100);
+      const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
+      const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?' unlocked':''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
+      return `<article class="achievement-card"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-progress"><span style="width:${progress}%"></span></div><p>${stage>=item.targets.length?'Все этапы завершены':`Прогресс: ${item.format(value)} · цель ${item.format(target)}`}</p><div class="achievement-stage-list">${stages}</div></article>`;
+    }).join('');
+  }
+
+  queueAchievementToast(achievement, tier) {
+    this.achievementToastQueue.push({ achievement, tier });
+    this.showNextAchievementToast();
+  }
+
+  showNextAchievementToast() {
+    if (this.achievementToastActive || !this.achievementToastQueue.length) return;
+    this.achievementToastActive = true;
+    const { achievement, tier } = this.achievementToastQueue.shift();
+    const toast = document.getElementById('achievement-toast');
+    toast.innerHTML = `<div class="achievement-toast-card"><div class="achievement-icon">${achievement.icon}</div><div><small>Получено достижение · ${ACHIEVEMENT_MEDALS[tier]}</small><b>${achievement.title}</b><span>${achievement.description}</span></div></div>`;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      toast.innerHTML = '';
+      this.achievementToastActive = false;
+      setTimeout(() => this.showNextAchievementToast(), 250);
+    }, 4200);
+  }
+
+  sampleAchievementProgress() {
+    if (!this.player || !this.firebaseUser || this.time - this.achievementLastMetricSample < 1) return;
+    this.achievementLastMetricSample = this.time;
+    const progress = this.achievementProgress;
+    let changed = false;
+    const maximize = (key,value) => { if (Number.isFinite(value) && value > (Number(progress[key]) || 0)) { progress[key] = value; changed = true; } };
+    maximize('bestSurvival', this.time);
+    const currentKills = Math.max(0, Number(this.kills) || 0);
+    if (currentKills > this.achievementRunKillSnapshot) {
+      progress.mobsKilled = (Number(progress.mobsKilled) || 0) + currentKills - this.achievementRunKillSnapshot;
+      this.achievementRunKillSnapshot = currentKills;
+      changed = true;
+    }
+    maximize('bestDamage', Number(this.player.dmgMult) || 1);
+    maximize('bestMaxHp', Number(this.player.maxHp) || 0);
+    maximize('bestCrit', Number(this.player.critChance) || 0);
+    if (changed) { this.checkAchievementUnlocks(); this.scheduleAchievementSave(); }
+  }
+
+  renderAchievementMedalToast() { this.checkAchievementUnlocks(); }
+
+  async onAuthenticatedNicknameReady() {
+    this.checkAchievementUnlocks(false);
+    await this.persistAchievementState();
   }
 
   async createPvpRoom() {
@@ -8854,6 +9213,7 @@ class Game {
     }
     this.sound.updateBossMusic(dt, aliveBosses, aliveMegaBosses);
     this.time += dt;
+    this.sampleAchievementProgress();
     this.applyMobDifficultyMilestones();
     this.player.dashCooldown = Math.max(0, (this.player.dashCooldown || 0) - dt);
     this.player.dashTimer = Math.max(0, (this.player.dashTimer || 0) - dt);
@@ -9297,6 +9657,11 @@ class Game {
         continue;
       }
       if (e.hp <= 0) {
+        if (e.isBoss && !guestGotKillCredit && this.firebaseUser) {
+          this.achievementProgress.bossesKilled = (Number(this.achievementProgress.bossesKilled) || 0) + 1;
+          this.checkAchievementUnlocks();
+          this.scheduleAchievementSave();
+        }
         if (e.isBoss && !e.isMegaBoss) {
           this.nextMiniBossAllowedTime = this.time + 40 + Math.random() * 10;
         }
@@ -9319,6 +9684,12 @@ class Game {
         }
         if (!guestGotKillCredit) {
           this.kills++;
+          if (this.firebaseUser) {
+            this.achievementProgress.mobsKilled = (Number(this.achievementProgress.mobsKilled) || 0) + 1;
+            this.achievementRunKillSnapshot = this.kills;
+            this.checkAchievementUnlocks();
+            this.scheduleAchievementSave();
+          }
           this.recordChallengeProgress('kills');
           if (e.shooter) this.recordChallengeProgress('shooters');
         }
@@ -9412,7 +9783,13 @@ class Game {
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
-        this.currency += Math.max(0, Math.round(g.xp * 0.5 * 0.9686 * (this.player.currencyMult || 1)));
+        const fitcoins = Math.max(0, Math.round(g.xp * 0.5 * 0.9686 * (this.player.currencyMult || 1)));
+        this.currency += fitcoins;
+        if (fitcoins && this.firebaseUser) {
+          this.achievementProgress.fitcoinsEarned = (Number(this.achievementProgress.fitcoinsEarned) || 0) + fitcoins;
+          this.checkAchievementUnlocks();
+          this.scheduleAchievementSave();
+        }
         document.getElementById('currency-display').innerText = this.currency;
         this.gems.splice(i, 1);
         if (this.paused) break;

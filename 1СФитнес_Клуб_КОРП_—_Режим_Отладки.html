@@ -1622,6 +1622,13 @@ const ACHIEVEMENT_DEFINITIONS = [
   { id:'power_build', icon:'⚔️', title:'Тяжёлая конфигурация', description:'Соберите множитель урона за один забег.', metric:'bestDamage', targets:[2,3,5,8], format:v=>`×${Number(v).toFixed(2)} урона` },
   { id:'health_stack', icon:'❤️', title:'Запас прочности', description:'Увеличьте максимум здоровья за один забег.', metric:'bestMaxHp', targets:[150,250,400,600], format:v=>`${Math.floor(v)} HP` },
   { id:'fitcoin_saver', icon:'💰', title:'Фиткоиновый магнат', description:'Подберите фиткоины за все забеги.', metric:'fitcoinsEarned', targets:[5000,50000,250000,1000000], format:v=>`${Math.floor(v).toLocaleString('ru-RU')} фиткоинов` },
+  { id:'fitcoin_spender', icon:'🛒', title:'Деньги жгут карман', description:'Потратьте фиткоины в магазине за все забеги.', metric:'fitcoinsSpent', targets:[1000,10000,50000,250000], format:v=>`${Math.floor(v).toLocaleString('ru-RU')} потрачено` },
+  { id:'run_score', icon:'🧮', title:'Это всё баги посчитали', description:'Наберите очки за один забег.', metric:'bestRunScore', targets:[30000,100000,250000,500000], format:v=>`${Math.floor(v).toLocaleString('ru-RU')} очков за заход` },
+  { id:'mv_hunter', icon:'📞', title:'Перезвоните Максиму', description:'Победите босса М.В. за все забеги.', metric:'mvBossesKilled', targets:[1,3,10,25], format:v=>`${Math.floor(v)} побед над М.В.` },
+  { id:'mv_victim', icon:'☎️', title:'Разговор был неприятный', description:'Погибните от босса М.В. за все забеги.', metric:'mvDeaths', targets:[1,3,10,25], format:v=>`${Math.floor(v)} встреч с М.В. закончились плохо` },
+  { id:'banana_break', icon:'🍌', title:'Банановый отдел', description:'Подберите бананы за все забеги.', metric:'bananasPicked', targets:[10,50,200,500], format:v=>`${Math.floor(v)} бананов` },
+  { id:'consumable_user', icon:'🧃', title:'Склад не резиновый', description:'Используйте расходники за все забеги.', metric:'consumablesUsed', targets:[10,50,200,500], format:v=>`${Math.floor(v)} расходников` },
+  { id:'sales_calls', icon:'📲', title:'Я вас не просил перезванивать', description:'Получите звонки отдела продаж за все забеги.', metric:'salesCallsReceived', targets:[10,50,200,500], format:v=>`${Math.floor(v)} звонков` },
   { id:'sharp_eye', icon:'🎯', title:'Точный расчёт', description:'Поднимите шанс критического удара за один забег.', metric:'bestCrit', targets:[0.15,0.30,0.50,0.75], format:v=>`${Math.round(v*100)}% крит. шанса` },
   { id:'pvp_regular', icon:'🥊', title:'Сетевой боец', description:'Сыграйте матчи в режиме PvP.', metric:'pvpMatches', targets:[1,10,25,100], format:v=>`${Math.floor(v)} матчей` },
   { id:'pvp_eliminations', icon:'⚔️', title:'Дуэлянт', description:'Выбейте соперников в PvP-матчах.', metric:'pvpEliminations', targets:[1,5,20,50], format:v=>`${Math.floor(v)} соперников` },
@@ -3400,7 +3407,7 @@ class Game {
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
     this.firebaseUser = null;
     this.profileReady = false;
-    this.achievementProgress = { bestSurvival:0, mobsKilled:0, bossesKilled:0, bestDamage:1, bestMaxHp:0, fitcoinsEarned:0, bestCrit:0, pvpMatches:0, pvpWins:0, pvpEliminations:0, brMatches:0, brWins:0, bestBrSurvival:0, rudesktopRescues:0 };
+    this.achievementProgress = { bestSurvival:0, mobsKilled:0, bossesKilled:0, bestDamage:1, bestMaxHp:0, fitcoinsEarned:0, fitcoinsSpent:0, bestRunScore:0, mvBossesKilled:0, mvDeaths:0, bananasPicked:0, consumablesUsed:0, salesCallsReceived:0, bestCrit:0, pvpMatches:0, pvpWins:0, pvpEliminations:0, brMatches:0, brWins:0, bestBrSurvival:0, rudesktopRescues:0 };
     this.achievementUnlocked = {};
     this.achievementSaveTimer = null;
     this.achievementToastQueue = [];
@@ -4458,6 +4465,14 @@ class Game {
   recordAchievementCounter(metric, amount = 1) {
     if (!this.firebaseUser || !Number.isFinite(Number(amount)) || Number(amount) <= 0) return;
     this.achievementProgress[metric] = Math.max(0, Number(this.achievementProgress[metric]) || 0) + Number(amount);
+    this.checkAchievementUnlocks();
+    this.scheduleAchievementSave();
+  }
+
+  recordAchievementBest(metric, value) {
+    const numericValue = Number(value);
+    if (!this.firebaseUser || !Number.isFinite(numericValue) || numericValue <= (Number(this.achievementProgress?.[metric]) || 0)) return;
+    this.achievementProgress[metric] = numericValue;
     this.checkAchievementUnlocks();
     this.scheduleAchievementSave();
   }
@@ -6472,6 +6487,7 @@ class Game {
     if (this.salesCallActive) return;
     this.salesCallActive = true;
     this.salesCallCount = (this.salesCallCount || 0) + 1;
+    this.recordAchievementCounter('salesCallsReceived');
     this.shopPriceMultiplier = (this.shopPriceMultiplier || 1.626748) * 1.0814;
     this.salesCallX = 12;
     this.salesCallY = 12;
@@ -7739,9 +7755,12 @@ class Game {
     if (!allPurchased) {
       this.currency += total;
       document.getElementById('shop-message').textContent = 'Не удалось разместить компоненты комплекта; фиткоины возвращены.';
-    } else document.getElementById('shop-message').textContent = assembled
-      ? `Комплект «${target.name}» собран одной покупкой.`
-      : `Компоненты комплекта «${target.name}» куплены; сборка завершится после размещения частей рецепта.`;
+    } else {
+      this.recordAchievementCounter('fitcoinsSpent', total);
+      document.getElementById('shop-message').textContent = assembled
+        ? `Комплект «${target.name}» собран одной покупкой.`
+        : `Компоненты комплекта «${target.name}» куплены; сборка завершится после размещения частей рецепта.`;
+    }
     this.updateHUD();
     this.renderShop();
   }
@@ -7761,7 +7780,10 @@ class Game {
     const backpackSlot = this.findBackpackFreeSlot();
     const canCombine = this.canCombinePassiveItem(key);
     if ((freeSlot < 0 && backpackSlot < 0 && !canCombine) || (!prepaid && this.currency < price)) return false;
-    if (!prepaid) this.currency -= price;
+    if (!prepaid) {
+      this.currency -= price;
+      this.recordAchievementCounter('fitcoinsSpent', price);
+    }
     const sharedCooldown = item.type === 'active'
       ? [...(this.shopPassives || []), ...(this.backpack || [])].reduce((cooldown, entry) => entry?.key === key ? Math.max(cooldown, entry.cooldown || 0) : cooldown, 0)
       : 0;
@@ -7831,6 +7853,7 @@ class Game {
       return;
     }
     this.currency -= price;
+    this.recordAchievementCounter('fitcoinsSpent', price);
     this.addConsumableToInventory(key);
     document.getElementById('shop-message').innerText = `Оплата прошла: ${item.name} добавлена в слот расходников.`;
     this.updateHUD();
@@ -7865,6 +7888,7 @@ class Game {
       this.log('Расходник не сработал: проверьте здоровье и условия применения.');
       return;
     }
+    this.recordAchievementCounter('consumablesUsed');
     this.scalePvpDefenseGain(beforeDefense);
     slot.count--;
     if (slot.count <= 0) this.consumables[slotIndex] = null;
@@ -10362,6 +10386,7 @@ class Game {
           this.checkAchievementUnlocks();
           this.scheduleAchievementSave();
         }
+        if (e.bossType === 'mv_chaser' && !guestGotKillCredit) this.recordAchievementCounter('mvBossesKilled');
         if (e.isBoss && !e.isMegaBoss) {
           this.nextMiniBossAllowedTime = this.time + 40 + Math.random() * 10;
         }
@@ -10456,6 +10481,7 @@ class Game {
           const healed = Math.round(this.player.hp - hpBefore);
           this.sound.playTone(520, 'triangle', 0.15, 0.12);
           this.addPopup(this.player.x, this.player.y - 25, `+${healed} HP (Банан)`, "#2ecc71");
+          this.recordAchievementCounter('bananasPicked');
         } else if (item.type === 'consumable') {
           this.addConsumableToInventory(item.consumableKey);
           this.addPopup(this.player.x, this.player.y - 25, `${CONSUMABLES_DEF[item.consumableKey].icon} Расходник найден`, '#ffcf70');
@@ -11050,6 +11076,8 @@ class Game {
     this.finalLoadout = this.getFinalLoadout(reason);
 
     const totalScore = this.calcScore();
+    this.recordAchievementBest('bestRunScore', totalScore);
+    if (!victory && this.player?.hp <= 0 && /м\.в\./i.test(String(reason))) this.recordAchievementCounter('mvDeaths');
     const statsBox = document.getElementById('gameover-stats');
     const finalHit = this.player?.hp <= 0 ? this.lastPlayerDamage : null;
     const finalHitMarkup = finalHit

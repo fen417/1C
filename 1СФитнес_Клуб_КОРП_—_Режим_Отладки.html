@@ -538,7 +538,7 @@
   .rude-skill-needle::after { content:''; position:absolute; left:calc(50% - 6px); top:calc(50% - 6px); width:12px; height:12px; border-radius:50%; background:#ffd200; border:2px solid #fff; }
   #rudesktop-skill-ring:focus-visible { outline:3px solid #ffd200; outline-offset:3px; }
   @media (max-width:500px) and (pointer:coarse) { #modal-rudesktop-rescue .win-1c { max-height:calc(100% - 18px); overflow-y:auto; } }
-  #modal-lb { z-index: 250; }
+  #modal-lb { z-index: 340; }
   #modal-shop { z-index: 180; }
   #modal-shop .win-1c { width: min(1440px, 96vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-settings, #modal-changelog { z-index: 280; }
@@ -622,6 +622,11 @@
   #modal-daily-briefing .daily-briefing-effect-title span { color:#900 !important; }
   #modal-daily-briefing .daily-briefing-effect-copy { color:#444 !important; font-size:12px; line-height:1.4; }
   #modal-daily-briefing .daily-briefing-actions .btn-1c { min-height:40px; }
+  #lb-daily-info .daily-leaderboard-info-card { padding:10px 14px; margin-bottom:12px; background:#fff; border:1px solid #bbb; border-radius:2px; color:#444; text-align:left; }
+  #lb-daily-info .daily-leaderboard-info-title { margin-bottom:6px; color:#900; font-size:13px; font-weight:bold; }
+  #lb-daily-info .daily-leaderboard-info-copy { color:#444; font-size:12px; line-height:1.4; }
+  #lb-daily-info .daily-leaderboard-info-copy + .daily-leaderboard-info-copy { margin-top:4px; }
+  #lb-daily-info .daily-leaderboard-info-copy b { color:#900; }
   #modal-pvp { z-index: 320; }
   #modal-pvp .win-1c { width:min(720px,96vw) !important; max-height:calc(100% - 20px); overflow-y:auto; }
   .pvp-room-browser { margin:0 0 12px; padding:9px; border:1px solid #bbb; background:#f8f9fa; }
@@ -918,7 +923,7 @@
   #lb-body tr.lb-version-group td { background:#e7edf3; color:#263746; font-weight:bold; padding:6px 8px 6px 16px; }
   #lb-body tr.leaderboard-record { cursor:pointer; }
   #lb-body tr.leaderboard-record:hover, #lb-body tr.leaderboard-record:focus { background:#fff2b3; outline:2px solid #d4af00; outline-offset:-2px; }
-  #modal-record-detail { z-index:270; }
+  #modal-record-detail { z-index:360; }
   #record-detail-content { max-height:min(72vh,720px); overflow:auto; }
   .record-detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
   .record-detail-stat { padding:7px; border:1px solid #dfe6e9; background:#f8f9fa; }
@@ -1500,7 +1505,7 @@
             <button id="lb-tab-general" class="btn-1c" style="background:#ffd200; font-weight:bold;" onclick="game.setLeaderboardTab('general')">🏆 Общий рейтинг</button>
             <button id="lb-tab-daily" class="btn-1c" onclick="game.setLeaderboardTab('daily')">📅 Ежедневный забег</button>
           </div>
-          <div id="lb-daily-info" class="release-notes" style="display:none; margin-bottom:10px; font-size:12px;"></div>
+  <div id="lb-daily-info" style="display:none; margin-bottom:10px; font-size:12px;"></div>
           <div style="max-height:300px; overflow:auto; border:1px solid #ccc; margin-bottom:12px;">
           <table id="lb-table">
             <thead>
@@ -8990,14 +8995,14 @@ class Game {
         const dailyClass = PLAYER_CLASSES[cfg.classId] || PLAYER_CLASSES.technician;
         dailyInfo.style.display = 'block';
         dailyInfo.innerHTML = `
-          <div style="background:#192638; border:1px solid #4a69bd; border-radius:6px; padding:10px 14px; margin-bottom:12px; color:#f1f2f6; text-align:left;">
-            <div style="font-size:13px; font-weight:bold; color:#ffeaa7; margin-bottom:6px;">
+          <div class="daily-leaderboard-info-card">
+            <div class="daily-leaderboard-info-title">
               📅 Смена дня ${this.escapeHtml(targetDate)}: дежурный класс <b>«${this.escapeHtml(dailyClass.name)}»</b> · модификатор <b>«${this.escapeHtml(cfg.modifier.name)}»</b>
             </div>
-            <div style="color:#55efc4; font-size:12px; line-height:1.4; margin-bottom:4px;">
+            <div class="daily-leaderboard-info-copy">
               <b>✅ Баффы:</b> ${this.escapeHtml(cfg.modifier.buffDesc || cfg.modifier.desc)}
             </div>
-            <div style="color:#ff7675; font-size:12px; line-height:1.4;">
+            <div class="daily-leaderboard-info-copy">
               <b>❌ Дебаффы:</b> ${this.escapeHtml(cfg.modifier.debuffDesc || '—')}
             </div>
           </div>

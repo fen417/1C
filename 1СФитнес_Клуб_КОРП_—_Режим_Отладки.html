@@ -1161,7 +1161,7 @@
         <div class="main-menu-layout">
           <div class="main-menu-actions">
             <button class="btn-1c" style="background:#55efc4;" onclick="game.startFromMainMenu()">▶ Одиночная игра</button>
-            <button class="btn-1c" style="background:#ffeaa7;" onclick="game.startDailyFromMainMenu()">📅 Ежедневный забег</button>
+            <button class="btn-1c" style="background:#ffeaa7; font-weight:bold;" onclick="game.openDailyRunBriefing()">📅 Ежедневный забег</button>
             <button class="btn-1c" onclick="game.showPvpMenu()">🌐 Сетевая игра</button>
             <button class="btn-1c" onclick="game.showSettings()">⚙️ Настройки</button>
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
@@ -1179,6 +1179,50 @@
               <p>ИИ-слоп признан премиальной услугой: магазин подорожал ещё сильнее, а фиткоины с дискет выпадают реже. Добавлены хаотичные тикеты Максима Воронина; оружейные улучшения перебалансированы и ограничены тремя уровнями. Усилены недостатки сильных комплектов. Характеристики теперь показаны понятными процентами; мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты. Проведена масштабная оптимизация движка, отрисовки, интерфейса и сетевой синхронизации без изменений графики; исправлены ошибки комплектов магазина и рюкзака, атак боссов, неуязвимости RuDesktop, сетевых матчей на 3–8 игроков и отправки рекордов.</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Брифинг ежедневного забега -->
+  <div id="modal-daily-briefing" class="modal-overlay" style="display:none;" onclick="if(event.target===this) game.closeDailyRunBriefing()">
+    <div class="win-1c" style="width:min(620px,96vw); max-height:min(90vh,760px); display:flex; flex-direction:column;" onclick="event.stopPropagation()">
+      <div class="win-1c-head"><span id="daily-briefing-title">📅 БРИФИНГ ЕЖЕДНЕВНОЙ СМЕНЫ</span><button class="win-close-btn" onclick="game.closeDailyRunBriefing()" aria-label="Закрыть">✕</button></div>
+      <div class="win-1c-body" style="overflow-y:auto; padding:14px; text-align:left;">
+        <div style="background:rgba(255,234,167,0.14); border:1px solid #ffeaa7; border-radius:6px; padding:10px 12px; margin-bottom:12px; font-size:12px; color:#ffeaa7; line-height:1.45;">
+          ⚠️ <b>Внимание:</b> Сид генерации волн, дежурный класс и условия смены одинаковы для всех сотрудников фитнес-кластера на сегодня. Рестарт сбрасывает попытку, а лучший счёт пойдёт в таблицу рекордов смены дня!
+        </div>
+
+        <div style="background:#162232; border:1px solid #34495e; border-radius:6px; padding:10px 14px; margin-bottom:10px;">
+          <div style="font-size:13px; font-weight:bold; color:#74b9ff; margin-bottom:6px;">
+            👨‍💼 НАЗНАЧЕННЫЙ ДЕЖУРНЫЙ КЛАСС: <span id="daily-briefing-class-name" style="color:#ffeaa7;"></span>
+          </div>
+          <div style="font-size:12px; margin-bottom:4px; color:#dce6f0;">
+            🔫 Стартовое оружие: <b id="daily-briefing-weapon" style="color:#55efc4;"></b>
+          </div>
+          <div style="font-size:11px; color:#a4b0be; line-height:1.4;">
+            ✨ Классовые перки: <span id="daily-briefing-class-desc"></span>
+          </div>
+        </div>
+
+        <div style="background:#162232; border:1px solid #34495e; border-radius:6px; padding:10px 14px; margin-bottom:12px;">
+          <div style="font-size:13px; font-weight:bold; color:#ff7675; margin-bottom:8px;">
+            ⚡ МОДИФИКАТОР ДНЯ: <span id="daily-briefing-mod-name" style="color:#fdcb6e;"></span>
+          </div>
+          <div style="background:rgba(46,213,115,0.12); border:1px solid #2ed573; border-radius:6px; padding:8px 12px; margin-bottom:8px;">
+            <div style="color:#2ed573; font-weight:bold; font-size:12px; margin-bottom:3px;">✅ ПОЛОЖИТЕЛЬНЫЕ ЭФФЕКТЫ (БАФФЫ):</div>
+            <div id="daily-briefing-buffs" style="font-size:12px; color:#f1f2f6; line-height:1.4;"></div>
+          </div>
+          <div style="background:rgba(255,71,87,0.12); border:1px solid #ff4757; border-radius:6px; padding:8px 12px;">
+            <div style="color:#ff4757; font-weight:bold; font-size:12px; margin-bottom:3px;">❌ ОТРИЦАТЕЛЬНЫЕ ЭФФЕКТЫ (ДЕБАФФЫ):</div>
+            <div id="daily-briefing-debuffs" style="font-size:12px; color:#f1f2f6; line-height:1.4;"></div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-1c" style="flex:2; min-height:44px; background:#55efc4; font-size:14px; font-weight:bold;" onclick="game.confirmStartDailyRun()">🚀 ЗАСТУПИТЬ НА СМЕНУ!</button>
+          <button class="btn-1c" style="flex:1; min-height:44px; background:#ffeaa7;" onclick="game.showLeaderboard('daily')">🏆 Рекорды смены</button>
+          <button class="btn-1c" style="min-height:44px;" onclick="game.closeDailyRunBriefing()">Отмена</button>
         </div>
       </div>
     </div>
@@ -1623,10 +1667,48 @@
 const GAME_VERSION = '2.7.0';
 const MAX_PLAYER_DODGE = 0.50;
 const DAILY_MODIFIERS = [
-  { key: 'quarter_close', name: 'Закрытие квартала', desc: 'Элитные мобы появляются вдвое чаще, опыт +15%, но перезарядка рывка дольше на 12%.' },
-  { key: 'audit_day', name: 'Выездная проверка касс', desc: 'Старт со 180 фиткоинами и +15% фиткоинов с дискет, но базовые цены магазина +14%.' },
-  { key: 'hot_shift', name: 'Горячая линия без перерыва', desc: 'Перезарядка оружия и умений быстрее на 8%, но обычные мобы движутся быстрее на 9%.' },
-  { key: 'friday_prod', name: 'Пятничный деплой на прод', desc: 'Шанс крита +8%, но здоровье всех боссов выше на 15%.' }
+  {
+    key: 'quarter_close',
+    name: 'Закрытие квартала',
+    desc: 'Опыт +35%, элита в 2.5 раза чаще (+50% золота), но урон элиты +30% и откат рывка дольше на 35%.',
+    buffDesc: 'Опыт за всех клиентов +35%, элитные клиенты появляются в 2.5 раза чаще и приносят на +50% больше фиткоинов.',
+    debuffDesc: 'Элитные мобы наносят на +30% больше урона, а время восстановления кувырка/рывка увеличено на +35%.'
+  },
+  {
+    key: 'audit_day',
+    name: 'Внезапная выездная налоговая',
+    desc: 'Старт с 500 фиткоинами и +50% золота с дискет, но цены в магазине +40% и кражи монет вдвое чаще.',
+    buffDesc: 'Стартовый баланс сразу 500 фиткоинов (моментальный закуп на старте) и +50% фиткоинов со всех источников.',
+    debuffDesc: 'Налоговая наценка магазина +40% к базовым ценам, а воришки фиткоинов крадут монеты в 2 раза чаще.'
+  },
+  {
+    key: 'hot_shift',
+    name: 'Авария на сервере: Горячая линия',
+    desc: 'Откат оружия и умений -25%, урон умений +35%, но все мобы быстрее на 20%.',
+    buffDesc: 'Оружие и активные умения перезаряжаются на 25% быстрее, а урон всех активных скиллов повышен на +35%!',
+    debuffDesc: 'Скорость передвижения абсолютно ВСЕХ мобов увеличена на +20% (ураганный напор клиентов).'
+  },
+  {
+    key: 'friday_prod',
+    name: 'Пятничный деплой на прод',
+    desc: 'Крит +25%, крит.урон +50%, но здоровье боссов +50% и их атаки агрессивнее на 30%.',
+    buffDesc: 'Шанс критического удара +25%, а критический урон увеличен на +50% (сокрушительные криты)!',
+    debuffDesc: 'Здоровье всех боссов и мини-боссов увеличено на +50%, а их спецснаряды вылетают на 30% чаще.'
+  },
+  {
+    key: 'release_rush',
+    name: 'Срочный релиз к выставке',
+    desc: 'Скорость бега +30% и урон +40%, но максимальное здоровье снижено на 35%.',
+    buffDesc: 'Скорость передвижения игрока +30%, а весь урон по мобам увеличен на +40% (молниеносная зачистка багов).',
+    debuffDesc: 'Максимальный запас здоровья снижен на 35% (стеклянная пушка — любая ошибка фатальна).'
+  },
+  {
+    key: 'overloaded_cluster',
+    name: 'DDoS-атака на кластер 1С',
+    desc: '+2 рикошета/пробития и радиус аур +40%, но спавн мобов плотнее на 40%.',
+    buffDesc: 'Все выстрелы получают +2 рикошета и +2 пробития, а радиус действия всех аур и взрывов увеличен на +40%!',
+    debuffDesc: 'Плотность спавна мобов увеличена на 40% (непрерывный шквал входящих запросов).'
+  }
 ];
 const ELITE_MODIFIERS = [
   { key: 'haste', tag: '[СРОЧНО!]', color: '#ff6b6b', hpMult: 1.75, speedMult: 1.38, dmgMult: 1.15, xpMult: 2.3 },
@@ -3738,6 +3820,50 @@ class Game {
     this.start();
   }
 
+  openDailyRunBriefing() {
+    const targetDate = getDailyDateString();
+    const cfg = getDailyRunConfig(targetDate);
+    const dailyClass = PLAYER_CLASSES[cfg.classId] || PLAYER_CLASSES.technician;
+    const starterWeapon = WEAPONS_DEF[dailyClass.weapon]?.name || dailyClass.weapon;
+    const modal = document.getElementById('modal-daily-briefing');
+    if (!modal) return this.startDailyFromMainMenu();
+
+    const titleEl = document.getElementById('daily-briefing-title');
+    if (titleEl) titleEl.textContent = `📅 БРИФИНГ ЕЖЕДНЕВНОЙ СМЕНЫ · ${targetDate}`;
+
+    const classNameEl = document.getElementById('daily-briefing-class-name');
+    if (classNameEl) classNameEl.textContent = `«${dailyClass.name}»`;
+
+    const weaponEl = document.getElementById('daily-briefing-weapon');
+    if (weaponEl) weaponEl.textContent = `«${starterWeapon}»`;
+
+    const classDescEl = document.getElementById('daily-briefing-class-desc');
+    if (classDescEl) classDescEl.textContent = dailyClass.perkDesc || '—';
+
+    const modNameEl = document.getElementById('daily-briefing-mod-name');
+    if (modNameEl) modNameEl.textContent = `«${cfg.modifier.name}»`;
+
+    const buffsEl = document.getElementById('daily-briefing-buffs');
+    if (buffsEl) buffsEl.textContent = cfg.modifier.buffDesc || cfg.modifier.desc;
+
+    const debuffsEl = document.getElementById('daily-briefing-debuffs');
+    if (debuffsEl) debuffsEl.textContent = cfg.modifier.debuffDesc || '—';
+
+    modal.style.display = 'flex';
+  }
+
+  closeDailyRunBriefing() {
+    const modal = document.getElementById('modal-daily-briefing');
+    if (modal) modal.style.display = 'none';
+  }
+
+  confirmStartDailyRun() {
+    this.closeDailyRunBriefing();
+    const menu = document.getElementById('modal-main-menu');
+    if (menu) menu.style.display = 'none';
+    this.startDailyFromMainMenu();
+  }
+
   startDailyFromMainMenu() {
     this.requestMobileFullscreen();
     this.start({ daily: true });
@@ -3963,16 +4089,25 @@ class Game {
     if (this.isDailyRun && this.dailyConfig?.modifier) {
       const modKey = this.dailyConfig.modifier.key;
       if (modKey === 'quarter_close') {
-        this.player.xpMult += 0.15;
-        this.player.dashCooldownMult *= 1.12;
+        this.player.xpMult += 0.35;
+        this.player.dashCooldownMult *= 1.35;
       } else if (modKey === 'audit_day') {
-        this.currency = 180;
-        this.player.currencyMult += 0.15;
-        this.shopPriceMultiplier *= 1.14;
+        this.currency = 500;
+        this.player.currencyMult += 0.50;
+        this.shopPriceMultiplier *= 1.40;
       } else if (modKey === 'hot_shift') {
-        this.player.cdMult *= 0.92;
+        this.player.cdMult *= 0.75;
       } else if (modKey === 'friday_prod') {
-        this.player.critChance += 0.08;
+        this.player.critChance += 0.25;
+      } else if (modKey === 'release_rush') {
+        this.player.speedMult = (this.player.speedMult || 1) + 0.30;
+        this.player.dmgMult = (this.player.dmgMult || 1) + 0.40;
+        this.player.maxHp = Math.max(25, Math.round(this.player.maxHp * 0.65));
+        this.player.hp = Math.min(this.player.hp, this.player.maxHp);
+      } else if (modKey === 'overloaded_cluster') {
+        this.player.ricochetLevel = (this.player.ricochetLevel || 0) + 2;
+        this.player.multishotLevel = (this.player.multishotLevel || 0) + 1;
+        this.player.areaMult = (this.player.areaMult || 1) * 1.40;
       }
     }
     this.salesCallCount = 0;
@@ -5669,7 +5804,8 @@ class Game {
     const p = this.player;
     const dmgBonusFactor = 1 + Math.max(-0.5, ((p?.dmgMult ?? 1) - 1) * 0.65);
     const buffMult = (p?.damageBuffTimer > 0 ? (p.damageBuffMult || 1) : 1) * (p?.readOnlyTimer > 0 ? 0.55 : 1);
-    let dmg = activeSkillDamage(baseDamage, level) * dmgBonusFactor * buffMult;
+    const dailySkillDmgMult = (this.isDailyRun && this.dailyConfig?.modifier?.key === 'hot_shift') ? 1.35 : 1;
+    let dmg = activeSkillDamage(baseDamage, level) * dmgBonusFactor * buffMult * dailySkillDmgMult;
     if (allowCrit) {
       const critChance = Math.min(0.8, Math.max(0, (p?.critChance || 0) + (p?.evotorSyncTimer > 0 ? 0.10 : 0)));
       if (Math.random() < critChance) dmg *= 1.75;
@@ -8836,7 +8972,19 @@ class Game {
         const cfg = getDailyRunConfig(targetDate);
         const dailyClass = PLAYER_CLASSES[cfg.classId] || PLAYER_CLASSES.technician;
         dailyInfo.style.display = 'block';
-        dailyInfo.innerHTML = `<b>📅 Смена дня ${this.escapeHtml(targetDate)}:</b> класс <b>«${this.escapeHtml(dailyClass.name)}»</b> · условие <b>«${this.escapeHtml(cfg.modifier.name)}»</b> — ${this.escapeHtml(cfg.modifier.desc)}`;
+        dailyInfo.innerHTML = `
+          <div style="background:#192638; border:1px solid #4a69bd; border-radius:6px; padding:10px 14px; margin-bottom:12px; color:#f1f2f6; text-align:left;">
+            <div style="font-size:13px; font-weight:bold; color:#ffeaa7; margin-bottom:6px;">
+              📅 Смена дня ${this.escapeHtml(targetDate)}: дежурный класс <b>«${this.escapeHtml(dailyClass.name)}»</b> · модификатор <b>«${this.escapeHtml(cfg.modifier.name)}»</b>
+            </div>
+            <div style="color:#55efc4; font-size:12px; line-height:1.4; margin-bottom:4px;">
+              <b>✅ Баффы:</b> ${this.escapeHtml(cfg.modifier.buffDesc || cfg.modifier.desc)}
+            </div>
+            <div style="color:#ff7675; font-size:12px; line-height:1.4;">
+              <b>❌ Дебаффы:</b> ${this.escapeHtml(cfg.modifier.debuffDesc || '—')}
+            </div>
+          </div>
+        `;
       } else {
         dailyInfo.style.display = 'none';
       }
@@ -8849,10 +8997,14 @@ class Game {
     this.fetchLeaderboard();
   }
 
-  showLeaderboard() {
-    const fromGameOver = document.getElementById('modal-gameover').style.display === 'flex';
-    if (fromGameOver) {
-      this.leaderboardTab = this.isDailyRun ? 'daily' : 'general';
+  showLeaderboard(defaultTab = null) {
+    if (defaultTab) {
+      this.leaderboardTab = defaultTab === 'daily' ? 'daily' : 'general';
+    } else {
+      const fromGameOver = document.getElementById('modal-gameover').style.display === 'flex';
+      if (fromGameOver) {
+        this.leaderboardTab = this.isDailyRun ? 'daily' : 'general';
+      }
     }
     this.syncLeaderboardTabsUI();
     if (document.getElementById('modal-lb').style.display === 'flex') {
@@ -12442,10 +12594,11 @@ class Game {
     } catch (_) {}
   }
 
-  loadLocalDailyScores(dateStr) {
+  loadLocalDailyScores(dateStr = 'all') {
     try {
       const existing = JSON.parse(localStorage.getItem('1c_daily_scores_v1') || '[]');
       if (!Array.isArray(existing)) return [];
+      if (!dateStr || dateStr === 'all') return existing.filter(Boolean);
       return existing.filter(item => item && String(item.dailyDate || '') === String(dateStr));
     } catch (_) { return []; }
   }
@@ -12544,14 +12697,33 @@ class Game {
       const firebaseDailyPromise = isDailyTab ? Promise.race([
         (async () => {
           const fb = await window.firebaseLeaderboardReady;
-          const dailyQuery = fb.query(fb.ref(fb.db, `dailyLeaderboard/${targetDailyDate}`), fb.orderByChild('score'), fb.limitToLast(200));
-          const snapshot = await fb.get(dailyQuery);
-          return snapshot.exists() ? Object.values(snapshot.val()) : [];
+          let snapshot = null;
+          try {
+            const dailyQuery = fb.query(fb.ref(fb.db, 'dailyLeaderboard'), fb.limitToLast(60));
+            snapshot = await fb.get(dailyQuery);
+          } catch (_) {}
+          if (!snapshot || !snapshot.exists()) {
+            const singleQuery = fb.query(fb.ref(fb.db, `dailyLeaderboard/${targetDailyDate}`), fb.orderByChild('score'), fb.limitToLast(100));
+            snapshot = await fb.get(singleQuery);
+            return snapshot.exists() ? Object.values(snapshot.val()) : [];
+          }
+          const val = snapshot.val();
+          const records = [];
+          for (const [dateKey, daySubtree] of Object.entries(val)) {
+            if (daySubtree && typeof daySubtree === 'object') {
+              for (const [recId, rec] of Object.entries(daySubtree)) {
+                if (rec && typeof rec === 'object') {
+                  records.push({ ...rec, dailyDate: rec.dailyDate || dateKey });
+                }
+              }
+            }
+          }
+          return records;
         })(),
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
       ]) : Promise.resolve([]);
       const [workerOutcome, firebaseOutcome, firebaseDailyOutcome] = await Promise.allSettled([workerPromise, firebasePromise, firebaseDailyPromise]);
-      const localDailyScores = isDailyTab ? this.loadLocalDailyScores(targetDailyDate) : [];
+      const localDailyScores = isDailyTab ? this.loadLocalDailyScores('all') : [];
       if (workerOutcome.status === 'rejected' && firebaseOutcome.status === 'rejected' && !localDailyScores.length) {
         throw workerOutcome.reason || firebaseOutcome.reason || new Error('проверьте подключение');
       }
@@ -12562,13 +12734,14 @@ class Game {
       let scores = rawGeneralScores;
       if (isDailyTab) {
         const dailyMerged = [
-          ...rawGeneralScores.filter(entry => this.extractEntryDailyInfo(entry)?.date === targetDailyDate),
+          ...rawGeneralScores.filter(entry => Boolean(this.extractEntryDailyInfo(entry))),
           ...(firebaseDailyOutcome.status === 'fulfilled' ? firebaseDailyOutcome.value : []),
           ...localDailyScores
         ];
         const seenKeys = new Set();
         scores = dailyMerged.filter(entry => {
-          const key = `${String(entry?.name || '')}|${Number(entry?.score || 0)}|${Number(entry?.seconds || 0)}`;
+          const dDate = this.extractEntryDailyInfo(entry)?.date || entry.dailyDate || '';
+          const key = `${String(entry?.name || '')}|${Number(entry?.score || 0)}|${Number(entry?.seconds || 0)}|${dDate}`;
           if (seenKeys.has(key)) return false;
           seenKeys.add(key);
           return true;
@@ -12585,8 +12758,16 @@ class Game {
         return (right[0] - left[0]) || (right[1] - left[1]);
       };
       const visibleScores = (this.hideCheatersFromLeaderboard ? scores.filter(entry => !hasCheaterTag(entry)) : scores)
-        .sort((a, b) => (isDailyTab ? 0 : compareVersion(a, b)) || Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds) || Number(a.createdAt || 0) - Number(b.createdAt || 0))
-        .slice(0, 100);
+        .sort((a, b) => {
+          if (isDailyTab) {
+            const dateA = String(this.extractEntryDailyInfo(a)?.date || a.dailyDate || '');
+            const dateB = String(this.extractEntryDailyInfo(b)?.date || b.dailyDate || '');
+            if (dateA !== dateB) return dateB.localeCompare(dateA);
+            return Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds) || Number(a.createdAt || 0) - Number(b.createdAt || 0);
+          }
+          return compareVersion(a, b) || Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds) || Number(a.createdAt || 0) - Number(b.createdAt || 0);
+        })
+        .slice(0, 150);
       this.leaderboardEntries = visibleScores;
       tbody.innerHTML = '';
       if (!visibleScores.length) {
@@ -12600,15 +12781,46 @@ class Game {
       const classNames = { technician: 'Технарь', courier: 'Переносчик', developer: 'Разработчик', support: 'Чел с техпода' };
       let previousVersionGroup = null;
       let previousMajor = null;
-      if (isDailyTab) {
-        const headerRow = document.createElement('tr');
-        headerRow.className = 'lb-major-group';
-        headerRow.innerHTML = `<td colspan="8">📅 Рейтинг смены ${this.escapeHtml(targetDailyDate)}</td>`;
-        tbody.appendChild(headerRow);
+      let previousDailyDate = null;
+      let dayRank = 0;
+
+      if (isDailyTab && !visibleScores.some(e => (this.extractEntryDailyInfo(e)?.date || e.dailyDate) === targetDailyDate)) {
+        const todayCfg = getDailyRunConfig(targetDailyDate);
+        const todayClass = PLAYER_CLASSES[todayCfg.classId] || PLAYER_CLASSES.technician;
+        const todayHeader = document.createElement('tr');
+        todayHeader.className = 'lb-major-group';
+        todayHeader.innerHTML = `
+          <td colspan="8" style="background:#1e293b; color:#ffeaa7; text-align:left; padding:9px 12px; font-size:12px; border-left:4px solid #f1c40f;">
+            📅 <b>Смена дня ${this.escapeHtml(targetDailyDate)} (Сегодня)</b> · Дежурный класс: <b>«${this.escapeHtml(todayClass.name)}»</b> · Модификатор: <b>«${this.escapeHtml(todayCfg.modifier.name)}»</b>
+          </td>
+        `;
+        const todayEmpty = document.createElement('tr');
+        todayEmpty.innerHTML = `<td colspan="8" style="text-align:center; color:#ffeaa7; padding:10px; font-size:12px;">За сегодняшнюю смену рекордов пока нет. Заступите на смену первым дежурным дня!</td>`;
+        tbody.appendChild(todayHeader);
+        tbody.appendChild(todayEmpty);
       }
       visibleScores.forEach((entry, idx) => {
         const version = String(entry.version || GAME_VERSION);
-        if (!isDailyTab) {
+        const dailyInfo = isDailyTab ? (this.extractEntryDailyInfo(entry) || { date: entry.dailyDate || targetDailyDate }) : null;
+        const entryDate = String(dailyInfo?.date || entry.dailyDate || targetDailyDate);
+        const dailyCfg = isDailyTab ? getDailyRunConfig(entryDate) : null;
+        if (isDailyTab) {
+          if (entryDate !== previousDailyDate) {
+            previousDailyDate = entryDate;
+            dayRank = 0;
+            const dayClass = PLAYER_CLASSES[dailyCfg.classId] || PLAYER_CLASSES.technician;
+            const headerRow = document.createElement('tr');
+            headerRow.className = 'lb-major-group';
+            headerRow.innerHTML = `
+              <td colspan="8" style="background:#1e293b; color:#ffeaa7; text-align:left; padding:9px 12px; font-size:12px; border-left:4px solid #55efc4;">
+                📅 <b>Смена дня ${this.escapeHtml(entryDate)}</b> · Класс: <b>«${this.escapeHtml(dayClass.name)}»</b> · Условие: <b>«${this.escapeHtml(dailyCfg.modifier.name)}»</b>
+                <span style="font-weight:normal; opacity:0.85; margin-left:8px; font-size:11px;">(${this.escapeHtml(dailyCfg.modifier.desc)})</span>
+              </td>
+            `;
+            tbody.appendChild(headerRow);
+          }
+          dayRank++;
+        } else {
           const major = `${version.split('.')[0] || '1'}.x`;
           if (major !== previousMajor) {
             const groupRow = document.createElement('tr');
@@ -12630,12 +12842,17 @@ class Game {
         const seconds = Math.max(0, Number(entry.seconds) || 0);
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
         const s = (seconds % 60).toString().padStart(2, '0');
-        const dailyInfo = this.extractEntryDailyInfo(entry);
         const entryMode = entry.mode || 'solo';
         const modeLabel = dailyInfo ? `📅 Смена ${this.escapeHtml(dailyInfo.date)}`
           : entryMode === 'battle_royale' ? 'Battle Royale'
           : entryMode === 'pvp' ? 'Сетевая · PvP'
           : entryMode === 'pve' ? 'Сетевая · PvE' : 'Одиночная';
+        const dailyTooltip = dailyCfg
+          ? `Условие смены: ${dailyCfg.modifier.name}\n✅ Баффы: ${dailyCfg.modifier.buffDesc || dailyCfg.modifier.desc}\n❌ Дебаффы: ${dailyCfg.modifier.debuffDesc || '—'}`
+          : '';
+        const modeCell = dailyTooltip
+          ? `<td title="${this.escapeHtml(dailyTooltip)}" style="cursor:help; text-decoration:underline dotted;">${modeLabel}</td>`
+          : `<td>${modeLabel}</td>`;
         const playerCount = Math.max(1, Math.min(8, Number(entry.playerCount) || (entryMode === 'solo' || entryMode === 'daily' ? 1 : 2)));
         const displayName = this.escapeHtml(String(entry.name || 'Архитектор_1С'));
         const usernameTag = hasCheaterTag(entry)
@@ -12648,11 +12865,11 @@ class Game {
         tr.dataset.recordIndex = String(idx);
         tr.setAttribute('aria-label', `Открыть карточку рекорда ${idx + 1}: ${displayName}`);
         tr.innerHTML = `
-          <td><b>${idx + 1}</b></td>
+          <td><b>${isDailyTab ? dayRank : (idx + 1)}</b></td>
           <td><b>${displayName}</b>${usernameTag}</td>
           <td>${this.escapeHtml(classLabel)}</td>
           <td>${this.escapeHtml(version)}</td>
-          <td>${modeLabel}</td>
+          ${modeCell}
           <td>${playerCount}</td>
           <td style="color:#b33939; font-weight:bold;">${Math.max(0, Number(entry.score) || 0)}</td>
           <td>${m}:${s}</td>
@@ -12696,8 +12913,10 @@ class Game {
     const title = document.getElementById('record-detail-title');
     title.textContent = `Карточка рекорда · ${entry.name || 'Игрок'}`;
     const dailyInfo = this.extractEntryDailyInfo(entry);
+    const dailyCfg = dailyInfo?.date ? getDailyRunConfig(dailyInfo.date) : null;
+    const mod = dailyCfg?.modifier || (dailyInfo?.modifierKey ? DAILY_MODIFIERS.find(m => m.key === dailyInfo.modifierKey) : null);
     const modeDisplay = dailyInfo
-      ? `📅 Ежедневный (${dailyInfo.date}${dailyInfo.modifierName ? ` · ${dailyInfo.modifierName}` : ''})`
+      ? `📅 Ежедневный (${dailyInfo.date}${mod ? ` · ${mod.name}` : (dailyInfo.modifierName ? ` · ${dailyInfo.modifierName}` : '')})`
       : (modeNames[entry.mode] || entry.mode || 'Одиночная');
     const cells = [
       ['Игрок', entry.name], ['Класс', classNames[entry.classId] || snapshot?.className || '—'],
@@ -12705,6 +12924,11 @@ class Game {
       ['Игроков', entry.playerCount || entry.players || 1], ['Очки', Math.max(0, Number(entry.score) || 0)],
       ['Время выживания', runTime], ['Дата', entry.createdAt || entry.created_at ? new Date(Number(entry.createdAt || entry.created_at)).toLocaleString() : '—']
     ];
+    if (dailyInfo && mod) {
+      cells.push(['Модификатор смены', mod.name]);
+      cells.push(['Баффы смены', mod.buffDesc || mod.desc]);
+      cells.push(['Дебаффы смены', mod.debuffDesc || '—']);
+    }
     let html = `<div class="record-detail-grid">${cells.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b>${h(value)}</div>`).join('')}</div>`;
     if (snapshot && typeof snapshot === 'object') {
       if (snapshot.reason) html += `<p><b>Причина завершения:</b> ${h(snapshot.reason)}</p>`;

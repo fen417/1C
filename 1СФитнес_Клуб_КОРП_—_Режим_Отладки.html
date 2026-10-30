@@ -1522,7 +1522,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, linkWithPopup, linkWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithCredential, linkWithPopup, linkWithRedirect, linkWithCredential, getRedirectResult, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
   import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
@@ -1552,6 +1552,28 @@
       if (user && !user.isAnonymous) resolve(makeFirebaseContext(user));
     }, reject);
   });
+  let pendingGoogleCredential = null;
+  // Redirect OAuth returns to the page after the original JS context is gone.
+  // Consume the result on startup so mobile sign-in can complete reliably.
+  getRedirectResult(auth).then(result => {
+    if (result?.user && !result.user.isAnonymous) resolveFirebaseLeaderboard(makeFirebaseContext(result.user));
+  }).catch(async error => {
+    if (error?.code === 'auth/account-exists-with-different-credential' || error?.code === 'auth/credential-already-in-use') {
+      pendingGoogleCredential = GoogleAuthProvider.credentialFromError(error);
+    }
+    if (error?.code === 'auth/credential-already-in-use' && pendingGoogleCredential) {
+      try {
+        const result = await signInWithCredential(auth, pendingGoogleCredential);
+        if (result?.user && !result.user.isAnonymous) {
+          pendingGoogleCredential = null;
+          resolveFirebaseLeaderboard(makeFirebaseContext(result.user));
+          return;
+        }
+      } catch (signInError) { error = signInError; }
+    }
+    window.firebaseRedirectAuthError = error;
+    window.game?.showGoogleAuthError?.(error);
+  });
   window.firebaseAuthActions = {
     signInGoogle: async () => {
       const mobile = window.matchMedia?.('(pointer: coarse)').matches;
@@ -1566,7 +1588,24 @@
       if (result?.user && !result.user.isAnonymous) resolveFirebaseLeaderboard(makeFirebaseContext(result.user));
       return result;
     },
-    signInEmail: (email, password) => signInWithEmailAndPassword(auth, email, password),
+    signInEmail: async (email, password) => {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      if (pendingGoogleCredential) {
+        try {
+          await linkWithCredential(result.user, pendingGoogleCredential);
+          pendingGoogleCredential = null;
+        } catch (error) {
+          if (error?.code !== 'auth/provider-already-linked') throw error;
+          pendingGoogleCredential = null;
+        }
+      }
+      return result;
+    },
+    captureGoogleCredential: error => {
+      pendingGoogleCredential = GoogleAuthProvider.credentialFromError(error);
+      return pendingGoogleCredential;
+    },
+    signInWithGoogleCredential: credential => signInWithCredential(auth, credential),
     createEmailAccount: (email, password) => createUserWithEmailAndPassword(auth, email, password),
     resetEmailPassword: email => sendPasswordResetEmail(auth, email),
     signOut: () => signOut(auth)
@@ -3399,6 +3438,7 @@ class Game {
     const attachAuth = () => window.firebaseLeaderboardReady?.then(fb => this.onFirebaseAuthenticated(fb)).catch(error => this.showGoogleAuthError(error));
     if (window.firebaseLeaderboardReady) attachAuth();
     else window.addEventListener('load', attachAuth, { once:true });
+    if (window.firebaseRedirectAuthError) this.showGoogleAuthError(window.firebaseRedirectAuthError);
   }
 
   resize() {
@@ -4157,7 +4197,27 @@ class Game {
   showGoogleAuthError(error) {
     const status = document.getElementById('google-auth-status');
     if (!status) return;
+    const code = String(error?.code || '');
     const message = String(error?.message || '');
+    if (code === 'auth/account-exists-with-different-credential') {
+      const email = String(error?.customData?.email || '').trim();
+      if (email) document.getElementById('auth-email').value = email;
+      this.setEmailAuthMode('login');
+      status.textContent = 'Этот email уже зарегистрирован другим способом. Войдите через вкладку «Войти» тем способом, которым создавали аккаунт; Google будет привязан к нему.';
+      return;
+    }
+    if (code === 'auth/credential-already-in-use') {
+      status.textContent = 'Этот Google-аккаунт уже подключён. Выполняем вход в существующий профиль…';
+      return;
+    }
+    if (code === 'auth/unauthorized-domain') {
+      status.textContent = 'Домен игры не разрешён в Firebase Authentication → Settings → Authorized domains.';
+      return;
+    }
+    if (code === 'auth/redirect-cancelled-by-user' || code === 'auth/popup-closed-by-user') {
+      status.textContent = 'Вход отменён. Попробуйте ещё раз и дождитесь возврата в игру.';
+      return;
+    }
     if (/permission|permission_denied/i.test(message)) {
       status.textContent = 'Google-вход выполнен, но RTDB запрещает чтение профиля. Опубликуйте database.rules.json в Firebase → Realtime Database → Rules.';
       return;
@@ -4237,6 +4297,26 @@ class Game {
       const fb = await window.firebaseLeaderboardReady;
       await this.onFirebaseAuthenticated(fb);
     } catch (error) {
+      const code = String(error?.code || '');
+      const pendingCredential = window.firebaseAuthActions.captureGoogleCredential(error);
+      if (code === 'auth/account-exists-with-different-credential' && pendingCredential) {
+        const email = String(error?.customData?.email || '').trim();
+        if (email) document.getElementById('auth-email').value = email;
+        this.setEmailAuthMode('login');
+        status.textContent = 'Для этого email уже есть аккаунт. Войдите его прежним способом — Google привяжется к тому же профилю и сохранениям.';
+        return;
+      }
+      if (code === 'auth/credential-already-in-use') {
+        try {
+          const credential = pendingCredential;
+          if (credential) {
+            await window.firebaseAuthActions.signInWithGoogleCredential(credential);
+            const fb = await window.firebaseLeaderboardReady;
+            await this.onFirebaseAuthenticated(fb);
+            return;
+          }
+        } catch (signInError) { error = signInError; }
+      }
       this.showGoogleAuthError(error);
     }
   }

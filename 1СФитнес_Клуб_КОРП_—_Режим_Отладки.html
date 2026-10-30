@@ -12390,7 +12390,7 @@ class Game {
       this.finishRudesktopRescue(true);
       return;
     }
-    state.zoneSize = Math.max(48, state.zoneSize - 6);
+    state.zoneSize = [72, 60, 53, 36, 18][state.stage - 1] || 18;
     this.startRudesktopSkillCheck();
   }
 

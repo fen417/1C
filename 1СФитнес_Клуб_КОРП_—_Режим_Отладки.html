@@ -606,6 +606,22 @@
   #modal-changelog .win-1c { width: min(760px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-main-menu { z-index: 300; }
   #modal-daily-briefing { z-index: 320; }
+  #modal-daily-briefing .daily-briefing-warning,
+  #modal-daily-briefing .daily-briefing-card,
+  #modal-daily-briefing .daily-briefing-effect { background:#fff; border:1px solid #bbb; border-radius:2px; color:#444; }
+  #modal-daily-briefing .daily-briefing-warning { padding:10px 12px; margin-bottom:12px; font-size:12px; line-height:1.45; }
+  #modal-daily-briefing .daily-briefing-card { padding:10px 14px; margin-bottom:10px; }
+  #modal-daily-briefing .daily-briefing-card-title { margin-bottom:6px; color:#900; font-size:13px; font-weight:bold; }
+  #modal-daily-briefing .daily-briefing-card-title span { color:#222 !important; }
+  #modal-daily-briefing .daily-briefing-weapon { margin-bottom:4px; font-size:12px; color:#444; }
+  #modal-daily-briefing .daily-briefing-weapon b { color:#222 !important; }
+  #modal-daily-briefing .daily-briefing-perk { color:#666; font-size:11px; line-height:1.4; }
+  #modal-daily-briefing .daily-briefing-effect { padding:8px 12px; }
+  #modal-daily-briefing .daily-briefing-effect + .daily-briefing-effect { margin-top:8px; }
+  #modal-daily-briefing .daily-briefing-effect-title { margin-bottom:3px; color:#900; font-size:12px; font-weight:bold; }
+  #modal-daily-briefing .daily-briefing-effect-title span { color:#900 !important; }
+  #modal-daily-briefing .daily-briefing-effect-copy { color:#444 !important; font-size:12px; line-height:1.4; }
+  #modal-daily-briefing .daily-briefing-actions .btn-1c { min-height:40px; }
   #modal-pvp { z-index: 320; }
   #modal-pvp .win-1c { width:min(720px,96vw) !important; max-height:calc(100% - 20px); overflow-y:auto; }
   .pvp-room-browser { margin:0 0 12px; padding:9px; border:1px solid #bbb; background:#f8f9fa; }
@@ -1190,40 +1206,40 @@
     <div class="win-1c" style="width:min(620px,96vw); max-height:min(90vh,760px); display:flex; flex-direction:column;" onclick="event.stopPropagation()">
       <div class="win-1c-head"><span id="daily-briefing-title">📅 БРИФИНГ ЕЖЕДНЕВНОЙ СМЕНЫ</span><button class="win-close-btn" onclick="game.closeDailyRunBriefing()" aria-label="Закрыть">✕</button></div>
       <div class="win-1c-body" style="overflow-y:auto; padding:14px; text-align:left;">
-        <div style="background:rgba(255,234,167,0.14); border:1px solid #ffeaa7; border-radius:6px; padding:10px 12px; margin-bottom:12px; font-size:12px; color:#ffeaa7; line-height:1.45;">
+        <div class="daily-briefing-warning">
           ⚠️ <b>Внимание:</b> Сид генерации волн, дежурный класс и условия смены одинаковы для всех сотрудников фитнес-кластера на сегодня. Рестарт сбрасывает попытку, а лучший счёт пойдёт в таблицу рекордов смены дня!
         </div>
 
-        <div style="background:#162232; border:1px solid #34495e; border-radius:6px; padding:10px 14px; margin-bottom:10px;">
-          <div style="font-size:13px; font-weight:bold; color:#74b9ff; margin-bottom:6px;">
-            👨‍💼 НАЗНАЧЕННЫЙ ДЕЖУРНЫЙ КЛАСС: <span id="daily-briefing-class-name" style="color:#ffeaa7;"></span>
+        <div class="daily-briefing-card">
+          <div class="daily-briefing-card-title">
+            👨‍💼 Назначенный дежурный класс: <span id="daily-briefing-class-name"></span>
           </div>
-          <div style="font-size:12px; margin-bottom:4px; color:#dce6f0;">
-            🔫 Стартовое оружие: <b id="daily-briefing-weapon" style="color:#55efc4;"></b>
+          <div class="daily-briefing-weapon">
+            🔫 Стартовое оружие: <b id="daily-briefing-weapon"></b>
           </div>
-          <div style="font-size:11px; color:#a4b0be; line-height:1.4;">
+          <div class="daily-briefing-perk">
             ✨ Классовые перки: <span id="daily-briefing-class-desc"></span>
           </div>
         </div>
 
-        <div style="background:#162232; border:1px solid #34495e; border-radius:6px; padding:10px 14px; margin-bottom:12px;">
-          <div style="font-size:13px; font-weight:bold; color:#ff7675; margin-bottom:8px;">
-            ⚡ МОДИФИКАТОР ДНЯ: <span id="daily-briefing-mod-name" style="color:#fdcb6e;"></span>
+        <div class="daily-briefing-card">
+          <div class="daily-briefing-card-title">
+            ⚡ Модификатор дня: <span id="daily-briefing-mod-name"></span>
           </div>
-          <div style="background:rgba(46,213,115,0.12); border:1px solid #2ed573; border-radius:6px; padding:8px 12px; margin-bottom:8px;">
-            <div style="color:#2ed573; font-weight:bold; font-size:12px; margin-bottom:3px;">✅ ПОЛОЖИТЕЛЬНЫЕ ЭФФЕКТЫ (БАФФЫ):</div>
-            <div id="daily-briefing-buffs" style="font-size:12px; color:#f1f2f6; line-height:1.4;"></div>
+          <div class="daily-briefing-effect">
+            <div class="daily-briefing-effect-title">✅ Положительные эффекты:</div>
+            <div id="daily-briefing-buffs" class="daily-briefing-effect-copy"></div>
           </div>
-          <div style="background:rgba(255,71,87,0.12); border:1px solid #ff4757; border-radius:6px; padding:8px 12px;">
-            <div style="color:#ff4757; font-weight:bold; font-size:12px; margin-bottom:3px;">❌ ОТРИЦАТЕЛЬНЫЕ ЭФФЕКТЫ (ДЕБАФФЫ):</div>
-            <div id="daily-briefing-debuffs" style="font-size:12px; color:#f1f2f6; line-height:1.4;"></div>
+          <div class="daily-briefing-effect">
+            <div class="daily-briefing-effect-title">❌ Отрицательные эффекты:</div>
+            <div id="daily-briefing-debuffs" class="daily-briefing-effect-copy"></div>
           </div>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn-1c" style="flex:2; min-height:44px; background:#55efc4; font-size:14px; font-weight:bold;" onclick="game.confirmStartDailyRun()">🚀 ЗАСТУПИТЬ НА СМЕНУ!</button>
-          <button class="btn-1c" style="flex:1; min-height:44px; background:#ffeaa7;" onclick="game.showLeaderboard('daily')">🏆 Рекорды смены</button>
-          <button class="btn-1c" style="min-height:44px;" onclick="game.closeDailyRunBriefing()">Отмена</button>
+        <div class="daily-briefing-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-1c" style="flex:2; font-weight:bold;" onclick="game.confirmStartDailyRun()">🚀 Заступить на смену</button>
+          <button class="btn-1c" style="flex:1;" onclick="game.showLeaderboard('daily')">🏆 Рекорды смены</button>
+          <button class="btn-1c" onclick="game.closeDailyRunBriefing()">Отмена</button>
         </div>
       </div>
     </div>

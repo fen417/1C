@@ -10066,7 +10066,7 @@ class Game {
           const dy = target.y - by;
           if (dx * dx + dy * dy < 33 * 33) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
-            this.dealWeaponTargetDamage(target, hit.dmg * dt * 3.8, 'Турникет');
+            this.dealWeaponTargetDamage(target, hit.dmg * dt * 3.8, WEAPONS_DEF.turnstile.name);
           }
         }
       }
@@ -10229,7 +10229,7 @@ class Game {
         const dy = target.y - this.player.y;
         if (dx * dx + dy * dy < pvpRadSq) {
           const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
-          this.dealWeaponTargetDamage(target, hit.dmg * dt, 'Аура кэша');
+          this.dealWeaponTargetDamage(target, hit.dmg * dt, WEAPONS_DEF.cache_aura.name);
         }
       }
     }
@@ -10259,7 +10259,7 @@ class Game {
       }
     }
 
-    // Лазер ЕГАИС
+    // АТОЛ: фискальный сканер
     if (this.weapons.egais_laser) {
       const w = this.weapons.egais_laser;
       w.timer -= dt;
@@ -10279,7 +10279,7 @@ class Game {
           let tgt = available.shift();
           if (tgt && Math.hypot(tgt.x - currX, tgt.y - currY) < 380) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.egais_laser.baseDmg + w.lvl * 8);
-            this.dealWeaponTargetDamage(tgt, hit.dmg, 'Лазер ЕГАИС');
+            this.dealWeaponTargetDamage(tgt, hit.dmg, WEAPONS_DEF.egais_laser.name);
             chain.push({ x1: currX, y1: currY, x2: tgt.x, y2: tgt.y });
             currX = tgt.x; currY = tgt.y;
             this.createHitFX(tgt.x, tgt.y, '#ff4757', 4);
@@ -10324,7 +10324,7 @@ class Game {
           const target = available.shift();
           if (Math.hypot(target.x - x, target.y - y) > 400) break;
           const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_ledger.baseDmg + w.lvl * 14);
-          this.dealWeaponTargetDamage(target, hit.dmg, 'Фискальный реестр');
+          this.dealWeaponTargetDamage(target, hit.dmg, WEAPONS_DEF.fusion_ledger.name);
           lines.push({ x1: x, y1: y, x2: target.x, y2: target.y });
           this.createHitFX(target.x, target.y, '#9b59b6', 4);
           x = target.x; y = target.y;
@@ -10360,7 +10360,7 @@ class Game {
           const dy = target.y - this.player.y;
           if (dx * dx + dy * dy <= radiusSq) {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16);
-            this.dealWeaponTargetDamage(target, hit.dmg, 'Контроль доступа');
+            this.dealWeaponTargetDamage(target, hit.dmg, WEAPONS_DEF.fusion_gate.name);
           }
         }
         this.createHitFX(this.player.x, this.player.y, '#55efc4', 8);
@@ -10591,7 +10591,7 @@ class Game {
             if (dx * dx + dy * dy < hitRadSq) { pvpTarget = candidate; break; }
           }
           if (pvpTarget) {
-            this.dealWeaponTargetDamage(pvpTarget, p.dmg, 'Попадание снаряда');
+            this.dealWeaponTargetDamage(pvpTarget, p.dmg, this.inferWeaponDamageSource(p));
             p.hitPlayers ||= [];
             p.hitPlayers.push(pvpTarget.uid);
             if (!p.piercing) { p.hitOpponent = true; p.life = 0; }
@@ -10789,7 +10789,7 @@ class Game {
             const dx = target.x - pud.x;
             const dy = target.y - pud.y;
             if (dx * dx + dy * dy < pvpRadSq) {
-              this.dealWeaponTargetDamage(target, pud.dmg * dt, 'Лужа');
+              this.dealWeaponTargetDamage(target, pud.dmg * dt, pud.source || WEAPONS_DEF.protein.name);
             }
           }
         }
@@ -11860,11 +11860,13 @@ class Game {
       ];
       const hasCheaterTag = entry => String(entry.tag || entry.label || entry.signature || '').trim().toLowerCase() === 'читерок'
         || String(entry.name || '').trim().toLowerCase() === 'username';
-      const patchVersion = entry => String(entry.version || '1.7.1').split('.').slice(0, 3).map(part => Number.parseInt(part, 10) || 0);
+      const versionGroupParts = entry => {
+        const [major = '1', minor = '0'] = String(entry.version || '1.7.1').split('.');
+        return [Number.parseInt(major, 10) || 0, Number.parseInt(minor, 10) || 0];
+      };
       const compareVersion = (a, b) => {
-        const left = patchVersion(a), right = patchVersion(b);
-        for (let i = 0; i < 3; i++) if (left[i] !== right[i]) return right[i] - left[i];
-        return 0;
+        const left = versionGroupParts(a), right = versionGroupParts(b);
+        return (right[0] - left[0]) || (right[1] - left[1]);
       };
       const visibleScores = (this.hideCheatersFromLeaderboard ? scores.filter(entry => !hasCheaterTag(entry)) : scores)
         .sort((a, b) => compareVersion(a, b) || Number(b.score) - Number(a.score) || Number(a.seconds) - Number(b.seconds) || Number(a.createdAt || 0) - Number(b.createdAt || 0))

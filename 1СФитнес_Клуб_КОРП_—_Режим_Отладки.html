@@ -605,6 +605,7 @@
   @keyframes achievement-toast-in { from { opacity:0; transform:translate(-50%,-14px) scale(.96); } to { opacity:1; transform:translate(-50%,0) scale(1); } }
   #modal-changelog .win-1c { width: min(760px, 94vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-main-menu { z-index: 300; }
+  #modal-daily-briefing { z-index: 320; }
   #modal-pvp { z-index: 320; }
   #modal-pvp .win-1c { width:min(720px,96vw) !important; max-height:calc(100% - 20px); overflow-y:auto; }
   .pvp-room-browser { margin:0 0 12px; padding:9px; border:1px solid #bbb; background:#f8f9fa; }
@@ -4147,7 +4148,7 @@ class Game {
     this.updateConsumableHUD();
     this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
     if (!options.skipScoreSession) {
-      this.beginVerifiedRunSession();
+      if (!this.isDailyRun) this.beginVerifiedRunSession();
       if (this.isDailyRun && this.dailyConfig) {
         const dailyClass = PLAYER_CLASSES[this.dailyConfig.classId] || PLAYER_CLASSES.technician;
         const mod = this.dailyConfig.modifier;
@@ -12613,23 +12614,36 @@ class Game {
     const status = document.getElementById('submit-status');
     const btn = document.getElementById('btn-submit-score');
 
-    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
-    const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
     const classId = this.player?.classId || this.selectedClassId;
     const loadout = this.finalLoadout || this.getFinalLoadout();
-    const dailyRecord = this.isDailyRun && this.dailyDate ? {
-      name: nick, score, seconds, version: GAME_VERSION, mode: 'daily', players: 1,
-      classId, loadout, dailyDate: this.dailyDate,
-      dailyModifierKey: this.dailyConfig?.modifier?.key || '',
-      dailyModifierName: this.dailyConfig?.modifier?.name || '',
-      createdAt: Date.now()
-    } : null;
-    if (dailyRecord) {
+    if (this.isDailyRun && this.dailyDate) {
+      const dailyRecord = {
+        name: nick, score, seconds, version: GAME_VERSION, mode: 'daily', players: 1,
+        classId, loadout, dailyDate: this.dailyDate,
+        dailyModifierKey: this.dailyConfig?.modifier?.key || '',
+        dailyModifierName: this.dailyConfig?.modifier?.name || '',
+        createdAt: Date.now()
+      };
       this.saveLocalDailyScore(dailyRecord);
-      window.firebaseLeaderboardReady?.then(fb =>
-        fb.push(fb.ref(fb.db, `dailyLeaderboard/${this.dailyDate}`), dailyRecord)
-      ).catch(() => null);
+      status.innerText = 'Сохраняем результат в рейтинг ежедневной смены…';
+      btn.disabled = true;
+      try {
+        const fb = await window.firebaseLeaderboardReady;
+        await fb.push(fb.ref(fb.db, `dailyLeaderboard/${this.dailyDate}`), dailyRecord);
+        status.innerHTML = '<b style="color:#27ae60">Результат добавлен в отдельный рейтинг ежедневного забега.</b>';
+        if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
+        this.leaderboardOpenTimer = setTimeout(() => {
+          this.leaderboardOpenTimer = null;
+          if (document.getElementById('modal-gameover').style.display === 'flex') this.showLeaderboard('daily');
+        }, 800);
+      } catch (err) {
+        status.innerHTML = `<span style="color:#d35400">Локальный рекорд смены сохранён (${this.escapeHtml(err.message || 'сервер недоступен')}).</span>`;
+        btn.disabled = false;
+      }
+      return;
     }
+    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
+    const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
     status.innerText = 'Сохраняем результат...';
     btn.disabled = true;
     try {
@@ -12654,18 +12668,14 @@ class Game {
         result = await response.json().catch(() => ({}));
       }
       if (!response.ok) throw new Error(result.error || `сервер ответил ${response.status}`);
-      status.innerHTML = `<b style="color:#27ae60">${this.isDailyRun ? 'Результат добавлен в рейтинг ежедневного забега и общую таблицу!' : 'Результат этого забега добавлен в таблицу!'}</b>`;
+      status.innerHTML = '<b style="color:#27ae60">Результат этого забега добавлен в таблицу!</b>';
       if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
       this.leaderboardOpenTimer = setTimeout(() => {
         this.leaderboardOpenTimer = null;
         if (document.getElementById('modal-gameover').style.display === 'flex') this.showLeaderboard();
       }, 800);
     } catch (err) {
-      if (dailyRecord) {
-        status.innerHTML = `<span style="color:#d35400">Локальный рекорд смены сохранён (${this.escapeHtml(err.message || 'сервер недоступен')}).</span>`;
-      } else {
-        status.innerHTML = `<span style="color:#c0392b">Не удалось сохранить: ${this.escapeHtml(err.message || 'ошибка сервера')}</span>`;
-      }
+      status.innerHTML = `<span style="color:#c0392b">Не удалось сохранить: ${this.escapeHtml(err.message || 'ошибка сервера')}</span>`;
       btn.disabled = false;
     }
   }

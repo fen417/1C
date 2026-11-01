@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.7.0</title>
+<title>1С:Фитнес Клуб КОРП 2.7.1</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -627,6 +627,10 @@
   #lb-daily-info .daily-leaderboard-info-copy { color:#444; font-size:12px; line-height:1.4; }
   #lb-daily-info .daily-leaderboard-info-copy + .daily-leaderboard-info-copy { margin-top:4px; }
   #lb-daily-info .daily-leaderboard-info-copy b { color:#900; }
+  #lb-table .lb-daily-group td { background:#fffbe6; color:#333; text-align:left; padding:9px 12px; font-size:12px; border-left:3px solid #cca400; }
+  #lb-table .lb-daily-group b { color:#900; }
+  #lb-table .lb-daily-description { display:block; margin-top:4px; color:#666; font-size:11px; font-weight:normal; line-height:1.4; }
+  #lb-table .lb-daily-empty td { text-align:center; color:#666; padding:10px; font-size:12px; }
   #modal-pvp { z-index: 320; }
   #modal-pvp .win-1c { width:min(720px,96vw) !important; max-height:calc(100% - 20px); overflow-y:auto; }
   .pvp-room-browser { margin:0 0 12px; padding:9px; border:1px solid #bbb; background:#f8f9fa; }
@@ -1003,7 +1007,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.7.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.7.1 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1178,7 +1182,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.7.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.7.1</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1189,12 +1193,12 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.7.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.7.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
-              <h3>Версия 2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3>
-              <p>Бухгалтерия сверила цифры: бесплатных плюшек больше не держат — мощные пассивки, эволюции пушек и все три легендарные миграции теперь приходят со своими побочками, а классы подтянуты друг к другу. В кластер завезли новые эволюции, элитных клиентов, «Закрытие года» и ежедневную смену с собственным рейтингом. Магазин стал дороже: выросли базовые цены и наценка за звонки и повторные покупки.</p>
+              <h3>Версия 2.7.1 — «Кластер держит соединение»</h3>
+              <p>Переработана синхронизация лобби на 3–8 игроков: отдельный учёт урона и убийств, частые обновления координат и надёжная доставка изменений мира. Выбывший хост продолжает обслуживать матч, пока открыта игра. Добавлены ежедневные смены «Ночная резервная копия» и «Оптимизация бюджета», усилены старые модификаторы. Таблица смен оформлена в общем светлом стиле.</p><p>Бухгалтерия сверила цифры: бесплатных плюшек больше не держат — мощные пассивки, эволюции пушек и все три легендарные миграции теперь приходят со своими побочками, а классы подтянуты друг к другу. В кластер завезли новые эволюции, элитных клиентов, «Закрытие года» и ежедневную смену с собственным рейтингом. Магазин стал дороже: выросли базовые цены и наценка за звонки и повторные покупки.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.6.0 — «ИИ-слоп на премиум-тарифе»</h3>
@@ -1364,7 +1368,8 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.7.1 — «Кластер держит соединение»</h3></summary><p>Новая передача изменений мира независимыми пакетами, координаты игроков и мобов — 20 раз в секунду. Исправлены общий счётчик урона гостей, рывки третьего игрока, повторные попадания при замене объектов, зависание выбора класса и остановка матча после смерти хоста. Хост после выбывания остаётся сервером, пока игра открыта; его персонаж не лечится, не атакует и не собирает предметы. Добавлены две ежедневные смены, усилены положительные и отрицательные эффекты старых и реализованы отсутствовавшие эффекты. Для сетевой игры всем участникам нужна версия 2.7.1 и новое лобби.</p></details>
+        <details class="release-notes patch-minor"><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры. Добавлены хаотичные тикеты Максима Воронина: отказ или игнор сразу вызывает М.В., три провала принятых тикетов — тоже; задания могут инвертировать или поворачивать управление, усиливать и множить мобов, отключать рывок. Усилены недостатки мощных предметов и комплектов; рикошет, мультивыстрел, замедление и поджог дают боевой бонус с соответствующим штрафом к перезарядке, урону или скорости и теперь имеют по три уровня. Рикошет даёт 1/2/3 отскока, мультивыстрел — +1/+2/+3 снаряда, замедление — 15/30/45%, поджог — шанс 30/50/65%; взрыв от поджига и замедления срабатывает на их максимальном уровне. Характеристики способностей и снаряжения описаны понятными процентами и величинами. Мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты. Проведена оптимизация производительности без визуальных изменений: внедрена пространственная сетка поиска целей и столкновений, кэширование глифов и свечений на Canvas, точечное обновление HUD и тикетов при изменении значений, однопроходная сериализация мира для WebRTC и параллельная загрузка таблиц лидеров. Исправлены пересчёт характеристик и здоровья при продаже и перемещении предметов между инвентарём и рюкзаком, рецепт и сборка комплекта «Архитектор рывка», работа временных усилений урона и отображение множителя опыта в характеристиках. Кислотная лужа мини-босса «Акт налоговой проверки» теперь наносит урон игрокам вместо мобов, защита от боссов учитывается на всех атаках боссов и больше не срабатывает на соперников с ником «Босс», а неуязвимый преследователь RuDesktop не подвержен отталкиванию, контролю, ветру и эволюциям оружия. В Battle Royale и массовых матчах очередь накопленных повышений уровня открывается подряд без сброса подсказки, клавиша L не завершает забег во время ввода текста, а в никах поддерживаются буквы «ё» и «Ё». Исправлены маршрутизация урона, активных умений, выстрелов и выбор целей в сетевых матчах на 3–8 игроков, очистка WebRTC-подписок при выходе соперника и отправка рекордов через проверяемую сессию забега.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
@@ -1686,50 +1691,65 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.7.0';
+const GAME_VERSION = '2.7.1';
 const MAX_PLAYER_DODGE = 0.50;
+const NETWORK_PROTOCOL = 2;
 const DAILY_MODIFIERS = [
   {
-    key: 'quarter_close',
-    name: 'Закрытие квартала',
-    desc: 'Опыт +35%, элита в 2.5 раза чаще (+50% золота), но урон элиты +30% и откат рывка дольше на 35%.',
-    buffDesc: 'Опыт за всех клиентов +35%, элитные клиенты появляются в 2.5 раза чаще и приносят на +50% больше фиткоинов.',
-    debuffDesc: 'Элитные мобы наносят на +30% больше урона, а время восстановления кувырка/рывка увеличено на +35%.'
+    key: 'quarter_close', name: 'Закрытие квартала',
+    desc: 'Опыт +75%, элита втрое чаще и даёт +80% фиткоинов, но её урон +60%, откат рывка +60%.',
+    buffDesc: 'Опыт +75%. Элитные клиенты появляются втрое чаще (шанс до 60%) и дают +80% фиткоинов с дискет.',
+    debuffDesc: 'Урон элитных клиентов +60%. Время восстановления рывка +60%.',
+    rules: { xpBonus: 0.75, eliteChanceMult: 3, eliteCurrencyMult: 1.8, eliteDamageMult: 1.6, dashCooldownMult: 1.6 }
   },
   {
-    key: 'audit_day',
-    name: 'Внезапная выездная налоговая',
-    desc: 'Старт с 500 фиткоинами и +50% золота с дискет, но цены в магазине +40% и кражи монет вдвое чаще.',
-    buffDesc: 'Стартовый баланс сразу 500 фиткоинов (моментальный закуп на старте) и +50% фиткоинов со всех источников.',
-    debuffDesc: 'Налоговая наценка магазина +40% к базовым ценам, а воришки фиткоинов крадут монеты в 2 раза чаще.'
+    key: 'audit_day', name: 'Внезапная выездная налоговая',
+    desc: '1000 фиткоинов на старте, доход +100%, но магазин дороже на 90%, кражи втрое чаще.',
+    buffDesc: 'Стартовый баланс — 1000 фиткоинов. Доход с дискет +100%.',
+    debuffDesc: 'Цены магазина +90%. Воришки крадут монеты каждые 1 с вместо 3 с при контакте.',
+    rules: { startingCurrency: 1000, currencyMult: 2, shopPriceMult: 1.9, theftCooldown: 1 }
   },
   {
-    key: 'hot_shift',
-    name: 'Авария на сервере: Горячая линия',
-    desc: 'Откат оружия и умений -25%, урон умений +35%, но все мобы быстрее на 20%.',
-    buffDesc: 'Оружие и активные умения перезаряжаются на 25% быстрее, а урон всех активных скиллов повышен на +35%!',
-    debuffDesc: 'Скорость передвижения абсолютно ВСЕХ мобов увеличена на +20% (ураганный напор клиентов).'
+    key: 'hot_shift', name: 'Авария на сервере: Горячая линия',
+    desc: 'Откат оружия и умений −40%, урон умений +70%, но скорость всех мобов и боссов +35%.',
+    buffDesc: 'Время перезарядки оружия и активных умений −40%. Урон активных умений +70%.',
+    debuffDesc: 'Скорость всех мобов, включая боссов, +35%.',
+    rules: { cooldownMult: 0.6, skillDamageMult: 1.7, enemySpeedMult: 1.35 }
   },
   {
-    key: 'friday_prod',
-    name: 'Пятничный деплой на прод',
-    desc: 'Крит +25%, крит.урон +50%, но здоровье боссов +50% и их атаки агрессивнее на 30%.',
-    buffDesc: 'Шанс критического удара +25%, а критический урон увеличен на +50% (сокрушительные криты)!',
-    debuffDesc: 'Здоровье всех боссов и мини-боссов увеличено на +50%, а их спецснаряды вылетают на 30% чаще.'
+    key: 'friday_prod', name: 'Пятничный деплой на прод',
+    desc: 'Крит +35 п.п., критический урон +80%, но здоровье боссов +90%, частота их атак +60%.',
+    buffDesc: 'Шанс крита +35 процентных пунктов (общий предел — 80%). Урон критических попаданий оружия и умений +80%.',
+    debuffDesc: 'Здоровье всех боссов +90%. Их специальные атаки срабатывают на 60% чаще.',
+    rules: { critBonus: 0.35, critDamageMult: 1.8, bossHpMult: 1.9, bossAttackRate: 1.6 }
   },
   {
-    key: 'release_rush',
-    name: 'Срочный релиз к выставке',
-    desc: 'Скорость бега +30% и урон +40%, но максимальное здоровье снижено на 35%.',
-    buffDesc: 'Скорость передвижения игрока +30%, а весь урон по мобам увеличен на +40% (молниеносная зачистка багов).',
-    debuffDesc: 'Максимальный запас здоровья снижен на 35% (стеклянная пушка — любая ошибка фатальна).'
+    key: 'release_rush', name: 'Срочный релиз к выставке',
+    desc: 'Скорость +50%, множитель урона +75 п.п., но максимальное здоровье −50%.',
+    buffDesc: 'Множитель скорости +50 п.п., множитель урона оружия +75 п.п. Бонус урона также усиливает активные умения.',
+    debuffDesc: 'Максимальное и стартовое здоровье снижены вдвое.',
+    rules: { speedBonus: 0.5, damageBonus: 0.75, maxHpMult: 0.5 }
   },
   {
-    key: 'overloaded_cluster',
-    name: 'DDoS-атака на кластер 1С',
-    desc: '+2 рикошета/пробития и радиус аур +40%, но спавн мобов плотнее на 40%.',
-    buffDesc: 'Все выстрелы получают +2 рикошета и +2 пробития, а радиус действия всех аур и взрывов увеличен на +40%!',
-    debuffDesc: 'Плотность спавна мобов увеличена на 40% (непрерывный шквал входящих запросов).'
+    key: 'overloaded_cluster', name: 'DDoS-атака на кластер 1С',
+    desc: '+3 рикошета и пробития, радиус аур и луж оружия +75%, но плотность волн +80%.',
+    buffDesc: 'Обычные снаряды получают +3 рикошета и +3 пробития. Радиус аур и луж оружия +75%.',
+    debuffDesc: 'Размер волн и предельное число обычных мобов +80%.',
+    rules: { ricochetBonus: 3, pierceBonus: 3, areaMult: 1.75, spawnMult: 1.8 }
+  },
+  {
+    key: 'night_backup', name: 'Ночная резервная копия',
+    desc: 'Здоровье +60%, регенерация +4 HP/с, но урон −35%, здоровье обычных мобов +45%.',
+    buffDesc: 'Максимальное и стартовое здоровье +60%. Восстановление здоровья +4 HP/с.',
+    debuffDesc: 'Множитель урона оружия −35% (также ослабляет умения). Здоровье обычных мобов +45%.',
+    rules: { maxHpMult: 1.6, regenBonus: 4, damageMult: 0.65, enemyHpMult: 1.45 }
+  },
+  {
+    key: 'budget_cut', name: 'Оптимизация бюджета',
+    desc: 'Множитель урона +100 п.п., опыт +100%, но доход −75%, магазин дороже на 60%.',
+    buffDesc: 'Множитель урона оружия +100 п.п. (также усиливает умения). Опыт +100%.',
+    debuffDesc: 'Доход с дискет снижен на 75%. Цены магазина +60%.',
+    rules: { damageBonus: 1, xpBonus: 1, currencyMult: 0.25, shopPriceMult: 1.6 }
   }
 ];
 const ELITE_MODIFIERS = [
@@ -1764,7 +1784,8 @@ function getDailyRunConfig(dateStr = getDailyDateString()) {
   const rng = createSeededRng(seed);
   const classIds = ['technician', 'courier', 'developer', 'support'];
   const classId = classIds[Math.floor(rng() * classIds.length)];
-  const modifier = DAILY_MODIFIERS[Math.floor(rng() * DAILY_MODIFIERS.length)];
+  const pool = dateStr <= '2026-11-01' ? DAILY_MODIFIERS.slice(0, 6) : DAILY_MODIFIERS;
+  const modifier = pool[Math.floor(rng() * pool.length)];
   return { dateStr, seed, classId, modifier };
 }
 const ACHIEVEMENT_MEDALS = ['Бронза', 'Серебро', 'Золото', 'Платина'];
@@ -4108,30 +4129,7 @@ class Game {
     this.currency = 0;
     this.shopPriceMultiplier = 2.0;
     this.shopRepeatPurchases = Object.create(null);
-    if (this.isDailyRun && this.dailyConfig?.modifier) {
-      const modKey = this.dailyConfig.modifier.key;
-      if (modKey === 'quarter_close') {
-        this.player.xpMult += 0.35;
-        this.player.dashCooldownMult *= 1.35;
-      } else if (modKey === 'audit_day') {
-        this.currency = 500;
-        this.player.currencyMult += 0.50;
-        this.shopPriceMultiplier *= 1.40;
-      } else if (modKey === 'hot_shift') {
-        this.player.cdMult *= 0.75;
-      } else if (modKey === 'friday_prod') {
-        this.player.critChance += 0.25;
-      } else if (modKey === 'release_rush') {
-        this.player.speedMult = (this.player.speedMult || 1) + 0.30;
-        this.player.dmgMult = (this.player.dmgMult || 1) + 0.40;
-        this.player.maxHp = Math.max(25, Math.round(this.player.maxHp * 0.65));
-        this.player.hp = Math.min(this.player.hp, this.player.maxHp);
-      } else if (modKey === 'overloaded_cluster') {
-        this.player.ricochetLevel = (this.player.ricochetLevel || 0) + 2;
-        this.player.multishotLevel = (this.player.multishotLevel || 0) + 1;
-        this.player.areaMult = (this.player.areaMult || 1) * 1.40;
-      }
-    }
+    this.applyDailyRunModifiers();
     this.salesCallCount = 0;
     this.fitcoinTheftCooldown = 0;
     this.shopPassives = Array(6).fill(null);
@@ -4505,6 +4503,7 @@ class Game {
     this.passives = {};
     this.repeatableUpgradeCounts = {};
     document.getElementById('modal-class-select').style.display = 'none';
+    this.paused = false;
     this.updateHUD();
     this.updateInventoryHUD();
     this.updateActiveHUD();
@@ -4904,6 +4903,7 @@ class Game {
   }
 
   sampleAchievementProgress() {
+    if (this.pvp?.eliminated) return;
     if (!this.player || !this.firebaseUser || this.time - this.achievementLastMetricSample < 1) return;
     this.achievementLastMetricSample = this.time;
     const progress = this.achievementProgress;
@@ -4957,8 +4957,8 @@ class Game {
       const directoryRef = ref(db, `pvpRoomDirectory/${code}`);
       const directoryEntry = { hostUid: uid, hostName: name, status: 'waiting', mode: this.pvpMode, playerCount: 1, maxPlayers, createdAt };
       let directoryPublishError = null;
-      await set(roomRef, { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt, rtcGeneration: 1, maxPlayers,
-        players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state } } });
+      await set(roomRef, { hostUid: uid, status: 'waiting', mode: this.pvpMode, createdAt, rtcGeneration: 1, networkProtocol: NETWORK_PROTOCOL, maxPlayers,
+        players: { [uid]: { uid, name, classId: this.selectedClassId, slot: 0, online: true, state, networkProtocol: NETWORK_PROTOCOL } } });
       await onDisconnect(roomRef).remove();
       try {
         await set(directoryRef, directoryEntry);
@@ -5005,6 +5005,7 @@ class Game {
       const snapshot = await get(roomRef);
       if (!snapshot.exists()) throw new Error('Комната не найдена.');
       const room = snapshot.val();
+      if (room.networkProtocol !== NETWORK_PROTOCOL) throw new Error('Версии сетевого протокола различаются. Все игроки должны открыть обновлённую игру 2.7.1 и создать новое лобби.');
       if (room.status !== 'waiting') throw new Error('Матч уже начался.');
       const existingPlayer = room.players?.[uid];
       if (uid === room.hostUid || (existingPlayer && existingPlayer.online !== false)) throw new Error('Вы уже подключены к этой комнате.');
@@ -5017,7 +5018,7 @@ class Game {
       if (slot === undefined) throw new Error('В лобби нет свободного места.');
       const classDef = PLAYER_CLASSES[this.selectedClassId] || PLAYER_CLASSES.technician;
       const state = { x: 2000, y: 2000, hp: classDef.stats.hp, maxHp: classDef.stats.maxHp, level: 1, time: 0, attackTotal: 0, enemyAttackTotal: 0, over: false, shield: false };
-      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, classId: this.selectedClassId, slot, online: true, state });
+      await set(ref(db, `pvpRooms/${code}/players/${uid}`), { uid, name, classId: this.selectedClassId, slot, online: true, state, networkProtocol: NETWORK_PROTOCOL });
       this.pvp = { code, host: false, initialRole: 'client', uid, name, started: false,
         maxPlayers: Number(room.maxPlayers), slot, choosing: null, remoteChoosing: null, remoteState: null,
         remotePlayer: null, opponentUid: null, remoteShots: [], attackTotal: 0, lastRemoteAttackTotal: 0,
@@ -5042,7 +5043,7 @@ class Game {
     if (!pvp || !room || pvp.started) {
       list.style.display = 'none'; startButton.style.display = 'none'; return;
     }
-    const players = Object.values(room.players || {}).sort((a, b) => Number(a.slot || 0) - Number(b.slot || 0));
+    const players = Object.values(room.players || {}).filter(player => player.online !== false).sort((a, b) => Number(a.slot || 0) - Number(b.slot || 0));
     list.style.display = 'block';
     list.innerHTML = `<b>Игроки в лобби · ${players.length}/8</b><br>${players.map(player => `${player.online ? '🟢' : '⚪'} ${this.escapeHtml(String(player.name || 'Игрок'))} · ${this.escapeHtml(PLAYER_CLASSES[player.classId]?.name || 'Технарь')}${player.uid === room.hostUid ? ' · хост' : ''}`).join('<br>')}`;
     startButton.style.display = pvp.host ? 'block' : 'none';
@@ -5055,8 +5056,12 @@ class Game {
   async startPvpMatch() {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.started) return;
-    const players = Object.values(pvp.roomCache?.players || {});
+    const players = Object.values(pvp.roomCache?.players || {}).filter(player => player.online !== false);
     const connected = Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length;
+    if (players.some(player => player.networkProtocol !== NETWORK_PROTOCOL)) {
+      this.pvpStatus('Все участники должны обновить игру до 2.7.1 и переподключиться к лобби.', true);
+      return;
+    }
     if (players.length < 2 || players.length > 8 || players.some(player => !player.online) || connected < players.length - 1) {
       this.pvpStatus('Все игроки должны быть подключены. Проверяем соединения…', true);
       return;
@@ -5110,9 +5115,9 @@ class Game {
     // Position/state packets are snapshots: stale packets are less useful than fresh ones.
     // Keep them off the reliable ordered channel so a lost packet cannot queue the match.
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-state', { ordered: false, maxRetransmits: 0 }));
-    // World snapshots replace one another; a small amount of loss is cheaper
-    // than retransmitting stale chunks and building a queue behind the match.
-    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: false, maxRetransmits: 1 }));
+    // Entity lifecycle and health changes must arrive. Positions use game-state.
+    // Small independent patches avoid waiting for a complete world snapshot.
+    this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-world', { ordered: false }));
     this.attachPvpDataChannel(peer, peer.pc.createDataChannel('game-control', { ordered: true }));
     peer.pc.onicecandidate = event => {
       if (!event.candidate) return;
@@ -5132,11 +5137,13 @@ class Game {
       type: peer.pc.localDescription.type,
       sdp: peer.pc.localDescription.sdp
     });
-    this.addPvpIceCandidates(peer, path, 'guestCandidates', fb);
   }
 
   watchPvpOffer(host, room, fb) {
     const pvp = this.pvp;
+    pvp.watchedOffers ||= new Set();
+    if (pvp.watchedOffers.has(host.uid)) return;
+    pvp.watchedOffers.add(host.uid);
     const path = this.pvpSignalPath(room, pvp.uid);
     const unsub = fb.onValue(fb.ref(fb.db, `${path}/offer`), async snapshot => {
       if (this.pvp !== pvp || pvp.peerConnections[host.uid]) return;
@@ -5159,7 +5166,6 @@ class Game {
           type: peer.pc.localDescription.type,
           sdp: peer.pc.localDescription.sdp
         });
-        this.addPvpIceCandidates(peer, path, 'hostCandidates', fb);
       } catch (error) { this.logPvpDiagnostic(pvp, 'WebRTC', 'не удалось ответить на offer', { message: error.message }); }
     });
     pvp.signalingCleanups.push(unsub);
@@ -5199,7 +5205,11 @@ class Game {
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.handlePvpPeerDisconnected(peer.uid, 'Канал WebRTC закрылся.');
       else this.waitForPvpOpponent(this.pvp, 'Канал WebRTC закрылся.');
     };
-    channel.onmessage = event => { try { this.handlePvpSocketPacket(JSON.parse(event.data)); } catch (_) {} };
+    channel.onmessage = event => {
+      if (this.pvp?.peerConnections?.[peer.uid] !== peer) return;
+      try { this.handlePvpSocketPacket(JSON.parse(event.data), peer.uid); }
+      catch (error) { this.logPvpDiagnostic(this.pvp, 'Пакет', 'ошибка обработки пакета', { uid: peer.uid, message: error.message }); }
+    };
   }
 
   updatePvpPeerConnected(peer) {
@@ -5241,9 +5251,15 @@ class Game {
     this.updatePvpLobby(room);
   }
 
-  handlePvpSocketPacket(message) {
+  handlePvpSocketPacket(message, senderUid = null) {
     const pvp = this.pvp;
-    if (!pvp || pvp.opponentLost || !message) return;
+    if (!pvp || pvp.opponentLost || !message || typeof message !== 'object') return;
+    if (senderUid && pvp.host) {
+      // A channel belongs to one guest; never trust a supplied sender identity.
+      message = { ...message, uid: senderUid };
+      if (message.skill) message.skill = { ...message.skill, senderUid };
+      if (['roster', 'player-state', 'world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete'].includes(message.type)) return;
+    }
     if (message.type === 'class-selected') {
       const uid = String(message.uid || '');
       const classId = String(message.classId || '');
@@ -5259,6 +5275,10 @@ class Game {
       this.syncPvpWait();
     } else if (message.type === 'player-state' && !pvp.host) {
       this.applyRelayedPvpPlayerState(message);
+    } else if (message.type === 'world-actions' && pvp.host) {
+      this.processPvpGuestWorldActions(String(message.uid), message);
+    } else if (message.type === 'world-patch' && !pvp.host) {
+      this.receivePvpWorldPatch(message);
     } else if (message.type === 'world-positions' && !pvp.host) {
       this.receivePvpWorldPositions(message);
     } else if ((message.type === 'state' || message.type === 'match-over') && message.state) {
@@ -5267,18 +5287,7 @@ class Game {
       const sequence = Number(message.sequence || 0);
       if (sequence && sequence <= Number(pvp.remoteStateSequences[uid] || 0)) return;
       const isMultiPlayerMatch = Number(pvp.actualPlayerCount) >= 3;
-      const previousState = isMultiPlayerMatch && pvp.host ? pvp.remotePlayers?.[uid]?.state : pvp.remoteState;
-      const savedRemoteState = pvp.remoteState;
-      const savedRemoteStateAt = pvp.remoteStateAt;
-      if (isMultiPlayerMatch && pvp.host) {
-        pvp.remoteState = previousState || null;
-        pvp.remoteStateAt = pvp.remotePlayers?.[uid]?.stateAt || performance.now();
-      }
       const validation = this.validatePvpRemoteState(message.state);
-      if (isMultiPlayerMatch && pvp.host) {
-        pvp.remoteState = savedRemoteState;
-        pvp.remoteStateAt = savedRemoteStateAt;
-      }
       if (!validation.ok) {
         const now = Date.now();
         if (now - Number(pvp.lastInvalidRemoteStateLogAt || 0) > 3000) {
@@ -5289,8 +5298,9 @@ class Game {
       }
       pvp.remoteStateSequences[uid] = sequence || Number(pvp.remoteStateSequences[uid] || 0) + 1;
       const state = validation.state;
+      this.recordPvpPosition(`@remote-${uid}`, state.x, state.y);
       if (message.uid && (!pvp.host || !pvp.opponentUid || pvp.opponentUid === uid)) pvp.opponentUid = uid;
-      const remotePlayer = { ...(pvp.remotePlayers?.[uid] || pvp.remotePlayer || {}), uid,
+      const remotePlayer = { ...(pvp.remotePlayers?.[uid] || (uid === pvp.opponentUid ? pvp.remotePlayer : null) || {}), uid,
         name: message.name || pvp.remotePlayers?.[uid]?.name || pvp.remotePlayer?.name || 'Соперник', online: true,
         choosing: message.choosing || null, paused: Boolean(message.paused), state };
       if (!isMultiPlayerMatch || !pvp.host || uid === pvp.opponentUid) {
@@ -5323,35 +5333,15 @@ class Game {
         const previousAttack = Number(prior.state?.attackTotal || 0);
         const attackDelta = Math.max(0, Number(state.attackTotal || 0) - previousAttack);
         if (attackDelta > 0 && this.player?.hp > 0) this.receivePvpDamage(attackDelta, `${message.name || 'Соперник'} · PvP`);
-        pvp.processedEnemyDamage ||= {};
-        const enemiesBySyncId = new Map(this.enemies.filter(item => item.syncId).map(item => [item.syncId, item]));
-        for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
-          const amount = Math.max(0, Number(amountValue) || 0);
-          const before = Number(pvp.processedEnemyDamage[enemyId] || 0);
-          const delta = Math.max(0, amount - before);
-          pvp.processedEnemyDamage[enemyId] = Math.max(before, amount);
-          if (delta > 0) {
-            const enemy = enemiesBySyncId.get(enemyId);
-            if (enemy && !enemy.is24hPursuer) {
-              pvp.applyingRemoteEnemyDamage = true;
-              try { enemy.hp = Math.max(0, enemy.hp - delta); } finally { pvp.applyingRemoteEnemyDamage = false; }
-            }
-          }
-        }
-        for (const dropId of Object.keys(state.claimedDrops || {})) {
-          if (!state.claimedDrops[dropId]) continue;
-          pvp.claimedDrops ||= {}; pvp.claimedDrops[dropId] = true;
-          this.gems = this.gems.filter(item => item.syncId !== dropId);
-          this.pickups = this.pickups.filter(item => item.syncId !== dropId);
-        }
+        this.processPvpGuestWorldActions(uid, state);
         if (uid === pvp.opponentUid) { pvp.remotePlayer = pvp.remotePlayers[uid]; pvp.remoteState = state; }
-        if (Number(pvp.actualPlayerCount) >= 3) this.relayPvpPlayerState(message, uid);
+        if (Number(pvp.actualPlayerCount) >= 3) this.relayPvpPlayerState({ ...message, state }, uid);
         this.publishThreePlayerRoster();
       } else this.applyPvpRemoteState(state);
       this.syncPvpWait();
-    } else if (message.type === 'world' && message.world) this.applyPvpSharedWorld(message.world);
-    else if (message.type === 'world-chunk') this.receivePvpWorldChunk(message);
-    else if (message.type === 'mv-ticket-trigger' && pvp.host) this.spawnMVBoss(['declined','ignored','three-failures'].includes(message.reason) ? message.reason : 'three-failures');
+    } else if (message.type === 'match-finished' && !pvp.host) {
+      this.finishPvpMultiplayerMatch(message.winnerUid || null, message.winner || '');
+    } else if (message.type === 'mv-ticket-trigger' && pvp.host) this.spawnMVBoss(['declined','ignored','three-failures'].includes(message.reason) ? message.reason : 'three-failures');
     else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
     else if (message.type === 'office-event-notice' && !pvp.host && pvp.started) this.showBanner(String(message.text || 'Офисное событие'));
     else if (message.type === 'friday-release-start' && !pvp.host && pvp.started) this.fridayReleaseUntil = this.time + Math.max(1, Number(message.duration) || 8);
@@ -5446,6 +5436,47 @@ class Game {
       this.receivePvpActiveSkill(message.skill);
     }
   }
+  sendPvpGuestWorldActions() {
+    const pvp = this.pvp;
+    const damageIds = [...(pvp.pendingEnemyDamage || [])].slice(0, 80);
+    const dropIds = [...(pvp.pendingDropClaims || [])].slice(0, 80);
+    if (!damageIds.length && !dropIds.length) return;
+    const sent = this.sendPvpNetworkMessage({ type: 'world-actions', uid: pvp.uid,
+      enemyDamage: Object.fromEntries(damageIds.map(id => [id, pvp.enemyDamageTotals[id]])),
+      claimedDrops: Object.fromEntries(dropIds.map(id => [id, true])) });
+    if (sent) {
+      for (const id of damageIds) pvp.pendingEnemyDamage.delete(id);
+      for (const id of dropIds) pvp.pendingDropClaims.delete(id);
+    }
+  }
+
+  processPvpGuestWorldActions(uid, state) {
+    const pvp = this.pvp;
+    pvp.enemyDamageByPlayer ||= {};
+    const totals = pvp.enemyDamageByPlayer[uid] ||= {};
+    pvp.processedEnemyDamage ||= {};
+    const enemies = new Map(this.enemies.filter(e => e.syncId).map(e => [e.syncId, e]));
+    for (const [id, value] of Object.entries(state.enemyDamage || {})) {
+      if (!enemies.has(id)) continue;
+      const amount = Number(value);
+      if (!Number.isFinite(amount) || amount < 0) continue;
+      const delta = Math.max(0, amount - (totals[id] || 0));
+      totals[id] = Math.max(totals[id] || 0, amount);
+      pvp.processedEnemyDamage[id] = (pvp.processedEnemyDamage[id] || 0) + delta;
+      const enemy = enemies.get(id);
+      if (enemy && !enemy.is24hPursuer && delta > 0) {
+        pvp.applyingRemoteEnemyDamage = true;
+        try { enemy.hp = Math.max(0, enemy.hp - delta); }
+        finally { pvp.applyingRemoteEnemyDamage = false; }
+      }
+    }
+    const claimed = new Set(Object.keys(state.claimedDrops || {}).filter(id => state.claimedDrops[id]));
+    if (claimed.size) {
+      this.gems = this.gems.filter(item => !claimed.has(item.syncId));
+      this.pickups = this.pickups.filter(item => !claimed.has(item.syncId));
+    }
+  }
+
   relayPvpPlayerState(message, excludeUid) {
     const pvp = this.pvp;
     if (!pvp?.host || Number(pvp.actualPlayerCount) < 3 || !message?.uid || !message.state) return;
@@ -5480,7 +5511,7 @@ class Game {
     const player = pvp.remotePlayers[uid] = {
       ...prior, uid, name: String(message.name || prior.name || 'Игрок').slice(0, 20),
       online: true, state: checked.state, stateAt: performance.now(),
-      choosing: message.choosing || prior.choosing || null, paused: Boolean(message.paused),
+      choosing: message.choosing || null, paused: Boolean(message.paused),
       classId: PLAYER_CLASSES[prior.classId] ? prior.classId : 'technician',
       shots: incomingShots,
       shotsAt: incomingShotsAt
@@ -5514,7 +5545,7 @@ class Game {
       }
       validPlayers.push({
         ...prior, uid: player.uid, name: String(player.name || prior.name || 'Игрок').slice(0, 20),
-        online: player.online !== false, state, stateAt: prior.stateAt || 0,
+        online: player.online !== false, state: player.eliminated && state ? { ...state, hp: 0, over: true } : state, stateAt: prior.stateAt || 0,
         choosing: player.choosing || null, paused: Boolean(player.paused),
         classId: PLAYER_CLASSES[player.classId] ? player.classId : 'technician'
       });
@@ -5534,23 +5565,33 @@ class Game {
     const byUid = new Map();
     byUid.set(pvp.uid, { uid: pvp.uid, name: pvp.name, classId: this.player?.classId || pvp.classId, choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused) });
     for (const player of Object.values(pvp.remotePlayers || {})) {
-      if (player?.uid) byUid.set(player.uid, { uid: player.uid, name: player.name || 'Соперник', classId: player.classId || 'technician', choosing: player.choosing || null, paused: Boolean(player.paused) });
+      if (player?.uid) byUid.set(player.uid, { uid: player.uid, name: player.name || 'Соперник', classId: player.classId || 'technician', choosing: player.state?.over ? null : (player.choosing || null), paused: !player.state?.over && Boolean(player.paused), online: player.online !== false, eliminated: Boolean(player.state?.over) });
     }
-    for (const peer of Object.values(pvp.threePeers || {})) if (peer?.uid) byUid.set(peer.uid, { uid: peer.uid, name: peer.name || 'Соперник', classId: peer.classId || 'technician', choosing: peer.choosing || null, paused: Boolean(peer.paused) });
+
     const players = [...byUid.values()];
-    const expected = Math.max(1, Number(pvp.actualPlayerCount || pvp.matchPlayerUids?.length) || 1);
-    pvp.classSelectionPending = players.length < expected || players.some(player => player.choosing === 'class');
+    pvp.classSelectionPending = !pvp.matchPlayerUids?.every(uid => pvp.classSelectionReadyUids?.has(uid) || pvp.remotePlayers?.[uid]?.disconnected);
     const signature = JSON.stringify({ players, pending: pvp.classSelectionPending });
     const changed = signature !== pvp.lastRosterSignature;
     if (!changed && now - Number(pvp.lastRosterSentAt || 0) < 2000) return;
     pvp.lastRosterSentAt = now;
     pvp.lastRosterSignature = signature;
-    const payload = JSON.stringify({ type: 'roster', players, classSelectionPending: pvp.classSelectionPending });
-    for (const peer of [pvp.rtc, ...Object.values(pvp.threePeers || {})]) {
-      if (peer?.channel?.readyState === 'open' && peer.channel.bufferedAmount < 32768) {
-        try { peer.channel.send(payload); } catch (_) {}
-      }
-    }
+    this.sendPvpNetworkMessage({ type: 'roster', players, classSelectionPending: pvp.classSelectionPending });
+  }
+
+  finishPvpMultiplayerMatch(winnerUid, winner) {
+    const pvp = this.pvp;
+    if (!pvp || pvp.matchOver) return;
+    clearTimeout(pvp.opponentMissingTimer);
+    pvp.opponentMissingTimer = null;
+    this.pvpPausedByRemote = false;
+    document.getElementById('modal-pvp-wait').style.display = 'none';
+    if (!pvp.eliminated) this.gameOver(winnerUid === pvp.uid ? 'Вы остались последним выжившим.' : 'Все участники выбыли.', { victory: winnerUid === pvp.uid });
+    pvp.matchOver = true;
+    this.paused = true;
+    if (this.pvpTimer) clearInterval(this.pvpTimer);
+    this.pvpTimer = null;
+    this.cleanupPvpRoom();
+    this.showBanner(winnerUid ? '🏆 Матч завершён. Победитель: ' + (winner || 'Игрок') : 'Все участники выбыли. Забег завершён.');
   }
 
   currentPvpState() {
@@ -5558,7 +5599,7 @@ class Game {
     if (!p) return null;
     return { x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10), maxHp: Math.round(p.maxHp), level: this.level,
       time: Number(this.time) || 0, attackTotal: Number(this.pvp?.attackTotal || 0), enemyAttackTotal: Number(this.pvp?.enemyAttackTotal || 0),
-      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0) }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85) };
+      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85) };
   }
 
   handlePvpRtcRecovered(rtc) {
@@ -5582,9 +5623,16 @@ class Game {
   sendPvpNetworkMessage(message, channelOverride = null, force = false) {
     const pvp = this.pvp;
     if (!pvp?.started || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
-    const isSnapshot = message.type === 'state' || message.type === 'roster';
+    const isSnapshot = message.type === 'state';
     const limit = isSnapshot ? 32768 : 262144;
-    const payload = JSON.stringify(message);
+    let payload = JSON.stringify(message);
+    if (isSnapshot && Array.isArray(message.shots)) {
+      const encoder = this._utf8Encoder ||= new TextEncoder();
+      while (encoder.encode(payload).byteLength > 12000 && message.shots.length) {
+        message = { ...message, shots: message.shots.slice(0, -1) };
+        payload = JSON.stringify(message);
+      }
+    }
     const channels = channelOverride ? [channelOverride] : (pvp.host
       ? Object.values(pvp.peerConnections || {}).map(peer => isSnapshot ? peer.channel : (peer.controlChannel || peer.channel))
       : [isSnapshot ? pvp.rtc?.channel : (pvp.rtc?.controlChannel || pvp.rtc?.channel)]);
@@ -5598,7 +5646,7 @@ class Game {
   }
 
   serializePvpShots() {
-    const maxShots = Number(this.pvp?.actualPlayerCount || 2) >= 3 ? 24 : 80;
+    const maxShots = Number(this.pvp?.actualPlayerCount || 2) >= 5 ? 12 : 24;
     return this.projectiles.slice(-maxShots).filter(projectile => projectile.life > 0).map(projectile => {
       if (projectile.type === 'laser_visual') {
         return { type: 'laser_visual', lines: (projectile.lines || []).slice(0, 12), life: projectile.life, color: projectile.color };
@@ -5623,10 +5671,9 @@ class Game {
       attackTotal: Math.round(pvp.attackTotal * 100) / 100,
       enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
       enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
-      killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0) },
+      killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0), players: pvp.killCounts || {} },
       over: pvp.matchOver || player.hp <= 0,
-      enemyDamage: pvp.host ? undefined : (pvp.enemyDamageTotals || {}),
-      claimedDrops: pvp.host ? undefined : (pvp.claimedDrops || {}), migration85: Boolean(player.migration85)
+      migration85: Boolean(player.migration85)
     };
     return this.sendPvpNetworkMessage({
       type, sequence: pvp.rtcStateSequence = (pvp.rtcStateSequence || 0) + 1,
@@ -5664,7 +5711,7 @@ class Game {
     pvp.positionHistory ||= {};
     const samples = pvp.positionHistory[id] ||= [];
     const last = samples[samples.length - 1];
-    if (last && last.x === x && last.y === y) return;
+    if (last && performance.now() - last.at < 1) return;
     samples.push({ x, y, at: performance.now() });
     if (samples.length > 12) samples.splice(0, samples.length - 12);
   }
@@ -5672,9 +5719,8 @@ class Game {
   getPvpRenderPosition(id, x, y) {
     const samples = this.pvp?.positionHistory?.[id];
     if (!samples?.length) return { x, y };
-    // Позиции идут каждые 66 мс в дуэли и каждые 100 мс в лобби от 3 игроков.
-    const players = Math.max(2, Number(this.pvp?.actualPlayerCount) || 2);
-    const positionInterval = players >= 3 ? 100 : 66;
+    // Render slightly behind the 20 Hz stream to absorb network jitter.
+    const positionInterval = 50;
     const targetTime = performance.now() - Math.max(100, positionInterval * 1.5);
     let before = null;
     let after = null;
@@ -5826,11 +5872,11 @@ class Game {
     const p = this.player;
     const dmgBonusFactor = 1 + Math.max(-0.5, ((p?.dmgMult ?? 1) - 1) * 0.65);
     const buffMult = (p?.damageBuffTimer > 0 ? (p.damageBuffMult || 1) : 1) * (p?.readOnlyTimer > 0 ? 0.55 : 1);
-    const dailySkillDmgMult = (this.isDailyRun && this.dailyConfig?.modifier?.key === 'hot_shift') ? 1.35 : 1;
+    const dailySkillDmgMult = this.getDailyRules().skillDamageMult || 1;
     let dmg = activeSkillDamage(baseDamage, level) * dmgBonusFactor * buffMult * dailySkillDmgMult;
     if (allowCrit) {
       const critChance = Math.min(0.8, Math.max(0, (p?.critChance || 0) + (p?.evotorSyncTimer > 0 ? 0.10 : 0)));
-      if (Math.random() < critChance) dmg *= 1.75;
+      if (this.rollRng() < critChance) dmg *= 1.75 * (this.getDailyRules().critDamageMult || 1);
     }
     return dmg;
   }
@@ -6151,8 +6197,8 @@ class Game {
     if (room.status === 'playing' && !pvp.started && (pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected && !pvp.rtc?.failed)) {
       pvp.started = true;
       pvp.spawnGraceUntil = pvp.mode === 'battle_royale' ? Infinity : 0;
-      pvp.actualPlayerCount = players.length;
-      pvp.matchPlayerUids = players.map(player => player.uid).filter(Boolean);
+      pvp.actualPlayerCount = players.filter(player => player.online !== false).length;
+      pvp.matchPlayerUids = players.filter(player => player.online !== false).map(player => player.uid).filter(Boolean);
       if (!pvp.achievementMatchRecorded && ['pvp', 'battle_royale'].includes(pvp.mode)) {
         pvp.achievementMatchRecorded = true;
         this.recordAchievementCounter(pvp.mode === 'battle_royale' ? 'brMatches' : 'pvpMatches');
@@ -6274,7 +6320,7 @@ class Game {
     pvp.lastWorldSync = 0;
     pvp.manualPaused = false;
     this.pvpTimer = setInterval(() => {
-      if (!this.pvp || !this.player) return;
+      if (this.pvp !== pvp || !this.player) return;
       if (this.pvp.matchOver || this.pvp.opponentLost) {
         clearInterval(this.pvpTimer);
         this.pvpTimer = null;
@@ -6288,18 +6334,30 @@ class Game {
         attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
         enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
         enemyAttackSource: this.pvp.enemyAttackSource || 'Атака противника',
-        killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0) },
+        killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0), players: this.pvp.killCounts || {} },
         over: this.pvp.matchOver || p.hp <= 0,
         migration85: Boolean(p.migration85),
-        enemyDamage: this.pvp.host ? undefined : (this.pvp.enemyDamageTotals || {}),
-        claimedDrops: this.pvp.host ? undefined : (this.pvp.claimedDrops || {})
       };
       this.sendPvpNetworkState(state);
+      if (!pvp.host) this.sendPvpGuestWorldActions();
+      else this.flushPvpEnemyDamage();
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 2) this.sendPvpWorldPositions();
       if (this.pvp.host && Number(this.pvp.actualPlayerCount) >= 3) this.publishThreePlayerRoster();
       const brRosterReady = this.pvp.classSelectionPending !== true
         && Number.isFinite(Number(this.pvp.spawnGraceUntil))
         && performance.now() >= Number(this.pvp.spawnGraceUntil);
+      if (this.pvp.host && !this.isBattleRoyale && Number(pvp.actualPlayerCount) >= 3 && !pvp.classSelectionPending) {
+        const participants = pvp.matchPlayerUids || [];
+        const alive = participants.filter(uid => uid === pvp.uid ? p.hp > 0 : pvp.remotePlayers?.[uid]?.state && !pvp.remotePlayers[uid].state.over && pvp.remotePlayers[uid].state.hp > 0);
+        const allKnown = participants.every(uid => uid === pvp.uid || pvp.remotePlayers?.[uid]?.state);
+        if (allKnown && alive.length <= (pvp.mode === 'pvp' ? 1 : 0)) {
+          const winnerUid = alive[0] || null;
+          const winner = winnerUid === pvp.uid ? pvp.name : pvp.remotePlayers?.[winnerUid]?.name || '';
+          this.sendPvpNetworkMessage({ type: 'match-finished', winnerUid, winner }, null, true);
+          this.finishPvpMultiplayerMatch(winnerUid, winner);
+          return;
+        }
+      }
       if (this.pvp.host && this.isBattleRoyale && brRosterReady && !this.pvp.brWinnerSent && this.pvp.actualPlayerCount >= 2) {
         const participants = (this.pvp.matchPlayerUids || []).filter(uid => uid && uid !== this.pvp.uid);
         const alive = [{ uid: this.pvp.uid, name: this.pvp.name, over: p.hp <= 0 }];
@@ -6327,12 +6385,12 @@ class Game {
         }
       }
       const playerCount = Math.max(2, Number(this.pvp.actualPlayerCount) || 2);
-      const worldSyncInterval = playerCount >= 5 ? 250 : playerCount >= 3 ? 200 : 100;
+      const worldSyncInterval = 150;
       if (this.pvp.host && performance.now() - this.pvp.lastWorldSync >= worldSyncInterval) {
         this.pvp.lastWorldSync = performance.now();
         this.publishPvpSharedWorld();
       }
-    }, Number(pvp.actualPlayerCount) >= 3 ? 100 : 66);
+    }, 50);
   }
 
   trackPvpSharedEntities() {
@@ -6349,11 +6407,12 @@ class Game {
         set: value => {
           const before = hp;
           hp = value;
-          if (!pvp.host && !enemy.is24hPursuer && enemy.syncId && Number.isFinite(before) && Number.isFinite(value) && value < before) {
+          if (!pvp.host && !pvp.applyingWorldPatch && !enemy.is24hPursuer && enemy.syncId && Number.isFinite(before) && Number.isFinite(value) && value < before) {
             pvp.enemyDamageTotals ||= {};
             pvp.enemyDamageTotals[enemy.syncId] = (pvp.enemyDamageTotals[enemy.syncId] || 0) + before - value;
             pvp.enemyDamageAt ||= {};
             pvp.enemyDamageAt[enemy.syncId] = performance.now();
+            (pvp.pendingEnemyDamage ||= new Set()).add(enemy.syncId);
           } else if (pvp.host && !pvp.applyingRemoteEnemyDamage && !enemy.is24hPursuer && enemy.syncId && Number.isFinite(before) && Number.isFinite(value) && value < before) {
             pvp.hostDamageTotals ||= {};
             pvp.hostDamageTotals[enemy.syncId] = (pvp.hostDamageTotals[enemy.syncId] || 0) + before - value;
@@ -6370,6 +6429,7 @@ class Game {
       for (const projectile of this.enemyProjectiles) assignDropId(projectile, 'p');
       for (const warning of this.bossWarnings) assignDropId(warning, 'w');
       for (const hazard of this.officeHazards) if (!hazard.syncId) hazard.syncId = `oh${++pvp.nextDropId}`;
+      for (const puddle of this.puddles) if (puddle.isEnemyPuddle && !puddle.syncId) puddle.syncId = `ep${++pvp.nextDropId}`;
     }
   }
 
@@ -6386,245 +6446,153 @@ class Game {
       pickups: byId(this.pickups),
       enemyProjectiles: byId(this.enemyProjectiles),
       bossWarnings: byId(this.bossWarnings),
-      officeHazards: byId(this.officeHazards)
+      officeHazards: byId(this.officeHazards),
+      puddles: byId(this.puddles.filter(item => item.isEnemyPuddle))
     };
     if (pvp.host ? !Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : !pvp.rtc?.connected || pvp.rtc?.failed) return false;
     return this.sendPvpWorldSnapshot(world);
   }
 
-  filterPvpWorldForPeer(world, uid) {
-    const state = this.pvp?.remotePlayers?.[uid]?.state;
-    if (!state || !Number.isFinite(Number(state.x)) || !Number.isFinite(Number(state.y))) return world;
-    const centerX = Number(state.x);
-    const centerY = Number(state.y);
-    const radiusSquared = 2200 * 2200;
-    const relevant = item => {
-      if (!Number.isFinite(Number(item.x)) || !Number.isFinite(Number(item.y))) return true;
-      if (item.isBoss || item.isMegaBoss || item.is24hPursuer) return true;
-      const dx = Number(item.x) - centerX;
-      const dy = Number(item.y) - centerY;
-      return dx * dx + dy * dy <= radiusSquared;
-    };
-    const filtered = { revision: world.revision, positionSequence: world.positionSequence };
-    for (const collection of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) {
-      filtered[collection] = Object.fromEntries(Object.entries(world[collection] || {}).filter(([, item]) => relevant(item)));
-    }
-    return filtered;
-  }
-
   sendPvpWorldPositions() {
     const pvp = this.pvp;
     if (!pvp?.host || !pvp.started) return false;
-    const allEntities = [];
-    for (const collection of [this.enemies, this.gems, this.pickups, this.enemyProjectiles, this.bossWarnings, this.officeHazards]) {
-      for (const item of collection) {
-        if (item.syncId && Number.isFinite(item.x) && Number.isFinite(item.y)) allEntities.push(item);
-      }
-    }
-    const sequence = pvp.worldPositionSequence = (Number(pvp.worldPositionSequence) || 0) + 1;
+    const entities = [...this.enemies, ...this.gems, ...this.pickups, ...this.enemyProjectiles, ...this.bossWarnings, ...this.officeHazards]
+      .filter(item => item.syncId && Number.isFinite(item.x) && Number.isFinite(item.y));
+    const sequence = pvp.worldPositionSequence = (pvp.worldPositionSequence || 0) + 1;
     let sent = false;
     for (const peer of Object.values(pvp.peerConnections || {})) {
-      const channel = peer?.worldChannel;
-      if (channel?.readyState !== 'open' || channel.bufferedAmount > 32768) continue;
+      const channel = peer.channel;
+      if (!peer.connected || channel?.readyState !== 'open' || channel.bufferedAmount > 8192) continue;
       const state = pvp.remotePlayers?.[peer.uid]?.state;
-      const centerX = Number(state?.x);
-      const centerY = Number(state?.y);
-      const hasCenter = Number.isFinite(centerX) && Number.isFinite(centerY);
-      const entities = allEntities
-        .filter(item => !hasCenter || item.isBoss || item.isMegaBoss || item.is24hPursuer || (item.x - centerX) ** 2 + (item.y - centerY) ** 2 <= 2200 * 2200)
-        .map(item => [item.syncId, item.x, item.y]);
-      const payload = JSON.stringify({ type: 'world-positions', sequence, entities });
-      try { channel.send(payload); sent = true; } catch (_) {}
+      const relevant = entities.filter(item => !state || item.isBoss || item.is24hPursuer ||
+        (item.x - state.x) ** 2 + (item.y - state.y) ** 2 <= 1600 ** 2);
+      for (let i = 0; i < relevant.length; i += 100) {
+        if (channel.bufferedAmount > 16384) break;
+        const packet = { type: 'world-positions', sequence,
+          entities: relevant.slice(i, i + 100).map(item => [item.syncId, Math.round(item.x * 10) / 10, Math.round(item.y * 10) / 10]) };
+        try { channel.send(JSON.stringify(packet)); sent = true; } catch (_) { break; }
+      }
     }
     return sent;
   }
 
   sendPvpWorldSnapshot(world) {
     const pvp = this.pvp;
-    if (!pvp || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
-    const peers = (pvp.host
-      ? Object.values(pvp.peerConnections || {})
-      : [{ uid: pvp.uid, worldChannel: pvp.rtc?.worldChannel }]
-    ).filter(peer => peer?.worldChannel?.readyState === 'open' && peer.worldChannel.bufferedAmount <= 65536);
-    if (!peers.length) return false;
-
-    const collectionNames = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards'];
-    const chunkLimit = 12000;
-    const radiusSquared = 2200 * 2200;
+    if (!pvp?.host) return false;
+    const names = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards', 'puddles'];
     const encoder = this._utf8Encoder ||= new TextEncoder();
-
-    // Pre-encode every shared entity once per tick instead of re-stringifying per peer.
-    const preEncodedByCollection = Object.create(null);
-    for (const collection of collectionNames) {
-      const sourceMap = world[collection];
-      const list = [];
-      if (sourceMap) {
-        for (const [id, item] of Object.entries(sourceMap)) {
-          if (!item) continue;
-          let safeItem = item;
-          if ((typeof item.hp === 'number' && !Number.isFinite(item.hp)) || (typeof item.maxHp === 'number' && !Number.isFinite(item.maxHp))) {
-            safeItem = {
-              ...item,
-              hp: typeof item.hp === 'number' && !Number.isFinite(item.hp) ? 1e12 : item.hp,
-              maxHp: typeof item.maxHp === 'number' && !Number.isFinite(item.maxHp) ? 1e12 : item.maxHp
-            };
-          }
-          const encodedEntry = `${JSON.stringify(id)}:${JSON.stringify(safeItem)}`;
-          const x = Number(item.x);
-          const y = Number(item.y);
-          list.push({
-            x,
-            y,
-            hasCoords: Number.isFinite(x) && Number.isFinite(y),
-            alwaysRelevant: Boolean(item.isBoss || item.isMegaBoss || item.is24hPursuer),
-            encodedEntry,
-            charLen: encodedEntry.length,
-            byteLen: encoder.encode(encodedEntry).byteLength
-          });
-        }
-      }
-      preEncodedByCollection[collection] = list;
-    }
-
-    const revision = world.revision;
-    const positionSequence = Number(world.positionSequence) || 0;
+    // AI timers, local effects and motion do not require full entity re-creation.
+    const volatile = new Set(['x', 'y', 'life', 'age', 'shootTimer', 'bossTimer1', 'bossTimer2', 'bossTimer3',
+      'freezeTimer', 'slowTimer', 'burnTimer', 'dashTimer', 'dashDuration', 'ticketWanderTimer', 'hangCharge']);
+    const encoded = Object.fromEntries(names.map(name => [name, Object.entries(world[name] || {}).map(([id, item]) => {
+      const safe = Object.fromEntries(Object.entries(item).filter(([key]) => !key.startsWith('_') && key !== 'hits' && key !== 'hitTargets')
+        .map(([key, value]) => [key, typeof value === 'number' && !Number.isFinite(value) ? 1e12 : value]));
+      const signature = JSON.stringify(Object.fromEntries(Object.entries(safe).filter(([key]) => !volatile.has(key))));
+      return { id, item: safe, signature };
+    })]));
     let sent = false;
-    let totalEncodedBytes = 0;
-
-    for (const peer of peers) {
+    let bytes = 0;
+    for (const peer of Object.values(pvp.peerConnections || {})) {
       const channel = peer.worldChannel;
-      const peerState = pvp.host ? pvp.remotePlayers?.[peer.uid]?.state : null;
-      const centerX = Number(peerState?.x);
-      const centerY = Number(peerState?.y);
-      const hasCenter = pvp.host && Number.isFinite(centerX) && Number.isFinite(centerY);
-
-      const chunks = [];
-      for (const collection of collectionNames) {
-        const list = preEncodedByCollection[collection];
-        let entries = [];
-        let entryLength = 0;
-        let entryBytes = 0;
-        for (let i = 0; i < list.length; i++) {
-          const record = list[i];
-          if (hasCenter && record.hasCoords && !record.alwaysRelevant) {
-            const dx = record.x - centerX;
-            const dy = record.y - centerY;
-            if (dx * dx + dy * dy > radiusSquared) continue;
-          }
-          const commaLen = entries.length ? 1 : 0;
-          if (entries.length && entryLength + record.charLen + commaLen > chunkLimit) {
-            chunks.push({ collection, entries: entries.join(','), byteLen: entryBytes });
-            entries = [];
-            entryLength = 0;
-            entryBytes = 0;
-          }
-          const nextComma = entries.length ? 1 : 0;
-          entryLength += record.charLen + nextComma;
-          entryBytes += record.byteLen + nextComma;
-          entries.push(record.encodedEntry);
+      if (!peer.connected || channel?.readyState !== 'open' || channel.bufferedAmount > 32768) continue;
+      peer.worldBaseline ||= {};
+      const state = pvp.remotePlayers?.[peer.uid]?.state;
+      for (const name of names) {
+        const baseline = peer.worldBaseline[name] ||= new Map();
+        const relevant = encoded[name].filter(({item}) => !state || item.isBoss || item.is24hPursuer ||
+          !Number.isFinite(item.x) || !Number.isFinite(item.y) || (item.x-state.x)**2 + (item.y-state.y)**2 <= 1600**2);
+        const ids = new Set(relevant.map(record => record.id));
+        const changes = relevant.filter(record => baseline.get(record.id) !== record.signature);
+        const removals = [...baseline.keys()].filter(id => !ids.has(id));
+        let packet = { type: 'world-patch', revision: world.revision, positionSequence: world.positionSequence,
+          collection: name, items: {}, removed: [] };
+        let records = [];
+        let packetBytes = 180;
+        const flush = () => {
+          if (!records.length && !packet.removed.length) return true;
+          const payload = JSON.stringify(packet);
+          const size = encoder.encode(payload).byteLength;
+          if (channel.bufferedAmount + size > 49152) return false;
+          try { channel.send(payload); } catch (_) { return false; }
+          for (const record of records) baseline.set(record.id, record.signature);
+          for (const id of packet.removed) baseline.delete(id);
+          sent = true; bytes += size;
+          packet = { ...packet, items: {}, removed: [] }; records = []; packetBytes = 180;
+          return true;
+        };
+        // Removals go first so expired attacks never queue behind new entities.
+        for (const id of removals) {
+          if (packet.removed.length >= 100 && !flush()) break;
+          packet.removed.push(id);
         }
-        if (entries.length) chunks.push({ collection, entries: entries.join(','), byteLen: entryBytes });
-      }
-
-      if (!chunks.length) chunks.push({ collection: '', entries: '', byteLen: 0 });
-      const packets = new Array(chunks.length);
-      let encodedBytes = 0;
-      for (let index = 0; index < chunks.length; index++) {
-        const chunk = chunks[index];
-        const prefix = `{"type":"world-chunk","revision":${revision},"positionSequence":${positionSequence},"index":${index},"total":${chunks.length},"collection":${JSON.stringify(chunk.collection)},"items":{`;
-        const packet = `${prefix}${chunk.entries}}}`;
-        packets[index] = packet;
-        encodedBytes += prefix.length + chunk.byteLen + 2;
-      }
-      totalEncodedBytes += encodedBytes;
-      if (channel.bufferedAmount + encodedBytes > 196608) continue;
-      try {
-        for (let i = 0; i < packets.length; i++) channel.send(packets[i]);
-        sent = true;
-      } catch (err) {
-        console.warn('Не удалось отправить снимок игрового мира соперникам:', err);
+        if (!flush()) break;
+        for (const record of changes) {
+          const size = encoder.encode(JSON.stringify(record.item)).byteLength + record.id.length + 8;
+          if (packetBytes + size > 8000 && !flush()) break;
+          packet.items[record.id] = record.item; records.push(record); packetBytes += size;
+        }
+        if (!flush()) break;
       }
     }
-    if (sent) this.pvp.lastWorldPayloadBytes = totalEncodedBytes;
+    pvp.lastWorldPayloadBytes = bytes;
     return sent;
   }
 
-  receivePvpWorldChunk(message) {
+  receivePvpWorldPatch(message) {
     const pvp = this.pvp;
-    const revision = Number(message.revision) || 0;
-    const total = Math.max(1, Number(message.total) || 1);
-    const index = Number(message.index);
-    if (!pvp || pvp.host || revision <= Number(pvp.remoteWorldRevision || 0) ||
-        !Number.isInteger(index) || index < 0 || index >= total) return;
-    let pending = pvp.pendingWorldSnapshot;
-    if (!pending || revision > pending.revision) {
-      pending = pvp.pendingWorldSnapshot = { revision, total, received: new Set(), world: { revision, positionSequence: Number(message.positionSequence) || 0 } };
-      for (const name of ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards']) pending.world[name] = {};
+    const names = ['enemies', 'gems', 'pickups', 'enemyProjectiles', 'bossWarnings', 'officeHazards', 'puddles'];
+    const name = message.collection;
+    const revision = Number(message.revision);
+    if (!pvp || pvp.host || !names.includes(name) || !Number.isSafeInteger(revision) || revision <= 0) return;
+    pvp.entityRevisions ||= {};
+    const revisions = pvp.entityRevisions[name] ||= new Map();
+    const byId = new Map(this[name].filter(item => item.syncId).map(item => [item.syncId, item]));
+    for (const id of message.removed || []) {
+      if (typeof id !== 'string' || revision <= (revisions.get(id) || 0)) continue;
+      byId.delete(id); revisions.set(id, revision);
+      delete pvp.positionHistory?.[id];
+      delete pvp.latestWorldPositions?.[id];
     }
-    if (revision !== pending.revision || total !== pending.total) return;
-    if (message.collection && !Object.prototype.hasOwnProperty.call(pending.world, message.collection)) return;
-    if (message.collection) Object.assign(pending.world[message.collection], message.items || {});
-    pending.received.add(index);
-    if (pending.received.size === pending.total) {
-      pvp.pendingWorldSnapshot = null;
-      this.applyPvpSharedWorld(pending.world);
+    for (const [id, incoming] of Object.entries(message.items || {})) {
+      if (!incoming || incoming.syncId !== id || revision <= (revisions.get(id) || 0)) continue;
+      revisions.set(id, revision);
+      if ((name === 'gems' || name === 'pickups') && pvp.claimedDrops?.[id]) continue;
+      const latest = pvp.latestWorldPositions?.[id];
+      const item = { ...incoming };
+      if (latest && latest.sequence > Number(message.positionSequence || 0)) { item.x = latest.x; item.y = latest.y; }
+      // Keep object identity: projectile hit lists and HP trackers refer to it.
+      const current = byId.get(id);
+      if (current) {
+        pvp.applyingWorldPatch = true;
+        try { Object.assign(current, item); } finally { pvp.applyingWorldPatch = false; }
+      } else byId.set(id, item);
+      this.recordPvpPosition(id, item.x, item.y);
     }
-  }
-
-  applyPvpSharedWorld(world) {
-    const pvp = this.pvp;
-    if (!pvp || pvp.host || !world || Number(world.revision || 0) <= Number(pvp.remoteWorldRevision || 0)) return;
-    pvp.remoteWorldRevision = Number(world.revision || 0);
-    const latestPositions = pvp.latestWorldPositions || {};
-    const snapshotPositionSequence = Number(world.positionSequence) || 0;
-    const materialize = collection => Object.values(world[collection] || {}).map(item => {
-      const copy = { ...item };
-      const latest = latestPositions[copy.syncId];
-      if (latest && latest.sequence > snapshotPositionSequence) { copy.x = latest.x; copy.y = latest.y; }
-      return copy;
-    });
-    this.enemies = materialize('enemies');
-    this.gems = materialize('gems');
-    this.pickups = materialize('pickups');
-    this.enemyProjectiles = materialize('enemyProjectiles');
-    this.bossWarnings = materialize('bossWarnings');
-    this.officeHazards = materialize('officeHazards');
-    pvp.sharedEntityById = new Map([...this.enemies, ...this.gems, ...this.pickups, ...this.enemyProjectiles, ...this.bossWarnings, ...this.officeHazards]
-      .filter(item => item.syncId).map(item => [item.syncId, item]));
-    pvp.latestWorldPositions = Object.fromEntries(Object.entries(latestPositions).filter(([id]) => pvp.sharedEntityById.has(id)));
-    for (const item of pvp.sharedEntityById.values()) this.recordPvpPosition(item.syncId, Number(item.x), Number(item.y));
-    const activeEnemyIds = new Set(this.enemies.map(enemy => enemy.syncId).filter(Boolean));
-    for (const id of Object.keys(pvp.enemyDamageTotals || {})) {
-      if (!activeEnemyIds.has(id) && performance.now() - Number(pvp.enemyDamageAt?.[id] || 0) > 2000) {
-        delete pvp.enemyDamageTotals[id];
-        delete pvp.enemyDamageAt[id];
-      }
-    }
-    const sharedIds = new Set([...this.enemies, ...this.gems, ...this.pickups].map(item => item.syncId).filter(Boolean));
-    for (const id of Object.keys(pvp.claimedDrops || {})) {
-      if (!sharedIds.has(id)) delete pvp.claimedDrops[id];
-    }
+    this[name] = [...this[name].filter(item => !item.syncId), ...byId.values()];
+    pvp.sharedEntityById = new Map(names.flatMap(key => this[key]).filter(item => item.syncId).map(item => [item.syncId, item]));
+    pvp.remoteWorldRevision = Math.max(pvp.remoteWorldRevision || 0, revision);
   }
 
   receivePvpWorldPositions(message) {
     const pvp = this.pvp;
-    const sequence = Number(message?.sequence) || 0;
-    if (!pvp || pvp.host || !sequence || sequence <= Number(pvp.remoteWorldPositionSequence || 0) || !Array.isArray(message.entities)) return;
-    const entities = pvp.sharedEntityById;
-    if (!entities) return;
-    pvp.remoteWorldPositionSequence = sequence;
+    const sequence = Number(message?.sequence);
+    if (!pvp || pvp.host || !Number.isSafeInteger(sequence) || sequence <= 0 || !Array.isArray(message.entities)) return;
+    pvp.remoteWorldPositionSequence = Math.max(pvp.remoteWorldPositionSequence || 0, sequence);
     pvp.latestWorldPositions ||= {};
+    const now = performance.now();
+    if (now - (pvp.lastPositionCleanupAt || 0) > 5000) {
+      pvp.lastPositionCleanupAt = now;
+      for (const [id, pos] of Object.entries(pvp.latestWorldPositions)) {
+        if (!pvp.sharedEntityById?.has(id) && now - pos.at > 5000) delete pvp.latestWorldPositions[id];
+      }
+    }
     for (const entry of message.entities) {
       if (!Array.isArray(entry) || typeof entry[0] !== 'string') continue;
-      const x = Number(entry[1]);
-      const y = Number(entry[2]);
-      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-      const item = entities.get(entry[0]);
-      if (!item) continue;
-      item.x = x;
-      item.y = y;
-      pvp.latestWorldPositions[entry[0]] = { x, y, sequence };
-      this.recordPvpPosition(entry[0], x, y);
+      const [id, x, y] = entry;
+      if (!Number.isFinite(x) || !Number.isFinite(y) || sequence <= (pvp.latestWorldPositions[id]?.sequence || 0)) continue;
+      pvp.latestWorldPositions[id] = { x, y, sequence, at: now };
+      const item = pvp.sharedEntityById?.get(id);
+      if (item) { item.x = x; item.y = y; this.recordPvpPosition(id, x, y); }
     }
   }
 
@@ -6632,7 +6600,7 @@ class Game {
     if (!this.pvp || !state) return;
     // Хост задаёт единый ход времени: клиентские таймеры не отстают из-за пауз.
     if (!this.pvp.host && Number.isFinite(Number(state.time))) this.time = Number(state.time);
-    if (!this.pvp.host && state.killCredits) this.kills = Math.max(0, Number(state.killCredits.guest) || 0);
+    if (!this.pvp.host && state.killCredits) this.kills = Math.max(0, Number(state.killCredits.players?.[this.pvp.uid] ?? state.killCredits.guest) || 0);
     const total = Number(state.attackTotal || 0);
     const damage = total - this.pvp.lastRemoteAttackTotal;
     if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage);
@@ -6645,28 +6613,7 @@ class Game {
     }
     this.pvp.lastRemoteEnemyAttackTotal = Math.max(previousEnemyAttackTotal, enemyAttackTotal);
     if (this.pvp.host) {
-      this.pvp.processedEnemyDamage ||= {};
-      const enemiesBySyncId = new Map(this.enemies.filter(item => item.syncId).map(item => [item.syncId, item]));
-      for (const [enemyId, amountValue] of Object.entries(state.enemyDamage || {})) {
-        const amount = Math.max(0, Number(amountValue) || 0);
-        const previous = this.pvp.processedEnemyDamage[enemyId] || 0;
-        const delta = Math.max(0, amount - previous);
-        this.pvp.processedEnemyDamage[enemyId] = Math.max(previous, amount);
-        if (delta > 0) {
-          const enemy = enemiesBySyncId.get(enemyId);
-          if (enemy && !enemy.is24hPursuer) {
-            this.pvp.applyingRemoteEnemyDamage = true;
-            try { enemy.hp = Math.max(0, enemy.hp - delta); }
-            finally { this.pvp.applyingRemoteEnemyDamage = false; }
-          }
-        }
-      }
-      const claimed = state.claimedDrops || {};
-      const claimedIds = new Set(Object.keys(claimed).filter(id => claimed[id]));
-      if (claimedIds.size) {
-        this.gems = this.gems.filter(item => !claimedIds.has(item.syncId));
-        this.pickups = this.pickups.filter(item => !claimedIds.has(item.syncId));
-      }
+      this.processPvpGuestWorldActions(this.pvp.opponentUid || 'remote', state);
     }
     if (state.over && (this.isBattleRoyale || Number(this.pvp.actualPlayerCount) >= 3)) {
       if (this.isBattleRoyale && this.pvp.host && this.pvp.remotePlayer?.uid) {
@@ -6683,7 +6630,7 @@ class Game {
 
   recordPlayerDamage(damage, source, options = {}) {
     const rawIncoming = Math.max(0, Number(damage) || 0);
-    if (!this.player || rawIncoming <= 0) return 0;
+    if (!this.player || this.player.hp <= 0 || this.pvp?.eliminated || rawIncoming <= 0) return 0;
     if (this.isBattleRoyale && this.pvp?.started && performance.now() < Number(this.pvp.spawnGraceUntil || 0)) return 0;
     if (this.player.dashInvulnerabilityTimer > 0) return 0;
     if (this.player.networkFilterBlockTimer > 0) return 0;
@@ -6748,19 +6695,27 @@ class Game {
   damageRemotePlayerFromEnemy(damage, source = 'Атака противника', targetUid = null, options = {}) {
     if (!this.pvp?.host || !this.pvp.started || damage <= 0) return;
     const isBoss = Boolean(options.isBoss) || /босс/i.test(String(source || ''));
-    if (this.isBattleRoyale && targetUid) {
-      const peer = this.pvp.peerConnections?.[targetUid];
-      if (peer?.connected) this.sendPvpNetworkMessage({ type: 'br-damage', targetUid, damage, source, isBoss }, peer.controlChannel || peer.channel, true);
-      return;
-    }
-    if (Number(this.pvp.actualPlayerCount) >= 3 && targetUid) {
-      const peer = this.pvp.peerConnections?.[targetUid];
-      if (peer?.connected) this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'enemy', targetUid, damage, source, isBoss }, peer.controlChannel || peer.channel, true);
+    if ((this.isBattleRoyale || Number(this.pvp.actualPlayerCount) >= 3) && targetUid) {
+      const pending = this.pvp.pendingEnemyAttacks ||= new Map();
+      const key = JSON.stringify([targetUid, source, isBoss]);
+      const before = pending.get(key);
+      pending.set(key, { type: this.isBattleRoyale ? 'br-damage' : 'targeted-damage', kind: 'enemy',
+        targetUid, damage: (before?.damage || 0) + damage, source, isBoss });
       return;
     }
     if (!this.pvp.remoteState || this.pvp.remoteState.over) return;
     this.pvp.enemyAttackTotal = (this.pvp.enemyAttackTotal || 0) + damage;
     this.pvp.enemyAttackSource = isBoss && !/босс/i.test(String(source || '')) ? `${source} · босс` : source;
+  }
+
+  flushPvpEnemyDamage() {
+    const pvp = this.pvp;
+    for (const [key, attack] of pvp.pendingEnemyAttacks || []) {
+      const peer = pvp.peerConnections?.[attack.targetUid];
+      const target = pvp.remotePlayers?.[attack.targetUid];
+      if (!peer?.connected || target?.state?.over) { pvp.pendingEnemyAttacks.delete(key); continue; }
+      if (this.sendPvpNetworkMessage(attack, peer.controlChannel)) pvp.pendingEnemyAttacks.delete(key);
+    }
   }
 
   damagePvpOpponent(damage, targetUid = null, source = 'Атака игрока') {
@@ -6855,6 +6810,30 @@ class Game {
     this.start(wasDaily ? { daily: true } : {});
   }
 
+  getDailyRules() {
+    return this.isDailyRun ? (this.dailyConfig?.modifier?.rules || {}) : {};
+  }
+
+  applyDailyRunModifiers() {
+    const r = this.getDailyRules();
+    const p = this.player;
+    p.xpMult += r.xpBonus || 0;
+    p.currencyMult *= r.currencyMult ?? 1;
+    p.cdMult *= r.cooldownMult ?? 1;
+    p.dashCooldownMult *= r.dashCooldownMult ?? 1;
+    p.speedMult += r.speedBonus || 0;
+    p.dmgMult = (p.dmgMult + (r.damageBonus || 0)) * (r.damageMult ?? 1);
+    p.critChance += r.critBonus || 0;
+    p.regen += r.regenBonus || 0;
+    p.maxHp = Math.max(1, Math.round(p.maxHp * (r.maxHpMult ?? 1)));
+    p.hp = p.maxHp;
+    p.ricochetLevel = (p.ricochetLevel || 0) + (r.ricochetBonus || 0);
+    p.pierceLevel = r.pierceBonus || 0;
+    p.areaMult = r.areaMult || 1;
+    this.currency = r.startingCurrency || 0;
+    this.shopPriceMultiplier *= r.shopPriceMult ?? 1;
+  }
+
   setPvpChoosing(kind) {
     if (!this.pvp) return;
     this.pvp.choosing = kind || null;
@@ -6885,7 +6864,7 @@ class Game {
     const pvp = this.pvp;
     if (!pvp?.host || !pvp.started) return false;
     const participants = (pvp.matchPlayerUids || []).filter(Boolean);
-    if (!participants.length || !participants.every(uid => pvp.classSelectionReadyUids?.has(uid))) return false;
+    if (!participants.length || !participants.every(uid => pvp.classSelectionReadyUids?.has(uid) || pvp.remotePlayers?.[uid]?.disconnected)) return false;
     pvp.classSelectionPending = false;
     if (pvp.mode === 'battle_royale') pvp.spawnGraceUntil = performance.now() + 6000;
     this.sendPvpNetworkMessage({ type: 'class-selection-complete' }, null, true);
@@ -6905,12 +6884,19 @@ class Game {
     if (!this.pvp?.started || this.pvp.host || !item?.syncId) return;
     this.pvp.claimedDrops ||= {};
     this.pvp.claimedDrops[item.syncId] = true;
+    (this.pvp.pendingDropClaims ||= new Set()).add(item.syncId);
   }
 
   syncPvpWait() {
     const pvp = this.pvp;
     if (!pvp?.started) return;
     if (this.integrationShopWait) return;
+    const remotes = Object.values(pvp.remotePlayers || {}).filter(player => player.online !== false && !player.state?.over);
+    if (Number(pvp.actualPlayerCount) >= 3) {
+      pvp.remotePaused = remotes.some(player => player.paused);
+      const choosing = remotes.find(player => player.choosing && !((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && player.choosing === 'levelup'));
+      pvp.remoteChoosing = choosing?.choosing || null;
+    }
     const remoteLevelChoice = (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && pvp.remoteChoosing === 'levelup';
     const classSelectionWait = Boolean(pvp.classSelectionPending && pvp.choosing !== 'class');
     const showWait = Boolean((classSelectionWait || (!this.isBattleRoyale && (pvp.connectionLost || pvp.remotePaused || (pvp.remoteChoosing && !pvp.choosing && !remoteLevelChoice)))) && !pvp.matchOver);
@@ -6935,7 +6921,7 @@ class Game {
       this.paused = true;
     } else if (this.pvpPausedByRemote) {
       this.pvpPausedByRemote = false;
-      this.paused = this.isBattleRoyale ? Boolean(pvp.brPaused) : Boolean(pvp.choosing || pvp.manualPaused || document.getElementById('modal-pause').style.display === 'flex' || this.player?.hp <= 0);
+      this.paused = this.isBattleRoyale ? Boolean(pvp.brPaused) : Boolean(pvp.choosing || pvp.manualPaused || document.getElementById('modal-pause').style.display === 'flex' || (this.player?.hp <= 0 && !pvp.eliminated));
       this.lastTime = performance.now();
     }
   }
@@ -7126,12 +7112,12 @@ class Game {
   }
 
   showSalesCall() {
-    if (this.isBattleRoyale || this.salesCallActive || this.player.hp <= 0) return;
+    if (this.isBattleRoyale || this.salesCallActive || (this.player.hp <= 0 && !this.pvp?.host)) return;
     if (this.pvp?.started && this.pvp.host) {
       if (this.pvp.mode === 'pvp') this.startIntegrationShopVote();
       else this.sendPvpNetworkMessage({ type: 'sales-call' });
     }
-    this.showSalesCallCard();
+    if (!this.pvp?.eliminated) this.showSalesCallCard();
   }
 
   showSalesCallCard() {
@@ -7211,7 +7197,7 @@ class Game {
   startIntegrationShopVote() {
     const pvp = this.pvp;
     if (!pvp?.host || !pvp.started || pvp.mode !== 'pvp') return;
-    const participants = [pvp.uid, ...Object.entries(pvp.peerConnections || {}).filter(([, peer]) => peer.connected).map(([uid]) => uid)];
+    const participants = [...(pvp.eliminated ? [] : [pvp.uid]), ...Object.entries(pvp.peerConnections || {}).filter(([uid, peer]) => peer.connected && !pvp.remotePlayers?.[uid]?.state?.over).map(([uid]) => uid)];
     const call = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, participants, votes: {}, completed: {}, voting: true, resolved: false };
     pvp.integrationShop = call;
     this.sendPvpNetworkMessage({ type: 'integration-shop-start', callId: call.id, participants });
@@ -7219,6 +7205,7 @@ class Game {
 
   receiveIntegrationShopStart(message) {
     if (!this.pvp?.started || this.pvp.mode !== 'pvp' || !message.callId) return;
+    if (!message.participants?.includes(this.pvp.uid)) return;
     this.pvp.integrationShop = { id: String(message.callId), participants: (message.participants || []).map(String), votes: {}, completed: {}, voting: true, resolved: false };
     this.showSalesCallCard();
   }
@@ -7242,6 +7229,7 @@ class Game {
     call.voting = false;
     call.resolved = true;
     const votes = { ...call.votes };
+    if (this.pvp.eliminated) votes[this.pvp.uid] = false;
     this.sendPvpNetworkMessage({ type: 'integration-shop-result', callId: call.id, votes }, null, true);
     this.receiveIntegrationShopResult({ type: 'integration-shop-result', callId: call.id, votes });
   }
@@ -7297,7 +7285,7 @@ class Game {
     pvp.choosing = null;
     document.getElementById('modal-pvp-wait').style.display = 'none';
     document.getElementById('modal-shop').style.display = 'none';
-    this.paused = Boolean(pvp.brPaused || pvp.manualPaused || this.player?.hp <= 0);
+    this.paused = Boolean(pvp.brPaused || pvp.manualPaused || (this.player?.hp <= 0 && !pvp.eliminated));
     this.keys = {};
     this.lastTime = performance.now();
   }
@@ -8799,7 +8787,7 @@ class Game {
 
   syncPvpHostWindowActivity() {
     const pvp = this.pvp;
-    if (!pvp?.host || !pvp.started || pvp.matchOver) return;
+    if (!pvp?.host || !pvp.started || pvp.matchOver || pvp.eliminated) return;
     const active = !document.hidden && document.hasFocus();
     if (!active) {
       if (pvp.hostInactivePause || this.paused) return;
@@ -9470,7 +9458,7 @@ class Game {
     }
     this.officeHazards = this.officeHazards.filter(hazard => this.time < (hazard.expiresAt ?? hazard.endsAt));
     for (const id of localState.keys()) if (!activeIds.has(id)) localState.delete(id);
-    if (this.player.hp <= 0) return true;
+    if (this.player.hp <= 0 && !this.pvp?.eliminated) return true;
     return false;
   }
 
@@ -9595,7 +9583,7 @@ class Game {
     this.log(`На 15-й минуте появился ${name}. Он медленно идёт за вами, неуязвим, убивает с одного касания и не отстанет до конца сессии.`);
   }
   getMobCountMultiplier() {
-    if (!this.pvp?.started) return 1;
+    if (!this.pvp?.started) return this.getDailyRules().spawnMult || 1;
     const players = Math.max(1, Math.min(8, Number(this.pvp.actualPlayerCount) || 1));
     return players === 1 ? 1 : 1.8 + (players - 2) * 0.25;
   }
@@ -9680,29 +9668,27 @@ class Game {
     const hpBuff = (1 + (this.time / 150)) * Math.pow(1.10, difficultyLevel);
     const damageBuff = Math.pow(1.10, difficultyLevel);
     const xpBuff = Math.pow(1.13, difficultyLevel);
-    const dailySpeedMult = (this.isDailyRun && this.dailyConfig?.modifier?.key === 'hot_shift') ? 1.09 : 1;
+    const dailyRules = this.getDailyRules();
 
     let elite = null;
     const allowElites = !options.noElite && this.time >= 180 && (!this.pvp?.started || this.pvp.mode === 'pve');
     if (allowElites) {
       const baseChance = Math.min(0.18, 0.055 + (this.time - 180) / 4200);
-      const eliteChance = (this.isDailyRun && this.dailyConfig?.modifier?.key === 'quarter_close')
-        ? Math.min(0.35, baseChance * 2)
-        : baseChance;
+      const eliteChance = Math.min(0.6, baseChance * (dailyRules.eliteChanceMult || 1));
       if (rng() < eliteChance) {
         elite = ELITE_MODIFIERS[Math.floor(rng() * ELITE_MODIFIERS.length)];
       }
     }
 
-    const finalHp = d.hp * hpBuff * (elite ? elite.hpMult : 1);
+    const finalHp = d.hp * hpBuff * (elite ? elite.hpMult : 1) * (dailyRules.enemyHpMult || 1);
     this.enemies.push({
       x: Number.isFinite(options.x) ? options.x : x,
       y: Number.isFinite(options.y) ? options.y : y,
       name: elite ? `${elite.tag} ${d.name}` : d.name,
       hp: finalHp,
       maxHp: finalHp,
-      speed: d.speed * dailySpeedMult * (elite ? elite.speedMult : 1),
-      dmg: d.dmg * damageBuff * (elite ? elite.dmgMult : 1),
+      speed: d.speed * (elite ? elite.speedMult : 1),
+      dmg: d.dmg * damageBuff * (elite ? elite.dmgMult * (dailyRules.eliteDamageMult || 1) : 1),
       icon: d.icon,
       xp: d.xp * xpBuff * (elite ? elite.xpMult : 1),
       size: elite ? Math.round(d.size * 1.18) : d.size,
@@ -9745,7 +9731,7 @@ class Game {
       { type: 'backup_99', name: 'РЕЗЕРВНАЯ КОПИЯ: 99% (ОСТАЛОСЬ 14 ЧАСОВ)', icon: '💾', col: '#0984e3', label: 'БЭКАП НЕ ЗАВЕРШЁН' }
     ];
     const variant = bossVariants[(this.megaBossCount - 1) % bossVariants.length];
-    const dailyBossHpMult = (this.isDailyRun && this.dailyConfig?.modifier?.key === 'friday_prod') ? 1.15 : 1;
+    const dailyBossHpMult = this.getDailyRules().bossHpMult || 1;
     const hp = Math.round((28000 + (this.megaBossCount - 1) * 10000) * 0.5 * dailyBossHpMult);
     const isMobileMegaBoss = this.megaBossCount >= 6;
     const boss = {
@@ -9789,7 +9775,7 @@ class Game {
     const angle = this.rollRng() * Math.PI * 2;
     const x = Math.max(200, Math.min(3800, center.x + Math.cos(angle) * 560));
     const y = Math.max(200, Math.min(3800, center.y + Math.sin(angle) * 560));
-    const dailyBossHpMult = (this.isDailyRun && this.dailyConfig?.modifier?.key === 'friday_prod') ? 1.15 : 1;
+    const dailyBossHpMult = this.getDailyRules().bossHpMult || 1;
     const hp = Math.round((22000 + this.time * 12) * dailyBossHpMult);
     const boss = { x, y, name: 'М.В. — «Я просто уточнить»', hp, maxHp: hp, size: 52,
       speed: 3.6, dmg: 92, icon: '📞', col: '#ff4757', xp: 240, isBoss: true,
@@ -9933,9 +9919,7 @@ class Game {
       this.log('Пятница, 18:00, резервной копии нет. Клиент: «Можно обновить без остановки?» — «Сначала копию». — «Не успеем, я уже нажал».');
     }
 
-    if (this.isDailyRun && this.dailyConfig?.modifier?.key === 'friday_prod') {
-      b.hp = Math.round(b.hp * 1.15);
-    }
+    b.hp = Math.round(b.hp * (this.getDailyRules().bossHpMult || 1));
     this.sound.boss();
     b.maxHp = b.hp;
     this.enemies.push(b);
@@ -10085,7 +10069,7 @@ class Game {
       const hitRadiusSq = (warning.radius + 18) * (warning.radius + 18);
       const ldx = this.player.x - warning.x;
       const ldy = this.player.y - warning.y;
-      const localHit = ldx * ldx + ldy * ldy < hitRadiusSq;
+      const localHit = this.player.hp > 0 && ldx * ldx + ldy * ldy < hitRadiusSq;
       const attackDamage = warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1);
       const attackSource = warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса';
       if (localHit) {
@@ -10106,7 +10090,7 @@ class Game {
       }
       this.createHitFX(warning.x, warning.y, '#ff4757', 10);
       this.bossWarnings.splice(i, 1);
-      if (this.player.hp <= 0) {
+      if (this.player.hp <= 0 && !this.pvp?.eliminated) {
         this.gameOver('Атака большого босса разрушила целостность базы!');
         return true;
       }
@@ -10115,9 +10099,11 @@ class Game {
   }
 
   updateBossAI(b, dt) {
+    const movementDt = dt;
+    dt *= this.getDailyRules().bossAttackRate || 1;
     const target = this.getPvpEnemyTarget(b);
     if (b.isMegaBoss) {
-      if (b.isMobileMegaBoss) this.moveLateMegaBoss(b, target, dt);
+      if (b.isMobileMegaBoss) this.moveLateMegaBoss(b, target, movementDt);
       if (b.bossType === 'cluster_core') this.updateMegaBossAI(b, dt);
       else if (b.bossType === 'release_break') this.updateReleaseMegaBossAI(b, dt);
       else if (b.bossType === 'backup_99') this.updateBackupMegaBossAI(b, dt);
@@ -10383,7 +10369,7 @@ class Game {
       moveX = -ny * direction;
       moveY = nx * direction;
     }
-    const step = b.speed * Math.max(0, dt) * 60;
+    const step = b.speed * (this.getDailyRules().enemySpeedMult || 1) * Math.max(0, dt) * 60;
     b.x = Math.max(this.BOUND_MIN + b.size, Math.min(this.BOUND_MAX - b.size, b.x + moveX * step));
     b.y = Math.max(this.BOUND_MIN + b.size, Math.min(this.BOUND_MAX - b.size, b.y + moveY * step));
   }
@@ -10490,9 +10476,9 @@ class Game {
     const buffMult = this.player.damageBuffTimer > 0 ? (this.player.damageBuffMult || 1) : 1;
     let dmg = baseDmg * this.player.dmgMult * buffMult * (this.player.readOnlyTimer > 0 ? 0.55 : 1);
     const critChance = Math.min(0.8, (this.player.critChance || 0) + (this.player.evotorSyncTimer > 0 ? 0.10 : 0));
-    let isCrit = Math.random() < critChance;
+    let isCrit = this.rollRng() < critChance;
     if (isCrit) {
-      dmg *= 2.5;
+      dmg *= 2.5 * (this.getDailyRules().critDamageMult || 1);
       this.sound.crit();
     }
     return { dmg, isCrit };
@@ -10789,7 +10775,7 @@ class Game {
         this.puddles.push({
           x: this.player.x + Math.cos(ang) * dst,
           y: this.player.y + Math.sin(ang) * dst,
-          radius: 46 + w.lvl * 7,
+          radius: (46 + w.lvl * 7) * (this.player.areaMult || 1),
           dmg: hit.dmg,
           life: 3.5, source: WEAPONS_DEF.protein.name
         });
@@ -10799,7 +10785,7 @@ class Game {
     // Аура
     if (this.weapons.cache_aura) {
       const w = this.weapons.cache_aura;
-      const rad = 72 + w.lvl * 14;
+      const rad = (72 + w.lvl * 14) * (this.player.areaMult || 1);
       this.forEachEnemyNear(this.player.x, this.player.y, rad, e => {
         if (e.hp <= 0 || e.is24hPursuer) return;
         const dx = e.x - this.player.x;
@@ -10986,7 +10972,7 @@ class Game {
 
     if (this.weapons.fusion_callcenter) {
       const w = this.weapons.fusion_callcenter;
-      const rad = 90 + w.lvl * 15;
+      const rad = (90 + w.lvl * 15) * (this.player.areaMult || 1);
       this.forEachEnemyNear(this.player.x, this.player.y, rad, e => {
         if (e.hp <= 0 || e.is24hPursuer) return;
         const dx = e.x - this.player.x;
@@ -11130,7 +11116,7 @@ class Game {
     }
     this.updateActiveHUD();
 
-    if (this.player.regen > 0) {
+    if (this.player.hp > 0 && !this.pvp?.eliminated && this.player.regen > 0) {
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + this.player.regen * dt);
     }
     if (this.player.xpBoostTimer > 0) {
@@ -11200,7 +11186,7 @@ class Game {
       mx = my;
       my = -previousX;
     }
-    if ((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && this.pvp?.choosing === 'levelup') { mx = 0; my = 0; this.mouseMoveAim = null; }
+    if (this.pvp?.eliminated || ((this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) && this.pvp?.choosing === 'levelup')) { mx = 0; my = 0; this.mouseMoveAim = null; }
 
     if (this.pvpControlTimer <= 0 && this.player.stunTimer <= 0 && (mx !== 0 || my !== 0)) {
       const len = Math.hypot(mx, my);
@@ -11221,7 +11207,7 @@ class Game {
       }
     }
 
-    if (this.player.dashTimer > 0) {
+    if (!this.pvp?.eliminated && this.player.dashTimer > 0) {
       const dashStep = Math.min(dt, this.player.dashTimer);
       this.player.x += this.player.dashX * 520 * dashStep;
       this.player.y += this.player.dashY * 520 * dashStep;
@@ -11240,8 +11226,10 @@ class Game {
     }
     this.updateBattleRoyaleZone(dt);
 
-    this.updateSummons(dt, frameScale);
-    this.updateWeapons(dt);
+    if (!this.pvp?.eliminated) {
+      this.updateSummons(dt, frameScale);
+      this.updateWeapons(dt);
+    }
 
     // Снаряды
     const pvpTargets = this.getPvpWeaponTargets();
@@ -11285,7 +11273,7 @@ class Game {
                 p.puddleSpawned = true;
                 this.puddles.push({
                   x: e.x, y: e.y,
-                  radius: p.puddleRadius || 60,
+                  radius: (p.puddleRadius || 60) * (this.player.areaMult || 1),
                   dmg: p.puddleDmg || 24,
                   life: 3.2,
                   slowEnemies: true,
@@ -11339,7 +11327,9 @@ class Game {
                 p.dmg *= 0.82;
                 p.color = '#ffeaa7';
               } else {
-                p.life = 0;
+                p.piercesRemaining ??= this.player.pierceLevel || 0;
+                if (p.piercesRemaining > 0) p.piercesRemaining--;
+                else p.life = 0;
               }
               return true;
             }
@@ -11351,7 +11341,7 @@ class Game {
           p.puddleSpawned = true;
           this.puddles.push({
             x: p.x, y: p.y,
-            radius: p.puddleRadius || 60,
+            radius: (p.puddleRadius || 60) * (this.player.areaMult || 1),
             dmg: p.puddleDmg || 24,
             life: 3.0,
             slowEnemies: true,
@@ -11390,7 +11380,7 @@ class Game {
           const hitRadSq = (18 + ep.size) * (18 + ep.size);
           const ldx = this.player.x - ep.x;
           const ldy = this.player.y - ep.y;
-          const localDistSq = ldx * ldx + ldy * ldy;
+          const localDistSq = this.player.hp > 0 ? ldx * ldx + ldy * ldy : Infinity;
           let nearestRemote = null;
           let nearestRemoteDistSq = Infinity;
           for (let r = 0; r < hostRemoteTargets.length; r++) {
@@ -11430,7 +11420,7 @@ class Game {
       }
     }
     if (this.updateBossWarnings(dt)) { this._framePvpTargets = null; return; }
-    if (this.player.hp <= 0) {
+    if (this.player.hp <= 0 && !this.pvp?.eliminated) {
       this._framePvpTargets = null;
       this.gameOver('База рухнула: вражеский снаряд уничтожил целостность!');
       return;
@@ -11447,7 +11437,7 @@ class Game {
           const hitRadSq = (pud.radius + 18) * (pud.radius + 18);
           const ldx = this.player.x - pud.x;
           const ldy = this.player.y - pud.y;
-          if (ldx * ldx + ldy * ldy < hitRadSq && this.player.shieldTimer <= 0 && Math.random() > this.getEffectivePlayerDodge()) {
+          if (this.player.hp > 0 && ldx * ldx + ldy * ldy < hitRadSq && this.player.shieldTimer <= 0 && Math.random() > this.getEffectivePlayerDodge()) {
             this.recordPlayerDamage(pud.dmg * dt, pud.source || 'Лужа босса', { isBoss: Boolean(pud.isBossAttack) });
             if (this.player.hp <= 0) {
               this._framePvpTargets = null;
@@ -11553,7 +11543,7 @@ class Game {
           freezeTimer: 0, slowTimer: 0, slowFactor: 1, isBoss: false, isClientDuplicate: false, duplicateTriggered: true });
         this.addPopup(e.x, e.y - e.size - 14, 'ДВОЙНОЙ ЗВОНОК!', '#ff9ff3');
       }
-      let moveSpeed = e.speed * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1) * (this.time < (this.fridayReleaseUntil || 0) ? 1.45 : 1);
+      let moveSpeed = e.speed * (this.getDailyRules().enemySpeedMult || 1) * (e.slowTimer > 0 ? (e.slowFactor || 1) : 1) * (this.time < (this.fridayReleaseUntil || 0) ? 1.45 : 1);
       if (activeAccountants.length > 0 && !e.isBoss && !e.is24hPursuer) {
         for (let aIdx = 0; aIdx < activeAccountants.length; aIdx++) {
           const acc = activeAccountants[aIdx];
@@ -11650,7 +11640,7 @@ class Game {
         if (e.isFitcoinThief && !target.isRemote && this.fitcoinTheftCooldown <= 0 && this.currency > 0) {
           const stolen = Math.min(this.currency, Math.max(1, Math.floor(this.currency * 0.05)));
           this.currency -= stolen;
-          this.fitcoinTheftCooldown = 3;
+          this.fitcoinTheftCooldown = this.getDailyRules().theftCooldown || 3;
           this.addPopup(this.player.x, this.player.y - 34, `🦝 УКРАДЕНО ${stolen} ФИТКОИНОВ`, '#f39c12');
           this.updateHUD();
         }
@@ -11694,7 +11684,7 @@ class Game {
           if (Math.random() < 0.08) this.addPopup(this.player.x, this.player.y - 20, "ЩИТ 1С", "#00cec9");
         }
 
-        if (this.player.hp <= 0) {
+        if (this.player.hp <= 0 && !this.pvp?.eliminated) {
           this._framePvpTargets = null;
           this.gameOver(`База рухнула: «${e.name}» вызвал аварийный сброс сеансов!`);
           return;
@@ -11709,14 +11699,19 @@ class Game {
       if (e.hp <= 0) {
         let guestGotKillCredit = false;
         if (this.pvp?.started && this.pvp.host && e.syncId && !this.pvp.opponentLost) {
-          const guestDamage = Number(this.pvp.processedEnemyDamage?.[e.syncId] || 0);
-          const hostDamage = Number(this.pvp.hostDamageTotals?.[e.syncId] || 0);
-          if (guestDamage > hostDamage) {
-            this.pvp.guestKillCount = (this.pvp.guestKillCount || 0) + 1;
-            guestGotKillCredit = true;
-          } else {
-            this.pvp.hostKillCount = (this.pvp.hostKillCount || 0) + 1;
+          let ownerUid = this.pvp.uid;
+          let bestDamage = Number(this.pvp.hostDamageTotals?.[e.syncId] || 0);
+          for (const [uid, totals] of Object.entries(this.pvp.enemyDamageByPlayer || {})) {
+            if ((totals[e.syncId] || 0) > bestDamage) { ownerUid = uid; bestDamage = totals[e.syncId]; }
+            delete totals[e.syncId];
           }
+          this.pvp.killCounts ||= {};
+          this.pvp.killCounts[ownerUid] = (this.pvp.killCounts[ownerUid] || 0) + 1;
+          guestGotKillCredit = ownerUid !== this.pvp.uid;
+          if (guestGotKillCredit) this.pvp.guestKillCount = (this.pvp.guestKillCount || 0) + 1;
+          else this.pvp.hostKillCount = (this.pvp.hostKillCount || 0) + 1;
+          delete this.pvp.processedEnemyDamage?.[e.syncId];
+          delete this.pvp.hostDamageTotals?.[e.syncId];
         }
         if (e.isBoss && !guestGotKillCredit) {
           if (e.isMegaBoss) this.megaBossKills = (this.megaBossKills || 0) + 1;
@@ -11781,6 +11776,7 @@ class Game {
           this.gems.push({
             x: e.x + 10, y: e.y - 8,
             xp: Math.max(6, Math.round(e.xp * 0.45 * this.player.xpMult * this.player.xpEventMult)),
+            currencyMult: this.getDailyRules().eliteCurrencyMult || 1,
             col: '#ffd200'
           });
         }
@@ -11802,6 +11798,7 @@ class Game {
         this.gems.push({
           x: e.x, y: e.y,
           xp: Math.round(e.xp * this.player.xpMult * this.player.xpEventMult),
+          currencyMult: e.eliteType ? (this.getDailyRules().eliteCurrencyMult || 1) : 1,
           col: e.xp > 15 ? '#e84393' : (e.xp > 5 ? '#0984e3' : '#00b894')
         });
 
@@ -11835,7 +11832,7 @@ class Game {
       }
       const pdx = this.player.x - item.x;
       const pdy = this.player.y - item.y;
-      if (pdx * pdx + pdy * pdy < 32 * 32) {
+      if (this.player.hp > 0 && !this.pvp?.eliminated && pdx * pdx + pdy * pdy < 32 * 32) {
         if (item.type === 'banana' && this.player.hp >= this.player.maxHp - 0.0001) continue;
         if ((item.type === 'br_supply' || item.type === 'consumable') && !this.canAddConsumableToInventory(item.consumableKey)) {
           if (!item.fullInventoryNotified) {
@@ -11879,7 +11876,7 @@ class Game {
     const teaMagnetRange = teaSkill ? mapRadius * teaRadiusFractions[teaLevel] : 0;
     const magnetRange = Math.max(100 * this.player.magnetMult, teaMagnetRange);
     const magnetRangeSq = magnetRange * magnetRange;
-    for (let i = this.gems.length - 1; i >= 0; i--) {
+    for (let i = this.gems.length - 1; !this.pvp?.eliminated && i >= 0; i--) {
       const g = this.gems[i];
       const gdx = this.player.x - g.x;
       const gdy = this.player.y - g.y;
@@ -11894,7 +11891,7 @@ class Game {
         this.gemsCollected++;
         this.recordChallengeProgress('gems');
         this.addXP(g.xp);
-        const fitcoins = Math.max(0, Math.round(g.xp * 0.3 * (this.player.currencyMult || 1)));
+        const fitcoins = Math.max(0, Math.round(g.xp * 0.3 * (this.player.currencyMult || 1) * (g.currencyMult || 1)));
         this.currency += fitcoins;
         if (fitcoins && this.firebaseUser) {
           this.achievementProgress.fitcoinsEarned = (Number(this.achievementProgress.fitcoinsEarned) || 0) + fitcoins;
@@ -12022,6 +12019,11 @@ class Game {
   }
 
   offerLegendaryMigrations(broadcast = true) {
+    if (this.pvp?.eliminated) {
+      if (broadcast && this.pvp.host) this.sendPvpNetworkMessage({ type: 'legendary-offer' });
+      this.legendaryOffered = true;
+      return;
+    }
     if (this.legendaryOffered || !Array.isArray(LEGENDARY_MIGRATIONS) || LEGENDARY_MIGRATIONS.length < 3) return;
     this.legendaryOffered = true;
     if (broadcast && this.pvp?.started && this.pvp.host) this.sendPvpNetworkMessage({ type: 'legendary-offer' });
@@ -12444,15 +12446,15 @@ class Game {
     this.rudesktopSkillFrame = null;
     this.rudesktopRescueState = null;
     document.getElementById('modal-rudesktop-rescue').style.display = 'none';
-    const battleRoyaleElimination = Boolean(this.isBattleRoyale && this.pvp?.started && this.player?.hp <= 0);
-    if (battleRoyaleElimination && this.pvp.eliminated) return;
+    const multiplayerElimination = Boolean((this.isBattleRoyale || Number(this.pvp?.actualPlayerCount) >= 3) && this.pvp?.started && !victory && this.player?.hp <= 0);
+    if (multiplayerElimination && this.pvp.eliminated) return;
     if (victory && this.isBattleRoyale && this.pvp?.started && !this.pvp.brAchievementWinRecorded) {
       this.pvp.brAchievementWinRecorded = true;
       this.recordAchievementCounter('brWins');
     }
     this.closeSalesCall();
     this.clearChallenge();
-    this.paused = !battleRoyaleElimination;
+    this.paused = !multiplayerElimination;
     document.getElementById('modal-pause').style.display = 'none';
     this.setMobileMenuScroll(false);
     document.getElementById('modal-lvlup').style.display = 'none';
@@ -12468,15 +12470,24 @@ class Game {
       primaryButton.onclick = () => this.showMainMenu();
     }
     if (this.pvp) {
-      if (battleRoyaleElimination) this.pvp.eliminated = true;
+      if (multiplayerElimination) this.pvp.eliminated = true;
       else this.pvp.matchOver = true;
       this.pvp.choosing = null;
+      this.pvp.manualPaused = false;
+      this.pvp.remotePaused = false;
+      this.pvp.hostInactivePause = false;
+      this.pvpPausedByRemote = false;
+      if (multiplayerElimination) {
+        this.projectiles = []; this.summons = [];
+        this.puddles = this.puddles.filter(item => item.isEnemyPuddle);
+        this.keys = {}; this.mobileMove = null; this.mouseMoveAim = null;
+      }
       this.sendPvpNetworkState();
       // Result must survive tab close; send it on the reliable control channel.
       this.sendPvpNetworkState(null, null, 'match-over');
-      if (!battleRoyaleElimination || victory || this.pvp.brWinnerSent) this.cleanupPvpRoom();
+      if (!multiplayerElimination || victory || this.pvp.brWinnerSent) this.cleanupPvpRoom();
     }
-    if (!battleRoyaleElimination) {
+    if (!multiplayerElimination) {
       if (this.pvpTimer) clearInterval(this.pvpTimer);
       this.pvpTimer = null;
     }
@@ -12485,9 +12496,9 @@ class Game {
     gameoverWindow.style.borderColor = victory ? '#27ae60' : '#c0392b';
     gameoverHead.style.background = victory ? '#55efc4' : '#ff7675';
     gameoverHead.style.color = victory ? '#123' : '#fff';
-    gameoverHead.querySelector('span').textContent = victory ? '🏆 BATTLE ROYALE · ПОБЕДА' : '⛔ АВАРИЯ: СУБД упала с кодом ошибки 0xDEAD';
+    gameoverHead.querySelector('span').textContent = victory ? (this.isBattleRoyale ? '🏆 BATTLE ROYALE · ПОБЕДА' : '🏆 PvP · ПОБЕДА') : '⛔ АВАРИЯ: СУБД упала с кодом ошибки 0xDEAD';
     const gameoverTitle = document.getElementById('gameover-title');
-    gameoverTitle.textContent = victory ? 'ВЫ ОСТАЛИСЬ ПОСЛЕДНИМ!' : 'СЕАНС ПРЕРВАН!';
+    gameoverTitle.textContent = victory ? 'ВЫ ОСТАЛИСЬ ПОСЛЕДНИМ!' : multiplayerElimination ? 'ВЫ ВЫБЫЛИ — МАТЧ ПРОДОЛЖАЕТСЯ' : 'СЕАНС ПРЕРВАН!';
     gameoverTitle.style.color = victory ? '#27ae60' : '#c0392b';
     this.sound.playTone(victory ? 660 : 60, victory ? 'sine' : 'sawtooth', 0.7, 0.45);
     this.finalLoadout = this.getFinalLoadout(reason);
@@ -12512,6 +12523,7 @@ class Game {
       : '';
     statsBox.innerHTML = `
       <b>${victory ? 'Итог матча' : 'Причина сбоя'}:</b> ${this.escapeHtml(String(reason))}<br><br>
+      ${multiplayerElimination && this.pvp.host ? 'Остальные игроки продолжают бой. Игра хоста должна оставаться открытой до завершения матча.<br><br>' : ''}
       ${finalHitMarkup}
       ${dailyMarkup}
       • Время аптайма: <b>${Math.floor(this.time)} сек</b><br>
@@ -12630,8 +12642,8 @@ class Game {
     let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-ЯёЁ0-9_-]/g, '').slice(0, 15) || 'Архитектор_1С';
     this.setPlayerNickname(nick);
 
-    const score = this.calcScore();
-    const seconds = Math.floor(this.time);
+    const score = this.finalLoadout?.run?.score ?? this.calcScore();
+    const seconds = this.finalLoadout?.run?.seconds ?? Math.floor(this.time);
     const status = document.getElementById('submit-status');
     const btn = document.getElementById('btn-submit-score');
 
@@ -12640,7 +12652,7 @@ class Game {
     if (this.isDailyRun && this.dailyDate) {
       const dailyRecord = {
         name: nick, score, seconds, version: GAME_VERSION, mode: 'daily', players: 1,
-        classId, loadout, dailyDate: this.dailyDate,
+        classId, loadout: typeof loadout === 'string' ? loadout : JSON.stringify(loadout), dailyDate: this.dailyDate,
         dailyModifierKey: this.dailyConfig?.modifier?.key || '',
         dailyModifierName: this.dailyConfig?.modifier?.name || '',
         createdAt: Date.now()
@@ -12755,7 +12767,7 @@ class Game {
       ]) : Promise.resolve([]);
       const [workerOutcome, firebaseOutcome, firebaseDailyOutcome] = await Promise.allSettled([workerPromise, firebasePromise, firebaseDailyPromise]);
       const localDailyScores = isDailyTab ? this.loadLocalDailyScores('all') : [];
-      if (workerOutcome.status === 'rejected' && firebaseOutcome.status === 'rejected' && !localDailyScores.length) {
+      if (workerOutcome.status === 'rejected' && firebaseOutcome.status === 'rejected' && (!isDailyTab || firebaseDailyOutcome.status === 'rejected') && !localDailyScores.length) {
         throw workerOutcome.reason || firebaseOutcome.reason || new Error('проверьте подключение');
       }
       const rawGeneralScores = [
@@ -12819,14 +12831,15 @@ class Game {
         const todayCfg = getDailyRunConfig(targetDailyDate);
         const todayClass = PLAYER_CLASSES[todayCfg.classId] || PLAYER_CLASSES.technician;
         const todayHeader = document.createElement('tr');
-        todayHeader.className = 'lb-major-group';
+        todayHeader.className = 'lb-daily-group';
         todayHeader.innerHTML = `
-          <td colspan="8" style="background:#1e293b; color:#ffeaa7; text-align:left; padding:9px 12px; font-size:12px; border-left:4px solid #f1c40f;">
+          <td colspan="8">
             📅 <b>Смена дня ${this.escapeHtml(targetDailyDate)} (Сегодня)</b> · Дежурный класс: <b>«${this.escapeHtml(todayClass.name)}»</b> · Модификатор: <b>«${this.escapeHtml(todayCfg.modifier.name)}»</b>
           </td>
         `;
         const todayEmpty = document.createElement('tr');
-        todayEmpty.innerHTML = `<td colspan="8" style="text-align:center; color:#ffeaa7; padding:10px; font-size:12px;">За сегодняшнюю смену рекордов пока нет. Заступите на смену первым дежурным дня!</td>`;
+        todayEmpty.className = 'lb-daily-empty';
+        todayEmpty.innerHTML = `<td colspan="8">За сегодняшнюю смену рекордов пока нет. Заступите на смену первым дежурным дня!</td>`;
         tbody.appendChild(todayHeader);
         tbody.appendChild(todayEmpty);
       }
@@ -12834,18 +12847,20 @@ class Game {
         const version = String(entry.version || GAME_VERSION);
         const dailyInfo = isDailyTab ? (this.extractEntryDailyInfo(entry) || { date: entry.dailyDate || targetDailyDate }) : null;
         const entryDate = String(dailyInfo?.date || entry.dailyDate || targetDailyDate);
-        const dailyCfg = isDailyTab ? getDailyRunConfig(entryDate) : null;
+        const assignedCfg = isDailyTab ? getDailyRunConfig(entryDate) : null;
+        const savedModifier = dailyInfo?.modifierKey && DAILY_MODIFIERS.find(mod => mod.key === dailyInfo.modifierKey);
+        const dailyCfg = assignedCfg ? { ...assignedCfg, classId: dailyInfo?.classId || entry.classId || assignedCfg.classId, modifier: savedModifier || assignedCfg.modifier } : null;
         if (isDailyTab) {
           if (entryDate !== previousDailyDate) {
             previousDailyDate = entryDate;
             dayRank = 0;
             const dayClass = PLAYER_CLASSES[dailyCfg.classId] || PLAYER_CLASSES.technician;
             const headerRow = document.createElement('tr');
-            headerRow.className = 'lb-major-group';
+            headerRow.className = 'lb-daily-group';
             headerRow.innerHTML = `
-              <td colspan="8" style="background:#1e293b; color:#ffeaa7; text-align:left; padding:9px 12px; font-size:12px; border-left:4px solid #55efc4;">
+              <td colspan="8">
                 📅 <b>Смена дня ${this.escapeHtml(entryDate)}</b> · Класс: <b>«${this.escapeHtml(dayClass.name)}»</b> · Условие: <b>«${this.escapeHtml(dailyCfg.modifier.name)}»</b>
-                <span style="font-weight:normal; opacity:0.85; margin-left:8px; font-size:11px;">(${this.escapeHtml(dailyCfg.modifier.desc)})</span>
+                <span class="lb-daily-description">${this.escapeHtml(dailyCfg.modifier.desc)}</span>
               </td>
             `;
             tbody.appendChild(headerRow);
@@ -12945,7 +12960,7 @@ class Game {
     title.textContent = `Карточка рекорда · ${entry.name || 'Игрок'}`;
     const dailyInfo = this.extractEntryDailyInfo(entry);
     const dailyCfg = dailyInfo?.date ? getDailyRunConfig(dailyInfo.date) : null;
-    const mod = dailyCfg?.modifier || (dailyInfo?.modifierKey ? DAILY_MODIFIERS.find(m => m.key === dailyInfo.modifierKey) : null);
+    const mod = (dailyInfo?.modifierKey ? DAILY_MODIFIERS.find(m => m.key === dailyInfo.modifierKey) : null) || dailyCfg?.modifier;
     const modeDisplay = dailyInfo
       ? `📅 Ежедневный (${dailyInfo.date}${mod ? ` · ${mod.name}` : (dailyInfo.modifierName ? ` · ${dailyInfo.modifierName}` : '')})`
       : (modeNames[entry.mode] || entry.mode || 'Одиночная');
@@ -13853,9 +13868,10 @@ class Game {
     if (this.pvp) {
       const now = performance.now();
       const renderRemoteShotBatch = (shots, shotsAt) => {
-        if (!shots?.length) return;
+        if (!shots?.length || now - (shotsAt || now) > 500) return;
         const elapsed = Math.max(0, Math.min(0.12, (now - (shotsAt || now)) / 1000));
         for (const shot of shots) {
+          if (Number.isFinite(shot.life) && shot.life <= elapsed) continue;
           if (shot.type === 'laser_visual') {
             this.ctx.strokeStyle = shot.color || '#ff7675';
             this.ctx.lineWidth = 3;
@@ -13977,7 +13993,7 @@ class Game {
     if (this.weapons.fusion_callcenter || this.weapons.cache_aura) {
       const isCallcenter = Boolean(this.weapons.fusion_callcenter);
       const auraW = this.weapons.fusion_callcenter || this.weapons.cache_aura;
-      const auraR = isCallcenter ? (90 + auraW.lvl * 15) : (72 + auraW.lvl * 14);
+      const auraR = (isCallcenter ? (90 + auraW.lvl * 15) : (72 + auraW.lvl * 14)) * (this.player.areaMult || 1);
       this.ctx.beginPath();
       this.ctx.arc(0, 0, auraR, 0, Math.PI * 2);
       this.ctx.fillStyle = isCallcenter ? 'rgba(0, 206, 201, 0.08)' : 'rgba(85, 239, 196, 0.06)';

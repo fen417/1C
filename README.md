@@ -11,9 +11,9 @@ game HTML as `index.html`, with the `audio/` directory beside it. Keep this
 directory in the published artifact: the music uses relative URLs, including
 when the site is hosted under the repository path.
 
-«Красный протокол» is an optional track with normal, miniboss and big-boss
-arrangements. Select it in settings for each desired mode; existing defaults
-and saved choices are preserved. Sample credits and the CC0 license are included
+«Красный протокол» has normal, miniboss and big-boss arrangements. It is the
+default for solo play and can be selected for other modes in settings. Saved
+manual choices are preserved. Sample credits and the CC0 license are included
 in `audio/red-protocol/`.
 
 The initial repository setup must enable GitHub Pages with **GitHub Actions**

@@ -413,6 +413,8 @@
     box-shadow: 0 3px 14px rgba(0,0,0,.65);
   }
   #mega-boss-title { font-size: 11px; font-weight: bold; color: #e0aaff; }
+  #mega-boss-hud { transition:border-color .8s, box-shadow .8s; }
+  #mega-boss-hud.is-critical { border-color:#c54b61; box-shadow:0 0 22px rgba(139,28,54,.32), 0 3px 14px rgba(0,0,0,.65); }
   #mega-boss-track { height: 10px; margin: 5px 0 3px; background: #333; border: 1px solid #fff; border-radius: 3px; overflow: hidden; }
   #mega-boss-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #8e44ad, #ff4757); transition: width .12s linear; }
   #mega-boss-direction { font-size: 10px; color: #f1f2f6; }
@@ -542,6 +544,7 @@
   #modal-shop { z-index: 180; }
   #modal-shop .win-1c { width: min(1440px, 96vw) !important; max-height: calc(100% - 24px); overflow-y: auto; }
   #modal-settings, #modal-changelog { z-index: 280; }
+  #modal-settings .settings-audio-row .btn-1c { flex:1; min-width:0; }
   #modal-key-bindings { z-index: 285; }
   #modal-achievements { z-index: 310; }
   #modal-google-auth { z-index: 1000; background:rgba(7,10,17,.94); }
@@ -1364,7 +1367,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.8.0 — «Каждому отделу — свой билд»</h3>
-              <p>Классовые бонусы и новые способности. IV тир «КОРП» и поиск предметов по статам. Новый трек «Красный протокол» — на выбор в настройках. Исправлена мобильная оболочка.</p>
+              <p>Классовые бонусы и новые способности. IV тир «КОРП» и поиск предметов по статам. «Красный протокол» — новая музыка одиночной игры. Исправлена мобильная оболочка.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3>
@@ -1499,7 +1502,7 @@
         <div class="release-notes" style="margin-bottom:14px;">
           <b style="display:block; font-size:12px; margin-bottom:8px;">🎼 Музыка по режимам</b>
           <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Одиночная игра
-            <select id="music-track-solo" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('solo', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily">«До полуночи» · Смена-бит</option><option value="red_protocol">«Красный протокол» · Оркестровый экшен</option></select>
+            <select id="music-track-solo" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('solo', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily">«До полуночи» · Смена-бит</option><option value="red_protocol" selected>«Красный протокол» · Оркестровый экшен</option></select>
           </label>
           <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Онлайн PvP / PvE
             <select id="music-track-online" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('online', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily">«До полуночи» · Смена-бит</option><option value="red_protocol">«Красный протокол» · Оркестровый экшен</option></select>
@@ -1510,7 +1513,6 @@
           <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px;">Ежедневный забег
             <select id="music-track-daily" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('daily', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily" selected>«До полуночи» · Смена-бит</option><option value="red_protocol">«Красный протокол» · Оркестровый экшен</option></select>
           </label>
-          <p style="font-size:11px; color:#666; margin-top:8px;">«До полуночи»: упругий бас и ритм часов. На мини-боссах — жёсткие ударные и синтезаторы, на больших боссах — тяжёлый индустриальный слой. Темп остаётся прежним.<br>«Красный протокол»: индустриальный бой со струнными; на большом боссе исходный мотив раскрывается в напряжённую оркестровую тему. Длинные вариативные лупы и короткие переходы. Включается только вручную для выбранного режима.</p>
         </div>
         <div class="release-notes mobile-controls-help">
           <p><b>Движение:</b> джойстик слева; игра — горизонтально.<br><b>Рывок:</b> кнопка 💨.<br><b>Динамическое обновление:</b> кнопка 🔄.<br><b>Умения:</b> четыре кнопки справа.<br><b>Предметы и расходники:</b> нажмите на значок в нижней панели; скрытые слоты доступны свайпом по ряду.<br><b>Перенос вещей:</b> в магазине удерживайте предмет, затем нажмите нужный слот.<br><b>Пауза:</b> кнопка ⏸ слева. Меню можно листать в обеих ориентациях.</p>
@@ -1552,7 +1554,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.8.0 — «Каждому отделу — свой билд»</h3></summary><p><b>Музыка и настройки.</b> Добавлен трек «Красный протокол»: отдельные аранжировки обычного боя, мини-босса и большого босса, длинные вариативные лупы и короткие переходы. Выбирается вручную для любого режима; прежние настройки и музыка по умолчанию сохранены. Переназначение клавиш перенесено в отдельное окно, открываемое кнопкой в настройках, со сбросом назначений и возвратом по Esc.<br>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.<br><b>Телефоны.</b> Исправлена сенсорная прокрутка магазина, лвлапа, выбора класса и остальных окон. Увеличены текст и области нажатия, учтены вырезы экрана и экранная клавиатура, переработаны магазин и нижняя панель инвентаря на небольших экранах. Меню доступны в портретной ориентации; для боя сохраняется альбомная.<br><b>Покупка компонентов.</b> Кнопка покупки компонента выбирает недостающую часть рецепта, на которую хватает фиткоинов и которую можно разместить с учётом лимита предмета. Недоступный первый компонент больше не блокирует покупку доступных следующих.<br><b>Поиск магазина по статам.</b> Запросы «урон», «HP», «крит», «перезарядка», «опыт» и другие находят предметы по характеристикам, включая временные эффекты, штрафы и компоненты рецептов. «Урон» находит как усиление, так и снижение исходящего урона, урон призывов и активные атаки. Поддержаны синонимы, несколько слов и поиск среди вещей для продажи; ввод запроса открывает весь каталог.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.8.0 — «Каждому отделу — свой билд»</h3></summary><p><b>Музыка и настройки.</b> Добавлен трек «Красный протокол»: отдельные аранжировки обычного боя, мини-босса и большого босса, длинные вариативные лупы. Переходы между обычным боем и мини-боссом выровнены по тактам с сохранением позиции в композиции и плавным затуханием. Новый трек выбран по умолчанию для одиночной игры, в остальных режимах доступен в настройках; сохранённый ручной выбор музыки сохранён. Переназначение клавиш перенесено в отдельное окно, открываемое кнопкой в настройках, со сбросом назначений и возвратом по Esc. Убраны описания треков из настроек, кнопки звука и музыки занимают всю строку.<br>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.<br><b>Телефоны.</b> Исправлена сенсорная прокрутка магазина, лвлапа, выбора класса и остальных окон. Увеличены текст и области нажатия, учтены вырезы экрана и экранная клавиатура, переработаны магазин и нижняя панель инвентаря на небольших экранах. Меню доступны в портретной ориентации; для боя сохраняется альбомная.<br><b>Атмосфера больших боссов.</b> Мягкое затемнение краёв, приглушённый красный пульс, редкие частицы по краям и акцент при появлении. Эффекты плавно усиливаются к концу боя и уходят после победы; центр экрана и интерфейс остаются читаемыми.<br><b>Ветер.</b> Исправлен таймер уведомлений, добавлены подпись события и предупреждение за 0,9 секунды. Скорость сноса снижена с 520 до 160, сила порыва плавно нарастает и затухает.<br><b>Покупка компонентов.</b> Кнопка покупки компонента выбирает недостающую часть рецепта, на которую хватает фиткоинов и которую можно разместить с учётом лимита предмета. Недоступный первый компонент больше не блокирует покупку доступных следующих.<br><b>Поиск магазина по статам.</b> Запросы «урон», «HP», «крит», «перезарядка», «опыт» и другие находят предметы по характеристикам, включая временные эффекты, штрафы и компоненты рецептов. «Урон» находит как усиление, так и снижение исходящего урона, урон призывов и активные атаки. Поддержаны синонимы, несколько слов и поиск среди вещей для продажи; ввод запроса открывает весь каталог.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p><p>Новая передача изменений мира независимыми пакетами, координаты игроков и мобов — 20 раз в секунду. Исправлены общий счётчик урона гостей, рывки третьего игрока, повторные попадания при замене объектов, зависание выбора класса и остановка матча после смерти хоста. Хост после выбывания остаётся сервером, пока игра открыта; его персонаж не лечится, не атакует и не собирает предметы. Добавлены две ежедневные смены, усилены положительные и отрицательные эффекты старых и реализованы отсутствовавшие эффекты. Для сетевой игры всем участникам нужна обновлённая игра и новое лобби.</p><p>Описания ежедневных смен в таблице рекордов приведены к общему светлому стилю. Исправлено сохранение ежедневных рекордов.</p><p>Добавлен оригинальный синтезированный трек «До полуночи» для ежедневного забега: синкопированный бас, упругий бит и мотив часов. На мини-боссах усиливаются ударные, открывается резонансный бас и появляются резкие синтезаторные акценты; на больших боссах добавляются тяжёлые квинты, металлическая перкуссия и сбивки. Темп остаётся 126 BPM, после победы дополнительные слои плавно затихают. Трек доступен для любого режима; в настройках появилась отдельная сохраняемая предустановка ежедневного забега, где «До полуночи» выбран по умолчанию. В главном меню оставлена краткая сводка, подробности собраны в полной истории обновлений.</p><p>Исправлены тикеты М.В.: обычное выживание больше не требует отсутствия урона, а задание «без урона» отслеживает сами попадания, включая урон зоны. Согласованы таймер и прогресс инверсии. Временные усиления мобов снимаются при завершении и сбросе задания; эффекты тикетов гостей применяются к общему миру через хоста. Убийства и устранение стрелков засчитываются гостям, подкрепления учитывают размер лобби, новые тикеты не выдаются выбывшим игрокам и вплотную к большому боссу. М.В. появляется по отказам гостей и после смерти хоста, с учётом границ увеличенной карты.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры. Добавлены хаотичные тикеты Максима Воронина: отказ или игнор сразу вызывает М.В., три провала принятых тикетов — тоже; задания могут инвертировать или поворачивать управление, усиливать и множить мобов, отключать рывок. Усилены недостатки мощных предметов и комплектов; рикошет, мультивыстрел, замедление и поджог дают боевой бонус с соответствующим штрафом к перезарядке, урону или скорости и теперь имеют по три уровня. Рикошет даёт 1/2/3 отскока, мультивыстрел — +1/+2/+3 снаряда, замедление — 15/30/45%, поджог — шанс 30/50/65%; взрыв от поджига и замедления срабатывает на их максимальном уровне. Характеристики способностей и снаряжения описаны понятными процентами и величинами. Мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты. Проведена оптимизация производительности без визуальных изменений: внедрена пространственная сетка поиска целей и столкновений, кэширование глифов и свечений на Canvas, точечное обновление HUD и тикетов при изменении значений, однопроходная сериализация мира для WebRTC и параллельная загрузка таблиц лидеров. Исправлены пересчёт характеристик и здоровья при продаже и перемещении предметов между инвентарём и рюкзаком, рецепт и сборка комплекта «Архитектор рывка», работа временных усилений урона и отображение множителя опыта в характеристиках. Кислотная лужа мини-босса «Акт налоговой проверки» теперь наносит урон игрокам вместо мобов, защита от боссов учитывается на всех атаках боссов и больше не срабатывает на соперников с ником «Босс», а неуязвимый преследователь RuDesktop не подвержен отталкиванию, контролю, ветру и эволюциям оружия. В Battle Royale и массовых матчах очередь накопленных повышений уровня открывается подряд без сброса подсказки, клавиша L не завершает забег во время ввода текста, а в никах поддерживаются буквы «ё» и «Ё». Исправлены маршрутизация урона, активных умений, выстрелов и выбор целей в сетевых матчах на 3–8 игроков, очистка WebRTC-подписок при выходе соперника и отправка рекордов через проверяемую сессию забега.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
@@ -2031,7 +2033,7 @@ class SoundEngine {
     this.mutedSFX = localStorage.getItem('1c_sfx_muted') === 'true';
     this.musicEnabled = localStorage.getItem('1c_music_enabled') !== 'false';
     this.modeMusicTracks = {
-      solo: this.loadModeTrack('1c_music_track_solo', 'classic'),
+      solo: this.loadModeTrack('1c_music_track_solo', 'red_protocol'),
       online: this.loadModeTrack('1c_music_track_online', 'classic'),
       battle_royale: this.loadModeTrack('1c_music_track_battle_royale', 'br'),
       daily: this.loadModeTrack('1c_music_track_daily', 'daily')
@@ -2041,6 +2043,7 @@ class SoundEngine {
     this.protocolFiles = new Map();
     this.protocolLoads = new Map();
     this.protocolVoice = null;
+    this.protocolTransition = null;
     this.protocolVoices = new Set();
     this.protocolRequest = null;
     this.protocolGeneration = 0;
@@ -2311,9 +2314,16 @@ class SoundEngine {
     this.protocolGeneration++;
     this.protocolRequest = null;
     this.protocolVoice = null;
+    this.protocolTransition = null;
     for (const entry of this.protocolVoices) {
-      entry.gain.gain.cancelScheduledValues(now);
-      entry.gain.gain.setTargetAtTime(0, now, 0.008);
+      const level = entry.gain.gain;
+      if (level.cancelAndHoldAtTime) level.cancelAndHoldAtTime(now);
+      else {
+        const current = level.value;
+        level.cancelScheduledValues(now);
+        level.setValueAtTime(current, now);
+      }
+      level.setTargetAtTime(0, now, 0.008);
       try { entry.source.stop(now + 0.04); } catch (_) {}
     }
     this.protocolVoices.clear();
@@ -2321,6 +2331,22 @@ class SoundEngine {
 
   scheduleProtocolMusic() {
     const stage = this.megaBossCount > 0 ? 'bigboss' : this.bossCount > 0 ? 'miniboss' : 'normal';
+    const transition = this.protocolTransition;
+    if (transition) {
+      const now = this.ctx.currentTime;
+      if (now >= transition.end) {
+        transition.previous.source.stop(now);
+        this.protocolTransition = null;
+      } else if (stage !== this.protocolVoice.stage && now < transition.start) {
+        // A boss may die before its entrance. Restore the current arrangement
+        // rather than playing an obsolete entrance or stacking three versions.
+        this.protocolVoice.source.stop(now);
+        transition.previous.gain.gain.cancelScheduledValues(now);
+        transition.previous.gain.gain.setValueAtTime(1, now);
+        this.protocolVoice = transition.previous;
+        this.protocolTransition = null;
+      } else return;
+    }
     // Invalidate an outstanding boss load even when returning to the playing stage.
     if (this.protocolRequest && this.protocolRequest !== stage) {
       this.protocolGeneration++;
@@ -2334,11 +2360,17 @@ class SoundEngine {
       const now = this.ctx.currentTime;
       const previous = this.protocolVoice;
       const beat = 60 / 148;
-      const phase = previous ? ((Math.max(0, now - previous.startedAt) + previous.offset) % beat) : 0;
-      // Enter on the next beat: at most 0.4 s, with only a short de-click fade.
-      const start = now + (previous ? Math.max(0.015, beat - phase) : 0.025);
+      const matchedPhrase = previous && ['normal', 'miniboss'].includes(previous.stage) && ['normal', 'miniboss'].includes(stage);
+      const boundary = matchedPhrase ? beat * 4 : beat;
+      const position = previous ? Math.max(0, now - previous.startedAt) + previous.offset : 0;
+      const phase = position % boundary;
+      const start = now + (previous ? boundary - phase + (boundary - phase < 0.015 ? boundary : 0) : 0.025);
+      const fadeDuration = matchedPhrase ? beat * (stage === 'normal' ? 4 : 2) : 0.035;
       const duration = Math.min(buffer.duration, (stage === 'bigboss' ? 32 : 64) * 4 * beat);
-      const offset = this.protocolResume?.stage === stage ? this.protocolResume.offset % duration : 0;
+      // Normal and miniboss share the same 64-bar harmony and variation blocks.
+      // Change arrangement at the same phrase position instead of restarting it.
+      const offset = matchedPhrase ? (previous.offset + start - previous.startedAt) % duration
+        : this.protocolResume?.stage === stage ? this.protocolResume.offset % duration : 0;
       const source = this.ctx.createBufferSource();
       const gain = this.ctx.createGain();
       source.buffer = buffer;
@@ -2348,7 +2380,11 @@ class SoundEngine {
       gain.connect(this.musicBus);
       gain.gain.setValueAtTime(0, now);
       gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(1, start + 0.035);
+      // Complementary S-curves avoid a volume surge where the related riffs overlap.
+      for (let i = 1; i <= 32; i++) {
+        const mix = Math.sin(i / 32 * Math.PI / 2) ** 2;
+        gain.gain.linearRampToValueAtTime(mix, start + fadeDuration * i / 32);
+      }
       const voice = { source, gain, stage, duration, offset, startedAt: start };
       source.onended = () => { source.disconnect(); gain.disconnect(); this.protocolVoices.delete(voice); };
       source.start(start, offset);
@@ -2356,8 +2392,12 @@ class SoundEngine {
       if (previous) {
         previous.gain.gain.cancelScheduledValues(start);
         previous.gain.gain.setValueAtTime(1, start);
-        previous.gain.gain.linearRampToValueAtTime(0, start + 0.035);
-        previous.source.stop(start + 0.04);
+        for (let i = 1; i <= 32; i++) {
+          const mix = Math.sin(i / 32 * Math.PI / 2) ** 2;
+          previous.gain.gain.linearRampToValueAtTime(1 - mix, start + fadeDuration * i / 32);
+        }
+        // Retire in the scheduler so an entrance can still be cancelled before it starts.
+        this.protocolTransition = { previous, start, end: start + fadeDuration + 0.01 };
       }
       this.protocolVoice = voice;
       this.protocolResume = null;
@@ -4900,6 +4940,8 @@ class Game {
     this.officeHazards = [];
     this.officeHazardSequence = 0;
     this.localOfficeHazardState = new Map();
+    this.activeMegaBoss = null;
+    this.megaBossAtmosphere = null;
 
     this.spawnTimer = 0;
     this.trailTimer = 0;
@@ -10201,9 +10243,10 @@ class Game {
 
   showBanner(msg) {
     const banner = document.getElementById('event-banner');
+    clearTimeout(this.eventBannerTimer);
     banner.innerText = msg;
     banner.style.display = 'block';
-    setTimeout(() => { banner.style.display = 'none'; }, 4200);
+    this.eventBannerTimer = setTimeout(() => { banner.style.display = 'none'; this.eventBannerTimer = null; }, 4200);
   }
 
   triggerGlitchScreen() {
@@ -10271,10 +10314,10 @@ class Game {
       const direction = directions[Math.floor(this.rollRng() * directions.length)];
       this.officeHazards.push({
         syncId: this.createOfficeHazardId(), kind: 'wind', dx: direction.x, dy: direction.y,
-        startsAt: this.time + 0.12, endsAt: this.time + 3.12, expiresAt: this.time + 3.12, speed: 520
+        startsAt: this.time + 0.9, endsAt: this.time + 3.9, expiresAt: this.time + 3.9, speed: 160
       });
       const side = direction.x > 0 ? 'вправо' : direction.x < 0 ? 'влево' : direction.y > 0 ? 'вниз' : 'вверх';
-      this.announceOfficeEvent(`📞 Клиент громко дышит в трубку. Порыв ветра сдувает игроков и мобов ${side}, к краю карты!`);
+      this.announceOfficeEvent(`📞 Клиент громко дышит в трубку! Через 0,9 с — ветер ${side}. Двигайтесь против порыва!`);
     } else if (roll === 15) {
       this.announceOfficeEvent('🚧 На ресепшене заело турникет в час пик! Очередь прорвалась через калитку и рассыпала абонементы.');
       for (let i = 0; i < 2; i++) this.spawnEnemy('trainee', { noElite: true });
@@ -10385,6 +10428,13 @@ class Game {
     if (this.player.hp <= 0) this.gameOver(`База разрушена: ${source}.`);
   }
 
+  getOfficeWindSpeed(hazard) {
+    const duration = Math.max(0.001, hazard.endsAt - hazard.startsAt);
+    const ramp = Math.min(0.75, duration / 2);
+    const envelope = Math.max(0, Math.min(1, (this.time - hazard.startsAt) / ramp, (hazard.endsAt - this.time) / ramp));
+    return hazard.speed * envelope * envelope * (3 - 2 * envelope);
+  }
+
   updateOfficeHazards(dt) {
     const hostSimulation = !this.pvp?.started || this.pvp.host;
     const localState = this.localOfficeHazardState ||= new Map();
@@ -10403,15 +10453,16 @@ class Game {
       if (id) activeIds.add(id);
       if (hazard.kind === 'wind') {
         if (this.time < hazard.startsAt || this.time >= hazard.endsAt) continue;
+        const drift = this.getOfficeWindSpeed(hazard) * dt;
         if (hostSimulation) {
           for (const enemy of this.enemies) {
             if (enemy.is24hPursuer) continue;
-            enemy.x = Math.max(this.BOUND_MIN + enemy.size, Math.min(this.BOUND_MAX - enemy.size, enemy.x + hazard.dx * hazard.speed * dt));
-            enemy.y = Math.max(this.BOUND_MIN + enemy.size, Math.min(this.BOUND_MAX - enemy.size, enemy.y + hazard.dy * hazard.speed * dt));
+            enemy.x = Math.max(this.BOUND_MIN + enemy.size, Math.min(this.BOUND_MAX - enemy.size, enemy.x + hazard.dx * drift));
+            enemy.y = Math.max(this.BOUND_MIN + enemy.size, Math.min(this.BOUND_MAX - enemy.size, enemy.y + hazard.dy * drift));
           }
         }
-        this.player.x = Math.max(this.BOUND_MIN + 18, Math.min(this.BOUND_MAX - 18, this.player.x + hazard.dx * hazard.speed * dt));
-        this.player.y = Math.max(this.BOUND_MIN + 18, Math.min(this.BOUND_MAX - 18, this.player.y + hazard.dy * hazard.speed * dt));
+        this.player.x = Math.max(this.BOUND_MIN + 18, Math.min(this.BOUND_MAX - 18, this.player.x + hazard.dx * drift));
+        this.player.y = Math.max(this.BOUND_MIN + 18, Math.min(this.BOUND_MAX - 18, this.player.y + hazard.dy * drift));
         continue;
       }
 
@@ -14175,6 +14226,7 @@ class Game {
     }
     const megaHud = this.getHudEl('mega-boss-hud');
     const hasMega = Boolean(megaBoss);
+    this.activeMegaBoss = megaBoss;
     this.setHudStyle(megaHud, 'display', hasMega ? 'block' : 'none');
     this.hudState ||= Object.create(null);
     if (megaHud && this.hudState.megaHudVis !== hasMega) {
@@ -14183,6 +14235,11 @@ class Game {
     }
     if (megaBoss) {
       const ratio = Math.max(0, Math.min(1, megaBoss.hp / megaBoss.maxHp));
+      const critical = ratio <= 0.3;
+      if (megaHud && this.hudState.megaHudCritical !== critical) {
+        this.hudState.megaHudCritical = critical;
+        megaHud.classList.toggle('is-critical', critical);
+      }
       this.setHudText(this.getHudEl('mega-boss-name'), `🧿 ${megaBoss.name}`);
       this.setHudText(this.getHudEl('mega-boss-health'), ` · ${Math.ceil(megaBoss.hp)} / ${megaBoss.maxHp} HP`);
       this.setHudStyle(this.getHudEl('mega-boss-fill'), 'width', `${(ratio * 100).toFixed(2)}%`);
@@ -14481,6 +14538,59 @@ class Game {
     this.ctx.fillText(glyph, x, y);
   }
 
+  drawMegaBossAtmosphere(dt) {
+    const boss = this.activeMegaBoss;
+    const active = Boolean(boss?.hp > 0 && this.player.hp > 0);
+    const state = this.megaBossAtmosphere ||= { level: 0, wasActive: false, enteredAt: 0 };
+    if (active && !state.wasActive) state.enteredAt = this.time;
+    state.wasActive = active;
+    const elapsed = this.paused ? 0 : Math.max(0, dt);
+    state.level += ((active ? 1 : 0) - state.level) * (1 - Math.exp(-elapsed / (active ? 0.55 : 0.9)));
+    if (!active && state.level < 0.003) { state.level = 0; return; }
+    if (state.level <= 0) return;
+    if (!state.shade) {
+      // Small cached textures: no full-resolution blur/filter passes on phones.
+      const texture = (outerColor) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 384; canvas.height = 216;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(canvas.width, canvas.height);
+        const gradient = ctx.createRadialGradient(0.5, 0.5, 0.28, 0.5, 0.5, 0.72);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(0.25, 'rgba(0,0,0,0)');
+        gradient.addColorStop(1, outerColor);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1, 1);
+        return canvas;
+      };
+      state.shade = texture('rgba(8,2,12,0.5)');
+      state.glow = texture('rgba(158,26,51,0.22)');
+      state.reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
+    }
+    const danger = active ? Math.max(0, 1 - boss.hp / Math.max(1, boss.maxHp)) : 0;
+    const healthPressure = Math.max(0, 1 - this.player.hp / Math.max(1, this.player.maxHp) / 0.4);
+    const pulse = state.reducedMotion ? 0 : ((1 + Math.sin(this.time * Math.PI * 2 * (148 / 60) / 4)) / 2) ** 6;
+    const entrance = active ? Math.max(0, 1 - (this.time - state.enteredAt) / 1.4) : 0;
+    const width = this.viewportWidth, height = this.viewportHeight;
+    this.ctx.save();
+    // Keep the middle transparent. Canvas effects stay below all DOM controls.
+    this.ctx.globalAlpha = state.level * (0.55 + danger * 0.1);
+    this.ctx.drawImage(state.shade, 0, 0, width, height);
+    this.ctx.globalAlpha = state.level * (0.3 + danger * 0.15 + healthPressure * 0.12 + pulse * 0.1 + entrance * 0.15);
+    this.ctx.drawImage(state.glow, 0, 0, width, height);
+    if (!state.reducedMotion) {
+      this.ctx.fillStyle = '#c35b70';
+      for (let i = 0; i < 8; i++) {
+        const progress = (this.time * 0.035 + i * 0.137) % 1;
+        const x = (i % 2 ? 0.96 : 0.04) * width + Math.sin(this.time * 0.2 + i) * 9;
+        const y = (1 - progress) * height;
+        this.ctx.globalAlpha = state.level * 0.15 * Math.sin(progress * Math.PI);
+        this.ctx.fillRect(x, y, 2, 2);
+      }
+    }
+    this.ctx.restore();
+  }
+
   render(dt = 1 / 60) {
     this.ctx.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
 
@@ -14658,14 +14768,25 @@ class Game {
     // Опасные офисные события
     for (const hazard of this.officeHazards) {
       if (hazard.kind === 'wind') {
-        if (this.time < hazard.startsAt || this.time >= hazard.endsAt) continue;
+        if (this.time >= hazard.endsAt) continue;
+        const warning = this.time < hazard.startsAt;
         this.ctx.save();
-        this.ctx.translate(this.player.x, this.player.y - 52);
+        this.ctx.translate(this.player.x, this.player.y - 64);
+        this.ctx.font = 'bold 12px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        const label = warning ? `📞 Клиент дышит · ветер через ${(hazard.startsAt - this.time).toFixed(1)} с` : '📞 Клиент громко дышит в трубку';
+        const labelWidth = Math.min(310, this.ctx.measureText(label).width) + 14;
+        this.ctx.fillStyle = 'rgba(12, 24, 36, 0.88)';
+        this.ctx.fillRect(-labelWidth / 2, -32, labelWidth, 23);
+        this.ctx.fillStyle = '#dff9fb';
+        this.ctx.fillText(label, 0, -20, 310);
         this.ctx.rotate(Math.atan2(hazard.dy, hazard.dx));
         this.ctx.font = 'bold 28px sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillStyle = '#dff9fb';
+        this.ctx.globalAlpha = warning ? 0.5 : 0.4 + 0.6 * Math.min(1, this.getOfficeWindSpeed(hazard) / Math.max(1, hazard.speed));
         this.ctx.shadowColor = '#74b9ff';
         this.ctx.shadowBlur = 14;
         this.ctx.fillText('💨 ➜', 0, 0);
@@ -15167,6 +15288,8 @@ class Game {
     }
 
     this.ctx.restore();
+
+    this.drawMegaBossAtmosphere(dt);
 
     if (this.player.hasSecondMonitor) {
       const margin = 38;

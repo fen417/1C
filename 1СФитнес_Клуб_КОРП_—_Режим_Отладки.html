@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>1С:Фитнес Клуб КОРП 2.8.0</title>
 <style>
   :root {
@@ -313,7 +313,7 @@
     #modal-pause .pause-audio-controls .btn-1c { width:100%; flex:0 0 auto; text-align:left; }
   }
   @media (pointer: coarse) and (orientation: portrait) {
-    body::before { content:'Поверните устройство горизонтально'; position:fixed; inset:0; z-index:9999; display:grid; place-items:center; padding:24px; background:#111; color:#fff; font:bold 20px sans-serif; text-align:center; }
+    body.mobile-landscape-required::before { content:'Поверните устройство горизонтально'; position:fixed; inset:0; z-index:9999; display:grid; place-items:center; padding:24px; background:#111; color:#fff; font:bold 20px sans-serif; text-align:center; }
   }
   .active-slot {
     width: 56px;
@@ -962,6 +962,7 @@
     width: 240px;
     outline: none;
   }
+  .mobile-controls-help { display:none; }
 
   /* После общих стилей: панели на телефоне растут только по содержимому. */
   @media (max-width: 1300px) and (pointer: coarse) {
@@ -1001,6 +1002,166 @@
   }
   @media (max-width: 660px) and (pointer: coarse) {
     #btn-dyn-update { right:calc(clamp(185px,20vw,245px) + 56px); bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px)); }
+  }
+  /* Мобильная оболочка: внешняя прокрутка окон, безопасные края и экранная клавиатура. */
+  @media (max-width:1300px) and (pointer:coarse) {
+    :root {
+      --mobile-height:100dvh;
+      --safe-top:env(safe-area-inset-top,0px);
+      --safe-right:env(safe-area-inset-right,0px);
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+      --safe-left:env(safe-area-inset-left,0px);
+    }
+    html, body { height:var(--mobile-height); min-height:0; touch-action:auto; }
+    html.mobile-menu-scroll, body.mobile-menu-scroll { touch-action:auto !important; }
+    #app-window { width:100%; max-width:none; height:var(--mobile-height); max-height:var(--mobile-height); min-height:0; border:0; }
+    #game-viewport { margin:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left); }
+    canvas { touch-action:none; }
+    #xp-bar-container { top:var(--safe-top); }
+    #btn-pause { left:calc(var(--safe-left) + 10px); min-width:44px; min-height:44px; }
+    #btn-dyn-update { right:calc(var(--safe-right) + clamp(185px,20vw,245px) - 10px); }
+    #mobile-move-control { bottom:16px; }
+    #hud-active-skills { bottom:12px; }
+    #hud-item-loadout { left:156px; right:252px; bottom:12px; width:auto; max-width:none; transform:none; align-items:stretch; }
+    #hud-consumables, #hud-shop-passives { width:100%; max-width:100%; overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; gap:4px; touch-action:pan-x; }
+    #hud-consumables .inv-slot, #hud-shop-passives .inv-slot { width:44px; height:44px; flex:0 0 44px; font-size:23px; }
+    #hud-item-loadout .inv-slot { touch-action:pan-x; }
+    #mobile-dash { bottom:86px; }
+    .mobile-modal-open #nav-bar { visibility:hidden; }
+    .modal-overlay {
+      padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px);
+      overflow:auto; overscroll-behavior:contain; touch-action:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .modal-overlay > .win-1c {
+      flex:0 1 auto; min-width:0; max-width:100% !important; max-height:100% !important;
+      overflow-x:hidden; overflow-y:auto; touch-action:auto; scroll-padding:56px 8px 16px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .modal-overlay .win-1c-head { min-height:48px; padding:5px 8px; }
+    .modal-overlay .win-1c-body { padding:10px; }
+    .modal-overlay .btn-1c, .modal-overlay .win-close-btn, .modal-overlay .auth-mode-tabs .btn-1c {
+      min-height:44px; min-width:44px; padding:9px 12px; font-size:13px; line-height:1.3;
+      white-space:normal; overflow-wrap:anywhere; touch-action:manipulation;
+    }
+    .modal-overlay .win-close-btn { flex:0 0 44px; width:44px; padding:8px; }
+    .modal-overlay input:not([type=checkbox]):not([type=range]), .modal-overlay select {
+      min-width:0; max-width:100%; min-height:44px; font-size:16px; user-select:text;
+    }
+    .modal-overlay input[type=checkbox] { width:22px; height:22px; flex:0 0 22px; }
+    .modal-overlay input[type=range] { min-height:36px; touch-action:pan-x; }
+    .modal-overlay p, .modal-overlay li, .modal-overlay label { overflow-wrap:anywhere; }
+    .release-notes { padding:10px; }
+    .release-notes p { font-size:12px; }
+    .main-menu-layout { grid-template-columns:minmax(190px,.85fr) minmax(0,1.4fr); gap:12px; }
+    .main-menu-layout > div { min-width:0; }
+    .main-menu-actions .btn-1c { padding:10px 12px; }
+    #modal-lvlup #upgrade-items { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    #modal-lvlup .card-upgrade { display:block; min-width:0; margin:0; padding:10px; touch-action:manipulation; }
+    #modal-lvlup .card-icon { min-width:0; margin-bottom:5px; font-size:26px; }
+    #modal-lvlup .card-info { min-width:0; }
+    #modal-lvlup .card-info h4 { font-size:13px; line-height:1.4; overflow-wrap:anywhere; }
+    #modal-lvlup .card-upgrade p { font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+    #modal-lvlup .card-upgrade:hover { transform:none; }
+    .class-select-stats, .legendary-card p { font-size:12px; line-height:1.45; }
+    .class-select-card { padding:10px; }
+    #modal-pause .pause-layout { grid-template-columns:minmax(190px,.8fr) minmax(0,1.2fr); gap:10px; }
+    #modal-pause .pause-loadout { grid-template-columns:1fr; }
+    .loadout-section li { font-size:12px; }
+    #modal-settings .settings-track-row { flex-direction:column; align-items:stretch !important; gap:5px !important; }
+    #modal-settings .settings-track-row select { width:100% !important; }
+    #modal-settings .settings-account-row, #modal-settings .settings-audio-row { flex-wrap:wrap; }
+    #modal-settings .settings-account-row input { flex:1 1 160px !important; }
+    #modal-settings .settings-account-row .btn-1c { flex:1 1 140px; }
+    #modal-settings .settings-audio-row .btn-1c { flex:1 1 140px; }
+    #key-bindings { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+    #key-bindings .btn-1c { min-width:0; }
+    #modal-settings .desktop-controls-settings, #modal-settings .desktop-controls-help, #pause-resume-hint { display:none; }
+    #modal-settings .mobile-controls-help { display:block; }
+    #pvp-mode-label { flex-wrap:wrap; }
+    #pvp-mode-select { flex:1 1 190px; }
+    .pvp-room-browser-head { flex-wrap:wrap; gap:6px; }
+    .pvp-room-entry { min-height:48px; flex-wrap:wrap; }
+    #modal-lb .win-1c-body > div:last-child { flex-wrap:wrap; gap:8px; }
+    #modal-lb .win-1c-body > div:last-child .btn-1c { flex:1 1 180px; }
+    #lb-table { font-size:12px; }
+    #lb-table th, #lb-table td { padding:8px; }
+    #modal-record-detail .record-item-title { flex-wrap:wrap; }
+    #modal-record-detail .record-item small { margin-left:0; font-size:12px; }
+    .achievement-rank-table { touch-action:auto; }
+    #modal-achievements .win-1c-head { flex-wrap:wrap; }
+    #modal-shop {
+      padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      align-items:stretch; overflow:hidden;
+    }
+    #modal-shop .dota-shop {
+      width:100% !important; max-width:100% !important; height:100%; min-height:0; max-height:100%;
+      margin:0; border:0; border-radius:0; display:flex; flex-direction:column; overflow:hidden;
+    }
+    #modal-shop .win-1c-head { flex:0 0 auto; flex-wrap:wrap; }
+    #shop-currency { font-size:11px; overflow-wrap:anywhere; }
+    #modal-shop .dota-shop-body {
+      display:block; flex:1 1 auto; min-height:0; padding:8px;
+      overflow-x:hidden; overflow-y:auto; touch-action:auto; -webkit-overflow-scrolling:touch;
+    }
+    .dota-shop-toolbar { flex-direction:row; flex-wrap:wrap; margin-bottom:8px; }
+    .dota-shop-categories { flex:1 1 100%; touch-action:auto; }
+    .dota-shop-categories .shop-tab { min-height:44px; font-size:12px; }
+    .dota-shop-search { min-height:44px; }
+    .dota-shop-main {
+      display:grid; grid-template-columns:minmax(0,1.2fr) minmax(230px,1fr); grid-template-rows:auto;
+      min-height:0; overflow:visible; gap:8px; margin-bottom:8px; align-items:start;
+    }
+    .dota-shop-catalog { display:flex; min-width:0; min-height:0; }
+    .dota-shop-items {
+      flex:none; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); min-height:100px;
+      max-height:min(58dvh,420px); overflow:auto; touch-action:auto; overscroll-behavior:contain;
+    }
+    .dota-shop-item-card { min-height:78px; }
+    .dota-shop-item { min-height:78px; padding:6px 36px 6px 6px; grid-template-columns:28px minmax(0,1fr); }
+    .dota-shop-item-name { font-size:12px; }
+    .dota-shop-item-price { font-size:11px; }
+    .shop-favorite-toggle { width:34px; height:34px; font-size:22px; line-height:30px; touch-action:manipulation; }
+    .dota-shop-details { min-width:0; overflow:visible; }
+    .dota-shop-selected { min-width:0; min-height:0; }
+    .dota-shop-selected > div { min-width:0; }
+    .dota-shop-selected h3 { font-size:14px; overflow-wrap:anywhere; }
+    .dota-shop-selected p { font-size:12px; line-height:1.45; }
+    .dota-shop-build { flex:0 0 auto; min-height:0; max-height:none; overflow:visible; }
+    .shop-build-node, .shop-build-option { min-height:44px; white-space:normal; overflow-wrap:anywhere; }
+    .dota-shop-detail-actions { grid-template-columns:1fr; }
+    .dota-shop-bottom { display:flex; flex-wrap:wrap; gap:8px; overflow:visible; margin-bottom:8px; }
+    .dota-shop-inventory-group { width:auto; max-width:100%; min-width:0; }
+    .dota-shop-inventory { flex-wrap:wrap; }
+    .dota-shop-inventory-slot, .dota-shop-inventory-slot.backpack-slot { width:44px; height:44px; flex-basis:44px; }
+    .dota-shop-footer { position:static; flex-wrap:wrap; margin:0; padding:8px; }
+    .dota-shop-footer #shop-message { flex:1 1 180px; font-size:12px; line-height:1.4; }
+    .dota-shop-footer #shop-close-button { flex:1 1 180px; }
+  }
+  @media (max-width:660px) and (pointer:coarse) {
+    #btn-dyn-update { right:calc(var(--safe-right) + 175px); bottom:calc(var(--safe-bottom) + 34px); }
+    .main-menu-layout, #modal-pause .pause-layout { grid-template-columns:1fr; }
+    #modal-lvlup #upgrade-items { grid-template-columns:1fr; }
+    #modal-lvlup .card-upgrade { display:flex; align-items:flex-start; }
+    #modal-lvlup .card-icon { flex:0 0 32px; }
+    .dota-shop-main { grid-template-columns:minmax(0,1fr); }
+    .dota-shop-items { max-height:42dvh; }
+    .dota-shop-detail-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .class-select-grid, #legendary-items { grid-template-columns:1fr; }
+    .legendary-card { min-height:0; }
+    #key-bindings, .record-detail-grid { grid-template-columns:1fr !important; }
+  }
+  @media (max-width:500px) and (pointer:coarse) {
+    #hud-item-loadout { left:144px; right:242px; bottom:12px; }
+    .main-menu-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .main-menu-version { grid-column:1/-1; }
+  }
+  @media (max-height:400px) and (min-width:661px) and (pointer:coarse) {
+    #modal-lvlup .card-upgrade { padding:8px; }
+    #modal-lvlup .card-icon { font-size:22px; }
+    .modal-overlay .win-1c-body { padding:8px; }
+    #mobile-move-control { width:108px; height:108px; left:12px; bottom:12px; }
+    #btn-pause { bottom:calc(var(--safe-bottom) + 128px); }
   }
 </style>
 </head>
@@ -1202,7 +1363,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.8.0 — «Каждому отделу — свой билд»</h3>
-              <p>Классовые бонусы к оружию и способностям, новые пушки, пассивки и активки. В магазине появился IV тир «КОРП» — 8 дорогих предметов для позднего забега.</p>
+              <p>Классовые бонусы и новые способности. IV тир «КОРП» и поиск предметов по статам. Исправлена мобильная оболочка.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3>
@@ -1316,20 +1477,20 @@
         <div class="release-notes" style="margin-bottom:14px;">
           <b style="display:block;font-size:12px;margin-bottom:8px;">👤 Аккаунт</b>
           <div id="settings-account-email" style="margin-bottom:7px;color:#666;font-size:11px;">Аккаунт не подключён</div>
-          <div style="display:flex;gap:6px;">
+          <div class="settings-account-row" style="display:flex;gap:6px;">
             <input id="settings-account-nickname" class="input-1c" type="text" maxlength="15" autocomplete="nickname" style="min-width:0;flex:1;" aria-label="Игровой ник">
             <button class="btn-1c" onclick="game.saveAccountNickname()">Сохранить ник</button>
           </div>
           <div id="settings-account-status" style="min-height:14px;margin-top:5px;color:#666;font-size:10px;"></div>
           <button class="btn-1c" style="margin-top:6px;" onclick="game.signOutGoogle()">Выйти из аккаунта</button>
         </div>
-        <div class="release-notes" style="margin-bottom:14px;">
+        <div class="release-notes desktop-controls-settings" style="margin-bottom:14px;">
           <b style="display:block;font-size:12px;margin-bottom:8px;">⌨️ Клавиши для ПК</b>
           <div id="key-bindings" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
           <div id="key-bind-status" style="font-size:10px;color:#666;margin-top:7px;">Нажмите кнопку действия и затем нужную клавишу.</div>
           <button class="btn-1c" style="margin-top:8px;" onclick="game.resetKeyBindings()">Вернуть стандартные клавиши</button>
         </div>
-        <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <div class="settings-audio-row" style="display:flex; gap:8px; margin-bottom:14px;">
           <button class="btn-1c" id="settings-sound" onclick="game.sound.toggleMute()">🔊 Звуковые эффекты</button>
           <button class="btn-1c" id="settings-music" onclick="game.sound.toggleMusic()">🎵 Музыка</button>
         </div>
@@ -1341,22 +1502,25 @@
         </div>
         <div class="release-notes" style="margin-bottom:14px;">
           <b style="display:block; font-size:12px; margin-bottom:8px;">🎼 Музыка по режимам</b>
-          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Одиночная игра
+          <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Одиночная игра
             <select id="music-track-solo" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('solo', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily">«До полуночи» · Смена-бит</option></select>
           </label>
-          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Онлайн PvP / PvE
+          <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Онлайн PvP / PvE
             <select id="music-track-online" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('online', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily">«До полуночи» · Смена-бит</option></select>
           </label>
-          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Battle Royale
+          <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; margin-bottom:7px;">Battle Royale
             <select id="music-track-battle-royale" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('battle_royale', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily">«До полуночи» · Смена-бит</option></select>
           </label>
-          <label style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px;">Ежедневный забег
+          <label class="settings-track-row" style="display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px;">Ежедневный забег
             <select id="music-track-daily" class="input-1c" style="width:225px;" onchange="game.sound.setModeTrack('daily', this.value)"><option value="classic">Старый бит · Классика</option><option value="br">«Последний круг» · BR-бит</option><option value="daily" selected>«До полуночи» · Смена-бит</option></select>
           </label>
           <p style="font-size:11px; color:#666; margin-top:8px;">«До полуночи»: упругий бас и ритм часов. На мини-боссах — жёсткие ударные и синтезаторы, на больших боссах — тяжёлый индустриальный слой. Темп остаётся прежним.</p>
         </div>
-        <div class="release-notes">
+        <div class="release-notes desktop-controls-help">
           <p><b>Движение:</b> WASD / стрелки или удерживайте ЛКМ на игровом поле<br><b>Рывок:</b> Shift или ПКМ<br><b>Динамическое обновление:</b> Пробел<br><b>Активные умения:</b> 1–4<br><b>Расходники:</b> 5, 6, Q, E (клавиши настраиваются)<br><b>Пауза:</b> Esc / P<br><b>Завершить забег:</b> L (в одиночной игре в любое время; в сети после выбытия соперника)</p>
+        </div>
+        <div class="release-notes mobile-controls-help">
+          <p><b>Движение:</b> джойстик слева; игра — горизонтально.<br><b>Рывок:</b> кнопка 💨.<br><b>Динамическое обновление:</b> кнопка 🔄.<br><b>Умения:</b> четыре кнопки справа.<br><b>Предметы и расходники:</b> нажмите на значок в нижней панели; скрытые слоты доступны свайпом по ряду.<br><b>Перенос вещей:</b> в магазине удерживайте предмет, затем нажмите нужный слот.<br><b>Пауза:</b> кнопка ⏸ слева. Меню можно листать в обеих ориентациях.</p>
         </div>
         <label class="release-notes" style="display:flex; align-items:center; gap:9px; margin-bottom:14px; font-size:12px;">
           <input id="collapse-accepted-tickets" type="checkbox" checked onchange="game.setCollapseAcceptedTickets(this.checked)">
@@ -1377,7 +1541,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.8.0 — «Каждому отделу — свой билд»</h3></summary><p>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.8.0 — «Каждому отделу — свой билд»</h3></summary><p>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.<br><b>Телефоны.</b> Исправлена сенсорная прокрутка магазина, лвлапа, выбора класса и остальных окон. Увеличены текст и области нажатия, учтены вырезы экрана и экранная клавиатура, переработаны магазин и нижняя панель инвентаря на небольших экранах. Меню доступны в портретной ориентации; для боя сохраняется альбомная.<br><b>Поиск магазина по статам.</b> Запросы «урон», «HP», «крит», «перезарядка», «опыт» и другие находят предметы по характеристикам, включая временные эффекты, штрафы и компоненты рецептов. «Урон» находит как усиление, так и снижение исходящего урона, урон призывов и активные атаки. Поддержаны синонимы, несколько слов и поиск среди вещей для продажи; ввод запроса открывает весь каталог.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p><p>Новая передача изменений мира независимыми пакетами, координаты игроков и мобов — 20 раз в секунду. Исправлены общий счётчик урона гостей, рывки третьего игрока, повторные попадания при замене объектов, зависание выбора класса и остановка матча после смерти хоста. Хост после выбывания остаётся сервером, пока игра открыта; его персонаж не лечится, не атакует и не собирает предметы. Добавлены две ежедневные смены, усилены положительные и отрицательные эффекты старых и реализованы отсутствовавшие эффекты. Для сетевой игры всем участникам нужна обновлённая игра и новое лобби.</p><p>Описания ежедневных смен в таблице рекордов приведены к общему светлому стилю. Исправлено сохранение ежедневных рекордов.</p><p>Добавлен оригинальный синтезированный трек «До полуночи» для ежедневного забега: синкопированный бас, упругий бит и мотив часов. На мини-боссах усиливаются ударные, открывается резонансный бас и появляются резкие синтезаторные акценты; на больших боссах добавляются тяжёлые квинты, металлическая перкуссия и сбивки. Темп остаётся 126 BPM, после победы дополнительные слои плавно затихают. Трек доступен для любого режима; в настройках появилась отдельная сохраняемая предустановка ежедневного забега, где «До полуночи» выбран по умолчанию. В главном меню оставлена краткая сводка, подробности собраны в полной истории обновлений.</p><p>Исправлены тикеты М.В.: обычное выживание больше не требует отсутствия урона, а задание «без урона» отслеживает сами попадания, включая урон зоны. Согласованы таймер и прогресс инверсии. Временные усиления мобов снимаются при завершении и сбросе задания; эффекты тикетов гостей применяются к общему миру через хоста. Убийства и устранение стрелков засчитываются гостям, подкрепления учитывают размер лобби, новые тикеты не выдаются выбывшим игрокам и вплотную к большому боссу. М.В. появляется по отказам гостей и после смерти хоста, с учётом границ увеличенной карты.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры. Добавлены хаотичные тикеты Максима Воронина: отказ или игнор сразу вызывает М.В., три провала принятых тикетов — тоже; задания могут инвертировать или поворачивать управление, усиливать и множить мобов, отключать рывок. Усилены недостатки мощных предметов и комплектов; рикошет, мультивыстрел, замедление и поджог дают боевой бонус с соответствующим штрафом к перезарядке, урону или скорости и теперь имеют по три уровня. Рикошет даёт 1/2/3 отскока, мультивыстрел — +1/+2/+3 снаряда, замедление — 15/30/45%, поджог — шанс 30/50/65%; взрыв от поджига и замедления срабатывает на их максимальном уровне. Характеристики способностей и снаряжения описаны понятными процентами и величинами. Мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты. Проведена оптимизация производительности без визуальных изменений: внедрена пространственная сетка поиска целей и столкновений, кэширование глифов и свечений на Canvas, точечное обновление HUD и тикетов при изменении значений, однопроходная сериализация мира для WebRTC и параллельная загрузка таблиц лидеров. Исправлены пересчёт характеристик и здоровья при продаже и перемещении предметов между инвентарём и рюкзаком, рецепт и сборка комплекта «Архитектор рывка», работа временных усилений урона и отображение множителя опыта в характеристиках. Кислотная лужа мини-босса «Акт налоговой проверки» теперь наносит урон игрокам вместо мобов, защита от боссов учитывается на всех атаках боссов и больше не срабатывает на соперников с ником «Босс», а неуязвимый преследователь RuDesktop не подвержен отталкиванию, контролю, ветру и эволюциям оружия. В Battle Royale и массовых матчах очередь накопленных повышений уровня открывается подряд без сброса подсказки, клавиша L не завершает забег во время ввода текста, а в никах поддерживаются буквы «ё» и «Ё». Исправлены маршрутизация урона, активных умений, выстрелов и выбор целей в сетевых матчах на 3–8 игроков, очистка WebRTC-подписок при выходе соперника и отправка рекордов через проверяемую сессию забега.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
@@ -1418,7 +1582,7 @@
             <button class="shop-tab" data-shop-view="favorites" onclick="game.setShopView('favorites')">★ Избранное</button>
             <button class="shop-tab" data-shop-view="sell" onclick="game.setShopView('sell')">Продать</button>
           </div>
-          <input id="shop-search" class="dota-shop-search" type="search" placeholder="Поиск предмета" oninput="game.setShopSearch(this.value)">
+          <input id="shop-search" class="dota-shop-search" type="search" placeholder="Название или стат: урон, HP, крит…" aria-label="Поиск предметов по названию и характеристикам" oninput="game.setShopSearch(this.value)">
         </div>
         <div class="dota-shop-main">
           <section class="dota-shop-catalog"><div class="dota-shop-section-title">Предметы</div><div id="shop-catalog" class="dota-shop-items"></div></section>
@@ -1446,7 +1610,7 @@
   <!-- Меню паузы -->
   <div id="modal-pause" class="modal-overlay">
     <div class="win-1c" onclick="event.stopPropagation()">
-      <div class="win-1c-head"><span>⏸ Игра приостановлена</span><span>Esc — продолжить</span><button class="win-close-btn" onclick="game.resume()" aria-label="Продолжить игру">✕</button></div>
+      <div class="win-1c-head"><span>⏸ Игра приостановлена</span><span id="pause-resume-hint">Esc — продолжить</span><button class="win-close-btn" onclick="game.resume()" aria-label="Продолжить игру">✕</button></div>
       <div class="win-1c-body">
         <div class="pause-layout">
           <div>
@@ -3840,6 +4004,40 @@ function describeCombatLevel(player, key, level, rich = false) {
   return stats.join('; ') + '.';
 }
 
+// Метки поиска описывают эффекты предметов, а рецепты наследуют метки компонентов.
+// Защита от входящего урона отделена от изменения/нанесения исходящего урона.
+const SHOP_STAT_ITEMS = {
+  damage: ['tech_gloves', 'shop_blade', 'shop_sprint_module', 'shop_damage_chip', 'shop_damage_matrix', 'shop_crit_console',
+    'analyst_bundle', 'full_stack_team', 'precision_suite', 'redline_kit', 'assault_overclock', 'capital_flow', 'dash_protocol',
+    'precision_reserve', 'financial_magnet', 'training_bracers', 'assault_protocol', 'execution_protocol',
+    'corp_combat_cluster', 'corp_quantum_bus', 'corp_support_core', 'corp_phase_drive', 'corp_analytics', 'corp_reactor', 'active_audit', 'evotor_connector'],
+  health: ['stability_belt', 'shop_whey', 'shop_health_cache', 'shop_health_reserve', 'backup_server', 'secure_perimeter', 'server_room',
+    'vitality_node', 'shield_routine', 'levelup_clinic', 'precision_reserve', 'health_firewall', 'recovery_belt', 'corp_citadel'],
+  speed: ['fast_service_shoes', 'shop_wraps', 'shop_speed_tracker', 'shop_sprint_module', 'shop_damage_matrix', 'sla_courier_kit', 'redline_kit',
+    'assault_overclock', 'learning_datahub', 'dash_protocol', 'rapid_recovery', 'magnetic_exchange', 'precision_reserve', 'critical_conveyor',
+    'dash_architect', 'assault_protocol', 'execution_protocol', 'corp_combat_cluster', 'corp_citadel', 'corp_support_core', 'corp_phase_drive', 'active_overclock', 'turbo_preworkout'],
+  critical: ['mssql_card', 'shop_scope', 'shop_crit_film', 'shop_crit_console', 'analyst_bundle', 'precision_suite', 'critical_conveyor', 'precision_scope', 'execution_protocol'],
+  regen: ['backup_coil', 'shop_ring', 'shop_oxygen_canister', 'shop_medical_station', 'backup_server', 'server_room', 'vitality_node', 'rapid_recovery', 'health_firewall', 'recovery_belt', 'corp_citadel', 'corp_support_core'],
+  cooldown: ['coffee_thermos', 'shop_gloves', 'shop_cooldown_relay', 'shop_cooldown_bus', 'sla_courier_kit', 'assault_overclock', 'rapid_recovery', 'corp_quantum_bus', 'active_overclock', 'turbo_preworkout', 'corp_reactor'],
+  dash: ['usb_adapter', 'shop_dash_oil', 'shop_dash_accumulator', 'redline_kit', 'dash_protocol', 'dash_architect', 'corp_phase_drive'],
+  magnet: ['floppy_magnet', 'shop_magnet_extension', 'shop_magnet_array', 'migration_toolkit', 'it_architect_kit', 'learning_datahub', 'magnetic_exchange', 'financial_magnet'],
+  experience: ['training_spreadsheet', 'shop_xp_cache', 'shop_xp_archive', 'migration_toolkit', 'full_stack_team', 'learning_datahub', 'capital_flow', 'financial_magnet', 'corp_combat_cluster', 'corp_analytics', 'crm_xp_campaign'],
+  currency: ['toner_fax', 'shop_cash_terminal', 'shop_cash_hub', 'capital_flow', 'magnetic_exchange', 'financial_magnet', 'corp_analytics', 'crm_xp_campaign'],
+  dodge: ['hasp_license', 'shop_dodge_driver', 'shop_dodge_grid', 'secure_perimeter', 'it_architect_kit', 'evasion_wall', 'guardian_protocol'],
+  defense: ['access_badge', 'shop_cloak', 'shop_boss_plating', 'shop_bulkhead', 'network_filter', 'evasion_wall', 'shield_routine', 'health_firewall', 'guardian_protocol', 'active_hotfix', 'active_firewall', 'corp_failover', 'sigur_day_pass'],
+  healing: ['ergonomic_chair', 'shop_level_care', 'shop_level_clinic', 'levelup_clinic', 'active_hotfix', 'active_incident_response', 'corp_failover', 'protein_shot'],
+  summons: ['corp_support_core']
+};
+const SHOP_STAT_ALIASES = {
+  damage: ['урон', 'урона', 'урону', 'дамаг', 'damage', 'dmg', 'атака'], health: ['hp', 'хп', 'здоровье', 'здоровья', 'жизни'],
+  speed: ['скорость', 'скорости', 'бег', 'бега'], critical: ['крит', 'крита', 'криты', 'crit'],
+  regen: ['реген', 'регенерация', 'регенерации', 'regen'], cooldown: ['кд', 'перезарядка', 'перезарядки', 'cooldown', 'скорострельность'],
+  dash: ['рывок', 'рывка', 'dash'], magnet: ['магнит', 'сбор', 'сбора', 'magnet'], experience: ['опыт', 'опыта', 'xp', 'exp'],
+  currency: ['валюта', 'фиткоины', 'фиткоинов', 'монеты', 'деньги', 'золото'], dodge: ['уклонение', 'уклонения', 'dodge'],
+  defense: ['защита', 'защиты', 'броня', 'щит', 'щита'], healing: ['лечение', 'лечения', 'хил', 'heal'], summons: ['призыв', 'призывы', 'призывов', 'помощники', 'помощников']
+};
+const SHOP_STAT_BY_ALIAS = new Map(Object.entries(SHOP_STAT_ALIASES).flatMap(([stat, aliases]) => aliases.map(alias => [alias, stat])));
+
 const LEGENDARY_MIGRATIONS = [
   { key: 'migration_85', name: 'Переход на 8.5', icon: '🟧', description: 'Новая платформа: герой становится плиткой со скруглёнными углами. +30% к урону, +25% к максимальному HP и +10% защиты от боссов. Тяжёлый интерфейс: −12% к скорости бега и перезарядка дольше на 10%.', apply: g => {
     g.player.migration85 = true;
@@ -3879,6 +4077,7 @@ class Game {
     this.sound.syncToggleButtons();
     this.pvp = null;
     this.pvpTimer = null;
+    this.setupMobileShell();
 
     this.MAP_SIZE = 4000;
     this.BOUND_MIN = 90;
@@ -3896,8 +4095,9 @@ class Game {
     this.gridPattern = this.ctx.createPattern(gridTile, 'repeat');
 
     this.resize();
-    window.addEventListener('resize', () => this.resize());
-    window.visualViewport?.addEventListener('resize', () => this.resize());
+    const resizeViewport = () => { this.updateMobileViewport(); this.syncMobileShell(); this.resize(); };
+    window.addEventListener('resize', resizeViewport);
+    window.visualViewport?.addEventListener('resize', resizeViewport);
 
     // Клавиатура
     this.keys = {};
@@ -8793,8 +8993,32 @@ class Game {
   }
 
   setShopSearch(value) {
-    this.shopSearch = String(value || '').trim().toLowerCase();
+    this.shopSearch = String(value || '').trim().toLowerCase().replace(/ё/g, 'е');
+    if (this.shopSearch && this.shopView !== 'sell') this.shopView = 'all';
     this.renderShop();
+  }
+
+  getShopItemSearchStats(key, seen = new Set()) {
+    if (seen.has(key)) return new Set();
+    const item = this.getShopCatalogItem(key);
+    if (!item) return new Set();
+    const stats = new Set(Object.entries(SHOP_STAT_ITEMS).filter(([, keys]) => keys.includes(key)).map(([stat]) => stat));
+    const next = new Set(seen).add(key);
+    for (const part of item.parts || []) for (const stat of this.getShopItemSearchStats(part, next)) stats.add(stat);
+    return stats;
+  }
+
+  matchesShopSearch(item, search) {
+    const query = String(search || '').toLowerCase().replace(/ё/g, 'е').trim();
+    if (!query) return true;
+    const stats = this.getShopItemSearchStats(item.key);
+    const text = `${item.name} ${item.desc || ''}`.toLowerCase().replace(/ё/g, 'е');
+    return query.replace(/(?:кд|перезарядка|перезарядки)\s+рывка/g, 'рывок').replace(/скорость\s+атаки/g, 'скорострельность').split(/\s+/).every(word => {
+      const stat = SHOP_STAT_BY_ALIAS.get(word);
+      if (stat === 'health') return stats.has('health') || stats.has('healing') || stats.has('regen');
+      if (stat === 'cooldown') return stats.has('cooldown') || stats.has('dash');
+      return stat ? stats.has(stat) : text.includes(word);
+    });
   }
 
   selectShopItem(key) {
@@ -9009,10 +9233,10 @@ class Game {
         if (this.shopView === 'actives' && item.shopKind !== 'active') return false;
         if (this.shopView === 'consumables' && item.shopKind !== 'consumable') return false;
         if (this.shopView === 'favorites' && !this.favoriteShopItems?.has(item.key)) return false;
-        return !search || `${item.name} ${item.desc}`.toLowerCase().includes(search);
+        return this.matchesShopSearch(item, search);
       });
     }
-    if (this.shopView === 'sell' && search) items = items.filter(item => `${item.name} ${item.desc}`.toLowerCase().includes(search));
+    if (this.shopView === 'sell' && search) items = items.filter(item => this.matchesShopSearch(item, search));
     for (const item of items) {
       const selected = this.selectedShopInventory
         ? this.selectedShopInventory.type === item.inventoryType && this.selectedShopInventory.index === item.inventoryIndex
@@ -9297,10 +9521,50 @@ class Game {
   updateConsumableHUD() {
     this.updateInventoryHUD();
   }
-  setMobileMenuScroll(enabled) {
-    const active = Boolean(enabled && this.isPhoneDevice());
-    document.documentElement.classList.toggle('mobile-menu-scroll', active);
-    document.body.classList.toggle('mobile-menu-scroll', active);
+  isMobileLayout() {
+    return Boolean(window.matchMedia?.('(max-width:1300px) and (pointer:coarse)').matches);
+  }
+
+  updateMobileViewport() {
+    const style = document.documentElement.style;
+    if (!this.isMobileLayout()) { style.removeProperty('--mobile-height'); return; }
+    const height = Math.round(window.visualViewport?.height || window.innerHeight);
+    if (height > 0) style.setProperty('--mobile-height', `${height}px`);
+  }
+
+  syncMobileShell() {
+    const mobile = this.isMobileLayout();
+    const menuOpen = mobile && Array.from(document.querySelectorAll('.modal-overlay')).some(modal =>
+      !modal.hidden && window.getComputedStyle(modal).display !== 'none');
+    document.documentElement.classList.toggle('mobile-menu-scroll', menuOpen);
+    document.body.classList.toggle('mobile-menu-scroll', menuOpen);
+    document.body.classList.toggle('mobile-modal-open', menuOpen);
+    const portraitGame = mobile && !menuOpen && this.player?.hp > 0 && window.matchMedia('(orientation:portrait)').matches;
+    document.body.classList.toggle('mobile-landscape-required', Boolean(portraitGame));
+  }
+
+  setupMobileShell() {
+    this.updateMobileViewport();
+    this.syncMobileShell();
+    const schedule = () => {
+      if (this.mobileShellFrame) return;
+      this.mobileShellFrame = requestAnimationFrame(() => {
+        this.mobileShellFrame = null;
+        this.syncMobileShell();
+      });
+    };
+    this.mobileShellObserver = new MutationObserver(schedule);
+    for (const modal of document.querySelectorAll('.modal-overlay')) {
+      this.mobileShellObserver.observe(modal, { attributes:true, attributeFilter:['style', 'class', 'hidden'] });
+    }
+    const media = window.matchMedia?.('(max-width:1300px) and (pointer:coarse)');
+    media?.addEventListener?.('change', () => { this.updateMobileViewport(); this.syncMobileShell(); this.resize(); });
+    this.syncMobileShell();
+  }
+
+  setMobileMenuScroll() {
+    // Источник состояния — все открытые окна, включая лвлап и сетевые диалоги.
+    this.syncMobileShell();
   }
   togglePause() {
     if (this.isBattleRoyale) return;
@@ -13872,6 +14136,7 @@ class Game {
     const backpackBox = document.getElementById('hud-backpack');
     const consumableBox = document.getElementById('hud-consumables');
     if (!box || !passiveBox || !backpackBox || !consumableBox) return;
+    const scroll = { passives:passiveBox.scrollLeft, consumables:consumableBox.scrollLeft };
     box.innerHTML = '';
     passiveBox.innerHTML = '';
     backpackBox.innerHTML = '';
@@ -13901,7 +14166,8 @@ class Game {
           this.useInventorySlot(i);
         };
       }
-      this.bindInventoryDrag(entry, 'main', i, Boolean(slot));
+      // На телефоне HUD прокручивается свайпом; перенос вещей остаётся в магазине.
+      if (!this.isMobileLayout()) this.bindInventoryDrag(entry, 'main', i, Boolean(slot));
       passiveBox.appendChild(entry);
     }
     for (let i = 0; i < 3; i++) {
@@ -13932,6 +14198,8 @@ class Game {
       }
       consumableBox.appendChild(entry);
     }
+    passiveBox.scrollLeft = scroll.passives;
+    consumableBox.scrollLeft = scroll.consumables;
   }
   updateActiveHUD() {
     for (let i = 0; i < 4; i++) {

@@ -1,0 +1,8 @@
+Красный протокол / Red Protocol — original game composition, 148 BPM.
+Normal and miniboss: v4 arrangements, 64 bars (103.78378 s) each.
+Big boss: v5 orchestral theme, 32 bars (51.89189 s).
+Rendered as complete arrangements, not additive boss layers. Cyclic preroll preserves reverb tails at loop boundaries.
+Stereo 44.1 kHz MP3 VBR quality 2. Same synthesis, orchestral samples and mix as the approved demos.
+Orchestral samples: VSCO 2 Community Edition, Versilian Studios / Sam Gossner, CC0 1.0.
+https://github.com/sgossner/VSCO-2-CE
+License included in LICENSE-CC0.txt.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1С:Фитнес Клуб КОРП 2.7.1</title>
+<title>1С:Фитнес Клуб КОРП 2.8.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -729,6 +729,9 @@
   .dota-shop-item-card { position:relative; min-width:0; min-height:70px; }
   .dota-shop-item { width:100%; height:100%; min-height:70px; padding:5px 25px 5px 5px; display:grid; grid-template-columns:30px 1fr; grid-template-rows:1fr auto; gap:3px 5px; text-align:left; color:#e8edf2; background:#2a3948; border:1px solid #526477; cursor:pointer; }
   .dota-shop-item:hover,.dota-shop-item.selected { background:#3b5368; border-color:#e5c66c; }
+  .dota-shop-item.tier-4 { border-color:#c99aff; background:linear-gradient(135deg,#3d2d52,#263446); }
+  .dota-shop-item.tier-4.selected { border-color:#f4dcff; box-shadow:inset 0 0 12px #c99aff55; }
+  .dota-shop-item.tier-4 .dota-shop-item-price { color:#e2bdff; }
   .dota-shop-item-icon { grid-row:1/3; width:30px; height:30px; display:grid; place-items:center; background:linear-gradient(145deg,#71859a,#243241); border:1px solid #9baaba; font-size:20px; }
   .dota-shop-item-name { font-size:9px; line-height:1.2; overflow-wrap:anywhere; }
   .dota-shop-item-price { align-self:end; color:#e5c66c; font-size:9px; }
@@ -1007,7 +1010,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v2.7.1 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v2.8.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1182,7 +1185,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.7.1</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v2.8.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1193,9 +1196,10 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>2.7.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>2.8.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
+            <div class="release-notes"><h3>Версия 2.8.0 — «Каждому отделу — свой билд»</h3><p>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.</p></div>
             <div class="release-notes">
               <h3>Версия 2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3>
               <p>Ежедневный забег получил смены «Ночная резервная копия» и «Оптимизация бюджета», более сильные баффы и дебаффы и отдельный рейтинг. Новый трек «До полуночи» становится агрессивнее на боссах; музыку можно назначить отдельно для каждого режима.</p>
@@ -1373,7 +1377,8 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p><p>Новая передача изменений мира независимыми пакетами, координаты игроков и мобов — 20 раз в секунду. Исправлены общий счётчик урона гостей, рывки третьего игрока, повторные попадания при замене объектов, зависание выбора класса и остановка матча после смерти хоста. Хост после выбывания остаётся сервером, пока игра открыта; его персонаж не лечится, не атакует и не собирает предметы. Добавлены две ежедневные смены, усилены положительные и отрицательные эффекты старых и реализованы отсутствовавшие эффекты. Для сетевой игры всем участникам нужна обновлённая игра и новое лобби.</p><p>Описания ежедневных смен в таблице рекордов приведены к общему светлому стилю. Исправлено сохранение ежедневных рекордов.</p><p>Добавлен оригинальный синтезированный трек «До полуночи» для ежедневного забега: синкопированный бас, упругий бит и мотив часов. На мини-боссах усиливаются ударные, открывается резонансный бас и появляются резкие синтезаторные акценты; на больших боссах добавляются тяжёлые квинты, металлическая перкуссия и сбивки. Темп остаётся 126 BPM, после победы дополнительные слои плавно затихают. Трек доступен для любого режима; в настройках появилась отдельная сохраняемая предустановка ежедневного забега, где «До полуночи» выбран по умолчанию. В главном меню оставлена краткая сводка, подробности собраны в полной истории обновлений.</p><p>Исправлены тикеты М.В.: обычное выживание больше не требует отсутствия урона, а задание «без урона» отслеживает сами попадания, включая урон зоны. Согласованы таймер и прогресс инверсии. Временные усиления мобов снимаются при завершении и сбросе задания; эффекты тикетов гостей применяются к общему миру через хоста. Убийства и устранение стрелков засчитываются гостям, подкрепления учитывают размер лобби, новые тикеты не выдаются выбывшим игрокам и вплотную к большому боссу. М.В. появляется по отказам гостей и после смерти хоста, с учётом границ увеличенной карты.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.8.0 — «Каждому отделу — свой билд»</h3></summary><p>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.</p></details>
+        <details class="release-notes patch-minor"><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p><p>Новая передача изменений мира независимыми пакетами, координаты игроков и мобов — 20 раз в секунду. Исправлены общий счётчик урона гостей, рывки третьего игрока, повторные попадания при замене объектов, зависание выбора класса и остановка матча после смерти хоста. Хост после выбывания остаётся сервером, пока игра открыта; его персонаж не лечится, не атакует и не собирает предметы. Добавлены две ежедневные смены, усилены положительные и отрицательные эффекты старых и реализованы отсутствовавшие эффекты. Для сетевой игры всем участникам нужна обновлённая игра и новое лобби.</p><p>Описания ежедневных смен в таблице рекордов приведены к общему светлому стилю. Исправлено сохранение ежедневных рекордов.</p><p>Добавлен оригинальный синтезированный трек «До полуночи» для ежедневного забега: синкопированный бас, упругий бит и мотив часов. На мини-боссах усиливаются ударные, открывается резонансный бас и появляются резкие синтезаторные акценты; на больших боссах добавляются тяжёлые квинты, металлическая перкуссия и сбивки. Темп остаётся 126 BPM, после победы дополнительные слои плавно затихают. Трек доступен для любого режима; в настройках появилась отдельная сохраняемая предустановка ежедневного забега, где «До полуночи» выбран по умолчанию. В главном меню оставлена краткая сводка, подробности собраны в полной истории обновлений.</p><p>Исправлены тикеты М.В.: обычное выживание больше не требует отсутствия урона, а задание «без урона» отслеживает сами попадания, включая урон зоны. Согласованы таймер и прогресс инверсии. Временные усиления мобов снимаются при завершении и сбросе задания; эффекты тикетов гостей применяются к общему миру через хоста. Убийства и устранение стрелков засчитываются гостям, подкрепления учитывают размер лобби, новые тикеты не выдаются выбывшим игрокам и вплотную к большому боссу. М.В. появляется по отказам гостей и после смерти хоста, с учётом границ увеличенной карты.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры. Добавлены хаотичные тикеты Максима Воронина: отказ или игнор сразу вызывает М.В., три провала принятых тикетов — тоже; задания могут инвертировать или поворачивать управление, усиливать и множить мобов, отключать рывок. Усилены недостатки мощных предметов и комплектов; рикошет, мультивыстрел, замедление и поджог дают боевой бонус с соответствующим штрафом к перезарядке, урону или скорости и теперь имеют по три уровня. Рикошет даёт 1/2/3 отскока, мультивыстрел — +1/+2/+3 снаряда, замедление — 15/30/45%, поджог — шанс 30/50/65%; взрыв от поджига и замедления срабатывает на их максимальном уровне. Характеристики способностей и снаряжения описаны понятными процентами и величинами. Мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты. Проведена оптимизация производительности без визуальных изменений: внедрена пространственная сетка поиска целей и столкновений, кэширование глифов и свечений на Canvas, точечное обновление HUD и тикетов при изменении значений, однопроходная сериализация мира для WebRTC и параллельная загрузка таблиц лидеров. Исправлены пересчёт характеристик и здоровья при продаже и перемещении предметов между инвентарём и рюкзаком, рецепт и сборка комплекта «Архитектор рывка», работа временных усилений урона и отображение множителя опыта в характеристиках. Кислотная лужа мини-босса «Акт налоговой проверки» теперь наносит урон игрокам вместо мобов, защита от боссов учитывается на всех атаках боссов и больше не срабатывает на соперников с ником «Босс», а неуязвимый преследователь RuDesktop не подвержен отталкиванию, контролю, ветру и эволюциям оружия. В Battle Royale и массовых матчах очередь накопленных повышений уровня открывается подряд без сброса подсказки, клавиша L не завершает забег во время ввода текста, а в никах поддерживаются буквы «ё» и «Ё». Исправлены маршрутизация урона, активных умений, выстрелов и выбор целей в сетевых матчах на 3–8 игроков, очистка WebRTC-подписок при выходе соперника и отправка рекордов через проверяемую сессию забега.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.5.0 — «Осенняя чистка»</h3></summary><p>Расходники складываются до четырёх штук в каждом из четырёх отдельных слотов. Одинаковые активные предметы можно покупать в разные слоты; у копий общая перезарядка. Рецепты сохраняют бонусы компонентов. Магазин получил каталог, категории, поиск, избранное, рецепты и продажу предметов за половину цены. Добавлены предметы и комплекты с усилениями здоровья, скорости, урона, критического шанса, регенерации, перезарядки, опыта, фиткоинов, уклонения, защиты от боссов, радиуса сбора и рывка. В карточке предмета можно посмотреть рецепты, в которые он входит. Исправлены покупки комплектов с учётом рюкзака. На ПК настраиваются клавиши шести слотов предметов, четырёх слотов расходников, тикетов и звонков отдела продаж. После каждого нового звонка отдела продаж цены магазина повышаются на 5%, даже если звонок сброшен. Мобильный интерфейс включается только на телефонах. Таблица рекордов ставит результаты свежих версий выше старых. Меню паузы дополнено настройками; принятый тикет на телефоне показывается под баффами с заданием и прогрессом. Урон больших боссов увеличен; новые тикеты не выдаются во время боя с большим боссом и за 40 секунд до его появления. Каждые 13 минут усиливаются обычные мобы. После 20-й минуты появляются новые усиленные мини-боссы с отдельными атаками, миньонами и видимыми аурами. С 30-й минуты большие боссы начинают преследовать игрока. Для наносящих урон активных умений увеличен урон на 3-м, 4-м и 5-м уровнях; повышен шанс поджога у поджигающих снарядов. При максимальном уровне поджига и заморозки их эффекты объединяются во взрыв. В магазине появилась покупка полного комплекта одной кнопкой. Добавлены три неактивных слота рюкзака и перетаскивание предметов между инвентарём и рюкзаком.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.4.0 — «Комплект и контроль»</h3></summary><p>Мобильная версия получила полноэкранный горизонтальный режим и переработанный боевой интерфейс: круговое управление движением, рывок под пальцем, активные умения ромбом справа и расходники в ряд снизу. Тикеты и панель большого босса стали компактнее; принять тикет можно без прокрутки. Настройки звука и бита перенесены в меню паузы. Награда за тикет теперь зависит от цены следующего уровня: на поздних этапах задание приносит до 1,6 требования опыта, поэтому каждые несколько минут сдвигает прогресс заметнее. Активные умения в выборе прокачки отмечены меткой [АКТИВНОЕ]. Умения, активные предметы и расходники на телефоне срабатывают при касании даже во время движения. RuDesktop не выбирается автоатаками целью. Первые две минуты PvP игроки не выбираются целью снарядов, лазеров и активных атак. В Battle Royale защита от урона начинается после выбора класса всеми игроками и даёт время на синхронизацию старта. В рекорд передаётся комплект игрока на финише. Недовольный клиент с возвратом при касании забирает 5% фиткоинов; возврат срабатывает не чаще раза в три секунды на игрока. Хост удаляет завершённые PvP-комнаты из Firebase. Магазин получил активные предметы, копии в стопках и рецепты из двух и трёх компонентов; получение фиткоинов с дискет снижено вдвое.</p></details>
@@ -1407,6 +1412,7 @@
             <button class="shop-tab selected" data-shop-view="all" onclick="game.setShopView('all')">Все</button>
             <button class="shop-tab" data-shop-view="basics" onclick="game.setShopView('basics')">Основные</button>
             <button class="shop-tab" data-shop-view="upgrades" onclick="game.setShopView('upgrades')">Улучшения</button>
+            <button class="shop-tab" data-shop-view="elite" onclick="game.setShopView('elite')">IV тир · КОРП</button>
             <button class="shop-tab" data-shop-view="actives" onclick="game.setShopView('actives')">Активные</button>
             <button class="shop-tab" data-shop-view="consumables" onclick="game.setShopView('consumables')">Расходники</button>
             <button class="shop-tab" data-shop-view="favorites" onclick="game.setShopView('favorites')">★ Избранное</button>
@@ -1695,7 +1701,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '2.7.1';
+const GAME_VERSION = '2.8.0';
 const MAX_PLAYER_DODGE = 0.50;
 const NETWORK_PROTOCOL = 2;
 const DAILY_MODIFIERS = [
@@ -2831,31 +2837,18 @@ const PASSIVES_DEF = {
   }
 };
 
-const PASSIVE_MULTIPLIERS = new Set(['cdMult']);
+const PASSIVE_MULTIPLIERS = new Set(['cdMult', 'dashCooldownMult']);
 const PASSIVE_FIXED_STATS = new Set(['hasBackupShield', 'hasShoeTrail', 'backupInterval', 'backupDuration']);
 
 function applyPassiveLevel(player, key, fromLevel, toLevel, mode = 'solo') {
-  const definition = PASSIVES_DEF[key];
-  const previous = definition.levels[fromLevel - 1] || {};
-  const current = definition.levels[toLevel - 1];
-  const profile = (stat, value, level) => {
-    if (mode !== 'pvp') return value;
-    if (key === 'backup_cron' && stat === 'backupInterval') return [44, 42, 40, 38, 36][level - 1];
-    if (key === 'backup_cron' && stat === 'backupDuration') return 2;
-    if (stat === 'dodge') return value * 0.6;
-    if (stat === 'regen') return value * 0.4;
-    if (stat === 'xpMult') return value * 0.5;
-    if (stat === 'magnetMult') return value * 0.7;
-    if (stat === 'dmgMult' && (key === 'overtime_pizza' || key === 'evotor_paid')) return value * 0.5;
-    if (stat === 'cdMult' && key === 'coffee_machine') return 1 + (value - 1) * 0.65;
-    return value;
-  };
+  const previous = passiveLevelStats(player, key, fromLevel, mode);
+  const current = passiveLevelStats(player, key, toLevel, mode);
   for (const stat of new Set([...Object.keys(previous), ...Object.keys(current)])) {
-    const before = profile(stat, previous[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0), fromLevel);
-    const after = profile(stat, current[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0), toLevel);
+    const before = previous[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0);
+    const after = current[stat] ?? (PASSIVE_MULTIPLIERS.has(stat) ? 1 : 0);
     if (PASSIVE_FIXED_STATS.has(stat)) player[stat] = after;
     else if (PASSIVE_MULTIPLIERS.has(stat)) player[stat] *= after / before;
-    else player[stat] += after - before;
+    else player[stat] = (player[stat] || 0) + after - before;
   }
 }
 
@@ -2872,7 +2865,7 @@ const ACTIVE_SKILLS_DEF = {
     desc: 'Мгновенное исцеление 40% HP, взрывная ударная волна отталкивания и золотая голограмма на 3.5с!',
     baseCd: 22,
     cast: (g, lvl) => {
-      const heal = Math.round(g.player.maxHp * (0.35 + lvl * 0.05));
+      const heal = Math.round(classValue(g, 'act_backup_dt', g.player.maxHp * (0.35 + lvl * 0.05), 1.15));
       g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal);
       g.player.shieldTimer = 3.5;
       g.sound.playTone(700, 'sine', 0.3, 0.25);
@@ -2931,8 +2924,8 @@ const ACTIVE_SKILLS_DEF = {
         const selfBurn = Math.max(1, Math.round(g.player.hp * 0.06));
         g.player.hp = Math.max(1, g.player.hp - selfBurn);
       }
-      g.player.turboBuffTimer = 6.5 + lvl * 0.5;
-      g.player.speedBuffTimer = 6.5 + lvl * 0.5;
+      g.player.turboBuffTimer = classValue(g, 'act_turbo_mssql', 6.5 + lvl * 0.5, 1.15);
+      g.player.speedBuffTimer = g.player.turboBuffTimer;
       g.addPopup(g.player.x, g.player.y - 30, '🚀 TURBO MSSQL: 2X АТАКА (ПЕРЕГРЕВ RAM)!', '#00cec9');
     }
   },
@@ -2972,7 +2965,7 @@ const ACTIVE_SKILLS_DEF = {
       g.sound.skillCast();
       for (const e of g.enemies) {
         if (e.is24hPursuer) continue;
-        e.freezeTimer = Math.max(e.freezeTimer || 0, e.isBoss ? 0.7 + lvl * 0.2 : 1.8 + lvl * 0.25);
+        e.freezeTimer = Math.max(e.freezeTimer || 0, e.isBoss ? 0.7 + lvl * 0.2 : classValue(g, 'act_messenger_blast', 1.8 + lvl * 0.25, 1.20));
         g.dealActiveSkillDamage(e, e.isBoss ? 80 + lvl * 25 : 35 + lvl * 15, lvl, ACTIVE_SKILLS_DEF.act_messenger_blast.name);
         g.createHitFX(e.x, e.y, '#74b9ff', 3);
       }
@@ -2989,8 +2982,9 @@ const ACTIVE_SKILLS_DEF = {
         if (e.is24hPursuer) continue;
         const dx = e.x - g.player.x, dy = e.y - g.player.y;
         const d = Math.hypot(dx, dy);
-        if (d < 310) {
-          const push = (310 - d) * 0.55;
+        const radius = classValue(g, 'act_sigur_lockdown', 310, 1.15);
+        if (d < radius) {
+          const push = (radius - d) * 0.55;
           e.x += (dx / (d || 1)) * push;
           e.y += (dy / (d || 1)) * push;
           g.dealActiveSkillDamage(e, (e.isBoss ? 90 : 120) + lvl * 30, lvl, ACTIVE_SKILLS_DEF.act_sigur_lockdown.name);
@@ -3047,7 +3041,7 @@ const ACTIVE_SKILLS_DEF = {
     desc: 'Счёт согласован, модуль подключён: временно +60% к урону и +10% к шансу крита, но тяжёлая синхронизация снижает скорость бега на 8%.',
     baseCd: 26,
     cast: (g, lvl) => {
-      const dur = 8 + lvl * 1.5;
+      const dur = classValue(g, 'act_evotor_approval', 8 + lvl * 1.5, 1.20);
       g.player.damageBuffMult = Math.max(g.player.damageBuffTimer > 0 ? (g.player.damageBuffMult || 1) : 1, 1.60);
       g.player.damageBuffTimer = Math.max(g.player.damageBuffTimer, dur);
       g.player.evotorSyncTimer = Math.max(g.player.evotorSyncTimer || 0, dur);
@@ -3061,7 +3055,7 @@ const ACTIVE_SKILLS_DEF = {
     desc: 'Автозадача сработала вовремя: лечит героя, выдаёт дискету опыта и ускоряет набор опыта на 35% на время акции.',
     baseCd: 24,
     cast: (g, lvl) => {
-      const heal = Math.round(g.player.maxHp * (0.20 + lvl * 0.03));
+      const heal = Math.round(classValue(g, 'act_membership_reactivation', g.player.maxHp * (0.20 + lvl * 0.03), 1.20));
       g.player.hp = Math.min(g.player.maxHp, g.player.hp + heal);
       g.gems.push({ x: g.player.x + 12, y: g.player.y, xp: 16 + lvl * 4, col: '#55efc4' });
       g.player.xpEventMult = Math.max(g.player.xpBoostTimer > 0 ? (g.player.xpEventMult || 1) : 1, 1.35);
@@ -3436,6 +3430,48 @@ const STORE_RECIPES = {
   execution_protocol: { parts: ['precision_scope', 'tech_gloves', 'training_spreadsheet'], name: 'Протокол точечного удара', icon: '💥', tier: 3, desc: 'Итоговые характеристики: +20% к урону, +16% к шансу критического удара и +10% к опыту, но скорость бега ниже на 8%.', apply: p => { p.dmgMult += 0.08; p.critChance += 0.04; p.speedMult -= 0.08; } }
 };
 
+// IV тир покупается напрямую: дорогие предметы занимают обычные слоты.
+// maxOwned учитывает и экипировку, и рюкзак, не позволяя обойти лимит переносом.
+Object.assign(STORE_PASSIVES_DEF, {
+  corp_combat_cluster: { name: 'КОРП: боевой кластер', icon: '🗄️', tier: 4, cost: 2600, stock: 1, maxOwned: 1,
+    desc: '+65% к урону, но −8% скорости бега и −4% опыта. Можно иметь один экземпляр.',
+    apply: p => { p.dmgMult += 0.65; p.speedMult -= 0.08; p.xpMult -= 0.04; } },
+  corp_citadel: { name: 'КОРП: цитадель серверной', icon: '🏰', tier: 4, cost: 2400, stock: 1, maxOwned: 1,
+    desc: '+180 максимального HP и +4 HP/с регенерации, но −8% скорости бега. Можно иметь один экземпляр.',
+    apply: p => { p.maxHp += 180; p.regen += 4; p.speedMult -= 0.08; } },
+  corp_quantum_bus: { name: 'КОРП: квантовая шина', icon: '⚛️', tier: 4, cost: 2800, stock: 1, maxOwned: 1,
+    desc: 'Перезарядка оружия и умений короче на 28%, но −8% урона. Можно иметь один экземпляр.',
+    apply: p => { p.cdMult *= 0.72; p.dmgMult -= 0.08; } },
+  corp_support_core: { name: 'КОРП: центр эскалаций', icon: '🛰️', tier: 4, cost: 2600, stock: 1, maxOwned: 1,
+    desc: '+55% к урону призывов и +2 HP/с регенерации, но −5% скорости бега. Можно иметь один экземпляр.',
+    apply: p => { p.summonDamageBonus = (p.summonDamageBonus || 0) + 0.55; p.regen += 2; p.speedMult -= 0.05; } },
+  corp_phase_drive: { name: 'КОРП: фазовый привод', icon: '🌀', tier: 4, cost: 2200, stock: 1, maxOwned: 1,
+    desc: '+24% скорости бега, перезарядка рывка короче на 30%, но −8% урона. Можно иметь один экземпляр.',
+    apply: p => { p.speedMult += 0.24; p.dashCooldownMult *= 0.70; p.dmgMult -= 0.08; } },
+  corp_analytics: { name: 'КОРП: центр аналитики', icon: '🏦', tier: 4, cost: 2500, stock: 1, maxOwned: 1,
+    desc: '+35% опыта и +30% фиткоинов, но −10% урона. Можно иметь один экземпляр.',
+    apply: p => { p.xpMult += 0.35; p.currencyMult += 0.30; p.dmgMult -= 0.10; } }
+});
+Object.assign(STORE_ACTIVES_DEF, {
+  corp_failover: { name: 'КОРП: аварийный дата-центр', icon: '🏢', tier: 4, cost: 3000, stock: 1, maxOwned: 1, type: 'active', cooldown: 48,
+    desc: 'Восстанавливает 55% максимального HP, даёт щит на 3 с и удаляет вражеские снаряды в радиусе 340. КД 48 с. Можно иметь один экземпляр.',
+    use: g => {
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + g.player.maxHp * 0.55);
+      g.player.shieldTimer = Math.max(g.player.shieldTimer, 3);
+      g.enemyProjectiles = g.enemyProjectiles.filter(p => Math.hypot(p.x - g.player.x, p.y - g.player.y) > 340);
+      g.addPopup(g.player.x, g.player.y - 30, '🏢 РЕЗЕРВНЫЙ ДАТА-ЦЕНТР В СТРОЮ', '#c99aff'); return true;
+    } },
+  corp_reactor: { name: 'КОРП: реактор продакшна', icon: '☢️', tier: 4, cost: 3200, stock: 1, maxOwned: 1, type: 'active', cooldown: 60,
+    desc: 'На 9 с: +85% урона и удвоенная скорострельность оружия. Запуск тратит 10% текущего HP, не ниже 1. КД 60 с. Можно иметь один экземпляр.',
+    use: g => {
+      g.player.hp = Math.max(1, g.player.hp - Math.max(1, Math.round(g.player.hp * 0.10)));
+      g.player.damageBuffMult = Math.max(g.player.damageBuffTimer > 0 ? g.player.damageBuffMult || 1 : 1, 1.85);
+      g.player.damageBuffTimer = Math.max(g.player.damageBuffTimer || 0, 9);
+      g.player.turboBuffTimer = Math.max(g.player.turboBuffTimer || 0, 9);
+      g.addPopup(g.player.x, g.player.y - 30, '☢️ РЕАКТОР ПРОДАКШНА ЗАПУЩЕН', '#c99aff'); return true;
+    } }
+});
+
 const CONSUMABLES_DEF = {
   protein_shot: {
     name: 'Интеграция «Питание по API»', icon: '🥤', cost: 135, stock: 2, maxStack: 4,
@@ -3570,6 +3606,170 @@ const REPEATABLE_UPGRADES = [
     }
   }
 ];
+
+// Специализации 2.8: чужие способности доступны без классового усиления.
+Object.assign(WEAPONS_DEF, {
+  batch_query: { name: 'Пакетный запрос', icon: '🗃️', baseCooldown: 2.4, baseDmg: 62,
+    desc: 'Помечает область возле ближайшей цели; через 0,65 с выполняет запрос по всей группе. Радиус и урон растут с уровнем.' },
+  ticket_queue: { name: 'Очередь обращений', icon: '📨', baseCooldown: 1.8, baseDmg: 15,
+    desc: 'Выпускает несколько самонаводящихся заявок. Число заявок и урон растут с уровнем.' }
+});
+
+const NEW_CLASS_PASSIVES = {
+  server_ups: { name: 'ИБП серверной', icon: '🔋',
+    levels: [12, 19, 26, 33, 40].map((maxHp, i) => ({ maxHp, speedMult: -0.01 * (i + 1) })) },
+  transfer_route: { name: 'Маршрут переноса', icon: '🗺️',
+    levels: [0.94, 0.89, 0.84, 0.80, 0.76].map((dashCooldownMult, i) => ({ dashCooldownMult, magnetMult: -0.03 * (i + 1) })) },
+  hot_patch: { name: 'Горячий патч', icon: '🩺',
+    levels: [0.10, 0.15, 0.20, 0.25, 0.30].map((dmgMult, i) => ({ dmgMult, xpMult: -0.02 - i * 0.01 })) },
+  support_knowledge: { name: 'База знаний техподдержки', icon: '📖',
+    levels: [0.08, 0.12, 0.16, 0.20, 0.24].map((summonDamageBonus, i) => ({ summonDamageBonus, cdMult: 1.02 + i * 0.015 })) }
+};
+Object.assign(PASSIVES_DEF, NEW_CLASS_PASSIVES);
+
+const ABILITY_CLASSES = {
+  technician: ['turnstile', 'iron_logic', 'egais_laser', 'fusion_gate', 'backup_cron', 'hasp_emu', 'evotor_paid', 'server_ups',
+    'act_sigur_lockdown', 'act_atol_receipt_rain', 'act_shtrikh_reconciliation', 'act_messenger_blast', 'act_emergency_ups', 'ricochet'],
+  courier: ['table_chart', 'protein', 'heavy_archive', 'fusion_attendance', 'shoe_covers', 'server_x64', 'rudesktop_lag', 'transfer_route',
+    'act_lavender_raf', 'act_evotor_approval', 'act_backup_dt', 'act_urgent_transfer', 'act_unloading', 'multishot'],
+  developer: ['syntax', 'keys', 'batch_query', 'fusion_audit', 'sql_indexes', 'cert_specialist', 'overtime_pizza', 'hot_patch',
+    'act_kill_sessions', 'act_turbo_mssql', 'act_cache_purge', 'act_transaction_rollback', 'act_hot_deploy', 'burnshot'],
+  support: ['support_phone', 'cache_aura', 'ticket_queue', 'fusion_callcenter', 'messenger_hub', 'try_except', 'mango_hold', 'support_knowledge',
+    'act_support_call', 'act_membership_reactivation', 'act_technician_drone', 'act_senior_escalation', 'act_remote_restore', 'slowshot']
+};
+const ABILITY_CLASS_BY_KEY = Object.fromEntries(Object.entries(ABILITY_CLASSES).flatMap(([id, keys]) => keys.map(key => [key, id])));
+const hasClassAffinity = (player, key) => Boolean(ABILITY_CLASS_BY_KEY[key] && player?.classId === ABILITY_CLASS_BY_KEY[key]);
+const classValue = (g, key, value, multiplier) => value * (hasClassAffinity(g.player, key) ? multiplier : 1);
+const CLASS_ACTIVE_DAMAGE = new Set(['act_atol_receipt_rain', 'act_shtrikh_reconciliation', 'act_kill_sessions', 'act_cache_purge', 'act_hot_deploy']);
+function classActiveDamageMultiplier(player, key) {
+  return hasClassAffinity(player, key) && CLASS_ACTIVE_DAMAGE.has(key) ? 1.15 : 1;
+}
+function passiveLevelStats(player, key, level, mode = 'solo') {
+  const raw = PASSIVES_DEF[key]?.levels[level - 1] || {};
+  return Object.fromEntries(Object.entries(raw).map(([stat, initial]) => {
+    let value = initial;
+    if (hasClassAffinity(player, key) && typeof value === 'number') {
+      if (stat === 'backupDuration') value *= 1.20;
+      else if (!PASSIVE_FIXED_STATS.has(stat)) {
+        if (PASSIVE_MULTIPLIERS.has(stat) && value < 1) value = 1 - (1 - value) * 1.20;
+        else if (!PASSIVE_MULTIPLIERS.has(stat) && value > 0) value *= ['xpMult', 'currencyMult'].includes(stat) ? 1.10 : 1.20;
+      }
+    }
+    if (mode === 'pvp') {
+      if (key === 'backup_cron' && stat === 'backupInterval') value = [44, 42, 40, 38, 36][level - 1];
+      else if (key === 'backup_cron' && stat === 'backupDuration') value = hasClassAffinity(player, key) ? 2.4 : 2;
+      else if (['dodge', 'regen', 'xpMult', 'magnetMult'].includes(stat)) value *= { dodge: 0.6, regen: 0.4, xpMult: 0.5, magnetMult: 0.7 }[stat];
+      else if (stat === 'dmgMult' && ['overtime_pizza', 'evotor_paid', 'hot_patch'].includes(key)) value *= 0.5;
+      else if (stat === 'cdMult' && key === 'coffee_machine') value = 1 + (value - 1) * 0.65;
+    }
+    return [stat, value];
+  }));
+}
+function describePassiveStats(stats) {
+  const labels = { critChance: 'шанс крита', dmgMult: 'урон', speedMult: 'скорость', xpMult: 'опыт', currencyMult: 'фиткоины',
+    magnetMult: 'радиус сбора', dodge: 'уклонение', summonDamageBonus: 'урон призывов' };
+  return Object.entries(stats).map(([stat, value]) => {
+    if (stat === 'hasBackupShield' || stat === 'hasShoeTrail') return value && stat === 'hasShoeTrail' ? 'оставляет дорожку' : '';
+    if (stat === 'backupInterval') return `щит каждые ${formatStatNumber(value)} с`;
+    if (stat === 'backupDuration') return `длительность щита ${formatStatNumber(value)} с`;
+    if (stat === 'regen') return `${value >= 0 ? '+' : ''}${formatStatNumber(value)} HP/с`;
+    if (stat === 'maxHp') return `+${formatStatNumber(value)} максимального HP`;
+    if (stat === 'cdMult' || stat === 'dashCooldownMult') return formatCooldownDelta(value, stat === 'cdMult' ? 'Перезарядка' : 'Перезарядка рывка');
+    return `${value >= 0 ? '+' : ''}${formatPercent(value * 100)}% ${labels[stat] || stat}`;
+  }).filter(Boolean).join('; ') + '.';
+}
+for (const def of Object.values(NEW_CLASS_PASSIVES)) {
+  def.levelDescriptions = def.levels.map(describePassiveStats);
+  def.desc = def.levelDescriptions[0];
+}
+
+Object.assign(ACTIVE_SKILLS_DEF, {
+  act_urgent_transfer: { name: 'Срочный перенос', icon: '📦', baseCd: 25,
+    desc: 'Перемещает вперёд на 130–210 единиц; оставленные коробки замедляют обычных врагов на 35% на 2 с.',
+    cast(g, lvl) {
+      const from = { x: g.player.x, y: g.player.y };
+      const distance = classValue(g, 'act_urgent_transfer', 110 + lvl * 20, 1.20);
+      const fx = g.player.facingX || 0, fy = g.player.facingY || 0;
+      const angle = fx || fy ? Math.atan2(fy, fx) : 0;
+      g.player.x = Math.max(g.BOUND_MIN, Math.min(g.BOUND_MAX, from.x + Math.cos(angle) * distance));
+      g.player.y = Math.max(g.BOUND_MIN, Math.min(g.BOUND_MAX, from.y + Math.sin(angle) * distance));
+      for (const e of g.enemies) if (!e.isBoss && !e.is24hPursuer && Math.hypot(e.x - from.x, e.y - from.y) < 170) {
+        e.slowFactor = Math.min(e.slowFactor ?? 1, 0.65); e.slowTimer = Math.max(e.slowTimer || 0, 2);
+      }
+      g.createHitFX(from.x, from.y, '#fdcb6e', 12); g.createHitFX(g.player.x, g.player.y, '#fdcb6e', 8);
+      g.addPopup(g.player.x, g.player.y - 30, '📦 ПЕРЕНОС ВЫПОЛНЕН', '#fdcb6e');
+    } },
+  act_emergency_ups: { name: 'Аварийный ИБП', icon: '🔋', baseCd: 30,
+    desc: 'Включает щит на 2,2–3 с и уничтожает вражеские снаряды в радиусе 180–260.',
+    cast(g, lvl) {
+      g.player.shieldTimer = Math.max(g.player.shieldTimer || 0, classValue(g, 'act_emergency_ups', 2 + lvl * 0.2, 1.20));
+      const radius = 160 + lvl * 20;
+      g.enemyProjectiles = g.enemyProjectiles.filter(p => Math.hypot(p.x - g.player.x, p.y - g.player.y) > radius);
+      g.createHitFX(g.player.x, g.player.y, '#ffeaa7', 16);
+      g.addPopup(g.player.x, g.player.y - 30, '🔋 РЕЗЕРВНОЕ ПИТАНИЕ', '#ffeaa7');
+    } },
+  act_unloading: { name: 'Окно разгрузки', icon: '🚚', baseCd: 28,
+    desc: 'Удар в радиусе 220–300: 125–225 урона, отталкивание и замедление обычных врагов на 40% на 2,5 с.',
+    cast(g, lvl) {
+      const radius = classValue(g, 'act_unloading', 200 + lvl * 20, 1.15);
+      for (const e of g.enemies) {
+        if (e.is24hPursuer || Math.hypot(e.x - g.player.x, e.y - g.player.y) > radius) continue;
+        g.dealActiveSkillDamage(e, 100 + lvl * 25, lvl, ACTIVE_SKILLS_DEF.act_unloading.name);
+        if (!e.isBoss) {
+          const angle = Math.atan2(e.y - g.player.y, e.x - g.player.x);
+          e.x += Math.cos(angle) * 70; e.y += Math.sin(angle) * 70;
+          e.slowFactor = Math.min(e.slowFactor ?? 1, 0.60); e.slowTimer = Math.max(e.slowTimer || 0, 2.5);
+        }
+      }
+      g.createHitFX(g.player.x, g.player.y, '#e17055', 20);
+      g.addPopup(g.player.x, g.player.y - 30, '🚚 МЕСТО ДЛЯ РАЗГРУЗКИ', '#e17055');
+    } },
+  act_hot_deploy: { name: 'Горячий деплой', icon: '🔥', baseCd: 29,
+    desc: 'Тратит 8% текущего HP (не ниже 1), наносит 220–380 урона в радиусе 260–340. Боссы получают 65% урона.',
+    cast(g, lvl) {
+      g.player.hp = Math.max(1, g.player.hp - Math.max(1, Math.round(g.player.hp * 0.08)));
+      for (const e of g.enemies) if (!e.is24hPursuer && Math.hypot(e.x - g.player.x, e.y - g.player.y) <= 240 + lvl * 20) {
+        g.dealActiveSkillDamage(e, (180 + lvl * 40) * (e.isBoss ? 0.65 : 1), lvl, ACTIVE_SKILLS_DEF.act_hot_deploy.name);
+        g.createHitFX(e.x, e.y, '#ff7675', 6);
+      }
+      g.addPopup(g.player.x, g.player.y - 30, '🔥 ДЕПЛОЙ БЕЗ ОСТАНОВКИ', '#ff7675');
+    } },
+  act_remote_restore: { name: 'Удалённое восстановление', icon: '🩺', baseCd: 32,
+    desc: 'Восстанавливает герою 8–16% максимального HP, а всем живым помощникам — 40–60% их максимального HP.',
+    cast(g, lvl) {
+      const bonus = hasClassAffinity(g.player, 'act_remote_restore') ? 1.20 : 1;
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + g.player.maxHp * (0.06 + lvl * 0.02) * bonus);
+      for (const s of g.summons) if (s.hp > 0 && s.life > 0) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * (0.35 + lvl * 0.05) * bonus * (g.pvp?.mode === 'pvp' ? 0.5 : 1));
+      g.createHitFX(g.player.x, g.player.y, '#55efc4', 14);
+      g.addPopup(g.player.x, g.player.y - 30, '🩺 СВЯЗЬ ВОССТАНОВЛЕНА', '#55efc4');
+    } }
+});
+Object.assign(ACTIVE_SKILL_LEVEL_SUMMARIES, {
+  act_urgent_transfer: lvl => `Перенос на ${110 + lvl * 20} единиц; замедление обычных врагов возле исходной точки на 35% на 2 с.`,
+  act_emergency_ups: lvl => `Щит ${formatStatNumber(2 + lvl * 0.2)} с; очистка снарядов в радиусе ${160 + lvl * 20}.`,
+  act_unloading: lvl => `Радиус ${200 + lvl * 20}; ${activeDamageLevelText(100, 25, lvl)} урона; отталкивание и замедление обычных врагов на 40% на 2,5 с.`,
+  act_hot_deploy: lvl => `Радиус ${240 + lvl * 20}; ${activeDamageLevelText(180, 40, lvl)} урона (боссам 65%); расход 8% текущего HP, не ниже 1.`,
+  act_remote_restore: lvl => `Лечение героя ${6 + lvl * 2}% максимального HP, живых помощников — ${35 + lvl * 5}% их максимального HP.`
+});
+const CLASS_ACTIVE_BONUS_TEXT = {
+  act_sigur_lockdown: 'Радиус +15%.', act_atol_receipt_rain: 'Урон +15%.', act_shtrikh_reconciliation: 'Урон +15%.',
+  act_messenger_blast: 'Оглушение обычных врагов дольше на 20%.', act_emergency_ups: 'Щит дольше на 20%.',
+  act_lavender_raf: 'Перезарядка короче на 10%.', act_evotor_approval: 'Усиление дольше на 20%.', act_backup_dt: 'Лечение сильнее на 15%.',
+  act_urgent_transfer: 'Дальность +20%.', act_unloading: 'Радиус +15%.', act_kill_sessions: 'Прямой урон +15%; порог добивания прежний.',
+  act_turbo_mssql: 'Разгон дольше на 15%.', act_cache_purge: 'Урон +15%.', act_transaction_rollback: 'Перезарядка короче на 15%.',
+  act_hot_deploy: 'Урон +15%.', act_membership_reactivation: 'Лечение сильнее на 20%.', act_remote_restore: 'Лечение сильнее на 20%.',
+  act_support_call: 'Помощники живут на 30% дольше и имеют на 25% больше HP.',
+  act_technician_drone: 'Дрон живёт на 30% дольше и имеет на 25% больше HP.',
+  act_senior_escalation: 'Специалист живёт на 30% дольше и имеет на 25% больше HP.'
+};
+const CLASS_COMBAT_BONUS_TEXT = { ricochet: 'Урон рикошетных попаданий +10%.',
+  multishot: 'Штраф урона на 20% слабее.', burnshot: 'Урон горения +20%.', slowshot: 'Замедление дольше на 20%.' };
+function abilityClassDescription(player, key) {
+  const owner = ABILITY_CLASS_BY_KEY[key];
+  if (!owner) return 'Общее улучшение — без классовой привязки.';
+  const bonus = WEAPONS_DEF[key] ? 'Урон этого оружия +15%.' : CLASS_ACTIVE_BONUS_TEXT[key] || CLASS_COMBAT_BONUS_TEXT[key] || 'Положительные эффекты +20%; опыт и фиткоины +10%. Штрафы прежние.';
+  return `Класс: ${PLAYER_CLASSES[owner].name}. ${hasClassAffinity(player, key) ? '★ Классовый бонус действует: ' : 'Бонус для своего класса: '}${bonus}`;
+}
 
 const LEGENDARY_MIGRATIONS = [
   { key: 'migration_85', name: 'Переход на 8.5', icon: '🟧', description: 'Новая платформа: герой становится плиткой со скруглёнными углами. +30% к урону, +25% к максимальному HP и +10% защиты от боссов. Тяжёлый интерфейс: −12% к скорости бега и перезарядка дольше на 10%.', apply: g => {
@@ -4258,6 +4458,7 @@ class Game {
     this.enemies = [];
     this.summons = [];
     this.projectiles = [];
+    this.pendingQueryHits = [];
     this.enemyProjectiles = [];
     this.puddles = [];
     this.gems = [];
@@ -5169,7 +5370,7 @@ class Game {
       const snapshot = await get(roomRef);
       if (!snapshot.exists()) throw new Error('Комната не найдена.');
       const room = snapshot.val();
-      if (room.networkProtocol !== NETWORK_PROTOCOL) throw new Error('Версии сетевого протокола различаются. Все игроки должны открыть обновлённую игру 2.7.1 и создать новое лобби.');
+      if (room.networkProtocol !== NETWORK_PROTOCOL) throw new Error('Версии сетевого протокола различаются. Все игроки должны открыть обновлённую игру 2.8.0 и создать новое лобби.');
       if (room.status !== 'waiting') throw new Error('Матч уже начался.');
       const existingPlayer = room.players?.[uid];
       if (uid === room.hostUid || (existingPlayer && existingPlayer.online !== false)) throw new Error('Вы уже подключены к этой комнате.');
@@ -5223,7 +5424,7 @@ class Game {
     const players = Object.values(pvp.roomCache?.players || {}).filter(player => player.online !== false);
     const connected = Object.values(pvp.peerConnections || {}).filter(peer => peer.connected).length;
     if (players.some(player => player.networkProtocol !== NETWORK_PROTOCOL)) {
-      this.pvpStatus('Все участники должны обновить игру до 2.7.1 и переподключиться к лобби.', true);
+      this.pvpStatus('Все участники должны обновить игру до 2.8.0 и переподключиться к лобби.', true);
       return;
     }
     if (players.length < 2 || players.length > 8 || players.some(player => !player.online) || connected < players.length - 1) {
@@ -6051,7 +6252,7 @@ class Game {
       const critChance = Math.min(0.8, Math.max(0, (p?.critChance || 0) + (p?.evotorSyncTimer > 0 ? 0.10 : 0)));
       if (this.rollRng() < critChance) dmg *= 1.75 * (this.getDailyRules().critDamageMult || 1);
     }
-    return dmg;
+    return dmg * classActiveDamageMultiplier(p, this.castingActiveKey) * (!allowCrit ? 1 + (p?.summonDamageBonus || 0) : 1);
   }
 
   dealActiveSkillDamage(enemy, baseDamage, level = 1, source = 'Активное умение') {
@@ -6938,7 +7139,8 @@ class Game {
       act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
       act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
       act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
-      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0]
+      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0],
+      act_unloading: [100, 25, 0.25], act_hot_deploy: [150, 35, 0]
     }[skill.key];
     const level = Number(skill.level);
     if (!offensive || !Number.isInteger(level) || level < 1 || level > 5) return;
@@ -6949,7 +7151,8 @@ class Game {
       if (dx * dx + dy * dy > 900 * 900) return;
     }
     const [base, perLevel, control] = offensive;
-    const damage = (base + (level - 1) * perLevel) * activeSkillDamageMultiplier(level);
+    const senderClassId = this.pvp.remotePlayers?.[skill.senderUid]?.classId || this.pvp.remotePlayer?.classId;
+    const damage = (base + (level - 1) * perLevel) * activeSkillDamageMultiplier(level) * classActiveDamageMultiplier({classId: senderClassId}, skill.key);
     const skillName = ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key;
     const senderName = String(skill.senderName || this.pvp.remotePlayers?.[skill.senderUid]?.name || this.pvp.remotePlayer?.name || 'Соперник').slice(0, 20);
     if (this.isBattleRoyale) {
@@ -6974,7 +7177,8 @@ class Game {
       act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
       act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
       act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
-      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0]
+      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0],
+      act_unloading: [100, 25, 0.25], act_hot_deploy: [150, 35, 0]
     }[key];
     if (!offensive) return; // Поддерживающие умения усиливают PvP-атаки игрока.
     const [base, perLevel, control] = offensive;
@@ -6984,7 +7188,7 @@ class Game {
         key,
         name: ACTIVE_SKILLS_DEF[key]?.name || key,
         level,
-        damage: (base + Math.max(0, level - 1) * perLevel) * activeSkillDamageMultiplier(level),
+        damage: (base + Math.max(0, level - 1) * perLevel) * activeSkillDamageMultiplier(level) * classActiveDamageMultiplier(this.player, key),
         control,
         senderUid: this.pvp.uid,
         senderName: String(this.pvp.name || 'Соперник').slice(0, 20),
@@ -8267,7 +8471,8 @@ class Game {
       levelUpHeal: p.levelUpHeal || 0,
       currencyMult: p.currencyMult || 1,
       dashCooldownMult: p.dashCooldownMult || 1,
-      bossDamageReduction: p.bossDamageReduction || 0
+      bossDamageReduction: p.bossDamageReduction || 0,
+      summonDamageBonus: p.summonDamageBonus || 0
     };
     applyFn(p);
     p.hp = beforeHp;
@@ -8282,6 +8487,7 @@ class Game {
       p.currencyMult = before.currencyMult + ((p.currencyMult || 1) - before.currencyMult) * 0.7;
       p.dashCooldownMult = before.dashCooldownMult + ((p.dashCooldownMult || 1) - before.dashCooldownMult) * 0.5;
       p.bossDamageReduction = before.bossDamageReduction + ((p.bossDamageReduction || 0) - before.bossDamageReduction) * 0.5;
+      p.summonDamageBonus = before.summonDamageBonus + ((p.summonDamageBonus || 0) - before.summonDamageBonus) * 0.5;
     }
   }
 
@@ -8301,7 +8507,7 @@ class Game {
     const numericStats = [
       'maxHp', 'speedMult', 'dmgMult', 'critChance', 'magnetMult', 'regen',
       'cdMult', 'dodge', 'levelUpHeal', 'currencyMult', 'dashCooldownMult',
-      'xpMult', 'bossDamageReduction'
+      'xpMult', 'bossDamageReduction', 'summonDamageBonus'
     ];
     const booleanStats = ['hasNetworkFilter', 'hasSecondMonitor'];
     const oldHp = Number(this.player.hp) || 0;
@@ -8511,7 +8717,7 @@ class Game {
   }
 
   setShopView(view) {
-    this.shopView = ['all', 'basics', 'upgrades', 'actives', 'consumables', 'favorites', 'sell'].includes(view) ? view : 'all';
+    this.shopView = ['all', 'basics', 'upgrades', 'elite', 'actives', 'consumables', 'favorites', 'sell'].includes(view) ? view : 'all';
     this.selectedShopInventory = null;
     if (this.shopView === 'sell') this.selectedShopItemKey = null;
     this.renderShop();
@@ -8598,6 +8804,7 @@ class Game {
     const missingCost = missingItem ? this.getShopItemTotalCost(missingKey) : 0;
     const consumableHasSpace = missingItem?.shopKind !== 'consumable' || this.canBuyConsumableItem(missingKey);
     const canPurchase = missingItem && this.currency >= missingCost && consumableHasSpace
+      && (!missingItem.maxOwned || this.getOwnedShopItemCount(missingKey) < missingItem.maxOwned)
       && (missingItem.shopKind === 'consumable' ? this.canBuyConsumableItem(missingKey) : this.hasInventorySpaceFor(missingKey));
     buy.disabled = Boolean(selected) || !canPurchase;
     buy.textContent = item.parts ? (missingItem ? `Купить компонент · ${missingCost} 💰` : 'Уже собрано') : `Купить · ${totalCost} 💰`;
@@ -8729,6 +8936,7 @@ class Game {
       items = this.getShopCatalogItems().filter(item => {
         if (this.shopView === 'basics' && item.shopKind !== 'passive') return false;
         if (this.shopView === 'upgrades' && item.shopKind !== 'recipe') return false;
+        if (this.shopView === 'elite' && item.tier !== 4) return false;
         if (this.shopView === 'actives' && item.shopKind !== 'active') return false;
         if (this.shopView === 'consumables' && item.shopKind !== 'consumable') return false;
         if (this.shopView === 'favorites' && !this.favoriteShopItems?.has(item.key)) return false;
@@ -8744,8 +8952,8 @@ class Game {
       card.className = 'dota-shop-item-card';
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = `dota-shop-item${selected ? ' selected' : ''}`;
-      button.innerHTML = `<span class="dota-shop-item-icon">${item.icon || '📦'}</span><span class="dota-shop-item-name">${this.escapeHtml(item.name)}</span><span class="dota-shop-item-price">${this.shopView === 'sell' ? `×${item.count || 1} · продажа` : `${this.getShopItemTotalCost(item.key)} 💰`}</span>`;
+      button.className = `dota-shop-item${selected ? ' selected' : ''}${item.tier === 4 ? ' tier-4' : ''}`;
+      button.innerHTML = `<span class="dota-shop-item-icon">${item.icon || '📦'}</span><span class="dota-shop-item-name">${item.tier === 4 ? 'IV · ' : ''}${this.escapeHtml(item.name)}</span><span class="dota-shop-item-price">${this.shopView === 'sell' ? `×${item.count || 1} · продажа` : `${this.getShopItemTotalCost(item.key)} 💰`}</span>`;
       if (this.shopView === 'sell') button.onclick = () => this.selectShopInventorySlot(item.inventoryType, item.inventoryIndex);
       else {
         button.onclick = () => this.selectShopItem(item.key);
@@ -8845,6 +9053,7 @@ class Game {
   buyPassiveItem(key, { prepaid = false, preferredRecipeKey = null, onlyRecipeTree = null, skipRender = false } = {}) {
     const item = this.getShopPassiveDef(key);
     if (!item) return false;
+    if (item.maxOwned && this.getOwnedShopItemCount(key) >= item.maxOwned) return false;
     const price = this.getShopItemTotalCost(key);
     const freeSlot = this.findInventoryFreeSlot();
     const backpackSlot = this.findBackpackFreeSlot();
@@ -9154,7 +9363,7 @@ class Game {
     }));
     const passives = Object.entries(this.passives || {}).map(([key, passive]) => ({
       icon: PASSIVES_DEF[key]?.icon || '⬆️', name: PASSIVES_DEF[key]?.name || key, value: `ур. ${passive.lvl}/5`,
-      detail: PASSIVES_DEF[key]?.levelDescriptions?.[passive.lvl - 1] || ''
+      detail: `${describePassiveStats(passiveLevelStats(player, key, passive.lvl, this.pvp?.mode))} ${abilityClassDescription(player, key)}`
     }));
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
@@ -9165,7 +9374,7 @@ class Game {
       icon: ACTIVE_SKILLS_DEF[skill.key]?.icon || '⚡',
       name: ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key,
       value: `ур. ${skill.lvl}`,
-      detail: ACTIVE_SKILLS_DEF[skill.key]?.desc || ''
+      detail: `${ACTIVE_SKILL_LEVEL_SUMMARIES[skill.key]?.(skill.lvl) || ACTIVE_SKILLS_DEF[skill.key]?.desc || ''} ${abilityClassDescription(player, skill.key)}`
     }));
     Object.entries(this.repeatableUpgradeCounts || {}).forEach(([key, count]) => {
       const upgrade = REPEATABLE_UPGRADES.find(item => item.key === key);
@@ -9348,7 +9557,8 @@ class Game {
         const projectileStart = this.projectiles.length;
         const puddleStart = this.puddles.length;
         const summonStart = this.summons.length;
-        def.cast(this, skill.lvl);
+        this.castingActiveKey = skill.key;
+        try { def.cast(this, skill.lvl); } finally { this.castingActiveKey = null; }
         for (const [enemy, hp] of enemyHpBefore) {
           const dealt = Math.min(hp, Math.max(0, hp - Math.max(0, Number(enemy.hp) || 0)));
           if (dealt > 0) this.recordDealtDamage(def.name, dealt);
@@ -9358,12 +9568,17 @@ class Game {
         for (const summon of this.summons.slice(summonStart)) summon.source ||= def.name;
         this.scalePvpDefenseGain(beforeDefense);
         this.sendPvpActiveSkill(skill.key, skill.lvl);
-        skill.cdTimer = def.baseCd * this.player.cdMult;
+        skill.cdTimer = this.getActiveSkillCooldown(skill.key);
         this.updateActiveHUD();
       }
     } else {
       this.sound.playTone(180, 'square', 0.06, 0.05);
     }
+  }
+
+  getActiveSkillCooldown(key) {
+    const bonus = hasClassAffinity(this.player, key) ? { act_lavender_raf: 0.90, act_transaction_rollback: 0.85 }[key] || 1 : 1;
+    return ACTIVE_SKILLS_DEF[key].baseCd * this.player.cdMult * bonus;
   }
 
   scalePvpDefenseGain(before) {
@@ -10741,7 +10956,8 @@ class Game {
     }
   }
 
-  dealPlayerDamage(baseDmg) {
+  dealPlayerDamage(baseDmg, weaponKey = null) {
+    if (hasClassAffinity(this.player, weaponKey)) baseDmg *= 1.15;
     const buffMult = this.player.damageBuffTimer > 0 ? (this.player.damageBuffMult || 1) : 1;
     let dmg = baseDmg * this.player.dmgMult * buffMult * (this.player.readOnlyTimer > 0 ? 0.55 : 1);
     const critChance = Math.min(0.8, (this.player.critChance || 0) + (this.player.evotorSyncTimer > 0 ? 0.10 : 0));
@@ -10758,7 +10974,7 @@ class Game {
     if (level <= 0) return;
     const slowPower = Math.min(0.45, level * 0.15) * (enemy.isBoss ? 0.5 : 1);
     enemy.slowFactor = Math.min(enemy.slowFactor ?? 1, 1 - slowPower);
-    enemy.slowTimer = Math.max(enemy.slowTimer || 0, 2.2);
+    enemy.slowTimer = Math.max(enemy.slowTimer || 0, classValue(this, 'slowshot', 2.2, 1.20));
   }
 
   applyProjectileBurn(enemy, source = 'Поджигающие снаряды') {
@@ -10766,7 +10982,7 @@ class Game {
     const burnChanceByLevel = [0, 0.30, 0.50, 0.65];
     if (level <= 0 || Math.random() >= (burnChanceByLevel[Math.min(3, level)] || 0)) return;
     enemy.burnTimer = Math.max(enemy.burnTimer || 0, 3);
-    enemy.burnDamage = Math.max(enemy.burnDamage || 0, 2.5 + level * 0.3);
+    enemy.burnDamage = Math.max(enemy.burnDamage || 0, classValue(this, 'burnshot', 2.5 + level * 0.3, 1.20));
     enemy.burnSource = source;
     enemy.burnTickTimer = Math.min(enemy.burnTickTimer ?? 0.5, 0.5);
   }
@@ -10781,7 +10997,7 @@ class Game {
 
     const radius = 82;
     const burstDamage = Math.max(1, projectileDamage * 0.5);
-    const burnDamage = (2.5 + this.player.burnShotLevel * 0.3) * 1.5;
+    const burnDamage = classValue(this, 'burnshot', (2.5 + this.player.burnShotLevel * 0.3) * 1.5, 1.20);
     this.forEachEnemyNear(enemy.x, enemy.y, radius, target => {
       if (target.is24hPursuer || (target !== enemy && target.hp <= 0)) return;
       const dx = target.x - enemy.x;
@@ -10871,11 +11087,60 @@ class Game {
     }
   }
 
+  updateClassWeapons(dt, cdFactor) {
+    this.pendingQueryHits ||= [];
+    for (let i = this.pendingQueryHits.length - 1; i >= 0; i--) {
+      const query = this.pendingQueryHits[i];
+      query.delay -= dt;
+      if (query.delay > 0) continue;
+      const targets = this.enemies.filter(e => e.hp > 0 && !e.is24hPursuer).map(e => ({ ...e, ref: e }));
+      targets.push(...this.getPvpWeaponTargets());
+      for (const target of targets) if (Math.hypot(target.x - query.x, target.y - query.y) <= query.radius + (target.size || 18)) {
+        this.dealWeaponTargetDamage(target, query.dmg, WEAPONS_DEF.batch_query.name);
+        this.createHitFX(target.x, target.y, '#a29bfe', 5);
+      }
+      this.pendingQueryHits.splice(i, 1);
+    }
+    const queryWeapon = this.weapons.batch_query;
+    if (queryWeapon) {
+      queryWeapon.timer -= dt;
+      if (queryWeapon.timer <= 0) {
+        const target = this.getNearestWeaponTarget(620);
+        if (target) {
+          queryWeapon.timer = WEAPONS_DEF.batch_query.baseCooldown * cdFactor;
+          const hit = this.dealPlayerDamage(62 + (queryWeapon.lvl - 1) * 17, 'batch_query');
+          this.pendingQueryHits.push({ x: target.x, y: target.y, radius: 75 + queryWeapon.lvl * 9, delay: 0.65, dmg: hit.dmg });
+        }
+      }
+    }
+    const tickets = this.weapons.ticket_queue;
+    if (tickets) {
+      tickets.timer -= dt;
+      if (tickets.timer <= 0) {
+        const target = this.getNearestWeaponTarget(620);
+        if (target) {
+          tickets.timer = WEAPONS_DEF.ticket_queue.baseCooldown * cdFactor;
+          const count = 2 + Math.floor(tickets.lvl / 2) + this.player.multishotLevel;
+          const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
+          for (let i = 0; i < count; i++) {
+            const a = angle + (i - (count - 1) / 2) * 0.22;
+            const hit = this.dealPlayerDamage(15 + (tickets.lvl - 1) * 4, 'ticket_queue');
+            this.projectiles.push({ x: this.player.x, y: this.player.y, vx: Math.cos(a) * 7.5, vy: Math.sin(a) * 7.5,
+              dmg: hit.dmg, isCrit: hit.isCrit, life: 1.8, icon: '📨', color: '#81ecec', size: 9, homing: true,
+              source: WEAPONS_DEF.ticket_queue.name });
+          }
+        }
+      }
+    }
+  }
+
   updateWeapons(dt) {
     let cdFactor = this.player.cdMult;
     if (this.player.turboBuffTimer > 0) {
       cdFactor *= 0.50; // В турбо-режиме оружие лупит в 2 раза чаще
     }
+
+    this.updateClassWeapons(dt, cdFactor);
 
     // Турникет
     if (this.weapons.turnstile) {
@@ -10895,7 +11160,7 @@ class Game {
           const dy = e.y - by;
           const r = e.size + 15;
           if (dx * dx + dy * dy < r * r) {
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5, 'turnstile');
             this.damageEnemy(e, hit.dmg * dt * 3.8, WEAPONS_DEF.turnstile.name);
             this.createHitFX(bx, by, '#ffd200', 1);
             if (hit.isCrit && Math.random() < 0.2) {
@@ -10907,7 +11172,7 @@ class Game {
           const dx = target.x - bx;
           const dy = target.y - by;
           if (dx * dx + dy * dy < 33 * 33) {
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5, 'turnstile');
             this.dealWeaponTargetDamage(target, hit.dmg * dt * 3.8, WEAPONS_DEF.turnstile.name);
           }
         }
@@ -10924,7 +11189,7 @@ class Game {
         const baseA = Math.atan2(this.player.facingY, this.player.facingX);
         for (let i = 0; i < count; i++) {
           const a = baseA + (i - (count - 1) / 2) * 0.13;
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.keys.baseDmg + w.lvl * 6);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.keys.baseDmg + w.lvl * 6, 'keys');
           this.projectiles.push({
             x: this.player.x, y: this.player.y,
             vx: Math.cos(a) * 11.0, vy: Math.sin(a) * 11.0,
@@ -10948,7 +11213,7 @@ class Game {
           const extraShots = this.player.multishotLevel;
           for (let i = 0; i <= extraShots; i++) {
             const shotAngle = angle + (i - extraShots / 2) * 0.12;
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.syntax.baseDmg + w.lvl * 9);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.syntax.baseDmg + w.lvl * 9, 'syntax');
             this.projectiles.push({
               x: this.player.x, y: this.player.y,
               vx: Math.cos(shotAngle) * 10.0, vy: Math.sin(shotAngle) * 10.0,
@@ -10972,7 +11237,7 @@ class Game {
           const shotCount = 1 + this.player.multishotLevel;
           for (let i = 0; i < shotCount; i++) {
             const shotAngle = angle + (i - (shotCount - 1) / 2) * 0.12;
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.table_chart.baseDmg + (w.lvl - 1) * 9);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.table_chart.baseDmg + (w.lvl - 1) * 9, 'table_chart');
             this.projectiles.push({
               x: this.player.x, y: this.player.y,
               vx: Math.cos(shotAngle) * 9.0, vy: Math.sin(shotAngle) * 9.0,
@@ -10996,7 +11261,7 @@ class Game {
           const shotCount = 1 + this.player.multishotLevel;
           for (let i = 0; i < shotCount; i++) {
             const shotAngle = angle + (i - (shotCount - 1) / 2) * 0.1;
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.support_phone.baseDmg + (w.lvl - 1) * 9);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.support_phone.baseDmg + (w.lvl - 1) * 9, 'support_phone');
             this.projectiles.push({
               x: this.player.x, y: this.player.y,
               vx: Math.cos(shotAngle) * 9.5, vy: Math.sin(shotAngle) * 9.5,
@@ -11019,7 +11284,7 @@ class Game {
         const extraShots = this.player.multishotLevel;
         for (let i = 0; i <= extraShots; i++) {
           const shotAngle = ang + (i - extraShots / 2) * 0.10;
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.heavy_archive.baseDmg + w.lvl * 25);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.heavy_archive.baseDmg + w.lvl * 25, 'heavy_archive');
           this.projectiles.push({
             x: this.player.x, y: this.player.y,
             vx: Math.cos(shotAngle) * 5.8, vy: Math.sin(shotAngle) * 5.8,
@@ -11040,7 +11305,7 @@ class Game {
         w.timer = WEAPONS_DEF.protein.baseCooldown * cdFactor;
         const ang = Math.random() * Math.PI * 2;
         const dst = 80 + Math.random() * 120;
-        const hit = this.dealPlayerDamage(WEAPONS_DEF.protein.baseDmg + w.lvl * 4);
+        const hit = this.dealPlayerDamage(WEAPONS_DEF.protein.baseDmg + w.lvl * 4, 'protein');
         this.puddles.push({
           x: this.player.x + Math.cos(ang) * dst,
           y: this.player.y + Math.sin(ang) * dst,
@@ -11061,7 +11326,7 @@ class Game {
         const dy = e.y - this.player.y;
         const r = rad + e.size;
         if (dx * dx + dy * dy < r * r) {
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4, 'cache_aura');
           this.damageEnemy(e, hit.dmg * dt, WEAPONS_DEF.cache_aura.name);
         }
       });
@@ -11070,7 +11335,7 @@ class Game {
         const dx = target.x - this.player.x;
         const dy = target.y - this.player.y;
         if (dx * dx + dy * dy < pvpRadSq) {
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.cache_aura.baseDmg + w.lvl * 4, 'cache_aura');
           this.dealWeaponTargetDamage(target, hit.dmg * dt, WEAPONS_DEF.cache_aura.name);
         }
       }
@@ -11088,7 +11353,7 @@ class Game {
           const shotCount = 1 + this.player.multishotLevel;
           for (let i = 0; i < shotCount; i++) {
             const shotAngle = angle + (i - (shotCount - 1) / 2) * 0.12;
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.iron_logic.baseDmg + w.lvl * 12);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.iron_logic.baseDmg + w.lvl * 12, 'iron_logic');
             this.projectiles.push({
               x: this.player.x, y: this.player.y,
               vx: Math.cos(shotAngle) * 10.0, vy: Math.sin(shotAngle) * 10.0,
@@ -11120,7 +11385,7 @@ class Game {
           available.sort((a,b) => Math.hypot(a.x-currX, a.y-currY) - Math.hypot(b.x-currX, b.y-currY));
           let tgt = available.shift();
           if (tgt && Math.hypot(tgt.x - currX, tgt.y - currY) < 380) {
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.egais_laser.baseDmg + w.lvl * 8);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.egais_laser.baseDmg + w.lvl * 8, 'egais_laser');
             this.dealWeaponTargetDamage(tgt, hit.dmg, WEAPONS_DEF.egais_laser.name);
             chain.push({ x1: currX, y1: currY, x2: tgt.x, y2: tgt.y });
             currX = tgt.x; currY = tgt.y;
@@ -11142,7 +11407,7 @@ class Game {
         if (target) {
           w.timer = WEAPONS_DEF.fusion_audit.baseCooldown * cdFactor;
           const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_audit.baseDmg + w.lvl * 15);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_audit.baseDmg + w.lvl * 15, 'fusion_audit');
           this.projectiles.push({
             x: this.player.x, y: this.player.y, vx: Math.cos(angle) * 10.5, vy: Math.sin(angle) * 10.5,
             dmg: hit.dmg, isCrit: hit.isCrit, life: 1.5, icon: '🧾', color: '#e17055', size: 12,
@@ -11165,7 +11430,7 @@ class Game {
           available.sort((a, b) => Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y));
           const target = available.shift();
           if (Math.hypot(target.x - x, target.y - y) > 400) break;
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_ledger.baseDmg + w.lvl * 14);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_ledger.baseDmg + w.lvl * 14, 'fusion_ledger');
           this.dealWeaponTargetDamage(target, hit.dmg, WEAPONS_DEF.fusion_ledger.name);
           lines.push({ x1: x, y1: y, x2: target.x, y2: target.y });
           this.createHitFX(target.x, target.y, '#9b59b6', 4);
@@ -11190,7 +11455,7 @@ class Game {
           const dx = enemy.x - this.player.x;
           const dy = enemy.y - this.player.y;
           if (dx * dx + dy * dy > radiusSq) return;
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16, 'fusion_gate');
           this.damageEnemy(enemy, hit.dmg, WEAPONS_DEF.fusion_gate.name);
           const angle = Math.atan2(dy, dx);
           enemy.x += Math.cos(angle) * 42;
@@ -11201,7 +11466,7 @@ class Game {
           const dx = target.x - this.player.x;
           const dy = target.y - this.player.y;
           if (dx * dx + dy * dy <= radiusSq) {
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_gate.baseDmg + w.lvl * 16, 'fusion_gate');
             this.dealWeaponTargetDamage(target, hit.dmg, WEAPONS_DEF.fusion_gate.name);
           }
         }
@@ -11218,10 +11483,10 @@ class Game {
           w.timer = WEAPONS_DEF.fusion_attendance.baseCooldown * cdFactor;
           const angle = Math.atan2(target.y - this.player.y, target.x - this.player.x);
           const shotCount = 1 + this.player.multishotLevel;
-          const puddleHit = this.dealPlayerDamage(18 + w.lvl * 6);
+          const puddleHit = this.dealPlayerDamage(18 + w.lvl * 6, 'fusion_attendance');
           for (let i = 0; i < shotCount; i++) {
             const shotAngle = angle + (i - (shotCount - 1) / 2) * 0.11;
-            const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_attendance.baseDmg + w.lvl * 15);
+            const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_attendance.baseDmg + w.lvl * 15, 'fusion_attendance');
             this.projectiles.push({
               x: this.player.x, y: this.player.y,
               vx: Math.cos(shotAngle) * 8.6, vy: Math.sin(shotAngle) * 8.6,
@@ -11248,7 +11513,7 @@ class Game {
         const dy = e.y - this.player.y;
         const r = rad + e.size;
         if (dx * dx + dy * dy < r * r) {
-          const hit = this.dealPlayerDamage(15 + w.lvl * 5);
+          const hit = this.dealPlayerDamage(15 + w.lvl * 5, 'fusion_callcenter');
           this.damageEnemy(e, hit.dmg * dt, WEAPONS_DEF.fusion_callcenter.name);
         }
       });
@@ -11257,7 +11522,7 @@ class Game {
         const dx = target.x - this.player.x;
         const dy = target.y - this.player.y;
         if (dx * dx + dy * dy < pvpRadSq) {
-          const hit = this.dealPlayerDamage(15 + w.lvl * 5);
+          const hit = this.dealPlayerDamage(15 + w.lvl * 5, 'fusion_callcenter');
           this.dealWeaponTargetDamage(target, hit.dmg * dt, WEAPONS_DEF.fusion_callcenter.name);
         }
       }
@@ -11271,7 +11536,7 @@ class Game {
         for (let i = 0; i < available.length && lines.length < maxLines; i++) {
           const tgt = available[i];
           if (Math.hypot(tgt.x - this.player.x, tgt.y - this.player.y) > 460) break;
-          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_callcenter.baseDmg + w.lvl * 11);
+          const hit = this.dealPlayerDamage(WEAPONS_DEF.fusion_callcenter.baseDmg + w.lvl * 11, 'fusion_callcenter');
           this.dealWeaponTargetDamage(tgt, hit.dmg, WEAPONS_DEF.fusion_callcenter.name);
           lines.push({ x1: this.player.x, y1: this.player.y, x2: tgt.x, y2: tgt.y });
           this.createHitFX(tgt.x, tgt.y, '#00cec9', 4);
@@ -11507,6 +11772,15 @@ class Game {
       const p = this.projectiles[i];
       p.life -= dt;
       if (p.type !== 'laser_visual') {
+        if (p.homing) {
+          const target = this.getNearestWeaponTarget(650);
+          if (target) {
+            const angle = Math.atan2(target.y - p.y, target.x - p.x);
+            const steer = Math.min(1, dt * 5);
+            p.vx += (Math.cos(angle) * 7.5 - p.vx) * steer;
+            p.vy += (Math.sin(angle) * 7.5 - p.vy) * steer;
+          }
+        }
         p.x += p.vx * frameScale; p.y += p.vy * frameScale;
 
         if (!p.hitOpponent && pvpTargets.length > 0) {
@@ -11595,6 +11869,7 @@ class Game {
                 p.vy = Math.sin(angle) * speed;
                 p.ricochetsRemaining--;
                 p.dmg *= 0.82;
+                if (!p.classRicochetApplied && hasClassAffinity(this.player, 'ricochet')) { p.dmg *= 1.10; p.classRicochetApplied = true; }
                 p.color = '#ffeaa7';
               } else {
                 p.piercesRemaining ??= this.player.pierceLevel || 0;
@@ -12372,10 +12647,18 @@ class Game {
     })) {
       if (this.player[stat] < 3) available.push({ type: 'combat_up', key, def: COMBAT_UPGRADES[key], lvl: this.player[stat] + 1 });
     }
-    const choices = available.sort(() => 0.5 - this.rollRng()).slice(0, 3);
+    const shuffle = list => {
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(this.rollRng() * (i + 1)); [list[i], list[j]] = [list[j], list[i]];
+      }
+      return list;
+    };
+    const own = shuffle(available.filter(choice => hasClassAffinity(this.player, choice.key)))[0];
+    const choices = shuffle([...(own ? [own] : []), ...shuffle(available.filter(choice => choice !== own)).slice(0, own ? 2 : 3)]);
     if (choices.length < 3) {
       const shuffledRep = REPEATABLE_UPGRADES.filter(rep => rep.key !== 'rep_salary_index' || (this.repeatableUpgradeCounts[rep.key] || 0) < 8).sort(() => 0.5 - this.rollRng());
-      for (let i = 0; i < 3 - choices.length; i++) {
+      const missing = 3 - choices.length;
+      for (let i = 0; i < missing; i++) {
         const rep = shuffledRep[i % shuffledRep.length];
         choices.push({ type: 'repeatable', key: rep.key, def: rep, applyFn: rep.apply, lvl: (this.repeatableUpgradeCounts[rep.key] || 0) + 1 });
       }
@@ -12395,6 +12678,8 @@ class Game {
       cache_aura: level => 12 + level * 4,
       iron_logic: level => 42 + level * 12,
       egais_laser: level => 34 + level * 8,
+      batch_query: level => 62 + (level - 1) * 17,
+      ticket_queue: level => 15 + (level - 1) * 4,
       fusion_audit: level => 38 + level * 15,
       fusion_ledger: level => 40 + level * 14,
       fusion_gate: level => 58 + level * 16,
@@ -12402,9 +12687,10 @@ class Game {
       fusion_callcenter: level => 32 + level * 11
     }[key];
     const weapon = WEAPONS_DEF[key];
-    const damage = damageAtLevel ? damageAtLevel(level) : weapon.baseDmg;
-    const previousDamage = level > 1 && damageAtLevel ? damageAtLevel(level - 1) : null;
-    const damageChange = previousDamage === null ? 'стартовый урон' : `+${damage - previousDamage} к базовому урону за уровень`;
+    const classMult = hasClassAffinity(this.player, key) ? 1.15 : 1;
+    const damage = Number(((damageAtLevel ? damageAtLevel(level) : weapon.baseDmg) * classMult).toFixed(2));
+    const previousDamage = level > 1 && damageAtLevel ? Number((damageAtLevel(level - 1) * classMult).toFixed(2)) : null;
+    const damageChange = previousDamage === null ? 'стартовый урон' : `+${formatStatNumber(damage - previousDamage)} к базовому урону за уровень`;
     const cooldown = weapon.baseCooldown > 0 ? `${formatStatNumber(weapon.baseCooldown)} с` : 'постоянная атака';
     const extras = {
       turnstile: `вращается вокруг героя; лопастей ${Math.min(5, 1 + Math.floor(level / 2))}`,
@@ -12417,13 +12703,15 @@ class Game {
       cache_aura: `постоянная аура радиусом ${72 + level * 14}`,
       iron_logic: `залп ${1 + this.player.multishotLevel} пропуск(а)`,
       egais_laser: `до ${[1, 2, 3, 3, 4][Math.max(0, Math.min(4, Math.floor(level) - 1))]} рикошетов`,
+      batch_query: `радиус ${75 + level * 9}; задержка 0,65 с`,
+      ticket_queue: `залп ${2 + Math.floor(level / 2) + this.player.multishotLevel} самонаводящихся заявок`,
       fusion_audit: 'пробивающий снаряд',
       fusion_ledger: `цепь до ${2 + Math.floor(level / 2)} целей`,
       fusion_gate: `ударная волна радиусом ${150 + level * 24}`,
       fusion_attendance: `пробивающая ведомость + замедляющая лужа радиусом ${56 + level * 7}`,
       fusion_callcenter: `аура дозвона ${90 + level * 15} + разряды по ${3 + Math.floor(level / 2) + this.player.multishotLevel} линиям`
     }[key] || '';
-    return `Ур. ${level}: ${damage} баз. урона (${damageChange}); базовая перезарядка ${cooldown}${extras ? `; ${extras}` : ''}.`;
+    return `Ур. ${level}: ${damage} баз. урона${classMult > 1 ? ' с классовым бонусом' : ''} (${damageChange}); базовая перезарядка ${cooldown}${extras ? `; ${extras}` : ''}.`;
   }
 
   getRepeatableUpgradeSummary(choice) {
@@ -12452,7 +12740,7 @@ class Game {
     }
     if (choice.type === 'repeatable') return this.getRepeatableUpgradeSummary(choice);
     const passiveLevel = choice.type === 'pass_new' ? 1 : (choice.type === 'pass_up' ? choice.lvl : 0);
-    if (passiveLevel) return `${choice.def.levelDescriptions[passiveLevel - 1]} (уровень ${passiveLevel} из 5)`;
+    if (passiveLevel) return `${describePassiveStats(passiveLevelStats(this.player, choice.key, passiveLevel, this.pvp?.mode))} (уровень ${passiveLevel} из 5)`;
     if (choice.type === 'combat_up') return choice.def.levelDescriptions?.[choice.lvl - 1] || choice.def.desc;
     return choice.def.desc || 'Улучшает характеристики героя.';
   }
@@ -12482,8 +12770,10 @@ class Game {
       else if (ch.type.endsWith('new')) stateBadge = ' <b style="color:#27ae60">[НОВОЕ]</b>';
       else if (ch.type.endsWith('up')) stateBadge = ` [УР. ${ch.lvl}]`;
       else if (ch.type === 'repeatable') stateBadge = ` <b style="color:#f39c12">[УЛУЧШЕНИЕ № ${ch.lvl || 1}]</b>`;
-      const title = `${typeBadge} ${upgradeName}${stateBadge}`;
-      const description = this.getUpgradeChoiceDescription(ch);
+      const owner = ABILITY_CLASS_BY_KEY[ch.key];
+      const affinityBadge = owner ? `<b style="color:${hasClassAffinity(this.player, ch.key) ? '#b77900' : '#666'}">[${hasClassAffinity(this.player, ch.key) ? '★ ' : ''}${PLAYER_CLASSES[owner].name}]</b>` : '<b style="color:#777">[ОБЩЕЕ]</b>';
+      const title = `${typeBadge} ${upgradeName}${stateBadge} ${affinityBadge}`;
+      const description = `${this.getUpgradeChoiceDescription(ch)} ${abilityClassDescription(this.player, ch.key)}`;
       card.innerHTML = `<div class="card-icon">${ch.def.icon}</div><div class="card-info"><h4>${title}</h4><p>${description}</p></div>`;
       card.onclick = () => {
         this.applyUpgrade(ch);
@@ -12577,7 +12867,7 @@ class Game {
           }[ch.key];
           if (penaltyByUpgrade) {
             const { property, totals } = penaltyByUpgrade;
-            this.player[property] += totals[nextLevel] - totals[previousLevel];
+            this.player[property] += (totals[nextLevel] - totals[previousLevel]) * (ch.key === 'multishot' && hasClassAffinity(this.player, ch.key) ? 0.80 : 1);
           }
         });
       }
@@ -12752,7 +13042,7 @@ class Game {
       this.pvp.hostInactivePause = false;
       this.pvpPausedByRemote = false;
       if (multiplayerElimination) {
-        this.projectiles = []; this.summons = [];
+        this.projectiles = []; this.pendingQueryHits = []; this.summons = [];
         this.puddles = this.puddles.filter(item => item.isEnemyPuddle);
         this.keys = {}; this.mobileMove = null; this.mouseMoveAim = null;
       }
@@ -13592,12 +13882,14 @@ class Game {
       if (keyEl && keyEl.textContent !== keyLabel) keyEl.textContent = keyLabel;
 
       if (!skill) {
+        el.title = '';
         el.className = 'active-slot empty';
         iconEl.innerText = '🔒';
         lvlEl.innerText = '';
         overlay.style.display = 'none';
       } else {
         const def = ACTIVE_SKILLS_DEF[skill.key];
+        el.title = `${def.name}. ${this.getUpgradeChoiceDescription({type: 'active_up', key: skill.key, def, lvl: skill.lvl})} ${abilityClassDescription(this.player, skill.key)}`;
         el.className = 'active-slot';
         iconEl.innerText = def.icon;
         lvlEl.innerText = `v${skill.lvl}`;
@@ -14123,6 +14415,13 @@ class Game {
     }
 
     // Снаряды
+    for (const query of this.pendingQueryHits || []) {
+      if (!isRenderVisible(query.x, query.y, query.radius)) continue;
+      this.ctx.beginPath();
+      this.ctx.arc(query.x, query.y, query.radius, 0, Math.PI * 2);
+      this.ctx.fillStyle = 'rgba(162,155,254,0.12)'; this.ctx.fill();
+      this.ctx.strokeStyle = '#a29bfe'; this.ctx.lineWidth = 2; this.ctx.stroke();
+    }
     for (let p of this.projectiles) {
       if (p.type === 'laser_visual') {
         // Laser lines may cross the viewport even when both endpoints are outside it.

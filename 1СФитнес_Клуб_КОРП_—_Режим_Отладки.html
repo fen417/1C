@@ -908,6 +908,7 @@
   .card-icon { font-size: 30px; min-width: 42px; text-align: center; }
   .card-info h4 { color: #900; font-size: 13px; margin-bottom: 2px; }
   .card-info p { font-size: 11px; color: #444; }
+  .card-info .class-stat-bonus { color:#b77900; font-weight:bold; white-space:nowrap; }
 
   #lb-table {
     width: 100%;
@@ -3185,8 +3186,7 @@ const ACTIVE_SKILLS_DEF = {
 const activeDamageAtLevel = (base, perLevel, level) => Math.round(activeSkillDamage(base + perLevel * level, level));
 const activeDamageLevelText = (base, perLevel, level) => {
   const current = activeDamageAtLevel(base, perLevel, level);
-  const previous = level > 1 ? activeDamageAtLevel(base, perLevel, level - 1) : 0;
-  return level > 1 ? `${current} (+${current - previous} к предыдущему уровню)` : `${current} на 1-м уровне`;
+  return `${current}`;
 };
 const ACTIVE_SKILL_LEVEL_SUMMARIES = {
   act_backup_dt: level => `Лечение ${35 + level * 5}% HP, щит 3,5 с; волна в радиусе 300 наносит ${activeDamageLevelText(90, 30, level)} урона.`,
@@ -3750,24 +3750,94 @@ Object.assign(ACTIVE_SKILL_LEVEL_SUMMARIES, {
   act_hot_deploy: lvl => `Радиус ${240 + lvl * 20}; ${activeDamageLevelText(180, 40, lvl)} урона (боссам 65%); расход 8% текущего HP, не ниже 1.`,
   act_remote_restore: lvl => `Лечение героя ${6 + lvl * 2}% максимального HP, живых помощников — ${35 + lvl * 5}% их максимального HP.`
 });
-const CLASS_ACTIVE_BONUS_TEXT = {
-  act_sigur_lockdown: 'Радиус +15%.', act_atol_receipt_rain: 'Урон +15%.', act_shtrikh_reconciliation: 'Урон +15%.',
-  act_messenger_blast: 'Оглушение обычных врагов дольше на 20%.', act_emergency_ups: 'Щит дольше на 20%.',
-  act_lavender_raf: 'Перезарядка короче на 10%.', act_evotor_approval: 'Усиление дольше на 20%.', act_backup_dt: 'Лечение сильнее на 15%.',
-  act_urgent_transfer: 'Дальность +20%.', act_unloading: 'Радиус +15%.', act_kill_sessions: 'Прямой урон +15%; порог добивания прежний.',
-  act_turbo_mssql: 'Разгон дольше на 15%.', act_cache_purge: 'Урон +15%.', act_transaction_rollback: 'Перезарядка короче на 15%.',
-  act_hot_deploy: 'Урон +15%.', act_membership_reactivation: 'Лечение сильнее на 20%.', act_remote_restore: 'Лечение сильнее на 20%.',
-  act_support_call: 'Помощники живут на 30% дольше и имеют на 25% больше HP.',
-  act_technician_drone: 'Дрон живёт на 30% дольше и имеет на 25% больше HP.',
-  act_senior_escalation: 'Специалист живёт на 30% дольше и имеет на 25% больше HP.'
-};
-const CLASS_COMBAT_BONUS_TEXT = { ricochet: 'Урон рикошетных попаданий +10%.',
-  multishot: 'Штраф урона на 20% слабее.', burnshot: 'Урон горения +20%.', slowshot: 'Замедление дольше на 20%.' };
-function abilityClassDescription(player, key) {
-  const owner = ABILITY_CLASS_BY_KEY[key];
-  if (!owner) return 'Общее улучшение — без классовой привязки.';
-  const bonus = WEAPONS_DEF[key] ? 'Урон этого оружия +15%.' : CLASS_ACTIVE_BONUS_TEXT[key] || CLASS_COMBAT_BONUS_TEXT[key] || 'Положительные эффекты +20%; опыт и фиткоины +10%. Штрафы прежние.';
-  return `Класс: ${PLAYER_CLASSES[owner].name}. ${hasClassAffinity(player, key) ? '★ Классовый бонус действует: ' : 'Бонус для своего класса: '}${bonus}`;
+// В карточках выделяется только фактическая классовая прибавка к числу.
+// Текстовые подсказки и снимки инвентаря получают итог без HTML-разметки.
+function abilityStat(label, base, actual = base, unit = '', rich = false, signed = false) {
+  const format = value => Number(Number(value).toFixed(2)).toLocaleString('ru-RU', { maximumFractionDigits: 2 });
+  const number = value => `${signed && value > 0 ? '+' : ''}${format(value)}${unit}`;
+  if (!rich) return `${label} ${number(actual)}`;
+  const difference = Number((actual - base).toFixed(6));
+  return `${label} ${number(base)}${Math.abs(difference) > 0.000001
+    ? ` <span class="class-stat-bonus">${difference > 0 ? '+' : '−'} ${format(Math.abs(difference))}${unit}</span>` : ''}`;
+}
+
+function describePassiveLevel(player, key, level, mode, rich = false) {
+  const base = passiveLevelStats({ ...player, classId: null }, key, level, mode);
+  const actual = passiveLevelStats(player, key, level, mode);
+  const labels = { critChance: 'Шанс крита', dmgMult: 'Урон', speedMult: 'Скорость', xpMult: 'Опыт', currencyMult: 'Фиткоины',
+    magnetMult: 'Радиус сбора', dodge: 'Уклонение', summonDamageBonus: 'Урон призывов' };
+  return Object.entries(actual).map(([stat, value]) => {
+    if (stat === 'hasBackupShield') return '';
+    if (stat === 'hasShoeTrail') return value ? 'Дорожка при движении' : '';
+    const normal = base[stat];
+    if (stat === 'backupInterval') return abilityStat('Интервал щита', normal, value, ' с', rich);
+    if (stat === 'backupDuration') return abilityStat('Длительность щита', normal, value, ' с', rich);
+    if (stat === 'regen') return abilityStat('Регенерация', normal, value, ' HP/с', rich, true);
+    if (stat === 'maxHp') return abilityStat('Максимум HP', normal, value, '', rich, true);
+    if (PASSIVE_MULTIPLIERS.has(stat)) return abilityStat(stat === 'cdMult' ? 'Перезарядка' : 'Перезарядка рывка', (normal - 1) * 100, (value - 1) * 100, '%', rich, true);
+    return abilityStat(labels[stat] || stat, normal * 100, value * 100, '%', rich, true);
+  }).filter(Boolean).join('; ') + '.';
+}
+
+function describeActiveLevel(player, key, level, mode, rich = false) {
+  const own = hasClassAffinity(player, key);
+  const defense = mode === 'pvp' ? 0.5 : 1;
+  const n = (label, base, multiplier = 1, unit = '') => abilityStat(label, base, base * (own ? multiplier : 1), unit, rich);
+  const pct = (label, base, multiplier = 1) => n(label, base, multiplier, '%');
+  const bonus = (label, value) => abilityStat(label, value, value, '%', rich, true);
+  const damage = (label, base) => n(label, activeSkillDamage(base, level), CLASS_ACTIVE_DAMAGE.has(key) ? 1.15 : 1);
+  const heal = (base, multiplier = 1) => pct('Лечение от максимума HP', base * defense, multiplier);
+  const shield = (base, multiplier = 1) => n('Щит', base * defense, multiplier, ' с');
+  const duration = (base, multiplier = 1) => n('Длительность', base, multiplier, ' с');
+  const summon = (count, hp, life, hit, bossFactor = 1) => [n('Помощников', count),
+    abilityStat('HP помощника', hp, Math.round(hp * (own ? 1.25 : 1)), '', rich),
+    n('Время жизни', life, 1.30, ' с'), damage('Урон за атаку', hit),
+    ...(bossFactor < 1 ? [pct('Урон по боссам от обычного', bossFactor * 100)] : [])];
+  const stats = {
+    act_backup_dt: () => [heal(35 + level * 5, 1.15), shield(3.5), n('Радиус', 300), damage('Урон волны', 90 + level * 30), n('Отталкивание', 160)],
+    act_kill_sessions: () => [pct('Добивание при HP до', 32 + level * 5), damage('Урон обычным врагам', 70 + level * 25), n('Оглушение обычных', 2, 1, ' с'), damage('Урон боссам', 250 + level * 100), n('Оглушение боссов', 3 + level * 0.5, 1, ' с')],
+    act_turbo_mssql: () => [duration(6.5 + level * 0.5, 1.15), bonus('Скорость', 50), bonus('Скорострельность оружия', 100), pct('Расход текущего HP', 6)],
+    act_lavender_raf: () => ['Притяжение всех дискет', pct('Радиус постоянного сбора от радиуса карты', [0, 10, 25, 50, 75, 100][level]), n('Снарядов', 24), damage('Урон снаряда', 65 + level * 20)],
+    act_messenger_blast: () => [damage('Урон обычным врагам', 35 + level * 15), damage('Урон боссам', 80 + level * 25), n('Оглушение обычных', 1.8 + level * 0.25, 1.20, ' с'), n('Оглушение боссов', 0.7 + level * 0.2, 1, ' с')],
+    act_sigur_lockdown: () => [n('Радиус', 310, 1.15), damage('Урон обычным врагам', 120 + level * 30), damage('Урон боссам', 90 + level * 30), n('Оглушение', 0.6 + level * 0.15, 1, ' с'), 'Отталкивание'],
+    act_atol_receipt_rain: () => [n('Чеков', 16 + level * 2), damage('Урон чека', 38 + level * 14)],
+    act_shtrikh_reconciliation: () => [n('Целей', 5 + level), damage('Урон обычным врагам', 180 + level * 35), damage('Урон боссам', 110 + level * 35), n('Оглушение', 0.45 + level * 0.12, 1, ' с')],
+    act_evotor_approval: () => [bonus('Урон', 60), bonus('Шанс крита', 10), bonus('Скорость', -8), duration(8 + level * 1.5, 1.20)],
+    act_membership_reactivation: () => [heal(20 + level * 3, 1.20), n('Опыт с дискеты', 16 + level * 4), bonus('Опыт', 35), duration(8 + level)],
+    act_support_call: () => summon(Math.min(4, level), 78 + level * 16, 11 + level * 1.4, 15 + level * 4),
+    act_cache_purge: () => [n('Радиус', 300 + level * 24), damage('Урон обычным врагам', 180 + level * 45), damage('Урон боссам', 110 + level * 45), n('Оглушение обычных', 1.1 + level * 0.12, 1, ' с'), n('Оглушение боссов', 0.5, 1, ' с'), 'Отталкивание; очистка снарядов'],
+    act_technician_drone: () => summon(1, 110 + level * 28, 10 + level * 2, 34 + level * 12),
+    act_senior_escalation: () => summon(1, 205 + level * 38, 8 + level * 1.6, 34 + level * 9, 0.48),
+    act_transaction_rollback: () => [n('Откат позиции на', 2.5 + level * 0.5, 1, ' с'), heal(4 + level), shield(0.35 + level * 0.1)],
+    act_urgent_transfer: () => [n('Дальность переноса', 110 + level * 20, 1.20), n('Радиус замедления', 170), pct('Замедление обычных', 35), duration(2)],
+    act_emergency_ups: () => [shield(2 + level * 0.2, 1.20), n('Радиус очистки снарядов', 160 + level * 20)],
+    act_unloading: () => [n('Радиус', 200 + level * 20, 1.15), damage('Урон', 100 + level * 25), n('Отталкивание обычных', 70), pct('Замедление обычных', 40), duration(2.5)],
+    act_hot_deploy: () => [n('Радиус', 240 + level * 20), damage('Урон обычным врагам', 180 + level * 40), damage('Урон боссам', (180 + level * 40) * 0.65), pct('Расход текущего HP', 8)],
+    act_remote_restore: () => [heal(6 + level * 2, 1.20), pct('Лечение помощников от максимума HP', (35 + level * 5) * defense, 1.20)]
+  }[key]?.() || [];
+  const cdMultiplier = own ? { act_lavender_raf: 0.90, act_transaction_rollback: 0.85 }[key] || 1 : 1;
+  const cooldown = ACTIVE_SKILLS_DEF[key].baseCd;
+  stats.push(abilityStat('Перезарядка', cooldown, cooldown * cdMultiplier, ' с', rich));
+  return stats.join('; ') + '.';
+}
+
+function describeCombatLevel(player, key, level, rich = false) {
+  const own = hasClassAffinity(player, key);
+  const rank = Math.max(1, Math.min(3, level));
+  const n = (label, base, actual = base, unit = '', signed = false) => abilityStat(label, base, actual, unit, rich, signed);
+  const combined = (key === 'slowshot' && level >= 3 && player.burnShotLevel >= 3) || (key === 'burnshot' && level >= 3 && player.slowShotLevel >= 3);
+  const burning = (base, bonus) => n('Урон горения каждые 0,5 с', base, base * (bonus ? 1.20 : 1));
+  const explosion = () => [n('Урон взрыва от попадания', 50, 50, '%'), n('Радиус взрыва', 82), n('Заморозка', 0.1, 0.1, ' с'),
+    ...(key === 'burnshot'
+      ? [burning((2.5 + level * 0.3) * 1.5, own)]
+      : [burning((2.5 + player.burnShotLevel * 0.3) * 1.5 * (player.classId === 'developer' ? 1.20 : 1), false)]), n('Горение', 3, 3, ' с')];
+  const stats = {
+    ricochet: () => [n('Рикошетов', level), n('Урон первого рикошета от исходного', 82, own ? 90.2 : 82, '%'), n('Перезарядка', [0, 3, 9, 15][rank], undefined, '%', true)],
+    multishot: () => [n('Дополнительных снарядов', level), n('Общий урон', [0, -4, -12, -20][rank], [0, -4, -12, -20][rank] * (own ? 0.8 : 1), '%', true)],
+    slowshot: () => [...(combined ? explosion() : [n('Замедление обычных', rank * 15, undefined, '%'), n('Замедление боссов', rank * 7.5, undefined, '%'), n('Длительность замедления', 2.2, own ? 2.64 : 2.2, ' с')]), n('Скорость', [0, -2, -6, -10][rank], undefined, '%', true)],
+    burnshot: () => [...(combined ? explosion() : [n('Шанс поджога', [0, 30, 50, 65][rank], undefined, '%'), burning(2.5 + level * 0.3, own), n('Горение', 3, 3, ' с')]), n('Перезарядка', [0, 2.5, 7.5, 12.5][rank], undefined, '%', true)]
+  }[key]?.() || [];
+  return stats.join('; ') + '.';
 }
 
 const LEGENDARY_MIGRATIONS = [
@@ -9358,22 +9428,22 @@ class Game {
       return { icon: item?.icon || '📦', name: `${item?.name || slot.key}${slot.count > 1 ? ` ×${slot.count}` : ''}`, value: kind, detail: item?.desc || '' };
     });
     const weapons = Object.entries(this.weapons || {}).map(([key, weapon]) => ({
-      icon: WEAPONS_DEF[key]?.icon || '🔫', name: WEAPONS_DEF[key]?.name || key, value: `ур. ${weapon.lvl}`, detail: WEAPONS_DEF[key]?.desc || ''
+      icon: WEAPONS_DEF[key]?.icon || '🔫', name: WEAPONS_DEF[key]?.name || key, value: `ур. ${weapon.lvl}`, detail: this.getWeaponUpgradeSummary(key, weapon.lvl)
     }));
     const passives = Object.entries(this.passives || {}).map(([key, passive]) => ({
       icon: PASSIVES_DEF[key]?.icon || '⬆️', name: PASSIVES_DEF[key]?.name || key, value: `ур. ${passive.lvl}/5`,
-      detail: `${describePassiveStats(passiveLevelStats(player, key, passive.lvl, this.pvp?.mode))} ${abilityClassDescription(player, key)}`
+      detail: describePassiveLevel(player, key, passive.lvl, this.pvp?.mode)
     }));
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
     ].filter(([stat]) => player[stat] > 0).map(([stat, key]) => ({
-      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${player[stat]}`, detail: COMBAT_UPGRADES[key].levelDescriptions?.[player[stat] - 1] || COMBAT_UPGRADES[key].desc
+      icon: COMBAT_UPGRADES[key].icon, name: COMBAT_UPGRADES[key].name, value: `ур. ${player[stat]}`, detail: describeCombatLevel(player, key, player[stat])
     }));
     const activeSkills = (this.activeSkills || []).filter(Boolean).map(skill => ({
       icon: ACTIVE_SKILLS_DEF[skill.key]?.icon || '⚡',
       name: ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key,
       value: `ур. ${skill.lvl}`,
-      detail: `${ACTIVE_SKILL_LEVEL_SUMMARIES[skill.key]?.(skill.lvl) || ACTIVE_SKILLS_DEF[skill.key]?.desc || ''} ${abilityClassDescription(player, skill.key)}`
+      detail: describeActiveLevel(player, skill.key, skill.lvl, this.pvp?.mode)
     }));
     Object.entries(this.repeatableUpgradeCounts || {}).forEach(([key, count]) => {
       const upgrade = REPEATABLE_UPGRADES.find(item => item.key === key);
@@ -12665,7 +12735,7 @@ class Game {
     return choices;
   }
 
-  getWeaponUpgradeSummary(key, level) {
+  getWeaponUpgradeSummary(key, level, rich = false) {
     const damageAtLevel = {
       turnstile: level => 16 + level * 5,
       keys: level => 26 + level * 6,
@@ -12687,10 +12757,9 @@ class Game {
     }[key];
     const weapon = WEAPONS_DEF[key];
     const classMult = hasClassAffinity(this.player, key) ? 1.15 : 1;
-    const damage = Number(((damageAtLevel ? damageAtLevel(level) : weapon.baseDmg) * classMult).toFixed(2));
-    const previousDamage = level > 1 && damageAtLevel ? Number((damageAtLevel(level - 1) * classMult).toFixed(2)) : null;
-    const damageChange = previousDamage === null ? 'стартовый урон' : `+${formatStatNumber(damage - previousDamage)} к базовому урону за уровень`;
-    const cooldown = weapon.baseCooldown > 0 ? `${formatStatNumber(weapon.baseCooldown)} с` : 'постоянная атака';
+    const damage = damageAtLevel ? damageAtLevel(level) : weapon.baseDmg;
+    const damageText = abilityStat('Урон', damage, damage * classMult, '', rich);
+    const cooldown = weapon.baseCooldown > 0 ? `Перезарядка ${formatStatNumber(weapon.baseCooldown)} с` : 'Постоянная атака';
     const extras = {
       turnstile: `вращается вокруг героя; лопастей ${Math.min(5, 1 + Math.floor(level / 2))}`,
       keys: `залп ${Math.min(6, 1 + Math.floor(level / 2)) + this.player.multishotLevel} пропуск(а)`,
@@ -12710,37 +12779,36 @@ class Game {
       fusion_attendance: `пробивающая ведомость + замедляющая лужа радиусом ${56 + level * 7}`,
       fusion_callcenter: `аура дозвона ${90 + level * 15} + разряды по ${3 + Math.floor(level / 2) + this.player.multishotLevel} линиям`
     }[key] || '';
-    return `Ур. ${level}: ${damage} баз. урона${classMult > 1 ? ' с классовым бонусом' : ''} (${damageChange}); базовая перезарядка ${cooldown}${extras ? `; ${extras}` : ''}.`;
+    const penalty = {
+      fusion_audit: 'Скорость −6%', fusion_ledger: 'Перезарядка +7%', fusion_gate: 'Радиус сбора −12%',
+      fusion_attendance: 'Скорость −7%', fusion_callcenter: 'Максимум HP −10%; перезарядка рывка +12%'
+    }[key];
+    return `${damageText}; ${cooldown}${extras ? `; ${extras}` : ''}${penalty ? `; ${penalty}` : ''}.`;
   }
 
   getRepeatableUpgradeSummary(choice) {
     const level = choice.lvl || 1;
     const summaries = {
-      rep_bonus_pay: `Выбор №${level}: +35 к максимуму HP, полное лечение и +5% к урону.`,
-      rep_espresso: `Выбор №${level}: +40 HP; скорость бега +5%; перезарядка умений и оружия короче ещё на 6%.`,
-      rep_cache_purge: `Выбор №${level}: +1,2 HP регенерации в секунду и +25% к радиусу сбора.`,
-      rep_salary_index: `Выбор №${level}: +15% к опыту и +5% к шансу крита; скорость бега ${level <= 8 ? '−1%' : 'без штрафа'} за этот выбор.`
+      rep_bonus_pay: '+35 к максимуму HP; полное лечение; урон +5%.',
+      rep_espresso: '+40 HP; скорость +5%; перезарядка −6%.',
+      rep_cache_purge: 'Регенерация +1,2 HP/с; радиус сбора +25%.',
+      rep_salary_index: `Опыт +15%; шанс крита +5%; скорость ${level <= 8 ? '−1%' : 'без штрафа'}.`
     };
     return summaries[choice.key] || choice.def.desc;
   }
 
-  getUpgradeChoiceDescription(choice) {
+  getUpgradeChoiceDescription(choice, rich = false) {
     if (choice.type === 'weapon_new' || choice.type === 'weapon_up' || choice.type === 'weapon_fusion') {
-      const summary = this.getWeaponUpgradeSummary(choice.key, choice.lvl || 1);
-      const fusion = choice.type === 'weapon_fusion'
-        ? `Объединяет ${choice.components.map(key => WEAPONS_DEF[key].name).join(' + ')}; компоненты заменяются комбинацией. `
-        : '';
-      return `${fusion}${summary} ${choice.def.desc}`;
+      return this.getWeaponUpgradeSummary(choice.key, choice.lvl || 1, rich);
     }
     if (choice.type === 'active_new' || choice.type === 'active_up') {
       const level = choice.lvl || 1;
-      const summary = ACTIVE_SKILL_LEVEL_SUMMARIES[choice.key]?.(level) || choice.def.desc;
-      return `Ур. ${level}: ${summary} Базовая перезарядка — ${choice.def.baseCd} с.`;
+      return describeActiveLevel(this.player, choice.key, level, this.pvp?.mode, rich);
     }
     if (choice.type === 'repeatable') return this.getRepeatableUpgradeSummary(choice);
     const passiveLevel = choice.type === 'pass_new' ? 1 : (choice.type === 'pass_up' ? choice.lvl : 0);
-    if (passiveLevel) return `${describePassiveStats(passiveLevelStats(this.player, choice.key, passiveLevel, this.pvp?.mode))} (уровень ${passiveLevel} из 5)`;
-    if (choice.type === 'combat_up') return choice.def.levelDescriptions?.[choice.lvl - 1] || choice.def.desc;
+    if (passiveLevel) return describePassiveLevel(this.player, choice.key, passiveLevel, this.pvp?.mode, rich);
+    if (choice.type === 'combat_up') return describeCombatLevel(this.player, choice.key, choice.lvl, rich);
     return choice.def.desc || 'Улучшает характеристики героя.';
   }
 
@@ -12772,7 +12840,7 @@ class Game {
       const owner = ABILITY_CLASS_BY_KEY[ch.key];
       const affinityBadge = owner ? `<b style="color:${hasClassAffinity(this.player, ch.key) ? '#b77900' : '#666'}">[${hasClassAffinity(this.player, ch.key) ? '★ ' : ''}${PLAYER_CLASSES[owner].name}]</b>` : '<b style="color:#777">[ОБЩЕЕ]</b>';
       const title = `${typeBadge} ${upgradeName}${stateBadge} ${affinityBadge}`;
-      const description = `${this.getUpgradeChoiceDescription(ch)} ${abilityClassDescription(this.player, ch.key)}`;
+      const description = this.getUpgradeChoiceDescription(ch, true);
       card.innerHTML = `<div class="card-icon">${ch.def.icon}</div><div class="card-info"><h4>${title}</h4><p>${description}</p></div>`;
       card.onclick = () => {
         this.applyUpgrade(ch);
@@ -13888,7 +13956,7 @@ class Game {
         overlay.style.display = 'none';
       } else {
         const def = ACTIVE_SKILLS_DEF[skill.key];
-        el.title = `${def.name}. ${this.getUpgradeChoiceDescription({type: 'active_up', key: skill.key, def, lvl: skill.lvl})} ${abilityClassDescription(this.player, skill.key)}`;
+        el.title = `${def.name}. ${this.getUpgradeChoiceDescription({type: 'active_up', key: skill.key, def, lvl: skill.lvl})}`;
         el.className = 'active-slot';
         iconEl.innerText = def.icon;
         lvlEl.innerText = `v${skill.lvl}`;

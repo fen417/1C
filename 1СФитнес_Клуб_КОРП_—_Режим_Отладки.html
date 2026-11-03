@@ -3187,7 +3187,7 @@ const PASSIVES_DEF = {
   sql_indexes: {
     name: 'Индексы MSSQL',
     icon: '⚡',
-    desc: '+18% шанс критического урона (x2.5), но тяжёлые запросы немного замедляют атаки.',
+    desc: 'Повышает шанс крита с +12% на первом уровне до +36% на пятом, но удлиняет перезарядку.',
     levels: [
       { critChance: 0.12, cdMult: 1.03 }, { critChance: 0.18, cdMult: 1.05 },
       { critChance: 0.24, cdMult: 1.08 }, { critChance: 0.30, cdMult: 1.12 }, { critChance: 0.36, cdMult: 1.16 }
@@ -3370,7 +3370,7 @@ const ACTIVE_SKILLS_DEF = {
   act_kill_sessions: {
     name: 'Активное: Завершить зависшие сеансы через консоль администрирования',
     icon: '✂️',
-    desc: 'Очистка диспетчера: убивает обычных врагов с HP < 30% на всём экране и станит боссов на 3с!',
+    desc: 'Добивает обычных врагов при 37–57% HP или ниже, в зависимости от уровня. Остальным наносит урон и оглушает; боссы оглушаются на 3,5–5,5 с.',
     baseCd: 18,
     cast: (g, lvl) => {
       g.sound.explosion();
@@ -3399,7 +3399,7 @@ const ACTIVE_SKILLS_DEF = {
   act_turbo_mssql: {
     name: 'Активное: Турбо-Режим MSSQL (Разгон RAM)',
     icon: '🚀',
-    desc: 'На 6.5 сек скорость бега +50%, а оружие стреляет в 2 раза чаще! Перегрев стойки сжигает 6% текущего HP (но не ниже 1 HP).',
+    desc: 'На 7–9 с скорость бега +50%, а оружие стреляет в 2 раза чаще. Перегрев стойки сжигает 6% текущего HP (но не ниже 1 HP).',
     baseCd: 24,
     cast: (g, lvl) => {
       g.sound.skillCast();
@@ -3671,6 +3671,9 @@ const activeDamageLevelText = (base, perLevel, level) => {
   const current = activeDamageAtLevel(base, perLevel, level);
   return `${current}`;
 };
+const SUMMON_BASE_SCALING = { hp: 1.35, life: 1.25, damage: 1.3 };
+const summonLevelText = (hp, life, damage, level) =>
+  `${formatStatNumber(hp * SUMMON_BASE_SCALING.hp)} HP, ${formatStatNumber(life * SUMMON_BASE_SCALING.life)} с на поле, ${formatStatNumber(activeSkillDamage(damage, level) * SUMMON_BASE_SCALING.damage)} урона за атаку`;
 const ACTIVE_SKILL_LEVEL_SUMMARIES = {
   act_backup_dt: level => `Лечение ${35 + level * 5}% HP, щит 3,5 с; волна в радиусе 300 наносит ${activeDamageLevelText(90, 30, level)} урона.`,
   act_kill_sessions: level => `Обычных врагов добивает при HP до ${32 + level * 5}%; иначе наносит ${activeDamageLevelText(70, 25, level)} урона. Боссам: ${activeDamageLevelText(250, 100, level)} урона и оглушение на ${formatStatNumber(3 + level * 0.5)} с.`,
@@ -3682,10 +3685,10 @@ const ACTIVE_SKILL_LEVEL_SUMMARIES = {
   act_shtrikh_reconciliation: level => `Поражает ${5 + level} ближайших целей; урон каждой: ${activeDamageLevelText(180, 35, level)} обычным врагам / ${activeDamageLevelText(110, 35, level)} боссам; оглушение ${formatStatNumber(0.45 + level * 0.12)} с.`,
   act_evotor_approval: level => `Урон +60% и шанс крита +10% на ${formatStatNumber(8 + level * 1.5)} с; скорость бега −8% на время синхронизации.`,
   act_membership_reactivation: level => `Лечение ${formatPercent((0.20 + level * 0.03) * 100)}% максимального HP, дискета на ${16 + level * 4} опыта и +35% к опыту на ${8 + level} с.`,
-  act_support_call: level => `Вызывает ${Math.min(4, Math.max(1, level))} помощника(ов): ${activeDamageLevelText(15, 4, level)} урона за атаку, ${78 + level * 16} HP и ${formatStatNumber(11 + level * 1.4)} с на поле.`,
+  act_support_call: level => `Вызывает помощников: ${Math.min(4, Math.max(1, level))}. У каждого ${summonLevelText(78 + level * 16, 11 + level * 1.4, 15 + level * 4, level)}.`,
   act_cache_purge: level => `Радиус ${300 + level * 24}; урон ${activeDamageLevelText(180, 45, level)} обычным врагам / ${activeDamageLevelText(110, 45, level)} боссам. Отталкивает врагов и убирает снаряды.`,
-  act_technician_drone: level => `Дрон на ${10 + level * 2} с: ${activeDamageLevelText(34, 12, level)} урона за атаку, ${110 + level * 28} HP.`,
-  act_senior_escalation: level => `Старший специалист на ${formatStatNumber(8 + level * 1.6)} с: ${activeDamageLevelText(34, 9, level)} урона за атаку, ${205 + level * 38} HP; боссам наносит 48% своего урона.`,
+  act_technician_drone: level => `Дрон: ${summonLevelText(110 + level * 28, 10 + level * 2, 34 + level * 12, level)}.`,
+  act_senior_escalation: level => `Старший специалист: ${summonLevelText(205 + level * 38, 8 + level * 1.6, 34 + level * 9, level)}. Боссам наносит 48% своего урона.`,
   act_transaction_rollback: level => `Откат на ${formatStatNumber(2.5 + level * 0.5)} с назад, лечение ${formatPercent((0.04 + level * 0.01) * 100)}% максимального HP и щит ${formatStatNumber(0.35 + level * 0.1)} с.`
 };
 
@@ -3751,7 +3754,7 @@ const STORE_PASSIVE_COMBOS = {
   sla_courier_kit: {
     parts: ['fast_service_shoes', 'usb_adapter'],
     name: 'Комплект «Курьер на SLA»', icon: '🛵',
-    desc: 'Итоговые характеристики: +15% к скорости бега; перезарядка умений и оружия короче на 4%, рывка — на 20%.',
+    desc: 'Итоговые характеристики: +15% к скорости бега; перезарядка умений и оружия короче на 4%, перезарядка рывка — на 20% короче.',
     apply: p => { p.speedMult += 0.05; p.cdMult *= 0.96; }
   },
   backup_server: {
@@ -16925,10 +16928,10 @@ function installPatch300() {
     }};
   ABILITY_CLASSES.support.push('act_incident_engineer');ABILITY_CLASS_BY_KEY.act_incident_engineer='support';
   for(const key of ['act_support_call','act_technician_drone','act_senior_escalation','act_incident_engineer'])ACTIVE_SKILLS_DEF[key].desc+=' В 3.0: помощникам +35% HP, +25% длительности и +30% урона; обычные помощники атакуют на 22% чаще, старший специалист — на 19% чаще.';
-  ACTIVE_SKILL_LEVEL_SUMMARIES.act_incident_engineer=l=>`Инженер: ${140+l*28} базового HP, ${12+l*2} с базовой длительности; попадания наносят дополнительный урон в радиусе 75.`;
+  ACTIVE_SKILL_LEVEL_SUMMARIES.act_incident_engineer=l=>`Инженер: ${summonLevelText(140+l*28,12+l*2,28+l*9,l)}. Попадания наносят дополнительный урон в радиусе 75.`;
   const passiveItems={
     proxy_stool:{name:'Прокси-сервер на табуретке',icon:'🪑',tier:3,cost:850,desc:'+20% максимального HP. Раз в 2,5 с с шансом 25% перенаправляет попавший снаряд моба в ближайшего врага с двойным уроном.',apply:p=>{p.maxHp*=1.2;p.patchProxyItem=1;}},
-    migration_case:{name:'Кейс срочной миграции',icon:'🧳',tier:3,cost:880,desc:'+8% скорости. После рывка следующий выстрел сильнее на 45%; попадание сокращает рывок на 0,8 с (КД 2 с).',apply:p=>{p.speedMult+=.08;p.patchMigrationItem=1;}},
+    migration_case:{name:'Кейс срочной миграции',icon:'🧳',tier:3,cost:880,desc:'+8% скорости. После рывка следующий выстрел сильнее на 45%; попадание сокращает перезарядку рывка на 0,8 с (КД 2 с).',apply:p=>{p.speedMult+=.08;p.patchMigrationItem=1;}},
     last_ups:{name:'ИБП последней надежды',icon:'🔋',tier:3,cost:960,desc:'+35 максимального HP. При падении ниже 25% HP: щит на 1,5 с и ускорение на 3 с. КД 55 с.',apply:p=>{p.maxHp+=35;p.patchLastUpsItem=1;}},
     support_package:{name:'Пакет расширенной поддержки',icon:'🎧',tier:3,cost:990,desc:'Помощникам +40% HP и +12% урона; подбирают дискеты в радиусе 70 для хозяина.',apply:p=>{p.summonDamageBonus=(p.summonDamageBonus||0)+.12;p.patchSupportItem=1;}},
     corp_hot_reserve:{name:'КОРП: горячий резерв',icon:'🏢',tier:4,cost:2800,maxOwned:1,desc:'+45 максимального HP. Защитный навык вызывает резервный дрон: базовая длительность 8 с, усиливается бонусами помощников. КД вызова 18 с.',apply:p=>{p.maxHp+=45;p.patchHotReserveItem=1;}},
@@ -17053,7 +17056,7 @@ function installPatch300() {
   });
   wrap('updateWeapons',function(original,dt){const start=this.projectiles.length;original.call(this,dt);const mirror=this.summons.find(s=>s.role==='mirror'&&s.hp>0&&s.life>0);if(mirror)for(const shot of this.projectiles.slice(start)){if(shot.type==='laser_visual'||shot.isSummon||!Number.isFinite(shot.vx))continue;this.projectiles.push({...shot,x:mirror.x,y:mirror.y,dmg:shot.dmg*.35,hits:[],hitTargets:[],hitPlayers:[],isSummon:true,source:'Зеркало тестовой базы'});}});
   wrap('updateSummons',function(original,dt,frameScale){
-    for(const s of this.summons){if(!s.patchBuffed){s.patchBuffed=true;s.hp*=1.35;s.maxHp*=1.35;s.maxLife=(s.maxLife||s.life)*1.25;s.life*=1.25;s.dmg*=1.3;s.patchDamageBonus=this.player.summonDamageBonus||0;}
+    for(const s of this.summons){if(!s.patchBuffed){s.patchBuffed=true;s.hp*=SUMMON_BASE_SCALING.hp;s.maxHp*=SUMMON_BASE_SCALING.hp;s.maxLife=(s.maxLife||s.life)*SUMMON_BASE_SCALING.life;s.life*=SUMMON_BASE_SCALING.life;s.dmg*=SUMMON_BASE_SCALING.damage;s.patchDamageBonus=this.player.summonDamageBonus||0;}
       const support=this.hasPatchItem('support_package');if(support!==Boolean(s.patchSupportScaled)){const ratio=support?1.4:1/1.4;s.hp*=ratio;s.maxHp*=ratio;s.patchSupportScaled=support;}
       const bonus=this.player.summonDamageBonus||0;if(bonus!==s.patchDamageBonus){s.dmg*=Math.max(.1,1+bonus)/Math.max(.1,1+(s.patchDamageBonus||0));s.patchDamageBonus=bonus;}
       if(s.role==='mirror')s.attackTimer=999;
@@ -17343,28 +17346,54 @@ const PATCH300_METHODS = {
   },
   closeKnowledgeBase() {document.getElementById('modal-knowledge').style.display='none';document.getElementById(this.knowledgeReturn||'modal-main-menu').style.display='flex';this.setMobileMenuScroll(true);},
   setKnowledgeTab(tab) {this.knowledgeTab=tab;this.renderKnowledgeBase();},
-  appendKnowledgeText(element,text,tone='') {
+  knowledgeNumberKind(head, tail, token) {
+    if (/^(?:Ур\.|[IVX]+\s+уров)/iu.test(token)) return 'level';
+    // Сравниваем число с его характеристикой, а не с соседним эффектом.
+    const separator = /[;!?·]|(?<!\d)[.,]|[.,](?!\d)/u;
+    const before = head.split(separator).at(-1);
+    const after = tail.split(separator)[0].split(/\s+(?:и|а|но|зато)\s+|[+＋−-]?\s*\d/iu)[0];
+    const stats = /(?<![\p{L}\p{N}])(?:скорост[а-яё]*\s+(?:перезаряд|восстановлен)[а-яё]*|(?:защит|сопротивлен|поглощени|снижени)[а-яё]*\s+(?:от\s+)?(?:(?:входящ|получаем)[а-яё]*\s+)?урон[а-яё]*|(?:входящ|получаем)[а-яё]*\s+урон[а-яё]*|урон[а-яё]*\s+по\s+(?:герою|игроку)|следующ[а-яё]*\s+попадани[а-яё]*|(?:перезаряж|перезаряд|откат|цен|стоимост|наценк|скорост|урон|защит|здоров|опыт|фиткоин|радиус|крит|лечен|регенерац|замедлен)[а-яё]*|HP)/giu;
+    const afterStat = after.match(stats)?.[0];
+    const stat = afterStat || before.match(stats)?.at(-1) || '';
+    const cooldown = /^(?:перезаряж|перезаряд|откат)/iu.test(stat);
+    const enemyAction = /(?:враг|моб|босс|преследовател)[а-яё]*\s+(?:(?:и\s+)?(?:босс|моб)[а-яё]*\s+)?(?:ускор|бега|атаку|теря)/iu.test(before);
+    const enemyStat = enemyAction || (/^(?:скорост|урон|здоров|HP)/iu.test(stat)
+      && /(?:скорост[а-яё]*|здоров[а-яё]*|урон[а-яё]*|HP)\s+(?:враг|моб|босс)/iu.test(before + ' ' + after));
+    const lowerIsBetter = cooldown || enemyStat ||
+      /^(?:(?:входящ|получаем)[а-яё]*\s+урон|урон[а-яё]*\s+по\s+(?:герою|игроку)|следующ[а-яё]*\s+попадани|цен|стоимост|наценк)/iu.test(stat);
+    const sign = token[0];
+    let direction = /[+＋]/u.test(sign) ? 1 : /[−-]/u.test(sign) ? -1 : 0;
+    if (!direction) {
+      // Длительности, радиусы и диапазоны без сравнения — характеристики.
+      const comparison = before.match(/(выше|ниже|больше|меньше|дороже|дешевле|короче|дольше|быстрее|медленнее|слабее|сильнее|чаще|реже)\s+(?:примерно\s+)?на\s*$/iu)?.[1]
+        || after.match(/^\s*(быстрее|медленнее|дольше|короче|больше|меньше|чаще|реже)(?![а-яё])/iu)?.[1];
+      if (comparison) {
+        const word = comparison.toLowerCase();
+        if (word === 'быстрее' || word === 'медленнее') direction = (word === 'быстрее') !== cooldown ? 1 : -1;
+        else direction = /^(?:ниже|меньше|дешевле|короче|слабее|реже)$/u.test(word) ? -1 : 1;
+      } else if (/(?:сниж|сокращ|уменьш|теря)[а-яё]*[^;!?·]*\s+на\s*$/iu.test(before) || /теря[а-яё]*\s*$/iu.test(before)) {
+        direction = -1;
+      } else if (/(?:увелич|повыш|усилива|ускор)[а-яё]*[^;!?·]*\s+на\s*$/iu.test(before)) {
+        direction = 1;
+      } else if (/замедл[а-яё]*[^;!?·]*\s+на\s*$/iu.test(before) && /%/u.test(token)) {
+        return /(?:враг|моб|босс|противник|обычных)/iu.test(before) ? 'bonus' : 'penalty';
+      } else if (/(?:трат|сжига|расход)[а-яё]*(?:\s+текущ[а-яё]*\s+HP)?\s*$/iu.test(before) && /%|HP/iu.test(token)) {
+        return 'penalty';
+      }
+    }
+    if (!direction) return 'value';
+    return (direction > 0) !== lowerIsBetter ? 'bonus' : 'penalty';
+  },
+  appendKnowledgeText(element,text,tone='',prefix='') {
     const value=String(text||'');if(tone)element.classList.add(`knowledge-${tone}`);
     // Вставляем только текстовые узлы: описания и поиск не становятся HTML.
-    const tokens=/(?:Ур\.\s*\d+|[IVX]+\s*уровень)|[+＋−–-]?\s*\d+(?:[.,]\d+)?(?:\s*[%×]|\s*HP(?:\/с)?|\s*с(?:екунд[а-яё]*)?(?![а-яё]))?/giu;
+    const tokens=/(?:Ур\.\s*\d+|[IVX]+\s+уров[а-яё]+)|(?:[+＋−-]\s*)?\d+(?:[ \u00a0\u202f]\d{3})*(?:[.,]\d+)?(?:\s*[–—-]\s*\d+(?:[.,]\d+)?)?(?:\s*(?:[%×]|п\.п\.|HP(?:\/с(?:ек(?:унд[а-яё]*)?)?)?|с(?:ек(?:унд[а-яё]*)?)?)(?![а-яё]))?/giu;
     let cursor=0;
     for(const match of value.matchAll(tokens)){
       element.appendChild(document.createTextNode(value.slice(cursor,match.index)));
       const span=document.createElement('span'),token=match[0];span.textContent=token;
-      let kind='value';
-      if(/^Ур\.|уровень/iu.test(token))kind='level';
-      else if(/^[+＋−–-]/u.test(token.trim())&&!/\d\s*$/u.test(value.slice(0,match.index))){
-        const tail=value.slice(match.index+token.length).split(/[;,.·]/u)[0].slice(0,45);
-        const head=value.slice(0,match.index).split(/[;,.·]/u).pop().slice(-45);
-        const reversed=/перезаряд|входящ[а-яё]*\s+урон|получаем[а-яё]*\s+урон|стоимост|наценк|цен[аыу]/iu.test(tail)||(/:\s*$/u.test(head)&&/перезаряд|входящ[а-яё]*\s+урон|стоимост|цен[аыу]/iu.test(head));
-        const positive=/^[+＋]/u.test(token.trim());kind=positive!==reversed?'bonus':'penalty';
-      }
-      if(kind==='value'){
-        const context=value.slice(0,match.index).split(/[;.·]/u).pop().slice(-65);
-        if(/(?:дольше|ниже|меньше|слабее|снижен[а-яё]*)\s+на\s*$/iu.test(context))kind='penalty';
-        else if(/(?:короче|быстрее|сокращает[а-яё\s]*|повышает[а-яё\s]*)\s+на\s*$/iu.test(context))kind='bonus';
-      }
-      span.className=`knowledge-${tone||kind}`;element.appendChild(span);cursor=match.index+token.length;
+      const kind=tone||this.knowledgeNumberKind((cursor===0?prefix:'')+value.slice(cursor,match.index),value.slice(match.index+token.length),token);
+      span.className=`knowledge-${kind}`;element.appendChild(span);cursor=match.index+token.length;
     }
     element.appendChild(document.createTextNode(value.slice(cursor)));
   },
@@ -17372,9 +17401,17 @@ const PATCH300_METHODS = {
     const query=document.getElementById('knowledge-search').value.trim().toLocaleLowerCase();
     const tabs={classes:'Классы',weapons:'Оружие',passives:'Перки',actives:'Навыки',items:'Магазин',events:'События',modifiers:'Модификаторы'};
     const nav=document.getElementById('knowledge-tabs');nav.replaceChildren();for(const [id,title] of Object.entries(tabs)){const button=document.createElement('button');button.className='btn-1c'+(this.knowledgeTab===id?' selected':'');button.textContent=title;button.onclick=()=>this.setKnowledgeTab(id);nav.appendChild(button);}
-    const entries=[];const add=(icon,name,desc,details=[])=>entries.push({icon,name,desc,details});
+    const entries=[];
+    const add=(icon,name,desc,details=[])=>{
+      const descriptions=Array.isArray(desc)?desc:[{text:desc}];
+      entries.push({icon,name,descriptions,details});
+    };
     if(this.knowledgeTab==='classes')for(const [id,def] of Object.entries(PLAYER_CLASSES)){const s=def.stats;add('🧑‍💻',def.name,def.perkDesc,[`${s.hp} HP · скорость ${s.baseSpeed} · урон ${Math.round(s.dmgMult*100)}% · опыт ${Math.round(s.xpMult*100)}%`,`Стартовое оружие: ${WEAPONS_DEF[def.weapon].name}`,`Классовые умения: ${ABILITY_CLASSES[id].map(key=>WEAPONS_DEF[key]?.name||PASSIVES_DEF[key]?.name||ACTIVE_SKILLS_DEF[key]?.name||COMBAT_UPGRADES[key]?.name).filter(Boolean).join(', ')}`]);}
-    if(this.knowledgeTab==='weapons')for(const [key,def] of Object.entries(WEAPONS_DEF)){const context=Object.create(this);context.player={...this.player,classId:null};add(def.icon,def.name,def.desc,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${context.getWeaponUpgradeSummary(key,i+1,false)}`));}
+    if(this.knowledgeTab==='weapons'){
+      const context=Object.create(this);
+      context.player={classId:null,multishotLevel:0};
+      for(const [key,def] of Object.entries(WEAPONS_DEF))add(def.icon,def.name,def.desc,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${context.getWeaponUpgradeSummary(key,i+1,false)}`));
+    }
     if(this.knowledgeTab==='passives'){
       for(const [key,def] of Object.entries(PASSIVES_DEF))add(def.icon,def.name,def.desc,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${def.levelDescriptions?.[i]||describePassiveLevel({classId:null},key,i+1,'solo',false)}`));
       for(const [key,def] of Object.entries(COMBAT_UPGRADES))add(def.icon,def.name,def.desc||'Боевой модификатор',Array.from({length:3},(_,i)=>`Ур. ${i+1}: ${describeCombatLevel({classId:null},key,i+1,false)}`));
@@ -17383,12 +17420,55 @@ const PATCH300_METHODS = {
     }
     if(this.knowledgeTab==='actives')for(const [key,def] of Object.entries(ACTIVE_SKILLS_DEF))add(def.icon,def.name,def.desc,[`Базовая перезарядка: ${def.baseCd} с`,...Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${ACTIVE_SKILL_LEVEL_SUMMARIES[key]?.(i+1)||def.desc}`)]);
     if(this.knowledgeTab==='items')for(const item of this.getShopCatalogItems())add(item.icon,`${item.tier===4?'IV · ':item.tier===3?'III · ':''}${item.name}`,item.desc,[`Базовая стоимость до наценки: ${item.cost||this.collectShopLeafKeys(item.key).reduce((sum,key)=>sum+(this.getShopPassiveDef(key)?.cost||0),0)} фиткоинов`,...(item.cooldown?[`Перезарядка: ${item.cooldown} с`]:[]),...(item.parts?[`Рецепт: ${item.parts.map(key=>this.getShopCatalogItem(key)?.name||key).join(' + ')}`]:[]),...(item.maxOwned?[`Лимит на игрока: ${item.maxOwned}`]:[])]);
-    if(this.knowledgeTab==='modifiers')for(const m of SOLO_RUN_MODIFIERS)add(m.icon,m.name,m.risk,[`Награда: ${m.reward}`]);
-    if(this.knowledgeTab==='events'){for(const [icon,name,description] of PATCH300_EVENTS)add(icon,name,description);for(const daily of DAILY_MODIFIERS)add('📅','Ежедневная смена: '+daily.name,daily.desc,[daily.buffDesc||'',daily.debuffDesc||''].filter(Boolean));}
-    const visible=entries.filter(entry=>!query||`${entry.name} ${entry.desc} ${entry.details.join(' ')}`.toLocaleLowerCase().includes(query));const box=document.getElementById('knowledge-list');box.replaceChildren();
+    if(this.knowledgeTab==='modifiers')for(const m of SOLO_RUN_MODIFIERS)add(m.icon,m.name,[{text:m.risk,tone:'penalty'}],[`Награда: ${m.reward}`]);
+    if(this.knowledgeTab==='events'){
+      for(const [icon,name,description] of PATCH300_EVENTS)add(icon,name,description);
+      for(const daily of DAILY_MODIFIERS){
+        const descriptions=[];
+        if(daily.buffDesc)descriptions.push({text:`Бонусы: ${daily.buffDesc}`,tone:'bonus'});
+        if(daily.debuffDesc)descriptions.push({text:`Штрафы: ${daily.debuffDesc}`,tone:'penalty'});
+        add('📅','Ежедневная смена: '+daily.name,descriptions.length?descriptions:daily.desc);
+      }
+    }
+    const visible=entries.filter(entry=>!query||[entry.name,...entry.descriptions.map(part=>part.text),...entry.details].join(' ').toLocaleLowerCase().includes(query));
+    const box=document.getElementById('knowledge-list');box.replaceChildren();
     document.getElementById('knowledge-count').textContent=`${tabs[this.knowledgeTab]} · ${visible.length} из ${entries.length}`;
-    for(const entry of visible){const article=document.createElement('article');article.className='knowledge-card';article.dataset.category=this.knowledgeTab;if(this.knowledgeTab==='items')article.dataset.tier=entry.name.startsWith('IV · ')?'4':entry.name.startsWith('III · ')?'3':'1';const title=document.createElement('h3');title.textContent=`${entry.icon||'📖'} ${entry.name}`;const desc=document.createElement('p');desc.className='knowledge-description';this.appendKnowledgeText(desc,entry.desc,this.knowledgeTab==='modifiers'?'penalty':'');article.append(title,desc);
-      if(entry.details.length){const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Характеристики и подробности';details.appendChild(summary);for(const text of entry.details){const line=document.createElement('p');line.className='knowledge-detail';const value=String(text||'');const label=value.match(/^(Ур\.\s*\d+|[^:]{1,55}):\s*/u);if(label){const tag=document.createElement('b');tag.className=/^Ур\./u.test(label[1])?'knowledge-level':'knowledge-label';tag.textContent=label[0];line.appendChild(tag);this.appendKnowledgeText(line,value.slice(label[0].length),/^Награда$/u.test(label[1])?'bonus':'');}else this.appendKnowledgeText(line,value);details.appendChild(line);}article.appendChild(details);}box.appendChild(article);
+    for(const entry of visible){
+      const article=document.createElement('article');
+      article.className='knowledge-card';
+      article.dataset.category=this.knowledgeTab;
+      if(this.knowledgeTab==='items')article.dataset.tier=entry.name.startsWith('IV · ')?'4':entry.name.startsWith('III · ')?'3':'1';
+      const title=document.createElement('h3');
+      title.textContent=`${entry.icon||'📖'} ${entry.name}`;
+      article.appendChild(title);
+      for(const part of entry.descriptions){
+        const desc=document.createElement('p');
+        desc.className='knowledge-description';
+        this.appendKnowledgeText(desc,part.text,part.tone);
+        article.appendChild(desc);
+      }
+      if(entry.details.length){
+        const details=document.createElement('details');
+        const summary=document.createElement('summary');
+        summary.textContent='Характеристики и подробности';
+        details.appendChild(summary);
+        for(const text of entry.details){
+          const line=document.createElement('p');
+          line.className='knowledge-detail';
+          const value=String(text||'');
+          const label=value.match(/^(Ур\.\s*\d+|[^:]{1,55}):\s*/u);
+          if(label){
+            const tag=document.createElement('b');
+            tag.className=/^Ур\./u.test(label[1])?'knowledge-level':'knowledge-label';
+            tag.textContent=label[0];
+            line.appendChild(tag);
+            this.appendKnowledgeText(line,value.slice(label[0].length),label[1]==='Награда'?'bonus':'',label[0]);
+          }else this.appendKnowledgeText(line,value);
+          details.appendChild(line);
+        }
+        article.appendChild(details);
+      }
+      box.appendChild(article);
     }
     if(!visible.length)box.textContent='По этому запросу ничего не найдено.';
   }

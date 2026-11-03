@@ -1664,6 +1664,7 @@
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
         <details class="release-notes patch-minor" open><summary><h3>3.0.0 — «Продакшн живой. Пока»</h3></summary>
+          <p><b>Исправления боя.</b> Диск ИТС, процентный урон офисного события и завершение сеансов больше не наносят повторный урон общей полосе здоровья комитета через его части. Стартовые волны появляются немного реже, а обычные враги имеют чуть меньше HP и урона; послабление плавно исчезает к пятой минуте. «Согласующий» создаёт круг только в пределах 520 м, не атакует во время заморозки, перезаряжается 6,5 с и предупреждает об ударе за 1,4 с. Между кругами группы согласующих выдерживается минимум 2,5 с.</p>
           <p><b>Усиленные одиночные забеги.</b> Перед стартом открывается отдельное окно подготовки с кнопкой модификаторов. Доступны десять добровольных усложнений с описанием риска и награды: больше врагов за дополнительный опыт; бронированные враги за стартовый урон; повышенный входящий урон за опыт и скорость; ускоренные враги за скорость и фиткоины; усиленные боссы за опыт и доход; дорогие лицензии за фиткоины; долгая перезарядка активок за стартовое HP; быстрые вражеские снаряды за опыт; больше элиты за опыт и деньги; слабое лечение за стартовые деньги и урон. Можно сочетать несколько, выбранный набор сохраняется для следующего одиночного старта и записывается в информацию о результате. Ежедневные и сетевые режимы используют свои правила.</p>
           <p><b>Девять новых перков.</b> Технарь: «Регламентное окно» ослабляет попадание после периода без урона, «Несгораемый остаток» накапливает резерв из избыточного лечения. Переносчик баз: «Пакет переноса» заряжает рывок дискетами и оставляет замедляющий буфер миграции, «Непрерывная выгрузка» усиливает выстрел после непрерывного движения. Разработчик: «Профилировщик» усиливает последовательные попадания по одной цели, «Грязный коммит» заряжает взрыв личными убийствами. Техпод: «Дежурная смена» оставляет ремнабор после гибели помощника, «База типовых решений» сокращает перезарядку навыка успешными атаками помощников. Общий «План отката» один раз за забег спасает от смертельного удара, возвращает в недавнюю безопасную точку и даёт короткий щит; дальнейшие уровни улучшают защиту. У всех перков пять уровней. Названия и описания переносчика приведены к миграции клиентских баз в 1С.</p>
           <p><b>Саммоны.</b> Всем помощникам увеличены HP на 35%, срок жизни на 25%, урон на 30%; обычные помощники атакуют чаще на 22%, старший специалист — на 19%. Добавлен четвёртый активный призыв техподдержки — «Дежурный инженер 1С»: дальность 650 и дополнительный урон по области. Теперь все четыре активных слота можно занять разными призывами. Сохраняются классовые бонусы техпода к HP и длительности. Перки, покупки и боты используют общий код помощников.</p>
@@ -3377,7 +3378,8 @@ const ACTIVE_SKILLS_DEF = {
       g.addPopup(g.player.x, g.player.y - 30, '✂️ СЕАНСЫ СБРОШЕНЫ!', '#ff4757');
 
       for (let e of g.enemies) {
-        if (e.is24hPursuer) continue;
+        // Глобальная атака уже попадает в общую полосу HP комитета через босса.
+        if (e.is24hPursuer || e.patchCommitteePart) continue;
         if (!e.isBoss) {
           if (e.hp / e.maxHp <= 0.32 + lvl * 0.05) {
             g.damageEnemy(e, e.hp, ACTIVE_SKILLS_DEF.act_kill_sessions.name);
@@ -11611,7 +11613,7 @@ class Game {
     if (roll === 0) {
       this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
-      for (const e of this.enemies) if (!e.is24hPursuer) this.damageEnemy(e, e.hp * 0.2, 'Офисное событие · уборка');
+      for (const e of this.enemies) if (!e.is24hPursuer && !e.patchCommitteePart) this.damageEnemy(e, e.hp * 0.2, 'Офисное событие · уборка');
     } else if (roll === 1) {
       this.showBanner('🎁 «После обновления ничего не работает». Клиент нажал «Обновить» раньше инструкции. Опыт x2 — хоть что-то обновилось успешно.');
       this.player.xpEventMult = 2.0;
@@ -11938,7 +11940,8 @@ class Game {
           this.spawnEnemy();
         }
       }
-      this.spawnTimer = Math.max(.75,1.85-this.time/950);
+      // Небольшая передышка на старте плавно исчезает к первому большому боссу.
+      this.spawnTimer = Math.max(.75,1.85-this.time/950) * (1 + .08 * Math.max(0, 1 - this.time / 300));
     }
 
     if (this.time >= this.nextBossMinute * 60 && this.time >= this.nextMiniBossAllowedTime) {
@@ -12076,8 +12079,9 @@ class Game {
 
     const d = defs[type];
     const difficultyLevel = Math.max(0,Math.floor((this.time-720)/180));
-    const hpBuff = (.85+Math.min(this.time,900)/210)*Math.pow(1.20,difficultyLevel);
-    const damageBuff = (.8+Math.min(this.time,720)/3600)*Math.pow(1.16,difficultyLevel);
+    const openingRelief = 1 - .05 * Math.max(0, 1 - this.time / 300);
+    const hpBuff = (.85+Math.min(this.time,900)/210)*Math.pow(1.20,difficultyLevel)*openingRelief;
+    const damageBuff = (.8+Math.min(this.time,720)/3600)*Math.pow(1.16,difficultyLevel)*openingRelief;
     const xpBuff = Math.pow(1.025,difficultyLevel);
     const dailyRules = this.getDailyRules();
 
@@ -13509,7 +13513,8 @@ class Game {
     this.sound.explosion();
     this.log("ПРИМЕНЕН ДИСК ИТС: Полное тестирование и исправление базы!");
     for (let e of this.enemies) {
-      if (e.is24hPursuer) continue;
+      // Части комитета передают урон боссу: диск должен задеть общую цель один раз.
+      if (e.is24hPursuer || e.patchCommitteePart) continue;
       if (!e.isBoss) {
         this.damageEnemy(e, e.hp, 'Диск ИТС · массовое уничтожение');
         this.createHitFX(e.x, e.y, '#ffd200', 8);
@@ -16941,7 +16946,7 @@ function installPatch300() {
   describePassiveLevel=function(player,key,level,mode,rich=false){return PATCH300_PERKS.some(perk=>perk[0]===key)?PASSIVES_DEF[key].levelDescriptions[level-1]:passiveDescription(player,key,level,mode,rich);};
   wrap('start',function(original,options={}){
     this.patchSoloIds=!this.pvp&&!options.daily?Array.from(new Set(options.soloModifiers||[])).filter(id=>SOLO_RUN_MODIFIERS.some(m=>m.id===id)):[];
-    this.patchSoloRules=this.buildSoloRules(this.patchSoloIds);this.patchZones=[];this.patchActorState=null;this.patchLicense=null;this.patchPortal=null;this.patchBossSequence=0;
+    this.patchSoloRules=this.buildSoloRules(this.patchSoloIds);this.patchZones=[];this.patchActorState=null;this.patchLicense=null;this.patchPortal=null;this.patchBossSequence=0;this.patchApproverNextCastAt=0;
     return original.call(this,options);
   });
   wrap('choosePlayerClass',function(original,id){const canChoose=document.getElementById('modal-class-select').style.display==='flex';original.call(this,id);if(canChoose&&!this.pvp&&!this.isDailyRun)this.applySoloStartingStats();});
@@ -17181,7 +17186,14 @@ const PATCH300_METHODS = {
     if(!e.patchType||e.hp<=0)return;e.patchAge=(e.patchAge||0)+dt;
     const target=this.getPvpEnemyTarget(e);
     if(e.patchType==='missing_inn'){const hidden=e.patchAge%6<1.2;if(e.patchGhostHidden&&!hidden){e.patchGhostTurnUntil=this.time+1;e.patchGhostAngle=Math.random()*Math.PI*2;}e.patchGhostHidden=hidden;if(hidden)e.slowTimer=0;}
-    if(e.patchType==='approver'){e.patchCast=(e.patchCast||3)-dt;if(e.patchCast<=0){e.patchCast=4.5;this.bossWarnings.push({x:target.x,y:target.y,radius:60,dmg:e.dmg*2.1,life:1.1,maxLife:1.1,isBossAttack:false,attackerName:e.name,attackerIcon:e.icon});}}
+    if(e.patchType==='approver'&&!(e.freezeTimer>0)){
+      e.patchCast=(e.patchCast??(3+this.rollRng()*2))-dt;
+      // Группа согласующих не должна накрывать игрока синхронными кругами издалека.
+      if(e.patchCast<=0&&Math.hypot(target.x-e.x,target.y-e.y)<=520&&this.time>=(this.patchApproverNextCastAt||0)){
+        e.patchCast=6.5;this.patchApproverNextCastAt=this.time+2.5;
+        this.bossWarnings.push({x:target.x,y:target.y,radius:60,dmg:e.dmg*2.1,life:1.4,maxLife:1.4,isBossAttack:false,attackerName:e.name,attackerIcon:e.icon});
+      }
+    }
     if(e.patchType==='return_courier'){
       e.patchStolenGems ||= [];if(e.patchStolenGems.length<12)for(let i=this.gems.length-1;i>=0;i--){const gem=this.gems[i];if(Math.hypot(gem.x-e.x,gem.y-e.y)<55){e.patchStolenGems.push({...gem});this.gems.splice(i,1);if(e.patchStolenGems.length>=12)break;}}
     }

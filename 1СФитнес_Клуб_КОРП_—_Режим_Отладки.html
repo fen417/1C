@@ -1179,6 +1179,14 @@
   #hud-inventory.hud-layout-custom, #hud-shop-passives.hud-layout-custom,
   #hud-consumables.hud-layout-custom, #hud-backpack.hud-layout-custom { width:max-content !important; }
   #dash-hud { white-space:nowrap; }
+  #hud-kill-feed { position:absolute; top:88px; right:15px; z-index:18; display:none; flex-direction:column; align-items:flex-end; gap:5px; width:430px; max-width:calc(100% - 24px); pointer-events:none; }
+  .kill-feed-row { display:flex; align-items:center; justify-content:flex-end; gap:8px; max-width:100%; color:#fff; font:bold 13px Tahoma,sans-serif; line-height:21px; text-shadow:1px 1px 2px #000,-1px -1px 2px #000,0 0 4px #000; }
+  .kill-feed-killer { color:#f1c27d; }
+  .kill-feed-victim { color:#9bd5ff; }
+  .kill-feed-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:170px; min-width:0; }
+  .kill-feed-icon { flex:none; font-size:18px; line-height:22px; white-space:nowrap; }
+  .kill-feed-local { color:#ffd200; }
+  @media (max-width:1300px) and (pointer:coarse) { #hud-kill-feed { top:76px; right:8px; gap:2px; } .kill-feed-row { font-size:10px; gap:5px; } .kill-feed-name { max-width:110px; } .kill-feed-icon { font-size:15px; } }
   #sales-call.hud-size-custom { transform:scale(var(--hud-scale)); transform-origin:top left; }
   #modal-hud-editor { z-index:290; padding:12px; background:rgba(5,10,18,.96); }
   #modal-hud-editor .hud-editor-window { width:100%; height:100%; max-width:1600px; max-height:100%; display:flex; flex-direction:column; }
@@ -1259,6 +1267,8 @@
       <div>💀 Багов: <span id="kill-display">0</span></div>
       <div>⏱️ <span id="time-display">00:00</span></div>
     </div>
+
+    <div id="hud-kill-feed" role="log" aria-live="polite" aria-label="Лента убийств игроков и ботов"></div>
 
     <!-- Активные умения 1 2 3 4 -->
     <div id="hud-active-skills">
@@ -1391,7 +1401,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 2.9.0 — «Рабочий стол по штатному расписанию»</h3>
-              <p>Боты в PvP и PvE: добавляйте и убирайте их в свободных слотах лобби, до семи на комнату. Случайные классы, сбор опыта, классовая прокачка, навыки и покупки. В PvP охотятся на игроков после снятия защиты, в PvE помогают против мобов.</p>
+              <p>Киллфид игроков и ботов без фона: имена, иконки оружия и мобов. Его положение настраивается в HUD; в редакторе есть перекрестие центра. Боты в PvP и PvE: добавляйте и убирайте их в свободных слотах лобби, до семи на комнату. Случайные классы, сбор опыта, классовая прокачка, навыки и покупки. В PvP охотятся на игроков после снятия защиты, в PvE помогают против мобов.</p>
               <p>На ПК в настройках появился редактор HUD: двигайте панели по макету, меняйте размер мышью и сохраняйте свою раскладку. Инвентарь, опыт, активки, расходники, рюкзак и информация о забеге настраиваются отдельно. Раскладка хранится на устройстве и синхронизируется с аккаунтом. Звонок отдела продаж сохраняет движение DVD — меняется только размер. Мобильный HUD остаётся прежним.</p>
             </div>
             <div class="release-notes">
@@ -1598,7 +1608,7 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 2.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>2.9.0 — «Рабочий стол по штатному расписанию»</h3></summary><p><b>Боты в PvP и PvE.</b> Хост динамически добавляет и убирает ботов в свободных местах лобби, заполняет все свободные места одной кнопкой и запускает матч без других людей. Всего в комнате до восьми участников, включая хоста и до семи ботов. Каждый бот получает случайный класс и стартовое оружие, подбирает настоящие дискеты опыта, фиткоины, бананы и кофе. Повышения уровня проходят автоматически: бот выбирает из обычных карточек, предпочитает классовые способности, усиливает оружие и собирает эволюции. Оружие, активные умения, помощники, временные эффекты и покупки используют общие правила игры. Раз в три минуты бот покупает за накопленные фиткоины предметы своего классового билда с учётом цен и шести слотов, затем заменяет дешёвые вещи целевыми предметами КОРП. ИИ оценивает безопасные направления, избегает мобов, снарядов, луж и предупреждений боссов, отступает при низком HP, ищет лечение, применяет щиты, рывок и боевые навыки. В PvP первые две минуты сохраняется защита от взаимного урона, затем боты атакуют игроков и друг друга; в PvE держатся рядом с союзниками и воюют только против мобов. Состояние ботов, выбывание и боевые эффекты рассчитывает хост и передаёт всем участникам. Исправлено начисление убийств и очков: урон ботов, включая горение и цепные взрывы, учитывается отдельно от хоста; убийства, элитные враги и боссы засчитываются их владельцу. Убийства ботов не попадают в общий счётчик гостей и личные достижения людей. В локальной отладке можно создать лобби с ботами без Firebase. Battle Royale ботов не использует. Обновлён сетевой протокол: всем участникам нужно обновить страницу и создать новое лобби.<br><b>Редактор HUD.</b> Добавлен редактор расположения HUD для ПК: кнопка в настройках открывает макет текущего интерфейса с перетаскиванием блоков, изменением размера за угол или ползунком от 40% до 250% и точным сдвигом стрелками. Отдельно настраиваются оружие и пассивки, инвентарь, расходники, рюкзак, активные умения, полоски опыта и здоровья, очки, время и убийства, усиления, здоровье босса, рывок, указатели Battle Royale, уведомления и тикеты. Пустые и временно скрытые панели показаны с примерами. Звонок отдела продаж можно только масштабировать: движение и отскоки в стиле DVD сохраняются с учётом нового размера. Верхняя панель, включая динамическое обновление, остаётся на своём месте и не редактируется. Глазик на блоке временно скрывает его только в макете, чтобы открыть перекрытые элементы; вернуть блок можно через список или кнопку «Показать все». Скрытие не сохраняется и не влияет на игровой HUD. Есть сброс отдельного блока и всего HUD, сохранение и отмена по Esc. Раскладка сохраняется отдельно для каждого аккаунта на устройстве и в облаке, адаптируется к размеру игрового поля и применяется в следующих забегах. Редактор доступен только на ПК; мобильный интерфейс не использует эти настройки.</p></details>
+        <details class="release-notes patch-minor" open><summary><h3>2.9.0 — «Рабочий стол по штатному расписанию»</h3></summary><p><b>Киллфид PvP и PvE.</b> Добавлена общая лента смертей игроков и ботов в стиле CS 1.6: без фона и рамок, только имена и иконка оружия, навыка или предмета. Если убил моб, показываются его иконка, значок выстрела и ник погибшего. Учитываются атаки обычных врагов, боссов, снаряды и опасные области. Хост передаёт записи всем участникам, повторные сообщения не дублируются. Видны до пяти последних записей, каждая исчезает через 8,5 секунды. Киллфид доступен отдельным блоком в редакторе HUD: можно изменить положение и размер, а глазик скрывает его только в макете. В редактор добавлено перекрестие через центр всего игрового поля; направляющие не перехватывают мышь и не сохраняются в игровой интерфейс.<br><b>Боты в PvP и PvE.</b> Хост динамически добавляет и убирает ботов в свободных местах лобби, заполняет все свободные места одной кнопкой и запускает матч без других людей. Всего в комнате до восьми участников, включая хоста и до семи ботов. Каждый бот получает случайный класс и стартовое оружие, подбирает настоящие дискеты опыта, фиткоины, бананы и кофе. Повышения уровня проходят автоматически: бот выбирает из обычных карточек, предпочитает классовые способности, усиливает оружие и собирает эволюции. Оружие, активные умения, помощники, временные эффекты и покупки используют общие правила игры. Раз в три минуты бот покупает за накопленные фиткоины предметы своего классового билда с учётом цен и шести слотов, затем заменяет дешёвые вещи целевыми предметами КОРП. ИИ оценивает безопасные направления, избегает мобов, снарядов, луж и предупреждений боссов, отступает при низком HP, ищет лечение, применяет щиты, рывок и боевые навыки. В PvP первые две минуты сохраняется защита от взаимного урона, затем боты атакуют игроков и друг друга; в PvE держатся рядом с союзниками и воюют только против мобов. Состояние ботов, выбывание и боевые эффекты рассчитывает хост и передаёт всем участникам. Исправлено начисление убийств и очков: урон ботов, включая горение и цепные взрывы, учитывается отдельно от хоста; убийства, элитные враги и боссы засчитываются их владельцу. Убийства ботов не попадают в общий счётчик гостей и личные достижения людей. В локальной отладке можно создать лобби с ботами без Firebase. Battle Royale ботов не использует. Обновлён сетевой протокол: всем участникам нужно обновить страницу и создать новое лобби.<br><b>Редактор HUD.</b> Добавлен редактор расположения HUD для ПК: кнопка в настройках открывает макет текущего интерфейса с перетаскиванием блоков, изменением размера за угол или ползунком от 40% до 250% и точным сдвигом стрелками. Отдельно настраиваются оружие и пассивки, инвентарь, расходники, рюкзак, активные умения, полоски опыта и здоровья, очки, время и убийства, усиления, здоровье босса, рывок, указатели Battle Royale, уведомления и тикеты. Пустые и временно скрытые панели показаны с примерами. Звонок отдела продаж можно только масштабировать: движение и отскоки в стиле DVD сохраняются с учётом нового размера. Верхняя панель, включая динамическое обновление, остаётся на своём месте и не редактируется. Глазик на блоке временно скрывает его только в макете, чтобы открыть перекрытые элементы; вернуть блок можно через список или кнопку «Показать все». Скрытие не сохраняется и не влияет на игровой HUD. Есть сброс отдельного блока и всего HUD, сохранение и отмена по Esc. Раскладка сохраняется отдельно для каждого аккаунта на устройстве и в облаке, адаптируется к размеру игрового поля и применяется в следующих забегах. Редактор доступен только на ПК; мобильный интерфейс не использует эти настройки.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.8.0 — «Каждому отделу — свой билд»</h3></summary><p><b>Музыка и настройки.</b> Добавлен трек «Красный протокол»: отдельные аранжировки обычного боя, мини-босса и большого босса, длинные вариативные лупы. Переходы между обычным боем и мини-боссом выровнены по тактам с сохранением позиции в композиции и плавным затуханием. Новый трек выбран по умолчанию для одиночной игры, в остальных режимах доступен в настройках; сохранённый ручной выбор музыки сохранён. Переназначение клавиш перенесено в отдельное окно, открываемое кнопкой в настройках, со сбросом назначений и возвратом по Esc. Убраны описания треков из настроек, кнопки звука и музыки занимают всю строку.<br>Оружие, пассивки, активки и боевые модификаторы получили классовые специализации: доступны всем, но сильнее у своего класса. На лвлапе при наличии гарантирована одна своя карточка; бонусы показаны в описаниях. У каждого класса по 3 пушки, 4 пассивки и 5 активок. Дрон закреплён за челом с техпода. Добавлены пушки «Пакетный запрос» и «Очередь обращений», активки «Срочный перенос», «Аварийный ИБП», «Окно разгрузки», «Горячий деплой», «Удалённое восстановление» и пассивки «ИБП серверной», «Маршрут переноса», «Горячий патч», «База знаний техподдержки». Общие улучшения сохранены; штрафы и ограничения PvP учитываются.<br><b>Магазин: IV тир «КОРП».</b> Добавлены 6 пассивных и 2 активных предмета: боевой кластер, цитадель серверной, квантовая шина, центр эскалаций, фазовый привод, центр аналитики, аварийный дата-центр и реактор продакшна. Обычные цены — 4400–6400 фиткоинов с дальнейшей наценкой магазина. Новая вкладка, фиолетовая маркировка и ограничение по одному экземпляру каждого предмета, включая рюкзак.<br><b>Телефоны.</b> Исправлена сенсорная прокрутка магазина, лвлапа, выбора класса и остальных окон. Увеличены текст и области нажатия, учтены вырезы экрана и экранная клавиатура, переработаны магазин и нижняя панель инвентаря на небольших экранах. Меню доступны в портретной ориентации; для боя сохраняется альбомная.<br><b>Атмосфера больших боссов.</b> Мягкое затемнение краёв, приглушённый красный пульс, редкие частицы по краям и акцент при появлении. Эффекты плавно усиливаются к концу боя и уходят после победы; центр экрана и интерфейс остаются читаемыми.<br><b>Ветер.</b> Исправлен таймер уведомлений, добавлены подпись события и предупреждение за 0,9 секунды. Скорость сноса снижена с 520 до 160, сила порыва плавно нарастает и затухает.<br><b>Покупка компонентов.</b> Кнопка покупки компонента выбирает недостающую часть рецепта, на которую хватает фиткоинов и которую можно разместить с учётом лимита предмета. Недоступный первый компонент больше не блокирует покупку доступных следующих.<br><b>Поиск магазина по статам.</b> Запросы «урон», «HP», «крит», «перезарядка», «опыт» и другие находят предметы по характеристикам, включая временные эффекты, штрафы и компоненты рецептов. «Урон» находит как усиление, так и снижение исходящего урона, урон призывов и активные атаки. Поддержаны синонимы, несколько слов и поиск среди вещей для продажи; ввод запроса открывает весь каталог.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.7.0 — «Баланс сошёлся до копейки (в тестовой базе)»</h3></summary><p>Добавлен режим «Ежедневный забег» с единым для всех игроков классом дня, условием смены, фиксированным зерном волн и отдельной вкладкой таблицы рекордов. Перебалансированы все четыре класса: «Чел с техпода» получил ускоренную перезарядку, больше здоровья и +30% к длительности и +25% к прочности вызываемых помощников при меньшем личном уроне; «Переносчик» усилен по урону с небольшим штрафом к перезарядке; «Разработчик» стал более хрупким и медленнее набирает опыт взамен высокого урона. Все три легендарные миграции («Переход на 8.5», «Оставить старый кластер», «Тонкий клиент на вайфае») переработаны с выраженными сильными сторонами и ощутимыми штрафами. Пассивные улучшения выровнены по полезности и получили компромиссы: кофе ускоряет перезарядку ценой точности урона, облачный бэкап и кроссовки снижают подвижность или радиус сбора, HASP-эмулятор и «Попытка...Исключение» нагружают перезарядку и урон, а мессенджеры, ожидание на линии и лаг RuDesktop получили собственные двойные бонусы со штрафами. Добавлены эволюции оружия «Отчёт по посещаемости» (Сводная таблица + Протеиновый шейкер) и «Горячая линия 24/7» (Телефон техподдержки + Сброс кэша сеансов); все пять эволюций оружия теперь имеют боевой побочный эффект. Урон активных умений масштабируется от характеристик героя и крита и учитывается в итоговой сводке урона; «Турбо-Режим MSSQL» расходует 6% текущего здоровья на разгон, «Эвотор: согласование интеграции» даёт +60% к урону и +10% к криту при замедлении бега, а «CRM: вернуть ушедшего клиента» перезаряжается быстрее и временно ускоряет набор опыта. Базовый множитель цен магазина увеличен до ×2,0; после каждого звонка отдела продаж цены растут на 15%, а повторная покупка бесконечно доступного предмета добавляет +30% за каждый предыдущий экземпляр. Предел уклонения снижен с 75% до 50%. Исправлена логика появления врагов после четвёртой минуты, добавлены элитные мобы с модификаторами («[СРОЧНО!]», «[КОПИЯ ДИРЕКТОРУ]», «[НА КОНТРОЛЕ]»), новые противники («Обработка висит на 99%», «Главбух в конце квартала», «Пользователь с чужой флешкой») и мини-босс «ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ». Итоговый счёт теперь дополнительно учитывает победу над элитными врагами, мини-боссами, большими боссами, закрытые тикеты и рост сложности кластера.</p><p>Новая передача изменений мира независимыми пакетами, координаты игроков и мобов — 20 раз в секунду. Исправлены общий счётчик урона гостей, рывки третьего игрока, повторные попадания при замене объектов, зависание выбора класса и остановка матча после смерти хоста. Хост после выбывания остаётся сервером, пока игра открыта; его персонаж не лечится, не атакует и не собирает предметы. Добавлены две ежедневные смены, усилены положительные и отрицательные эффекты старых и реализованы отсутствовавшие эффекты. Для сетевой игры всем участникам нужна обновлённая игра и новое лобби.</p><p>Описания ежедневных смен в таблице рекордов приведены к общему светлому стилю. Исправлено сохранение ежедневных рекордов.</p><p>Добавлен оригинальный синтезированный трек «До полуночи» для ежедневного забега: синкопированный бас, упругий бит и мотив часов. На мини-боссах усиливаются ударные, открывается резонансный бас и появляются резкие синтезаторные акценты; на больших боссах добавляются тяжёлые квинты, металлическая перкуссия и сбивки. Темп остаётся 126 BPM, после победы дополнительные слои плавно затихают. Трек доступен для любого режима; в настройках появилась отдельная сохраняемая предустановка ежедневного забега, где «До полуночи» выбран по умолчанию. В главном меню оставлена краткая сводка, подробности собраны в полной истории обновлений.</p><p>Исправлены тикеты М.В.: обычное выживание больше не требует отсутствия урона, а задание «без урона» отслеживает сами попадания, включая урон зоны. Согласованы таймер и прогресс инверсии. Временные усиления мобов снимаются при завершении и сбросе задания; эффекты тикетов гостей применяются к общему миру через хоста. Убийства и устранение стрелков засчитываются гостям, подкрепления учитывают размер лобби, новые тикеты не выдаются выбывшим игрокам и вплотную к большому боссу. М.В. появляется по отказам гостей и после смерти хоста, с учётом границ увеличенной карты.</p></details>
         <details class="release-notes patch-minor"><summary><h3>2.6.0 — «ИИ-слоп на премиум-тарифе»</h3></summary><p>ИИ-слоп оказался премиальной услугой: базовые цены магазина повышены ещё на 13% (в сумме на 62,67% от исходных), а каждый звонок отдела продаж повышает их ещё на 8,14%, даже если сбросить вызов. Добавлены новые комплектные предметы. Награда фиткоинами с дискет уменьшена до 30% исходной (суммарное снижение — 70%). На мобильном HUD расходники занимают место рюкзака, сам рюкзак скрыт. Добавлен вход через Google или email и пароль, профиль с изменяемым ником, облачные достижения с медалями, включая спасение после касания RuDesktop, и рейтинг игроков по числу наград с просмотром достижений игроков. Добавлены этапы достижений за матчи, победы и выбивания в PvP, а также за участие, выживание и победы в Battle Royale. Исправлена ошибка при обработке смерти босса, из-за которой останавливался игровой цикл. Исправлено выравнивание рейтинга достижений; первые три места отмечаются золотой, серебряной и бронзовой медалями. Панели инвентаря, рюкзака и расходников магазина расположены в один ряд. Индикатор большого босса на ПК перенесён над индикатором рывка. Ошибка игрового кадра теперь приостанавливает забег с сообщением вместо молчаливой остановки игры. Добавлены хаотичные тикеты Максима Воронина: отказ или игнор сразу вызывает М.В., три провала принятых тикетов — тоже; задания могут инвертировать или поворачивать управление, усиливать и множить мобов, отключать рывок. Усилены недостатки мощных предметов и комплектов; рикошет, мультивыстрел, замедление и поджог дают боевой бонус с соответствующим штрафом к перезарядке, урону или скорости и теперь имеют по три уровня. Рикошет даёт 1/2/3 отскока, мультивыстрел — +1/+2/+3 снаряда, замедление — 15/30/45%, поджог — шанс 30/50/65%; взрыв от поджига и замедления срабатывает на их максимальном уровне. Характеристики способностей и снаряжения описаны понятными процентами и величинами. Мобильный магазин переработан. Бананы и кофе исчезают с карты через три минуты. Проведена оптимизация производительности без визуальных изменений: внедрена пространственная сетка поиска целей и столкновений, кэширование глифов и свечений на Canvas, точечное обновление HUD и тикетов при изменении значений, однопроходная сериализация мира для WebRTC и параллельная загрузка таблиц лидеров. Исправлены пересчёт характеристик и здоровья при продаже и перемещении предметов между инвентарём и рюкзаком, рецепт и сборка комплекта «Архитектор рывка», работа временных усилений урона и отображение множителя опыта в характеристиках. Кислотная лужа мини-босса «Акт налоговой проверки» теперь наносит урон игрокам вместо мобов, защита от боссов учитывается на всех атаках боссов и больше не срабатывает на соперников с ником «Босс», а неуязвимый преследователь RuDesktop не подвержен отталкиванию, контролю, ветру и эволюциям оружия. В Battle Royale и массовых матчах очередь накопленных повышений уровня открывается подряд без сброса подсказки, клавиша L не завершает забег во время ввода текста, а в никах поддерживаются буквы «ё» и «Ё». Исправлены маршрутизация урона, активных умений, выстрелов и выбор целей в сетевых матчах на 3–8 игроков, очистка WebRTC-подписок при выходе соперника и отправка рекордов через проверяемую сессию забега.</p></details>
@@ -4315,6 +4325,125 @@ const BOT_SHOP_BUILDS = {
   support: ['shop_xp_archive', 'shop_magnet_extension', 'shop_oxygen_canister', 'active_firewall', 'corp_support_core', 'corp_analytics']
 };
 
+class PvpKillFeed {
+  constructor(game) {
+    this.game=game;
+    this.element=document.getElementById('hud-kill-feed');
+    this.mobIcons=new Map();
+    this.catalog={...WEAPONS_DEF,...ACTIVE_SKILLS_DEF,...STORE_PASSIVES_DEF,...STORE_ACTIVES_DEF,...STORE_RECIPES,...CONSUMABLES_DEF};
+    this.weaponDefs=Object.values(this.catalog).filter(def=>def.name).sort((a,b)=>b.name.length-a.name.length);
+    this.reset();
+  }
+
+  enabled() { return Boolean(this.game.pvp?.started && ['pvp','pve'].includes(this.game.pvp.mode)); }
+
+  reset() {
+    clearTimeout(this.expiryTimer);clearTimeout(this.reportTimer);
+    this.entries=[];this.seen=new Set();this.deaths=new Set();this.lastHits=new Map();this.pendingReport=null;
+    this.mobIcons.clear();this.element.replaceChildren();this.element.style.display='none';
+  }
+
+  member(uid) {
+    const g=this.game,pvp=g.pvp;
+    if(uid===pvp?.uid)return {uid,name:pvp.name || g.savedNick,isBot:false};
+    return pvp?.remotePlayers?.[uid] || g.getPvpRoomMembers().find(member=>member.uid===uid) || null;
+  }
+
+  rememberMobs() {
+    for(const enemy of this.game.enemies || [])if(enemy.name && enemy.icon)this.mobIcons.set(enemy.name,enemy.icon);
+  }
+
+  describeHit(source, options={}) {
+    const text=String(source || 'Неизвестная атака').slice(0,180);
+    const explicit=options.killFeed || {};
+    const isPvp=Boolean(options.isPvp || explicit.kind==='player');
+    const participants=[this.member(this.game.pvp?.uid),...Object.values(this.game.pvp?.remotePlayers || {})].filter(Boolean);
+    const attackerUid=String(options.attackerUid || explicit.attackerUid || (isPvp ? participants.find(p=>text.startsWith(p.name+' · '))?.uid || '' : '')).slice(0,128);
+    const attacker=this.member(attackerUid);
+    const weaponKey=options.weaponKey || explicit.weaponKey;
+    let weapon=this.catalog[weaponKey];
+    if(!weapon)weapon=this.weaponDefs.find(def=>text.toLocaleLowerCase().includes(def.name.toLocaleLowerCase()));
+    let mobName=options.attackerName || explicit.attackerName || text;
+    let mobIcon=options.attackerIcon || explicit.attackerIcon;
+    if(!isPvp&&!mobIcon) {
+      const match=[...this.mobIcons.keys()].filter(name=>text.includes(name)).sort((a,b)=>b.length-a.length)[0];
+      if(match){mobName=match;mobIcon=this.mobIcons.get(match);}
+    }
+    const fallbackIcon=/ветер|порыв/i.test(text)?'🌪️':/метеорит/i.test(text)?'☄️':/бомб|взрыв/i.test(text)?'💣':/луж|кислот/i.test(text)?'🧪':/босс/i.test(text)?'👹':'👾';
+    return {kind:isPvp?'player':'mob',attackerUid:isPvp?attackerUid:'',attackerName:String(isPvp?attacker?.name || text.split(' · ')[0] : mobName).slice(0,80),
+      attackerIcon:String(mobIcon || fallbackIcon).slice(0,16),weaponKey:String(weaponKey || '').slice(0,80),
+      weaponIcon:String(options.weaponIcon || explicit.weaponIcon || weapon?.icon || (/обновлен.*конфигурац|динамическ.*обновл/i.test(text)?'⚡':/ironlogic/i.test(text)?'💳':/синтакс/i.test(text)?'{;}':'🔫')).slice(0,16),source:text};
+  }
+
+  rememberHit(uid, hit) { if(this.enabled() && uid && hit)this.lastHits.set(uid,hit); }
+
+  reportDeath(uid, hit) {
+    if(!this.enabled() || !uid)return;
+    if(this.game.pvp.host){this.publishDeath(uid,hit?.hit || hit || this.lastHits.get(uid));return;}
+    if(uid!==this.game.pvp.uid || this.seen.has(uid))return;
+    const deathHit=hit?.hit || hit || this.lastHits.get(uid);
+    const victim=this.member(uid);
+    this.receive({id:uid,room:this.game.pvp.code,victimUid:uid,victimName:victim?.name || 'Игрок',...this.describeHit(deathHit?.source,{killFeed:deathHit})});
+    this.pendingReport={uid,hit:deathHit,createdAt:performance.now()};
+    this.flushReport();
+  }
+
+  flushReport() {
+    clearTimeout(this.reportTimer);
+    const pvp=this.game.pvp;
+    if(!this.pendingReport || !this.enabled() || pvp.leaving || performance.now()-this.pendingReport.createdAt>15000)return;
+    this.game.sendPvpNetworkMessage({type:'player-death',uid:pvp.uid,hit:this.pendingReport.hit,room:pvp.code},null,true);
+    this.reportTimer=setTimeout(()=>this.flushReport(),700);
+  }
+
+  publishDeath(victimUid, rawHit) {
+    const pvp=this.game.pvp;
+    if(!this.enabled() || !pvp.host || this.deaths.has(victimUid) || !pvp.matchPlayerUids?.includes(victimUid))return;
+    const victim=this.member(victimUid);if(!victim)return;
+    const hit=this.describeHit(rawHit?.source || 'Неизвестная атака',{killFeed:rawHit});
+    this.deaths.add(victimUid);
+    const event={id:victimUid,room:pvp.code,victimUid,victimName:String(victim.name || 'Игрок').slice(0,20),...hit};
+    this.receive(event);
+    this.game.sendPvpNetworkMessage({type:'kill-feed',event},null,true);
+  }
+
+  receive(event) {
+    const pvp=this.game.pvp;
+    if(!this.enabled() || !event || event.room!==pvp.code || !pvp.matchPlayerUids?.includes(event.victimUid))return;
+    if(event.victimUid===this.pendingReport?.uid){this.pendingReport=null;clearTimeout(this.reportTimer);}
+    if(this.seen.has(event.victimUid))return;
+    this.seen.add(event.victimUid);
+    this.entries.push({...event,expiresAt:performance.now()+8500});
+    if(this.entries.length>5)this.entries.shift();
+    this.render();
+  }
+
+  createRow(event, doc=document) {
+    const row=doc.createElement('div');row.className='kill-feed-row';
+    const killer=doc.createElement('span');
+    killer.className=event.kind==='player'?'kill-feed-killer kill-feed-name':'kill-feed-icon';
+    killer.textContent=event.kind==='player'?String(event.attackerName || 'Игрок').slice(0,20):String(event.attackerIcon || '👾').slice(0,16);
+    killer.title=String(event.attackerName || 'Моб').slice(0,80);
+    if(event.attackerUid && event.attackerUid===this.game.pvp?.uid)killer.classList.add('kill-feed-local');
+    const weapon=doc.createElement('span');weapon.className='kill-feed-icon';
+    weapon.textContent=event.kind==='player'?String(event.weaponIcon || '🔫').slice(0,16):'🔫';
+    weapon.title=String(event.source || 'Атака').slice(0,180);
+    const victim=doc.createElement('span');victim.className='kill-feed-victim kill-feed-name';
+    victim.textContent=String(event.victimName || 'Игрок').slice(0,20);victim.title=victim.textContent;
+    if(event.victimUid && event.victimUid===this.game.pvp?.uid)victim.classList.add('kill-feed-local');
+    row.append(killer,weapon,victim);return row;
+  }
+
+  render() {
+    clearTimeout(this.expiryTimer);
+    const now=performance.now();this.entries=this.entries.filter(event=>event.expiresAt>now);
+    this.element.replaceChildren(...this.entries.map(event=>this.createRow(event)));
+    this.element.style.display=this.entries.length?'flex':'none';
+    if(this.entries.length)this.expiryTimer=setTimeout(()=>this.render(),Math.max(1,Math.min(...this.entries.map(event=>event.expiresAt))-now));
+    this.game.hudLayout?.scheduleApply();
+  }
+}
+
 class PvpBotController {
   constructor(game, members) {
     this.game = game;
@@ -4346,6 +4475,7 @@ class PvpBotController {
     actor.sound = new Proxy({}, {get:()=>noop});
     for (const key of ['updateHUD','updateInventoryHUD','updateActiveHUD','updateConsumableHUD','renderShop','log',
       'recordAchievementCounter','recordChallengeProgress','showBanner','triggerGlitchScreen','setPvpChoosing']) actor[key] = noop;
+    actor.killFeed=g.killFeed;
     actor.getDailyRules = () => ({});
     actor.rollRng = Math.random;
     actor.addPopup = g.addPopup.bind(g);
@@ -4388,11 +4518,13 @@ class PvpBotController {
     if (g.pvp.mode !== 'pvp' || g.time < 120 || !(damage > 0) || attackerUid === targetUid) return;
     const name = this.bots.get(attackerUid)?.name || g.pvp.remotePlayers?.[attackerUid]?.name || g.pvp.name;
     const label = `${name} · ${source}`;
-    if (this.bots.has(targetUid)) this.hurt(targetUid, damage, label, {isPvp:true});
-    else if (targetUid === g.pvp.uid) g.receivePvpDamage(damage, label);
+    const killFeed=g.killFeed.describeHit(label,{isPvp:true,attackerUid});
+    g.killFeed.rememberHit(targetUid,killFeed);
+    if (this.bots.has(targetUid)) this.hurt(targetUid, damage, label, {isPvp:true,killFeed});
+    else if (targetUid === g.pvp.uid) g.receivePvpDamage(damage, label,{killFeed});
     else {
       const peer = g.pvp.peerConnections?.[targetUid];
-      if (peer?.connected) g.sendPvpNetworkMessage({type:'targeted-damage',kind:'pvp',targetUid,damage,source:label}, peer.controlChannel || peer.channel, true);
+      if (peer?.connected) g.sendPvpNetworkMessage({type:'targeted-damage',kind:'pvp',targetUid,damage,source:label,killFeed}, peer.controlChannel || peer.channel, true);
     }
   }
 
@@ -4431,6 +4563,7 @@ class PvpBotController {
   die(bot) {
     if (bot.dead) return;
     bot.dead = true;
+    this.game.killFeed.reportDeath(bot.uid,bot.actor.lastPlayerDamage?.hit || this.game.killFeed.lastHits.get(bot.uid));
     bot.actor.projectiles.length = 0;
     bot.actor.summons.length = 0;
     this.game.addPopup(bot.actor.player.x,bot.actor.player.y-35,`${bot.name} выбыл`,'#ff7675');
@@ -4705,6 +4838,7 @@ const HUD_LAYOUT_BLOCKS = [
   ['hud-active-skills', 'Активные умения', 'flex'],
   ['xp-bar-container', 'Полоска опыта', 'block'],
   ['hud-stats', 'Забег · очки, время, убийства', 'flex'],
+  ['hud-kill-feed', 'Киллфид · игроки и боты', 'flex'],
   ['hud-health', 'Здоровье', 'block'],
   ['hud-buffs', 'Временные усиления', 'flex'],
   ['mega-boss-hud', 'Здоровье большого босса', 'block'],
@@ -4893,10 +5027,16 @@ class HudLayoutManager {
       .hud-editor-handle { position:absolute; right:-5px; bottom:-5px; width:22px; height:22px; border:1px solid #111; border-radius:3px; background:#ffd200; color:#111; cursor:nwse-resize; font:bold 18px sans-serif; text-align:center; line-height:20px; touch-action:none; z-index:1; }
       .hud-editor-eye { position:absolute; right:0; top:0; width:24px; height:22px; padding:0; border:1px solid #111; border-radius:3px; background:#ffd200; color:#111; cursor:pointer; font:15px sans-serif; line-height:20px; touch-action:manipulation; z-index:2; }
       .hud-editor-block[data-id="sales-call"] { cursor:default; }
+      #hud-editor-crosshair { position:absolute; inset:0; z-index:300; pointer-events:none; }
+      #hud-editor-crosshair::before { content:''; position:absolute; top:0; bottom:0; left:50%; width:1px; background:rgba(255,210,0,.55); }
+      #hud-editor-crosshair::after { content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(255,210,0,.55); }
+      #hud-editor-crosshair span { position:absolute; left:calc(50% + 8px); top:calc(50% + 6px); color:#ffd200; font:10px Tahoma,sans-serif; text-shadow:1px 1px 2px #000; }
     `;
     doc.head.appendChild(style);
     const viewport = doc.importNode(this.template, true);
     doc.body.appendChild(viewport);
+    const crosshair=doc.createElement('div');crosshair.id='hud-editor-crosshair';crosshair.setAttribute('aria-hidden','true');
+    const centerLabel=doc.createElement('span');centerLabel.textContent='ЦЕНТР';crosshair.appendChild(centerLabel);doc.body.appendChild(crosshair);
     for (const [id] of HUD_LAYOUT_BLOCKS) {
       const original = this.homes.get(id).element;
       const clone = doc.importNode(original, true);
@@ -4933,6 +5073,12 @@ class HudLayoutManager {
       doc.getElementById('challenge-description').textContent = 'Описание задания и прогресс выполнения';
       doc.getElementById('challenge-progress').textContent = 'Прогресс: 3 / 10';
     }
+    const killFeed=doc.getElementById('hud-kill-feed');
+    if(!killFeed.children.length)for(const example of [
+      {kind:'player',attackerName:'Игрок',weaponIcon:'💳',victimName:'Бот 1'},
+      {kind:'player',attackerName:'Бот 2',weaponIcon:'🗃️',victimName:'Игрок'},
+      {kind:'mob',attackerName:'Моб',attackerIcon:'👹',victimName:'Бот 3'}
+    ])killFeed.appendChild(this.game.killFeed.createRow(example,doc));
     doc.getElementById('xp-bar-fill').style.width = '45%';
     // Измеряем все штатные блоки до переноса, сохраняя их текущую геометрию.
     for (const [id, , display] of HUD_LAYOUT_BLOCKS) doc.getElementById(id).style.display = display;
@@ -5376,6 +5522,7 @@ class Game {
 
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
     this.firebaseUser = null;
+    this.killFeed = new PvpKillFeed(this);
     this.hudLayout = new HudLayoutManager(this);
     this.profileReady = false;
     this.leaderboardTab = 'general';
@@ -5663,6 +5810,7 @@ class Game {
 
   start(options = {}) {
     this.botController = null;
+    this.killFeed?.reset();
     const runtimeErrorNotice = document.getElementById('game-runtime-error');
     if (runtimeErrorNotice) { runtimeErrorNotice.style.display = 'none'; runtimeErrorNotice.textContent = ''; }
     this.lastReportedFrameError = null;
@@ -7143,9 +7291,13 @@ class Game {
       // A channel belongs to one guest; never trust a supplied sender identity.
       message = { ...message, uid: senderUid };
       if (message.skill) message.skill = { ...message.skill, senderUid };
-      if (['roster', 'player-state', 'bot-states', 'world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete'].includes(message.type)) return;
+      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete'].includes(message.type)) return;
     }
-    if (message.type === 'class-selected') {
+    if(message.type==='player-death' && pvp.host && senderUid && message.room===pvp.code) {
+      this.killFeed.publishDeath(senderUid,message.hit || this.killFeed.lastHits.get(senderUid));
+    } else if(message.type==='kill-feed' && !pvp.host) {
+      this.killFeed.receive(message.event);
+    } else if (message.type === 'class-selected') {
       const uid = String(message.uid || '');
       const classId = String(message.classId || '');
       if (!pvp.matchPlayerUids?.includes(uid) || !PLAYER_CLASSES[classId]) return;
@@ -7199,6 +7351,8 @@ class Game {
       }
       pvp.remoteStateSequences[uid] = sequence || Number(pvp.remoteStateSequences[uid] || 0) + 1;
       const state = validation.state;
+      if(pvp.host && state.over && state.hp<=0)this.killFeed.publishDeath(uid,state.deathHit || this.killFeed.lastHits.get(uid));
+      if(!pvp.host && Array.isArray(state.killFeedEvents))for(const event of state.killFeedEvents.slice(-5))this.killFeed.receive(event);
       this.recordPvpPosition(`@remote-${uid}`, state.x, state.y);
       if (message.uid && (!pvp.host || !pvp.opponentUid || pvp.opponentUid === uid)) pvp.opponentUid = uid;
       const remotePlayer = { ...(pvp.remotePlayers?.[uid] || (uid === pvp.opponentUid ? pvp.remotePlayer : null) || {}), uid,
@@ -7233,7 +7387,7 @@ class Game {
         };
         const previousAttack = Number(prior.state?.attackTotal || 0);
         const attackDelta = Math.max(0, Number(state.attackTotal || 0) - previousAttack);
-        if (attackDelta > 0 && this.player?.hp > 0) this.receivePvpDamage(attackDelta, `${message.name || 'Соперник'} · PvP`);
+        if (attackDelta > 0 && this.player?.hp > 0) this.receivePvpDamage(attackDelta, `${message.name || 'Соперник'} · ${state.attackSource || 'PvP'}`,{attackerUid:uid});
         this.processPvpGuestWorldActions(uid, state);
         if (uid === pvp.opponentUid) { pvp.remotePlayer = pvp.remotePlayers[uid]; pvp.remoteState = state; }
         if (Number(pvp.actualPlayerCount) >= 3) this.relayPvpPlayerState({ ...message, state }, uid);
@@ -7304,17 +7458,19 @@ class Game {
         const damage = Math.min(1000, Math.max(0, Number(message.damage) || 0));
         if (!attacker?.state || attacker.state.over || !target?.state || target.state.over || target.state.hp <= 0 ||
             !damage || attackerUid === targetUid || Math.hypot(attacker.state.x - target.state.x, attacker.state.y - target.state.y) > 1800) return;
-        const source = `${String(attacker.name || 'Игрок').slice(0, 20)} · PvP`;
-        if (targetUid === pvp.uid) this.receivePvpDamage(damage, source);
-        else if(this.botController?.bots.has(targetUid))this.botController.hurt(targetUid,damage,source,{isPvp:true});
+        const source = `${String(attacker.name || 'Игрок').slice(0, 20)} · ${String(message.source || 'PvP').slice(0,160)}`;
+        const killFeed=this.killFeed.describeHit(source,{isPvp:true,attackerUid});
+        this.killFeed.rememberHit(targetUid,killFeed);
+        if (targetUid === pvp.uid) this.receivePvpDamage(damage, source,{killFeed});
+        else if(this.botController?.bots.has(targetUid))this.botController.hurt(targetUid,damage,source,{isPvp:true,killFeed});
         else {
           const peer = pvp.peerConnections?.[targetUid];
-          if (peer?.connected) this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'pvp', targetUid, damage, source }, peer.controlChannel || peer.channel, true);
+          if (peer?.connected) this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'pvp', targetUid, damage, source, killFeed }, peer.controlChannel || peer.channel, true);
         }
       } else if (!pvp.host && message.targetUid === pvp.uid) {
         const damage = Math.max(0, Number(message.damage) || 0);
-        if (message.kind === 'pvp') this.receivePvpDamage(damage, message.source || 'Соперник · PvP');
-        else this.receiveEnemyDamage(damage, message.source || 'Атака противника', { isBoss: Boolean(message.isBoss) });
+        if (message.kind === 'pvp') this.receivePvpDamage(damage, message.source || 'Соперник · PvP',{killFeed:message.killFeed});
+        else this.receiveEnemyDamage(damage, message.source || 'Атака противника', { isBoss: Boolean(message.isBoss),killFeed:message.killFeed });
       }
     }
     else if (message.type === 'br-pause-request' && this.isBattleRoyale && pvp.host && typeof message.paused === 'boolean') {
@@ -7581,6 +7737,9 @@ class Game {
       over: pvp.matchOver || player.hp <= 0,
       migration85: Boolean(player.migration85)
     };
+    state={...state,attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
+      deathHit:player.hp<=0 ? this.lastPlayerDamage?.hit || null : null,
+      ...(pvp.host ? {killFeedEvents:this.killFeed.entries.map(({expiresAt,...event})=>event)} : {})};
     return this.sendPvpNetworkMessage({
       type, sequence: pvp.rtcStateSequence = (pvp.rtcStateSequence || 0) + 1,
       uid: pvp.uid, name: pvp.name || 'Соперник', state,
@@ -8523,13 +8682,13 @@ class Game {
     }
     const total = Number(state.attackTotal || 0);
     const damage = total - this.pvp.lastRemoteAttackTotal;
-    if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage);
+    if (damage > 0.01 && this.player && !this.pvp.matchOver) this.receivePvpDamage(damage,`${this.pvp.remotePlayer?.name || 'Соперник'} · ${state.attackSource || 'Атака PvP'}`,{attackerUid:this.pvp.opponentUid});
     this.pvp.lastRemoteAttackTotal = Math.max(this.pvp.lastRemoteAttackTotal, total);
     const enemyAttackTotal = Number(state.enemyAttackTotal || 0);
     const previousEnemyAttackTotal = Number(this.pvp.lastRemoteEnemyAttackTotal || 0);
     const enemyDamage = enemyAttackTotal - previousEnemyAttackTotal;
     if (enemyDamage > 0.01 && this.player && !this.pvp.matchOver) {
-      this.receiveEnemyDamage(enemyDamage, state.enemyAttackSource || 'Атака противника');
+      this.receiveEnemyDamage(enemyDamage, state.enemyAttackSource || 'Атака противника',{killFeed:state.enemyAttackHit});
     }
     this.pvp.lastRemoteEnemyAttackTotal = Math.max(previousEnemyAttackTotal, enemyAttackTotal);
     if (this.pvp.host) {
@@ -8567,7 +8726,10 @@ class Game {
     const applied = Math.min(hpBefore, incoming);
     this.player.hp = Math.max(0, hpBefore - applied);
     if (applied > 0) {
-      this.lastPlayerDamage = { source: String(source || 'Неизвестная атака'), damage: incoming, applied };
+      const hit=this.killFeed?.enabled() ? this.killFeed.describeHit(source,options) : null;
+      this.lastPlayerDamage = { source: String(source || 'Неизвестная атака'), damage: incoming, applied, hit };
+      this.killFeed?.rememberHit(this.pvp?.uid,hit);
+      if(this.player.hp<=0)this.killFeed?.reportDeath(this.pvp?.uid,hit);
       const challenge = this.activeChallenge;
       if (challenge?.status === 'active' && challenge.objectives.some(objective => objective.type === 'surviveNoDamage')) {
         challenge.tookDamage = true;
@@ -8576,7 +8738,7 @@ class Game {
     return applied;
   }
 
-  receivePvpDamage(damage, source = `${this.pvp?.remotePlayer?.name || 'Соперник'} · атака PvP`) {
+  receivePvpDamage(damage, source = `${this.pvp?.remotePlayer?.name || 'Соперник'} · атака PvP`, options = {}) {
     if (!this.player || this.player.hp <= 0) return;
     if (this.pvp?.mode === 'pvp' && this.time < 120) return;
     if (this.player.shieldTimer > 0) {
@@ -8588,7 +8750,7 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, 'PvP-ПРОМАХ!', '#f1c40f');
       return;
     }
-    const applied = this.recordPlayerDamage(damage, source, { isPvp: true });
+    const applied = this.recordPlayerDamage(damage, source, { ...options, isPvp: true });
     if (applied <= 0) return;
     this.sound.hit();
     this.addPopup(this.player.x, this.player.y - 22, `PvP -${Math.ceil(applied)} HP`, '#ff4757');
@@ -8608,7 +8770,7 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
       return;
     }
-    const applied = this.recordPlayerDamage(damage, source, { isBoss: Boolean(options.isBoss) });
+    const applied = this.recordPlayerDamage(damage, source, { ...options, isBoss: Boolean(options.isBoss) });
     if (applied <= 0) return;
     this.sound.hit();
     this.addPopup(this.player.x, this.player.y - 22, `МОБЫ -${Math.ceil(applied)} HP`, '#ff4757');
@@ -8618,19 +8780,22 @@ class Game {
 
   damageRemotePlayerFromEnemy(damage, source = 'Атака противника', targetUid = null, options = {}) {
     if (!this.pvp?.host || !this.pvp.started || damage <= 0) return;
-    if(this.botController?.bots.has(targetUid)){this.botController.hurt(targetUid,damage,source,options);return;}
+    const killFeed=this.killFeed.describeHit(source,options);
+    this.killFeed.rememberHit(targetUid || this.pvp.opponentUid,killFeed);
+    if(this.botController?.bots.has(targetUid)){this.botController.hurt(targetUid,damage,source,{...options,killFeed});return;}
     const isBoss = Boolean(options.isBoss) || /босс/i.test(String(source || ''));
     if ((this.isBattleRoyale || Number(this.pvp.actualPlayerCount) >= 3) && targetUid) {
       const pending = this.pvp.pendingEnemyAttacks ||= new Map();
       const key = JSON.stringify([targetUid, source, isBoss]);
       const before = pending.get(key);
       pending.set(key, { type: this.isBattleRoyale ? 'br-damage' : 'targeted-damage', kind: 'enemy',
-        targetUid, damage: (before?.damage || 0) + damage, source, isBoss });
+        targetUid, damage: (before?.damage || 0) + damage, source, isBoss, killFeed });
       return;
     }
     if (!this.pvp.remoteState || this.pvp.remoteState.over) return;
     this.pvp.enemyAttackTotal = (this.pvp.enemyAttackTotal || 0) + damage;
     this.pvp.enemyAttackSource = isBoss && !/босс/i.test(String(source || '')) ? `${source} · босс` : source;
+    this.pvp.enemyAttackHit = killFeed;
   }
 
   flushPvpEnemyDamage() {
@@ -8657,7 +8822,9 @@ class Game {
     const pvp = this.pvp;
     if (!pvp?.started || pvp.mode === 'pve' || damage <= 0 || this.time < 120) return;
     const amount = damage * 0.14;
-    if(pvp.host && this.botController?.bots.has(targetUid)){this.botController.hurt(targetUid,amount,source,{isPvp:true});return;}
+    const killFeed=this.killFeed.describeHit(source,{isPvp:true,attackerUid:pvp.uid});
+    this.killFeed.rememberHit(targetUid || pvp.opponentUid,killFeed);
+    if(pvp.host && this.botController?.bots.has(targetUid)){this.botController.hurt(targetUid,amount,source,{isPvp:true,killFeed});return;}
     if (this.isBattleRoyale && targetUid) {
       this.damageBattleRoyalePlayer(targetUid, damage, source);
       return;
@@ -8665,14 +8832,15 @@ class Game {
     if (Number(pvp.actualPlayerCount) >= 3 && targetUid && targetUid !== pvp.uid) {
       if (pvp.host) {
         const peer = pvp.peerConnections?.[targetUid];
-        const hostSource = `${String(pvp.name || 'Хост').slice(0, 20)} · PvP`;
-        if (peer?.connected) this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'pvp', targetUid, damage: amount, source: hostSource }, peer.controlChannel || peer.channel, true);
+        const hostSource = `${String(pvp.name || 'Хост').slice(0, 20)} · ${source}`;
+        if (peer?.connected) this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'pvp', targetUid, damage: amount, source: hostSource, killFeed }, peer.controlChannel || peer.channel, true);
       } else {
-        this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'pvp', uid: pvp.uid, targetUid, damage: amount }, null, true);
+        this.sendPvpNetworkMessage({ type: 'targeted-damage', kind: 'pvp', uid: pvp.uid, targetUid, damage: amount, source }, null, true);
       }
       return;
     }
     if (!pvp.remoteState || pvp.remoteState.over) return;
+    pvp.attackSource=String(source || 'Атака PvP').slice(0,160);
     pvp.attackTotal += amount;
   }
 
@@ -8703,7 +8871,7 @@ class Game {
     if (this.isBattleRoyale) {
       this.receiveBattleRoyaleDamage(damage * 0.14, `${senderName} · ${skillName}`, { isPvp: true });
     } else {
-      this.receivePvpDamage(damage * 0.14, `${senderName} · ${skillName}`);
+      this.receivePvpDamage(damage * 0.14, `${senderName} · ${skillName}`,{attackerUid:skill.senderUid,weaponKey:skill.key});
     }
     if (control > 0 && this.player?.hp > 0) {
       this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(0.65, control));
@@ -8871,6 +9039,7 @@ class Game {
     if (!pvp) return;
     pvp.leaving = true;
     this.botController = null;
+    this.killFeed.reset();
     this.paused = true;
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
@@ -12220,10 +12389,11 @@ class Game {
       const ldy = this.player.y - warning.y;
       const localHit = this.player.hp > 0 && ldx * ldx + ldy * ldy < hitRadiusSq;
       const attackDamage = warning.dmg * (warning.isMegaBossAttack ? 1.4 : 1);
-      const attackSource = warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса';
+      const attackSource = warning.attackerName || (warning.isMegaBossAttack ? 'Атака большого босса' : 'Атака босса');
+      const attackInfo={isBoss:true,attackerName:warning.attackerName,attackerIcon:warning.attackerIcon};
       if (localHit) {
         if (this.player.shieldTimer <= 0) {
-          const applied = this.recordPlayerDamage(attackDamage, attackSource, { isBoss: true });
+          const applied = this.recordPlayerDamage(attackDamage, attackSource, attackInfo);
           this.sound.hit();
           this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(applied)} HP`, '#ff4757');
         } else {
@@ -12234,7 +12404,7 @@ class Game {
         const rdx = remoteTarget.x - warning.x;
         const rdy = remoteTarget.y - warning.y;
         if (rdx * rdx + rdy * rdy < hitRadiusSq) {
-          this.damageRemotePlayerFromEnemy(attackDamage, attackSource, remoteTarget.uid, { isBoss: true });
+          this.damageRemotePlayerFromEnemy(attackDamage, attackSource, remoteTarget.uid, attackInfo);
         }
       }
       this.createHitFX(warning.x, warning.y, '#ff4757', 10);
@@ -13378,6 +13548,7 @@ class Game {
 
   update(dt) {
     this.trackPvpSharedEntities();
+    if(this.killFeed.enabled())this.killFeed.rememberMobs();
     this._framePvpTargets = null;
     this._framePvpTargets = this.getPvpWeaponTargets();
     this.rebuildEnemyGrid();
@@ -13621,16 +13792,17 @@ class Game {
             }
           }
           const isBossShot = Boolean(ep.isMegaBossAttack || ep.isBossAttack);
-          const shotSource = ep.isMegaBossAttack ? 'Снаряд большого босса' : ep.isBossAttack ? 'Снаряд босса' : `Снаряд ${ep.icon || 'противника'}`;
+          const shotSource = ep.attackerName ? `${ep.attackerName} · выстрел` : ep.isMegaBossAttack ? 'Снаряд большого босса' : ep.isBossAttack ? 'Снаряд босса' : `Снаряд ${ep.icon || 'противника'}`;
+          const shotInfo={isBoss:isBossShot,attackerName:ep.attackerName,attackerIcon:ep.attackerIcon};
           if (nearestRemote && nearestRemoteDistSq < hitRadSq && nearestRemoteDistSq <= localDistSq) {
-            this.damageRemotePlayerFromEnemy(ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1), shotSource, nearestRemote.uid, { isBoss: isBossShot });
+            this.damageRemotePlayerFromEnemy(ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1), shotSource, nearestRemote.uid, shotInfo);
             if (ep.readOnlyProjectile) this.sendPvpNetworkMessage({ type: 'read-only-debuff', targetUid: nearestRemote.uid });
             this.createHitFX(nearestRemote.x, nearestRemote.y, '#ff7675', 3);
             ep.life = 0;
           } else if (localDistSq < hitRadSq) {
             if (this.player.shieldTimer <= 0) {
               const damage = ep.dmg * (ep.isMegaBossAttack ? 1.4 : 1);
-              const applied = this.recordPlayerDamage(damage, shotSource, { isBoss: isBossShot });
+              const applied = this.recordPlayerDamage(damage, shotSource, shotInfo);
               if (ep.readOnlyProjectile) this.applyReadOnlyDebuff();
               this.sound.hit();
               this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(applied)}`, '#ff4757');
@@ -13665,7 +13837,7 @@ class Game {
           const ldx = this.player.x - pud.x;
           const ldy = this.player.y - pud.y;
           if (this.player.hp > 0 && ldx * ldx + ldy * ldy < hitRadSq && this.player.shieldTimer <= 0 && Math.random() > this.getEffectivePlayerDodge()) {
-            this.recordPlayerDamage(pud.dmg * dt, pud.source || 'Лужа босса', { isBoss: Boolean(pud.isBossAttack) });
+            this.recordPlayerDamage(pud.dmg * dt, pud.source || 'Лужа босса', { isBoss: Boolean(pud.isBossAttack),attackerName:pud.attackerName,attackerIcon:pud.attackerIcon });
             if (this.player.hp <= 0) {
               this._framePvpTargets = null;
               this.gameOver('База рухнула: очередь у ресепшена перегрузила кластер!');
@@ -13677,7 +13849,7 @@ class Game {
             const rdx = remoteTarget.x - pud.x;
             const rdy = remoteTarget.y - pud.y;
             if (rdx * rdx + rdy * rdy < hitRadSq) {
-              this.damageRemotePlayerFromEnemy(pud.dmg * dt, pud.source || 'Лужа босса', remoteTarget.uid, { isBoss: Boolean(pud.isBossAttack) });
+              this.damageRemotePlayerFromEnemy(pud.dmg * dt, pud.source || 'Лужа босса', remoteTarget.uid, { isBoss: Boolean(pud.isBossAttack),attackerName:pud.attackerName,attackerIcon:pud.attackerIcon });
             }
           }
         }
@@ -13731,6 +13903,7 @@ class Game {
     }
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
+      const projectileStart=this.enemyProjectiles.length,warningStart=this.bossWarnings.length,puddleStart=this.puddles.length;
       const worldAuthority = !this.pvp?.started || this.pvp.host;
       this.updateEnemyBurn(e, dt);
 
@@ -13859,6 +14032,13 @@ class Game {
           if (e.burstShooter) this.addPopup(e.x, e.y - e.size - 12, 'ПРОВЕРКА ПО ПУНКТАМ!', '#f39c12');
         }
       }
+      if(worldAuthority) {
+        for(const [items,start] of [[this.enemyProjectiles,projectileStart],[this.bossWarnings,warningStart],[this.puddles,puddleStart]]) {
+          for(let index=start;index<items.length;index++) {
+            items[index].attackerName ||= e.name;items[index].attackerIcon ||= e.icon;
+          }
+        }
+      }
       // Касание
       const contactRad = e.size + 18;
       if (worldAuthority && targetDistSq < contactRad * contactRad) {
@@ -13873,14 +14053,14 @@ class Game {
         }
         if (e.is24hPursuer && !target.isRemote && this.time < this.rudesktopRescueGraceUntil) continue;
         if (e.is24hPursuer && target.isRemote) {
-          this.damageRemotePlayerFromEnemy((target.hp || this.pvp.remoteState?.hp || 100) + 1, enemyAttackSource, target.uid);
+          this.damageRemotePlayerFromEnemy((target.hp || this.pvp.remoteState?.hp || 100) + 1, enemyAttackSource, target.uid,{attackerName:e.name,attackerIcon:e.icon});
         } else if (e.is24hPursuer) {
           if (!this.pvp?.started) {
             this._framePvpTargets = null;
             this.beginRudesktopRescue(e);
             return;
           }
-          this.recordPlayerDamage((this.player.hp || 0) + 1, enemyAttackSource);
+          this.recordPlayerDamage((this.player.hp || 0) + 1, enemyAttackSource,{attackerName:e.name,attackerIcon:e.icon});
           this._framePvpTargets = null;
           this.gameOver(`Сессия завершена: вас догнал ${e.name}.`);
           return;
@@ -13892,11 +14072,11 @@ class Game {
         }
 
         if (target.isRemote) {
-          this.damageRemotePlayerFromEnemy(e.dmg * dt, enemyAttackSource, target.uid, { isBoss: Boolean(e.isBoss) });
+          this.damageRemotePlayerFromEnemy(e.dmg * dt, enemyAttackSource, target.uid, { isBoss: Boolean(e.isBoss),attackerName:e.name,attackerIcon:e.icon });
         } else if (this.player.shieldTimer <= 0) {
           if (Math.random() > this.getEffectivePlayerDodge()) {
             const damage = e.dmg * dt;
-            const appliedHit = this.recordPlayerDamage(damage, enemyAttackSource, { isBoss: Boolean(e.isBoss) });
+            const appliedHit = this.recordPlayerDamage(damage, enemyAttackSource, { isBoss: Boolean(e.isBoss),attackerName:e.name,attackerIcon:e.icon });
             if (e.eliteType === 'vampiric' && appliedHit > 0) {
               e.hp = Math.min(e.maxHp, e.hp + appliedHit * 4.5);
             }
@@ -13987,7 +14167,7 @@ class Game {
         if (e.isFlashUser) {
           this.puddles.push({
             x: e.x, y: e.y, radius: 46, dmg: 10, life: 4.5, isTrail: false,
-            isEnemyPuddle: true, source: 'Чужая флешка · автозапуск'
+            isEnemyPuddle: true, source: 'Чужая флешка · автозапуск',attackerName:e.name,attackerIcon:e.icon
           });
         }
         if (e.eliteType === 'splitter') {
@@ -14691,6 +14871,7 @@ class Game {
   }
 
   gameOver(reason, { victory = false } = {}) {
+    if(!victory && this.player?.hp<=0)this.killFeed?.reportDeath(this.pvp?.uid,this.lastPlayerDamage?.hit || this.killFeed.describeHit(this.lastPlayerDamage?.source || reason));
     if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
     this.rudesktopSkillFrame = null;
     this.rudesktopRescueState = null;

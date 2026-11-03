@@ -1199,9 +1199,23 @@
   #knowledge-tabs { display:flex; gap:5px; flex-wrap:wrap; }
   #knowledge-tabs .selected { background:#ffd200; }
   #knowledge-list { overflow:auto; min-height:0; flex:1; display:grid; grid-template-columns:1fr 1fr; gap:9px; align-content:start; touch-action:pan-y; }
-  .knowledge-card { padding:11px; background:#fff; border:1px solid #bbb; min-width:0; }
-  .knowledge-card h3 { font-size:14px; margin-bottom:7px; }.knowledge-card p { font-size:12px; line-height:1.5; margin-bottom:6px; }
-  .knowledge-card details,.knowledge-card summary { font-size:11px; line-height:1.5; cursor:pointer; }
+  .knowledge-legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:11px; }
+  .knowledge-legend span { display:inline-flex; align-items:center; gap:5px; }
+  .knowledge-legend span::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .knowledge-card { --knowledge-accent:#205c94; padding:11px; background:#fff; border:1px solid #c8cdd3; border-left:3px solid var(--knowledge-accent); min-width:0; }
+  .knowledge-card[data-category=classes] { --knowledge-accent:#8a570f; }
+  .knowledge-card[data-category=passives] { --knowledge-accent:#216541; }
+  .knowledge-card[data-category=actives] { --knowledge-accent:#69449d; }
+  .knowledge-card[data-category=events],.knowledge-card[data-category=modifiers] { --knowledge-accent:#a33030; }
+  .knowledge-card[data-tier="3"] { --knowledge-accent:#8a570f; }.knowledge-card[data-tier="4"] { --knowledge-accent:#69449d; }
+  .knowledge-card h3 { font-size:14px; margin:-11px -11px 9px; padding:9px 11px; color:var(--knowledge-accent); background:#f4f6f8; border-bottom:1px solid #e1e5e9; }
+  .knowledge-card p { font-size:12px; line-height:1.65; margin-bottom:6px; color:#3c4651; }
+  .knowledge-card details { margin-top:9px; border-top:1px solid #e1e5e9; font-size:11px; line-height:1.5; }
+  .knowledge-card summary { padding:7px 0 2px; color:var(--knowledge-accent); font-size:11px; font-weight:bold; cursor:pointer; }
+  .knowledge-card .knowledge-detail { margin:5px 0 0; padding:6px 8px; background:#f5f7fa; border-radius:3px; }
+  .knowledge-card .knowledge-label { color:#4b5663; }.knowledge-card .knowledge-level { color:#69449d; font-weight:bold; }
+  #modal-knowledge .knowledge-bonus { color:#216541; }#modal-knowledge .knowledge-penalty { color:#a33030; }#modal-knowledge .knowledge-value { color:#205c94; }
+  .knowledge-card span.knowledge-bonus,.knowledge-card span.knowledge-penalty,.knowledge-card span.knowledge-value { font-weight:bold; }
   @media(max-width:650px) { .solo-modifier-list,#knowledge-list { grid-template-columns:1fr; } }
   @media (max-width:1300px) and (pointer:coarse) { #hud-kill-feed { top:76px; right:8px; gap:2px; } .kill-feed-row { font-size:10px; gap:5px; } .kill-feed-name { max-width:110px; } .kill-feed-icon { font-size:15px; } }
   #sales-call.hud-size-custom { transform:scale(var(--hud-scale)); transform-origin:top left; }
@@ -1419,8 +1433,11 @@
           <div>
             <div class="release-notes">
               <h3>Версия 3.0.0 — «Продакшн живой. Пока»</h3>
-              <p>Десять усложнений для одиночного забега с наградами. Новые перки, предметы III–IV тира, шесть мобов и четыре босса. Саммоны усилены; техпод получил четвёртый призыв.</p>
-              <p>Более мягкий старт, растущая угроза после 15 минут и новая экономика. Карточки показывают «до → после». База знаний доступна из главного меню и паузы.</p>
+              <p><b>Собери свой вызов.</b> Десять модификаторов одиночного забега с описаниями усложнений и наград: больше опыта, стартовых характеристик и фиткоинов. Можно включить сразу несколько.</p>
+              <p><b>Новые билды.</b> Девять перков и десять предметов III–IV тира: резерв здоровья, взрывной коммит, зеркало базы, ремонтная зона и портал возврата. Переносчик теперь специализируется на миграции клиентских баз в 1С.</p>
+              <p><b>Техпод на связи.</b> Помощникам повышены здоровье, урон, длительность и частота атак. Новый дежурный инженер позволяет занять все четыре активных слота разными призывами.</p>
+              <p><b>Продакшн сопротивляется.</b> Шесть новых мобов и четыре босса с отдельными механиками. Старт мягче, после 15 минут давление растёт, а RuDesktop постепенно ускоряется к 25-й минуте. Экономика замедляет слишком быстрый выход в полный билд.</p>
+              <p><b>Всё под рукой.</b> Карточки улучшений показывают значения «до → после». База знаний с поиском доступна из главного меню и паузы. В киллфиде развёрнут пистолет; исправлен сбой при смерти в соло.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 2.9.0 — «Рабочий стол по штатному расписанию»</h3>
@@ -1449,7 +1466,7 @@
   </div>
   <div id="modal-knowledge" class="modal-overlay">
     <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.0.0</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
-      <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
+      <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
 
@@ -17272,6 +17289,31 @@ const PATCH300_METHODS = {
   },
   closeKnowledgeBase() {document.getElementById('modal-knowledge').style.display='none';document.getElementById(this.knowledgeReturn||'modal-main-menu').style.display='flex';this.setMobileMenuScroll(true);},
   setKnowledgeTab(tab) {this.knowledgeTab=tab;this.renderKnowledgeBase();},
+  appendKnowledgeText(element,text,tone='') {
+    const value=String(text||'');if(tone)element.classList.add(`knowledge-${tone}`);
+    // Вставляем только текстовые узлы: описания и поиск не становятся HTML.
+    const tokens=/(?:Ур\.\s*\d+|[IVX]+\s*уровень)|[+＋−–-]?\s*\d+(?:[.,]\d+)?(?:\s*[%×]|\s*HP(?:\/с)?|\s*с(?:екунд[а-яё]*)?(?![а-яё]))?/giu;
+    let cursor=0;
+    for(const match of value.matchAll(tokens)){
+      element.appendChild(document.createTextNode(value.slice(cursor,match.index)));
+      const span=document.createElement('span'),token=match[0];span.textContent=token;
+      let kind='value';
+      if(/^Ур\.|уровень/iu.test(token))kind='level';
+      else if(/^[+＋−–-]/u.test(token.trim())&&!/\d\s*$/u.test(value.slice(0,match.index))){
+        const tail=value.slice(match.index+token.length).split(/[;,.·]/u)[0].slice(0,45);
+        const head=value.slice(0,match.index).split(/[;,.·]/u).pop().slice(-45);
+        const reversed=/перезаряд|входящ[а-яё]*\s+урон|получаем[а-яё]*\s+урон|стоимост|наценк|цен[аыу]/iu.test(tail)||(/:\s*$/u.test(head)&&/перезаряд|входящ[а-яё]*\s+урон|стоимост|цен[аыу]/iu.test(head));
+        const positive=/^[+＋]/u.test(token.trim());kind=positive!==reversed?'bonus':'penalty';
+      }
+      if(kind==='value'){
+        const context=value.slice(0,match.index).split(/[;.·]/u).pop().slice(-65);
+        if(/(?:дольше|ниже|меньше|слабее|снижен[а-яё]*)\s+на\s*$/iu.test(context))kind='penalty';
+        else if(/(?:короче|быстрее|сокращает[а-яё\s]*|повышает[а-яё\s]*)\s+на\s*$/iu.test(context))kind='bonus';
+      }
+      span.className=`knowledge-${tone||kind}`;element.appendChild(span);cursor=match.index+token.length;
+    }
+    element.appendChild(document.createTextNode(value.slice(cursor)));
+  },
   renderKnowledgeBase() {
     const query=document.getElementById('knowledge-search').value.trim().toLocaleLowerCase();
     const tabs={classes:'Классы',weapons:'Оружие',passives:'Перки',actives:'Навыки',items:'Магазин',events:'События',modifiers:'Модификаторы'};
@@ -17291,8 +17333,8 @@ const PATCH300_METHODS = {
     if(this.knowledgeTab==='events'){for(const [icon,name,description] of PATCH300_EVENTS)add(icon,name,description);for(const daily of DAILY_MODIFIERS)add('📅','Ежедневная смена: '+daily.name,daily.desc,[daily.buffDesc||'',daily.debuffDesc||''].filter(Boolean));}
     const visible=entries.filter(entry=>!query||`${entry.name} ${entry.desc} ${entry.details.join(' ')}`.toLocaleLowerCase().includes(query));const box=document.getElementById('knowledge-list');box.replaceChildren();
     document.getElementById('knowledge-count').textContent=`${tabs[this.knowledgeTab]} · ${visible.length} из ${entries.length}`;
-    for(const entry of visible){const article=document.createElement('article');article.className='knowledge-card';const title=document.createElement('h3');title.textContent=`${entry.icon||'📖'} ${entry.name}`;const desc=document.createElement('p');desc.textContent=entry.desc||'';article.append(title,desc);
-      if(entry.details.length){const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Характеристики и подробности';details.appendChild(summary);for(const text of entry.details){const line=document.createElement('p');line.textContent=text;details.appendChild(line);}article.appendChild(details);}box.appendChild(article);
+    for(const entry of visible){const article=document.createElement('article');article.className='knowledge-card';article.dataset.category=this.knowledgeTab;if(this.knowledgeTab==='items')article.dataset.tier=entry.name.startsWith('IV · ')?'4':entry.name.startsWith('III · ')?'3':'1';const title=document.createElement('h3');title.textContent=`${entry.icon||'📖'} ${entry.name}`;const desc=document.createElement('p');desc.className='knowledge-description';this.appendKnowledgeText(desc,entry.desc,this.knowledgeTab==='modifiers'?'penalty':'');article.append(title,desc);
+      if(entry.details.length){const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Характеристики и подробности';details.appendChild(summary);for(const text of entry.details){const line=document.createElement('p');line.className='knowledge-detail';const value=String(text||'');const label=value.match(/^(Ур\.\s*\d+|[^:]{1,55}):\s*/u);if(label){const tag=document.createElement('b');tag.className=/^Ур\./u.test(label[1])?'knowledge-level':'knowledge-label';tag.textContent=label[0];line.appendChild(tag);this.appendKnowledgeText(line,value.slice(label[0].length),/^Награда$/u.test(label[1])?'bonus':'');}else this.appendKnowledgeText(line,value);details.appendChild(line);}article.appendChild(details);}box.appendChild(article);
     }
     if(!visible.length)box.textContent='По этому запросу ничего не найдено.';
   }

@@ -2151,6 +2151,13 @@ const RUN_FINISH_API_URL = 'https://fitness-leaderboard.fitness1c.workers.dev/ru
 /* ============================================================
    АУДИО-ДВИЖОК
    ============================================================ */
+const PROTOCOL_SHARED_BARS = 64;
+const PROTOCOL_LOOP_BARS = PROTOCOL_SHARED_BARS + 32;
+const PROTOCOL_VARIATION_ROOTS = {
+  normal: [[38, 38, 34, 38, 38, 43, 39, 33], [38, 38, 39, 38, 34, 38, 43, 33]],
+  miniboss: [[38, 38, 39, 38, 34, 38, 43, 33], [38, 34, 38, 43, 38, 39, 43, 33]]
+};
+
 class SoundEngine {
   constructor() {
     this.ctx = null;
@@ -2392,7 +2399,8 @@ class SoundEngine {
     if (!this.protocolFiles.has(stage)) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 30000);
-      const file = fetch(new URL(`audio/red-protocol/${stage}.mp3`, document.baseURI), { signal: controller.signal })
+      const version = stage === 'bigboss' ? '' : '?v=7';
+      const file = fetch(new URL(`audio/red-protocol/${stage}.mp3${version}`, document.baseURI), { signal: controller.signal })
         .then(response => {
           if (!response.ok) throw new Error(`Music HTTP ${response.status}`);
           return response.arrayBuffer();
@@ -2454,6 +2462,24 @@ class SoundEngine {
     this.protocolVoices.clear();
   }
 
+  matchProtocolBar(fromStage, toStage, bar) {
+    if (bar < PROTOCOL_SHARED_BARS) return bar;
+    // Each added variation uses its own eight-bar harmony twice.
+    const variation = Math.floor((bar - PROTOCOL_SHARED_BARS) / 16);
+    const beatGroup = bar % 8;
+    const root = PROTOCOL_VARIATION_ROOTS[fromStage][variation][beatGroup];
+    const destination = PROTOCOL_VARIATION_ROOTS[toStage][variation];
+    let closest = beatGroup;
+    let distance = Infinity;
+    for (let i = 0; i < destination.length; i++) {
+      if (destination[i] === root && Math.abs(i - beatGroup) < distance) {
+        closest = i;
+        distance = Math.abs(i - beatGroup);
+      }
+    }
+    return bar - beatGroup + closest;
+  }
+
   scheduleProtocolMusic() {
     const stage = this.megaBossCount > 0 ? 'bigboss' : this.bossCount > 0 ? 'miniboss' : 'normal';
     const transition = this.protocolTransition;
@@ -2491,11 +2517,13 @@ class SoundEngine {
       const phase = position % boundary;
       const start = now + (previous ? boundary - phase + (boundary - phase < 0.015 ? boundary : 0) : 0.025);
       const fadeDuration = matchedPhrase ? beat * (stage === 'normal' ? 4 : 2) : 0.035;
-      const duration = Math.min(buffer.duration, (stage === 'bigboss' ? 32 : 64) * 4 * beat);
-      // Normal and miniboss share the same 64-bar harmony and variation blocks.
-      // Change arrangement at the same phrase position instead of restarting it.
-      const offset = matchedPhrase ? (previous.offset + start - previous.startedAt) % duration
-        : this.protocolResume?.stage === stage ? this.protocolResume.offset % duration : 0;
+      const barLength = 4 * beat;
+      const duration = Math.min(buffer.duration, (stage === 'bigboss' ? 32 : PROTOCOL_LOOP_BARS) * barLength);
+      let offset = this.protocolResume?.stage === stage ? this.protocolResume.offset % duration : 0;
+      if (matchedPhrase) {
+        const nextBar = Math.round((previous.offset + start - previous.startedAt) / barLength) % PROTOCOL_LOOP_BARS;
+        offset = (this.matchProtocolBar(previous.stage, stage, nextBar) * barLength) % duration;
+      }
       const source = this.ctx.createBufferSource();
       const gain = this.ctx.createGain();
       source.buffer = buffer;

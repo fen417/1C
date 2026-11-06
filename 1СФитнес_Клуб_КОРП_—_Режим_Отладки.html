@@ -457,6 +457,17 @@
     text-align: center;
   }
 
+  #weapon-evolution-notice {
+    position:absolute; top:110px; left:50%; transform:translateX(-50%);
+    box-sizing:border-box; width:min(440px,calc(100% - 32px)); padding:12px 16px;
+    border:2px solid #ffd166; border-radius:8px; background:linear-gradient(135deg,#342c16,#171e2b);
+    box-shadow:0 5px 24px #0009; color:#fff; text-align:center; z-index:145; pointer-events:none;
+  }
+  #weapon-evolution-notice[hidden] { display:none; }
+  #weapon-evolution-notice small { display:block; color:#ffd166; font-size:11px; font-weight:bold; margin-bottom:5px; }
+  #weapon-evolution-notice b { display:block; font-size:16px; }
+  #weapon-evolution-notice span { display:block; color:#d2d7df; font-size:11px; margin-top:6px; }
+
   /* Футер */
   #footer-1c {
     height: 26px;
@@ -1347,6 +1358,9 @@
     <div id="dash-hud">💨 Рывок · ПКМ / Shift</div>
 
     <div id="event-banner">⚠️ ВНИМАНИЕ: СЕРВЕР ОБНАРУЖИЛ КРИТИЧЕСКИЙ СБОЙ!</div>
+    <div id="weapon-evolution-notice" role="status" aria-live="polite" hidden>
+      <small>ОРУЖИЕ ЭВОЛЮЦИОНИРОВАЛО!</small><b></b><span></span>
+    </div>
     <div id="glitch-overlay"></div>
     <div id="sales-call" onclick="event.stopPropagation()">
       <div id="sales-call-head">📞 Mango Talker · входящий вызов</div>
@@ -1678,10 +1692,12 @@
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
         <details class="release-notes patch-minor" open><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
           <h4>Нововведения</h4>
+          <p><b>Уведомление об эволюции.</b> После объединения оружия появляется отдельный баннер с иконкой, названием новой пушки и исходными компонентами.</p>
           <p><b>Боты в Battle Royale.</b> Хост добавляет и убирает ботов в лобби, заполняет ими свободные места и запускает матч без других людей. Боты фармят мобов, собирают дискеты и прокачиваются с приоритетом способностей своего класса. После стартового периода защиты воюют с людьми и друг с другом. Учитывают безопасный круг и предстоящее сжатие, возвращаются в зону, не преследуют добычу за её пределами и проверяют точки рывка и переноса. Зона и ветер действуют на ботов; выбывание и победитель определяются общими правилами. Магазин в BR закрыт для всех.</p>
           <p><b>Развитие легендарных миграций.</b> После победы над большим боссом 30-й минуты открывается второй выбор: оставить текущую миграцию или выбрать одно из двух её продолжений. Для «Перехода на 8.5» доступны «Боевой кластер» и «Отказоустойчивый контур»; для старого кластера — «Горячий разгон» и «Резервный узел»; для тонкого клиента — «Прямой канал» и «Локальный кэш». У каждого развития свои усиления и штрафы, которые добавляются к исходной миграции. Сохранение текущей не начисляет её бонусы повторно. Выбор выдаётся один раз за забег после победы над нужным боссом, включая сетевые режимы. Миграции видны в характеристиках и информации о результате.</p>
           <p><b>База знаний.</b> В названиях оружия, навыков и перков указана классовая специализация, её бонусы выделены золотом. Легендарные перки и их поздние развития находятся в отдельных блоках той же вкладки «Перки» с золотыми рамками. Названия умений в карточках классов, компоненты рецептов и связанные миграции стали ссылками: открывают нужную вкладку, раскрывают характеристики и подсвечивают карточку. Магазин автоматически сгруппирован по тиру, внутри тира предметы отсортированы по названию. Активные предметы подписаны, расходники показаны отдельно.</p>
           <h4>Ребаланс</h4>
+          <p><b>Эволюции оружия.</b> У всех эволюций убраны штрафы к характеристикам героя. Описания в базе знаний и карточках улучшений обновлены.</p>
           <p><b>Большие боссы.</b> Первый босс стал крепче. Пока жив защитник комитета, он снижает урон по остальным частям и понемногу восстанавливает им здоровье. Себя защитник не лечит, уничтоженные части не воскрешаются. Монолит быстрее восстанавливает уничтоженные защитные модули. Большие боссы и их части невосприимчивы к станам, оглушениям и принудительному перемещению.</p>
           <p><b>Ранний забег и навыки.</b> Первые волны немного меньше, после шестой минуты возвращается прежний лимит. До появления первого большого босса игроки и боты получают больше опыта; дробный остаток бонуса накапливается. Фиткоины от этой прибавки не меняются. Блокировка Sigur и аварийный ИБП перезаряжаются быстрее. Радиусы блокировки Sigur и ауры «Сброс Кэша Сеансов» заметнее растут с уровнем. Динамическое обновление отключено в PvP и BR — по клавише, кнопке и ботам. В одиночной игре и PvE оно сохранено. Порыв офисного ветра стал продолжительнее, сохранились предупреждение и плавное нарастание силы.</p>
           <h4>Исправления ошибок</h4>
@@ -3177,33 +3193,28 @@ const WEAPONS_DEF = {
   },
   fusion_audit: {
     name: 'Эволюция: Аудит доступа', icon: '🧾',
-    desc: 'Связка синтаксической проверки и считывателя запускает пробивающий аудиторский снаряд. Тяжёлый аудит: −6% к скорости бега.',
-    baseCooldown: 1.85, baseDmg: 38,
-    onEvolve: p => { p.speedMult -= 0.06; }
+    desc: 'Связка синтаксической проверки и считывателя запускает пробивающий аудиторский снаряд.',
+    baseCooldown: 1.85, baseDmg: 38
   },
   fusion_ledger: {
     name: 'Эволюция: Фискальный реестр', icon: '📚',
-    desc: 'Архив чеков и фискальный сканер объединены в цепную атаку по нескольким целям. Сверка с ОФД: перезарядка дольше на 7%.',
-    baseCooldown: 2.65, baseDmg: 40,
-    onEvolve: p => { p.cdMult *= 1.07; }
+    desc: 'Архив чеков и фискальный сканер объединены в цепную атаку по нескольким целям.',
+    baseCooldown: 2.65, baseDmg: 40
   },
   fusion_gate: {
     name: 'Эволюция: Контроль доступа', icon: '🚧',
-    desc: 'Турникет и IronLogic создают ударную волну, отбрасывающую врагов вокруг героя. Помехи контура СКУД: −12% к радиусу сбора.',
-    baseCooldown: 2.4, baseDmg: 58,
-    onEvolve: p => { p.magnetMult -= 0.12; }
+    desc: 'Турникет и IronLogic создают ударную волну, отбрасывающую врагов вокруг героя.',
+    baseCooldown: 2.4, baseDmg: 58
   },
   fusion_attendance: {
     name: 'Эволюция: Отчёт по посещаемости', icon: '📈',
-    desc: 'Сводная таблица и шейкер запускают тяжёлую ведомость, разливающую замедляющие протеиновые лужи при попадании. Перегруз Excel: −7% к скорости бега.',
-    baseCooldown: 1.55, baseDmg: 44,
-    onEvolve: p => { p.speedMult -= 0.07; }
+    desc: 'Сводная таблица и шейкер запускают тяжёлую ведомость, разливающую замедляющие протеиновые лужи при попадании.',
+    baseCooldown: 1.55, baseDmg: 44
   },
   fusion_callcenter: {
     name: 'Эволюция: Горячая линия 24/7', icon: '🎧',
-    desc: 'Телефон техподдержки и аура кэша создают вокруг героя поле дозвона и бьют разрядами по нескольким линиям сразу. Выгорание смены: −10% к макс. HP и рывок перезаряжается дольше на 12%.',
-    baseCooldown: 1.25, baseDmg: 32,
-    onEvolve: p => { p.maxHp = Math.max(50, Math.round(p.maxHp * 0.90)); p.hp = Math.min(p.hp, p.maxHp); p.dashCooldownMult = (p.dashCooldownMult || 1) * 1.12; }
+    desc: 'Телефон техподдержки и аура кэша создают вокруг героя поле дозвона и бьют разрядами по нескольким линиям сразу.',
+    baseCooldown: 1.25, baseDmg: 32
   }
 };
 
@@ -4477,7 +4488,7 @@ function scaleLegendaryHealth(game, multiplier) {
 
 const LEGENDARY_DEVELOPMENTS = [
   {key:'migration_85_combat',parent:'migration_85',name:'8.5: боевой кластер',icon:'⚔️',
-    description:'Дополнительно к «Переходу на 8.5»: урон +35%, шанс крита +12 п.п. Цена боевого режима: максимальный HP −15%, перезарядка оружия и навыков дольше на 15%.',
+    description:'Дополнительно к «Переходу на 8.5»: урон +35%, шанс крита +12%. Цена боевого режима: максимальный HP −15%, перезарядка оружия и навыков дольше на 15%.',
     apply:g=>{g.player.dmgMult*=1.35;g.player.critChance+=.12;scaleLegendaryHealth(g,.85);g.player.cdMult*=1.15;}},
   {key:'migration_85_failover',parent:'migration_85',name:'8.5: отказоустойчивый контур',icon:'🏰',
     description:'Дополнительно к «Переходу на 8.5»: максимальный HP +35%, регенерация +4 HP/с. Резервирование ресурсов: урон −18%, скорость бега −8%.',
@@ -4489,7 +4500,7 @@ const LEGENDARY_DEVELOPMENTS = [
     description:'Дополнительно к старому кластеру: максимальный HP +45%, регенерация +3 HP/с. Синхронизация резервного узла: перезарядка оружия и навыков дольше на 15%, скорость бега −10%.',
     apply:g=>{scaleLegendaryHealth(g,1.45);g.player.regen+=3;g.player.cdMult*=1.15;g.player.speedMult*=.90;}},
   {key:'thin_client_direct',parent:'thin_client',name:'Тонкий клиент: прямой канал',icon:'📡',
-    description:'Дополнительно к тонкому клиенту: урон +25%, шанс крита +10 п.п. Канал занят боевыми данными: получаемый опыт −20%, доход фиткоинов с дискет −15%.',
+    description:'Дополнительно к тонкому клиенту: урон +25%, шанс крита +10%. Канал занят боевыми данными: получаемый опыт −20%, доход фиткоинов с дискет −15%.',
     apply:g=>{g.player.dmgMult*=1.25;g.player.critChance+=.10;g.player.xpMult*=.80;g.player.currencyMult*=.85;}},
   {key:'thin_client_edge',parent:'thin_client',name:'Тонкий клиент: локальный кэш',icon:'☁️',
     description:'Дополнительно к тонкому клиенту: опыт и доход фиткоинов с дискет +25%, радиус сбора +35%, перезарядка рывка короче на 25%. Накладные расходы: урон −15%, максимальный HP −15%.',
@@ -11828,6 +11839,18 @@ class Game {
     this.eventBannerTimer = setTimeout(() => { banner.style.display = 'none'; this.eventBannerTimer = null; }, 4200);
   }
 
+  showWeaponEvolutionNotice(choice) {
+    const notice = document.getElementById('weapon-evolution-notice');
+    clearTimeout(this.weaponEvolutionNoticeTimer);
+    notice.querySelector('b').textContent = `${choice.def.icon} ${choice.def.name.replace(/^Эволюция:\s*/u, '')}`;
+    notice.querySelector('span').textContent = choice.components.map(key=>WEAPONS_DEF[key].name).join(' + ');
+    notice.hidden = false;
+    this.weaponEvolutionNoticeTimer = setTimeout(()=>{
+      notice.hidden = true;
+      this.weaponEvolutionNoticeTimer = null;
+    }, 5000);
+  }
+
   triggerGlitchScreen() {
     const g = document.getElementById('glitch-overlay');
     g.style.display = 'block';
@@ -14974,11 +14997,7 @@ class Game {
       fusion_attendance: `пробивающая ведомость + замедляющая лужа радиусом ${56 + level * 7}`,
       fusion_callcenter: `аура дозвона ${90 + level * 15} + разряды по ${3 + Math.floor(level / 2) + this.player.multishotLevel} линиям`
     }[key] || '';
-    const penalty = {
-      fusion_audit: 'Скорость −6%', fusion_ledger: 'Перезарядка +7%', fusion_gate: 'Радиус сбора −12%',
-      fusion_attendance: 'Скорость −7%', fusion_callcenter: 'Максимум HP −10%; перезарядка рывка +12%'
-    }[key];
-    return `${damageText}; ${cooldown}${extras ? `; ${extras}` : ''}${penalty ? `; ${penalty}` : ''}.`;
+    return `${damageText}; ${cooldown}${extras ? `; ${extras}` : ''}.`;
   }
 
   getRepeatableUpgradeSummary(choice) {
@@ -15040,6 +15059,7 @@ class Game {
       card.onclick = () => {
         this.applyUpgrade(ch);
         document.getElementById('modal-lvlup').style.display = 'none';
+        if (ch.type === 'weapon_fusion') this.showWeaponEvolutionNotice(ch);
         this.lastTime = performance.now();
         if (this.isBattleRoyale || this.isPvpMassUpgradeMode?.()) {
           this.pendingBattleRoyaleUpgrades.shift();
@@ -15088,9 +15108,6 @@ class Game {
         this.evolvedWeapons.add(key);
       }
       this.weapons[ch.key] = { lvl: 1, timer: 0 };
-      if (WEAPONS_DEF[ch.key]?.onEvolve) {
-        this.withCleanShopStats(() => WEAPONS_DEF[ch.key].onEvolve(this.player));
-      }
       this.recordAchievementCounter('evolutionsCrafted');
     } else if (ch.type === 'pass_new') {
       this.passives[ch.key] = { lvl: 1 };
@@ -17673,7 +17690,8 @@ const PATCH300_METHODS = {
     const after = tail.split(separator)[0].split(/\s+(?:и|а|но|зато)\s+|[+＋−-]?\s*\d/iu)[0];
     const stats = /(?<![\p{L}\p{N}])(?:скорост[а-яё]*\s+(?:перезаряд|восстановлен)[а-яё]*|(?:защит|сопротивлен|поглощени|снижени)[а-яё]*\s+(?:от\s+)?(?:(?:входящ|получаем)[а-яё]*\s+)?урон[а-яё]*|(?:входящ|получаем)[а-яё]*\s+урон[а-яё]*|урон[а-яё]*\s+по\s+(?:герою|игроку)|следующ[а-яё]*\s+попадани[а-яё]*|(?:перезаряж|перезаряд|откат|цен|стоимост|наценк|скорост|урон|защит|здоров|опыт|фиткоин|радиус|крит|лечен|регенерац|замедлен)[а-яё]*|HP)/giu;
     const afterStat = after.match(stats)?.[0];
-    const stat = afterStat || before.match(stats)?.at(-1) || '';
+    // A following sentence must not override the stat immediately before a value.
+    const stat = before.match(stats)?.at(-1) || afterStat || '';
     const cooldown = /^(?:перезаряж|перезаряд|откат)/iu.test(stat);
     const enemyAction = /(?:враг|моб|босс|преследовател)[а-яё]*\s+(?:(?:и\s+)?(?:босс|моб)[а-яё]*\s+)?(?:ускор|бега|атаку|теря)/iu.test(before);
     const enemyStat = enemyAction || (/^(?:скорост|урон|здоров|HP)/iu.test(stat)

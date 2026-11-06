@@ -457,7 +457,10 @@
     text-align: center;
   }
 
-  #spectator-hud { position:absolute; bottom:175px; left:50%; transform:translateX(-50%); z-index:140; max-width:calc(100% - 24px); padding:9px 12px; border:1px solid #81ecec; border-radius:7px; background:#111d2aee; color:#fff; text-align:center; font:12px Tahoma,sans-serif; }
+  #spectator-hud { position:absolute; bottom:calc(env(safe-area-inset-bottom) + 14px); left:50%; transform:translateX(-50%); z-index:140; max-width:calc(100% - 24px); padding:9px 12px; border:1px solid #81ecec; border-radius:7px; background:#111d2aee; color:#fff; text-align:center; font:12px Tahoma,sans-serif; }
+  #app-window.is-spectating :is(#xp-bar-container, #hud-top-left, #hud-inventory, #hud-buffs, #mobile-challenge-summary, #br-upgrade-button, #hud-item-loadout, #hud-shop-passives, #hud-consumables, #hud-backpack, #hud-health, #hud-stats, #hud-active-skills, #dash-hud, #br-center-marker, #mobile-move-control, #mobile-dash, #btn-dyn-update, #challenge-notification, #sales-call, #weapon-evolution-notice, #mega-boss-direction),
+  #app-window.is-spectating #nav-status > span:not(:last-child),
+  #app-window.is-spectating #footer-1c > div:last-child { display:none !important; }
   #spectator-hud[hidden] { display:none; }
   #spectator-hud small { display:block; margin:5px 0; color:#cbd5e1; }
   #spectator-hud .spectator-actions { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; }
@@ -1718,6 +1721,8 @@
           <p><b>Уникальное снаряжение.</b> Каждый предмет II, III и IV тира можно иметь только в одном экземпляре на основной инвентарь и рюкзак вместе. Повторная покупка, сборка второго одинакового комплекта и подбор дубликата заблокированы. Бонусы одинаковых предметов этих тиров не складываются; предметы I тира сохраняют прежние правила.</p>
           <p><b>Рост тира поставок.</b> Первые три аирдропа содержат предмет I тира, следующие три — II, с седьмого выпадают случайные предметы III тира. Количество опыта с погибшего увеличивается с его уровнем и имеет верхний предел.</p>
           <h4>Исправления ошибок</h4>
+          <p><b>HUD наблюдателя.</b> После смерти скрываются личные здоровье, опыт, очки, инвентарь, активные навыки, рывок и указатель центра зоны. Панель обзора перенесена вниз вместо активных умений. Киллфид и события матча остаются видимыми; при новом забеге обычный HUD возвращается.</p>
+          <p><b>Безопасное появление мобов.</b> Обычные волны и RuDesktop появляются за пределами обзора живых игроков с запасом расстояния. Учитываются размер экрана, масштаб камеры и другие участники комнаты. Координаты больше не прижимаются к краю карты, что могло поставить врага рядом с игроком. Камера погибшего наблюдателя не ограничивает спавн.</p>
           <p><b>Матч после смерти хоста.</b> Исправлена обработка выбывания в комнатах на двух участников: смерть больше не считается выходом из сессии и не передаёт роль хоста. PvE продолжается до гибели последнего союзника, PvP и BR определяют последнего выжившего. Синхронизация и таймер комнаты работают, пока хост наблюдает или открывает свои итоги.</p>
           <p><b>Общие предметы.</b> Выдачу снаряжения подтверждает хост: одна вещь достаётся одному участнику, повторные сообщения не выдают её повторно. При нехватке места предмет остаётся доступен на карте. Боты тоже подбирают снаряжение.</p>
         </details>
@@ -6390,9 +6395,18 @@ class Game {
       : {x:this.player.x,y:this.player.y,zoom:this.cameraZoom || 1};
   }
 
+  syncSpectatorHudVisibility() {
+    const root=document.getElementById('app-window');
+    const active=Boolean(this.spectatorMode);
+    const changed=root.classList.contains('is-spectating')!==active;
+    root.classList.toggle('is-spectating',active);
+    document.getElementById('spectator-hud').hidden=!active;
+    // Hiding the XP bar changes the viewport height; keep the canvas in sync.
+    if(changed)this.resize();
+  }
+
   updateSpectatorHud() {
-    const hud = document.getElementById('spectator-hud');
-    hud.hidden = !this.spectatorMode;
+    this.syncSpectatorHudVisibility();
     if (!this.spectatorMode) return;
     const locked = this.isHostExitLocked();
     document.getElementById('spectator-status').textContent = this.pvp?.started && !this.pvp.matchOver
@@ -6605,7 +6619,7 @@ class Game {
     if(this.pvp===this.activeMatchPvp && this.blockHostExit())return;
     this.activeMatchPvp=this.pvp;
     this.spectatorMode=false;this.spectatorCamera=null;this.spectatorDrag=null;
-    document.getElementById('spectator-hud').hidden=true;
+    this.syncSpectatorHudVisibility();
     document.getElementById('gameover-primary-button').disabled=false;
     this.brSupplyCount=0;
     this.botController = null;
@@ -6892,7 +6906,7 @@ class Game {
   showMainMenu() {
     if(this.blockHostExit())return;
     this.spectatorMode=false;this.spectatorDrag=null;
-    document.getElementById('spectator-hud').hidden=true;
+    this.syncSpectatorHudVisibility();
     this.unsubscribePvpRoomDirectory();
     if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
     this.rudesktopSkillFrame = null;
@@ -8510,7 +8524,7 @@ class Game {
     if (!p) return null;
     return { x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10), maxHp: Math.round(p.maxHp), level: this.level,
       time: Number(this.time) || 0, attackTotal: Number(this.pvp?.attackTotal || 0), enemyAttackTotal: Number(this.pvp?.enemyAttackTotal || 0),
-      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85),inventoryLoot:this.getLootInventory() };
+      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85),inventoryLoot:this.getLootInventory(),spawnView:this.getPlayerSpawnView() };
   }
 
   handlePvpRtcRecovered(rtc) {
@@ -8586,7 +8600,7 @@ class Game {
       over: pvp.matchOver || player.hp <= 0,
       migration85: Boolean(player.migration85)
     };
-    state={...state,inventoryLoot:this.getLootInventory(),attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
+    state={...state,spawnView:this.getPlayerSpawnView(),inventoryLoot:this.getLootInventory(),attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
       deathHit:player.hp<=0 ? this.lastPlayerDamage?.hit || null : null,
       patchMirror:this.summons.filter(s=>s.role==='mirror'&&s.hp>0&&s.life>0).map(s=>({id:s.id,x:s.x,y:s.y,hp:s.hp,size:s.size,life:s.life}))[0]||null,
       ...(pvp.host ? {killFeedEvents:this.killFeed.entries.map(({expiresAt,...event})=>event),patchZones:(this.patchZones||[]).map(z=>({ownerUid:z.ownerUid,x:z.x,y:z.y,radius:z.radius,life:z.life}))} : {})};
@@ -8929,6 +8943,58 @@ class Game {
     return targetRemote
       ? { x: remote.x, y: remote.y, hp: remote.hp, maxHp: remote.maxHp, isRemote: true, uid: this.pvp.remotePlayer?.uid || this.pvp.opponentUid || 'remote' }
       : local;
+  }
+
+  getPlayerSpawnView() {
+    const zoom=Math.max(.1,Number(this.cameraZoom)||this.getCameraZoom());
+    return {halfWidth:(Number(this.viewportWidth)||1280)/(2*zoom),halfHeight:(Number(this.viewportHeight)||720)/(2*zoom)};
+  }
+
+  getLiveSpawnAvoidanceAreas() {
+    const areas=[];
+    if(this.player?.hp>0 && !this.pvp?.eliminated)areas.push({...this.player,...this.getPlayerSpawnView()});
+    const fallback=this.getPlayerSpawnView();
+    for(const target of this.getHostRemotePlayerTargets()) {
+      const remote=this.pvp?.remotePlayers?.[target.uid];
+      const state=remote?.state || this.pvp?.remoteState;
+      const bot=Boolean(remote?.isBot || this.botController?.bots.has(target.uid));
+      const view=bot?{halfWidth:360,halfHeight:260}:state?.spawnView;
+      const halfWidth=Number(view?.halfWidth),halfHeight=Number(view?.halfHeight);
+      areas.push({x:target.x,y:target.y,
+        halfWidth:Number.isFinite(halfWidth)&&halfWidth>0?Math.min(this.MAP_SIZE,halfWidth):Math.max(1334,fallback.halfWidth),
+        halfHeight:Number.isFinite(halfHeight)&&halfHeight>0?Math.min(this.MAP_SIZE,halfHeight):Math.max(750,fallback.halfHeight)});
+    }
+    return areas;
+  }
+
+  getOffscreenEnemySpawnPoint(center,minimumDistance=640,rng=()=>this.rollRng()) {
+    const areas=this.getLiveSpawnAvoidanceAreas();
+    if(!areas.length)return null;
+    const margin=90,near=this.BOUND_MIN+40,far=this.BOUND_MAX-40;
+    const safe=point=>point.x>=near && point.x<=far && point.y>=near && point.y<=far && areas.every(area=>
+      Math.hypot(point.x-area.x,point.y-area.y)>=minimumDistance &&
+      (Math.abs(point.x-area.x)>area.halfWidth+margin || Math.abs(point.y-area.y)>area.halfHeight+margin));
+    const focus=areas.reduce((best,area)=>Math.hypot(area.x-center.x,area.y-center.y)<Math.hypot(best.x-center.x,best.y-center.y)?area:best,areas[0]);
+    // Always consume two random values: geometry must not change the daily wave RNG sequence.
+    const firstAngle=rng()*Math.PI*2,extraDistance=rng()*80;
+    for(let i=0;i<40;i++) {
+      const angle=firstAngle+i*Math.PI*(3-Math.sqrt(5));
+      const dx=Math.cos(angle),dy=Math.sin(angle);
+      const viewEdge=Math.min((focus.halfWidth+margin)/Math.max(.0001,Math.abs(dx)),(focus.halfHeight+margin)/Math.max(.0001,Math.abs(dy)));
+      const distance=Math.max(minimumDistance,viewEdge+40)+extraDistance;
+      const point={x:center.x+dx*distance,y:center.y+dy*distance};
+      if(safe(point))return point;
+    }
+    // Near walls, search legal map edges instead of clamping an invalid point next to a player.
+    let best=null,bestDistance=Infinity;
+    for(let i=0;i<=24;i++) {
+      const coordinate=near+(far-near)*i/24;
+      for(const point of [{x:coordinate,y:near},{x:coordinate,y:far},{x:near,y:coordinate},{x:far,y:coordinate}]) {
+        const distance=Math.hypot(point.x-center.x,point.y-center.y);
+        if(distance<bestDistance && safe(point)){best=point;bestDistance=distance;}
+      }
+    }
+    return best;
   }
 
   getPvpSpawnCenter() {
@@ -9931,7 +9997,7 @@ class Game {
     if (!pvp) return;
     if(this.blockHostExit())return false;
     this.spectatorMode=false;this.spectatorCamera=null;this.spectatorDrag=null;
-    document.getElementById('spectator-hud').hidden=true;
+    this.syncSpectatorHudVisibility();
     pvp.leaving = true;
     this.botController = null;
     this.killFeed.reset();
@@ -12759,8 +12825,7 @@ class Game {
       }
       this.pursuerSpawnCountdown -= dt;
       if (this.pursuerSpawnCountdown <= 0) {
-        this.pursuerSpawnCountdown = null;
-        this.spawn24hPursuer();
+        this.pursuerSpawnCountdown = this.spawn24hPursuer() ? null : 0;
       }
     }
     const megaBossAlive = this.enemies.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
@@ -12823,11 +12888,10 @@ class Game {
   }
 
   spawn24hPursuer() {
-    const angle = Math.random() * Math.PI * 2;
-    const distance = 760;
     const center = this.getPvpSpawnCenter();
-    const x = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, center.x + Math.cos(angle) * distance));
-    const y = Math.max(this.BOUND_MIN + 40, Math.min(this.BOUND_MAX - 40, center.y + Math.sin(angle) * distance));
+    const point=this.getOffscreenEnemySpawnPoint(center,760,Math.random);
+    if(!point)return false;
+    const {x,y}=point;
     const name = 'RuDesktop: 24ч ЛИМИТ';
     this.enemies.push({ x, y, name, hp: Infinity, maxHp: Infinity, size: 25, speed: 1.05, dmg: 0,
       icon: '🐢', col: '#8e44ad', xp: 0, isBoss: false, isMegaBoss: false,
@@ -12835,6 +12899,7 @@ class Game {
     this.showBanner(`🚨 ${name} появился и не отстанет до конца сессии!`);
     this.addPopup(x, y - 38, 'НЕУЯЗВИМ · УБИВАЕТ С КАСАНИЯ', '#e0aaff');
     this.log(`На 15-й минуте появился ${name}. Он медленно идёт за вами, неуязвим, убивает с одного касания и не отстанет до конца сессии.`);
+    return true;
   }
   getMobCountMultiplier() {
     if (!this.pvp?.started) return this.getDailyRules().spawnMult || 1;
@@ -12860,11 +12925,10 @@ class Game {
 
   spawnEnemy(forcedType = null, options = {}) {
     const rng = () => this.rollRng();
-    const angle = rng() * Math.PI * 2;
-    const dist = 640 + rng() * 80;
     const center = this.getPvpSpawnCenter();
-    const x = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.x + Math.cos(angle) * dist));
-    const y = Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.y + Math.sin(angle) * dist));
+    const point=Number.isFinite(options.x)&&Number.isFinite(options.y)?{x:options.x,y:options.y}:this.getOffscreenEnemySpawnPoint(center,640,rng);
+    if(!point)return null;
+    const {x,y}=point;
 
     const defs = {
       gymbro: { name: 'Качок в сланцах', hp: 30, speed: 1.7, dmg: 7, icon: '💪', xp: 3, size: 16, col: '#e67e22' },
@@ -17658,7 +17722,7 @@ class Game {
     this.renderNearestAirdropIndicator(camera);
     this.updateSpectatorHud();
 
-    if (this.player.hasSecondMonitor) {
+    if (this.player.hasSecondMonitor && !this.spectatorMode) {
       const margin = 38;
       const centerX = this.viewportWidth / 2;
       const centerY = this.viewportHeight / 2;

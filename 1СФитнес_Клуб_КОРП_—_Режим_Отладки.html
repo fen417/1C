@@ -4880,6 +4880,17 @@ class PvpKillFeed {
   }
 }
 
+// Общие параметры PvP-навыков: базовый урон, прирост за уровень, контроль.
+// Боты используют первые два значения; получение и отправка — все три.
+const PVP_OFFENSIVE_SKILLS = {
+  act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.45],
+  act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
+  act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
+  act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
+  act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0],
+  act_unloading: [100, 25, 0.25], act_hot_deploy: [150, 35, 0]
+};
+
 class PvpBotController {
   constructor(game, members) {
     this.game = game;
@@ -4975,10 +4986,7 @@ class PvpBotController {
 
   skillAttack(uid, key, level, origin = null) {
     const g = this.game;
-    const offensive = { act_backup_dt:[45,12], act_kill_sessions:[240,50], act_lavender_raf:[150,35],
-      act_messenger_blast:[120,35], act_sigur_lockdown:[100,30], act_atol_receipt_rain:[90,25],
-      act_shtrikh_reconciliation:[115,30], act_cache_purge:[150,40], act_technician_drone:[55,15],
-      act_senior_escalation:[100,30], act_unloading:[100,25], act_hot_deploy:[150,35] }[key];
+    const offensive = PVP_OFFENSIVE_SKILLS[key];
     if (!offensive || !Number.isInteger(level) || level < 1 || level > 5 || !g.isPvpCombatAvailable()) return;
     const bot = this.bots.get(uid);
     const source = origin || bot?.actor.player;
@@ -5807,6 +5815,23 @@ class HudLayoutManager {
     document.getElementById('settings-hud-layout').focus();
   }
 }
+
+const EARLY_MINI_BOSSES = [
+  { bossType: 'deadlock', name: 'СКУД SIGUR НЕ ВИДИТ КОНТРОЛЛЕР', hp: 2700, dmg: 24, icon: '🔒', col: '#c0392b',
+    log: 'Клиент уверяет, что СКУД включена. Через AnyDesk выяснилось: к сети её никто не подключил.' },
+  { bossType: 'tax', name: 'ВЫШЕЛ НОВЫЙ РЕЛИЗ И ИНТЕГРАЦИИ СЛОМАЛИСЬ', hp: 3600, dmg: 28, icon: '📲', col: '#8e44ad',
+    log: 'Вышел новый релиз, интеграции сломались. По телефону техспец подключается через AnyDesk и просит клиента пока не нажимать «Подключить» ещё раз.' },
+  { bossType: 'tamara', name: 'ОБНОВЛЕНИЕ КОНФИГУРАЦИИ БЕЗ РЕЗЕРВНОЙ КОПИИ', hp: 6000, dmg: 36, icon: '🎟️', col: '#d35400',
+    log: 'Клиент требует обновить прямо сейчас. На вопрос о резервной копии отвечает: «Какая копия?»' },
+  { bossType: 'ldf_blob', name: 'БАЗА КЛИЕНТА РАЗВЁРНУТА НЕ НА ТОМ СЕРВЕРЕ', hp: 12500, dmg: 48, icon: '🗄️', col: '#2c3e50', size: 52,
+    log: 'База развёрнута на сервере клиента. Свободно 2 ГБ, резервная копия весит 240 ГБ. Клиент уверен, что места хватит.' },
+  { bossType: 'ceo', name: 'КЛИЕНТСКИЙ СЕРВЕР ВЫКЛЮЧИЛИ ИЗ РОЗЕТКИ', hp: 16500, dmg: 54, icon: '👔', col: '#b71540', size: 50,
+    log: '«После обновления всё перестало работать». Через Rudesktop техспец видит один кадр в минуту. Клиент: «Я думал, зависло, поэтому сервер выключил».' },
+  { bossType: 'franchisee', name: 'ПОДОЖДИТЕ, КУРСОР ДОЕДЕТ', hp: 21000, dmg: 58, icon: '💸', col: '#10ac84', size: 54,
+    log: 'Клиент просит настроить турникет через Rudesktop. Курсор ползёт к настройкам — обновление уже вышло.' },
+  { bossType: 'year_close', name: 'ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ', hp: 24500, dmg: 61, icon: '📒', col: '#e17055', size: 56,
+    log: 'Дебет с кредитом разошлись на одну копейку. Бухгалтерия заблокировала период и вызвала весь ИТ-отдел.' }
+];
 
 class Game {
   constructor() {
@@ -7628,9 +7653,7 @@ class Game {
       title.textContent = `🏅 Достижения · ${String(player.name || 'Игрок').slice(0,15)}`;
       grid.innerHTML = ACHIEVEMENT_DEFINITIONS.map(item => {
         const stage = Math.max(0, Math.min(item.targets.length, Number(unlocked[item.id]) || 0));
-        const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
-        const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?` unlocked tier-${index + 1}`:''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
-        return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-stage-list">${stages}</div></article>`;
+        return this.renderAchievementCard(item, stage);
       }).join('');
     } catch (error) {
       grid.innerHTML = `<div class="achievement-summary">Не удалось загрузить достижения: ${this.escapeHtml(error.message || 'ошибка')}</div>`;
@@ -7638,6 +7661,12 @@ class Game {
   }
 
   closePlayerAchievements() { document.getElementById('modal-player-achievements').style.display = 'none'; }
+
+  renderAchievementCard(item, stage, progressContent = '') {
+    const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
+    const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?` unlocked tier-${index + 1}`:''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
+    return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div>${progressContent}<div class="achievement-stage-list">${stages}</div></article>`;
+  }
 
   renderAchievements() {
     const grid = document.getElementById('achievement-grid');
@@ -7650,9 +7679,7 @@ class Game {
       const stage = Math.min(item.targets.length, Number(this.achievementUnlocked[item.id]) || 0);
       const target = item.targets[stage] || item.targets[item.targets.length - 1];
       const progress = stage >= item.targets.length ? 100 : Math.min(100, value / target * 100);
-      const rank = stage ? ACHIEVEMENT_MEDALS[stage - 1] : 'Ещё не получено';
-      const stages = item.targets.map((required,index)=>`<span class="achievement-stage${index<stage?` unlocked tier-${index + 1}`:''}">${ACHIEVEMENT_MEDALS[index]}<br>${item.format(required)}</span>`).join('');
-      return `<article class="achievement-card tier-${stage}"><div class="achievement-card-top"><div class="achievement-icon">${item.icon}</div><div><h3>${item.title}</h3><p>${item.description}</p></div><div class="achievement-rank">${rank}<br>${stage}/${item.targets.length}</div></div><div class="achievement-progress"><span style="width:${progress}%"></span></div><p>${stage>=item.targets.length?'Все этапы завершены':`Прогресс: ${item.format(value)} · цель ${item.format(target)}`}</p><div class="achievement-stage-list">${stages}</div></article>`;
+      return this.renderAchievementCard(item, stage, `<div class="achievement-progress"><span style="width:${progress}%"></span></div><p>${stage>=item.targets.length?'Все этапы завершены':`Прогресс: ${item.format(value)} · цель ${item.format(target)}`}</p>`);
     }).join('');
   }
 
@@ -8594,17 +8621,7 @@ class Game {
     if (!pvp?.started || !(pvp.host ? Object.values(pvp.peerConnections || {}).some(peer => peer.connected) : pvp.rtc?.connected)) return false;
     const player = this.player;
     if (!player) return false;
-    state ||= {
-      x: player.x, y: player.y, hp: Math.max(0, Math.round(player.hp * 10) / 10),
-      maxHp: Math.round(player.maxHp), shield: player.shieldTimer > 0, level: this.level,
-      time: Number(this.time) || 0,
-      attackTotal: Math.round(pvp.attackTotal * 100) / 100,
-      enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
-      enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
-      killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0), players: pvp.killCounts || {} },
-      over: pvp.matchOver || player.hp <= 0,
-      migration85: Boolean(player.migration85)
-    };
+    state ||= this.createPvpNetworkState();
     state={...state,spawnView:this.getPlayerSpawnView(),inventoryLoot:this.getLootInventory(),attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
       deathHit:player.hp<=0 ? this.lastPlayerDamage?.hit || null : null,
       patchMirror:this.summons.filter(s=>s.role==='mirror'&&s.hp>0&&s.life>0).map(s=>({id:s.id,x:s.x,y:s.y,hp:s.hp,size:s.size,life:s.life}))[0]||null,
@@ -8615,6 +8632,21 @@ class Game {
       choosing: pvp.choosing || null, paused: Boolean(pvp.manualPaused),
       shots: this.serializePvpShots()
     }, channelOverride, Boolean(channelOverride));
+  }
+
+  createPvpNetworkState() {
+    const player = this.player, pvp = this.pvp;
+    return {
+      x: player.x, y: player.y, hp: Math.max(0, Math.round(player.hp * 10) / 10),
+      maxHp: Math.round(player.maxHp), shield: player.shieldTimer > 0, level: this.level,
+      time: Number(this.time) || 0,
+      attackTotal: Math.round(pvp.attackTotal * 100) / 100,
+      enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
+      enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
+      killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0), players: pvp.killCounts || {} },
+      over: pvp.matchOver || player.hp <= 0,
+      migration85: Boolean(player.migration85)
+    };
   }
 
   validatePvpRemoteState(state) {
@@ -8893,19 +8925,7 @@ class Game {
   receiveBattleRoyaleDamage(damage, source = 'Атака противника', options = {}) {
     if (options.isPvp && !this.isPvpCombatAvailable()) return;
     if (!options.isPvp && this.pvp?.started && performance.now() < Number(this.pvp.spawnGraceUntil || 0)) return;
-    if (this.player.shieldTimer > 0) {
-      this.addPopup(this.player.x, this.player.y - 22, options.isPvp ? 'PvP-УДАР ПОГЛОЩЁН ЩИТОМ' : 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
-      return;
-    }
-    if (Math.random() < this.getEffectivePlayerDodge()) {
-      this.addPopup(this.player.x, this.player.y - 22, options.isPvp ? 'PvP-ПРОМАХ!' : 'УКЛОНЕНИЕ!', '#f1c40f');
-      return;
-    }
-    const applied = this.recordPlayerDamage(damage, source, options);
-    if (applied <= 0) return;
-    this.sound.hit();
-    this.addPopup(this.player.x, this.player.y - 22, `-${Math.ceil(applied)} HP`, '#ff4757');
-    this.updateHUD();
+    if (this.applyIncomingDamage(damage, source, options, 'br') <= 0) return;
     if (this.player.hp <= 0) this.gameOver(`Battle Royale: вас выбил ${source}.`);
   }
 
@@ -8935,19 +8955,9 @@ class Game {
       if (enemy) enemy.aggroTarget = best.uid;
       return best;
     }
-    const remote = this.pvp?.host && this.pvp.started ? this.pvp.remoteState : null;
-    if (!remote || remote.over || remote.hp <= 0 || !Number.isFinite(remote.x) || !Number.isFinite(remote.y)) {
-      if (enemy) enemy.aggroTarget = 'local';
-      return local;
-    }
-    const localDistance = enemy ? Math.hypot(local.x - enemy.x, local.y - enemy.y) : 0;
-    const remoteDistance = enemy ? Math.hypot(remote.x - enemy.x, remote.y - enemy.y) : Infinity;
-    const wasRemote = enemy?.aggroTarget === 'remote';
-    const targetRemote = wasRemote ? remoteDistance <= localDistance + 80 : remoteDistance + 80 < localDistance;
-    if (enemy) enemy.aggroTarget = targetRemote ? 'remote' : 'local';
-    return targetRemote
-      ? { x: remote.x, y: remote.y, hp: remote.hp, maxHp: remote.maxHp, isRemote: true, uid: this.pvp.remotePlayer?.uid || this.pvp.opponentUid || 'remote' }
-      : local;
+    // Все варианты хоста уже обработаны выше; здесь возможна только локальная цель.
+    if (enemy) enemy.aggroTarget = 'local';
+    return local;
   }
 
   getPlayerSpawnView() {
@@ -9232,6 +9242,17 @@ class Game {
     }
   }
 
+  closePvpPeer(peer) {
+    peer.restarting = true;
+    peer.connected = false;
+    clearTimeout(peer.connectTimer);
+    peer.unsubscribers?.forEach(unsubscribe => { try { unsubscribe(); } catch (_) {} });
+    peer.channel?.close();
+    peer.controlChannel?.close();
+    peer.worldChannel?.close();
+    peer.pc?.close();
+  }
+
   handlePvpOpponentLost(message, promoteToHost = false) {
     const pvp = this.pvp;
     if (!pvp?.started || pvp.opponentLost) return;
@@ -9267,26 +9288,10 @@ class Game {
     pvp.remoteShots = [];
     pvp.remoteChoosing = null;
     pvp.remotePaused = false;
-    if (pvp.rtc) {
-      pvp.rtc.restarting = true;
-      pvp.rtc.connected = false;
-      clearTimeout(pvp.rtc.connectTimer);
-      pvp.rtc.unsubscribers?.forEach(unsubscribe => { try { unsubscribe(); } catch (_) {} });
-      pvp.rtc.channel?.close();
-      pvp.rtc.controlChannel?.close();
-      pvp.rtc.worldChannel?.close();
-      pvp.rtc.pc?.close();
-    }
+    if (pvp.rtc) this.closePvpPeer(pvp.rtc);
     for (const peer of Object.values(pvp.peerConnections || {})) {
       if (!peer || peer === pvp.rtc) continue;
-      peer.restarting = true;
-      peer.connected = false;
-      clearTimeout(peer.connectTimer);
-      peer.unsubscribers?.forEach(unsubscribe => { try { unsubscribe(); } catch (_) {} });
-      peer.channel?.close();
-      peer.controlChannel?.close();
-      peer.worldChannel?.close();
-      peer.pc?.close();
+      this.closePvpPeer(peer);
     }
     for (const unsubscribe of (pvp.signalingCleanups || []).splice(0)) {
       try { unsubscribe(); } catch (_) {}
@@ -9364,18 +9369,7 @@ class Game {
         if(now-grant.at>=1000){this.sendEquipmentMessage(grant.uid,{type:'equipment-grant',item:grant.item});grant.at=now;}
       }
       if(pvp.pendingEquipmentClaim && now-pvp.pendingEquipmentClaim.at>2500)pvp.pendingEquipmentClaim=null;
-      const state = {
-        x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
-        maxHp: Math.round(p.maxHp), shield: p.shieldTimer > 0, level: this.level,
-        time: Number(this.time) || 0,
-        attackTotal: Math.round(this.pvp.attackTotal * 100) / 100,
-        enemyAttackTotal: Math.round(this.pvp.enemyAttackTotal * 100) / 100,
-        enemyAttackSource: this.pvp.enemyAttackSource || 'Атака противника',
-        killCredits: { host: Number(this.pvp.hostKillCount || 0), guest: Number(this.pvp.guestKillCount || 0), players: this.pvp.killCounts || {} },
-        over: this.pvp.matchOver || p.hp <= 0,
-        migration85: Boolean(p.migration85),
-      };
-      this.sendPvpNetworkState(state);
+      this.sendPvpNetworkState(this.createPvpNetworkState());
       if(pvp.host && this.botController && performance.now()-Number(pvp.lastBotStateSentAt||0)>=100){pvp.lastBotStateSentAt=performance.now();this.botController.sendStates();}
       if (!pvp.host) this.sendPvpGuestWorldActions();
       else {
@@ -9700,43 +9694,38 @@ class Game {
     return applied;
   }
 
+  applyIncomingDamage(damage, source, options, kind) {
+    const isPvp = kind === 'pvp' || (kind === 'br' && options.isPvp);
+    if (this.player.shieldTimer > 0) {
+      this.addPopup(this.player.x, this.player.y - 22, isPvp ? 'PvP-УДАР ПОГЛОЩЁН ЩИТОМ' : 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
+      return 0;
+    }
+    if (Math.random() < this.getEffectivePlayerDodge()) {
+      this.addPopup(this.player.x, this.player.y - 22, isPvp ? 'PvP-ПРОМАХ!' : 'УКЛОНЕНИЕ!', '#f1c40f');
+      return 0;
+    }
+    const hitOptions = kind === 'pvp' ? { ...options, isPvp: true }
+      : kind === 'enemy' ? { ...options, isBoss: Boolean(options.isBoss) } : options;
+    const applied = this.recordPlayerDamage(damage, source, hitOptions);
+    if (applied <= 0) return applied;
+    this.sound.hit();
+    const prefix = kind === 'pvp' ? 'PvP ' : kind === 'enemy' ? 'МОБЫ ' : '';
+    this.addPopup(this.player.x, this.player.y - 22, `${prefix}-${Math.ceil(applied)} HP`, '#ff4757');
+    this.updateHUD();
+    return applied;
+  }
+
   receivePvpDamage(damage, source = `${this.pvp?.remotePlayer?.name || 'Соперник'} · атака PvP`, options = {}) {
     if (!this.player || this.player.hp <= 0) return;
     if (this.pvp?.mode === 'pvp' && this.time < 120) return;
-    if (this.player.shieldTimer > 0) {
-      this.addPopup(this.player.x, this.player.y - 22, 'PvP-УДАР ПОГЛОЩЁН ЩИТОМ', '#00cec9');
-      return;
-    }
-    const dodgeChance = this.getEffectivePlayerDodge();
-    if (Math.random() < dodgeChance) {
-      this.addPopup(this.player.x, this.player.y - 22, 'PvP-ПРОМАХ!', '#f1c40f');
-      return;
-    }
-    const applied = this.recordPlayerDamage(damage, source, { ...options, isPvp: true });
-    if (applied <= 0) return;
-    this.sound.hit();
-    this.addPopup(this.player.x, this.player.y - 22, `PvP -${Math.ceil(applied)} HP`, '#ff4757');
-    this.updateHUD();
+    if (this.applyIncomingDamage(damage, source, options, 'pvp') <= 0) return;
     const attackerName = String(source || '').split(' · ')[0] || this.pvp?.remotePlayer?.name || 'Соперник';
     if (this.player.hp <= 0) this.gameOver(`ПОРАЖЕНИЕ! ${attackerName} победил.`);
   }
 
   receiveEnemyDamage(damage, source = 'Атака противника', options = {}) {
     if (!this.player || this.player.hp <= 0 || damage <= 0) return;
-    if (this.player.shieldTimer > 0) {
-      this.addPopup(this.player.x, this.player.y - 22, 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
-      return;
-    }
-    const dodgeChance = this.getEffectivePlayerDodge();
-    if (Math.random() < dodgeChance) {
-      this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
-      return;
-    }
-    const applied = this.recordPlayerDamage(damage, source, { ...options, isBoss: Boolean(options.isBoss) });
-    if (applied <= 0) return;
-    this.sound.hit();
-    this.addPopup(this.player.x, this.player.y - 22, `МОБЫ -${Math.ceil(applied)} HP`, '#ff4757');
-    this.updateHUD();
+    if (this.applyIncomingDamage(damage, source, options, 'enemy') <= 0) return;
     if (this.player.hp <= 0) this.gameOver('Противники уничтожили целостность базы!');
   }
 
@@ -9809,14 +9798,7 @@ class Game {
   receivePvpActiveSkill(skill) {
     if (!this.isPvpCombatAvailable() || !skill || this.player?.hp <= 0) return;
     if (skill.senderUid && skill.senderUid === this.pvp.uid) return;
-    const offensive = {
-      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.45],
-      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
-      act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
-      act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
-      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0],
-      act_unloading: [100, 25, 0.25], act_hot_deploy: [150, 35, 0]
-    }[skill.key];
+    const offensive = PVP_OFFENSIVE_SKILLS[skill.key];
     const level = Number(skill.level);
     if (!offensive || !Number.isInteger(level) || level < 1 || level > 5) return;
     if ((this.isBattleRoyale || Number(this.pvp.actualPlayerCount) >= 3) && skill.key !== 'act_messenger_blast' &&
@@ -9848,14 +9830,7 @@ class Game {
       ? Object.values(this.pvp.peerConnections || {}).some(peer => peer.connected)
       : Boolean(this.pvp.rtc?.connected);
     if (!connected) return;
-    const offensive = {
-      act_backup_dt: [45, 12, 0], act_kill_sessions: [240, 50, 0.45],
-      act_lavender_raf: [150, 35, 0], act_messenger_blast: [120, 35, 0.6],
-      act_sigur_lockdown: [100, 30, 0.65], act_atol_receipt_rain: [90, 25, 0],
-      act_shtrikh_reconciliation: [115, 30, 0.35], act_cache_purge: [150, 40, 0.45],
-      act_technician_drone: [55, 15, 0], act_senior_escalation: [100, 30, 0],
-      act_unloading: [100, 25, 0.25], act_hot_deploy: [150, 35, 0]
-    }[key];
+    const offensive = PVP_OFFENSIVE_SKILLS[key];
     if (!offensive) return; // Поддерживающие умения усиливают PvP-атаки игрока.
     const [base, perLevel, control] = offensive;
     this.sendPvpNetworkMessage({
@@ -11105,6 +11080,25 @@ class Game {
     return [...filtered].sort((a, b) => priorityOf(a[0], a[1]) - priorityOf(b[0], b[1]));
   }
 
+  consumeShopIngredients(slots, uses) {
+    for (const [index, usedCount] of uses) {
+      const slot = slots[index];
+      slot.count = (slot.count || 1) - usedCount;
+      if (slot.count <= 0) slots[index] = null;
+    }
+  }
+
+  findShopRecipeIngredients(parts, slots) {
+    const indices = [], used = new Map();
+    for (const part of parts) {
+      const index = slots.findIndex((slot, i) => (used.get(i) || 0) < (slot?.count || 1) && slot?.key === part && (slot.count || 1) > 0);
+      if (index < 0) return null;
+      indices.push(index);
+      used.set(index, (used.get(index) || 0) + 1);
+    }
+    return { indices, used };
+  }
+
   combineShopPassives(preferredKey = null, { onlyRecipeTree = null, skipRecalc = false, healOnGain = true } = {}) {
     let lastCombo = null;
     let changed = true;
@@ -11114,19 +11108,13 @@ class Game {
       for (const [comboKey, combo] of orderedRecipes) {
         const limit=this.getShopPassiveDef(comboKey)?.maxOwned;
         if(limit && this.getOwnedShopItemCount(comboKey)>=limit)continue;
-        const locations = [];
-        const used = new Map();
-        for (const part of combo.parts) {
-          const location = [
-            ...(this.shopPassives || []).map((slot, index) => ({ zone: 'main', index, slot })),
-            ...(this.backpack || []).map((slot, index) => ({ zone: 'backpack', index, slot }))
-          ].find(entry => (used.get(`${entry.zone}:${entry.index}`) || 0) < (entry.slot?.count || 1) && entry.slot?.key === part && (entry.slot.count || 1) > 0);
-          if (!location) break;
-          locations.push(location);
-          const locationKey = `${location.zone}:${location.index}`;
-          used.set(locationKey, (used.get(locationKey) || 0) + 1);
-        }
-        if (locations.length !== combo.parts.length) continue;
+        const entries = [
+          ...(this.shopPassives || []).map((slot, index) => ({ zone: 'main', index, slot })),
+          ...(this.backpack || []).map((slot, index) => ({ zone: 'backpack', index, slot }))
+        ];
+        const ingredients = this.findShopRecipeIngredients(combo.parts, entries.map(entry => entry.slot));
+        if (!ingredients) continue;
+        const locations = ingredients.indices.map(index => entries[index]);
         const mainUses = new Map();
         const backpackUses = new Map();
         for (const location of locations) {
@@ -11141,16 +11129,8 @@ class Game {
           ? (freeingMainIngredient?.[0] ?? freeMainIndex)
           : (freeingBackpackIngredient?.[0] ?? this.findBackpackFreeSlot());
         if (outputIndex < 0) continue;
-        for (const [index, usedCount] of mainUses) {
-          const slot = this.shopPassives[index];
-          slot.count = (slot.count || 1) - usedCount;
-          if (slot.count <= 0) this.shopPassives[index] = null;
-        }
-        for (const [index, usedCount] of backpackUses) {
-          const slot = this.backpack[index];
-          slot.count = (slot.count || 1) - usedCount;
-          if (slot.count <= 0) this.backpack[index] = null;
-        }
+        this.consumeShopIngredients(this.shopPassives, mainUses);
+        this.consumeShopIngredients(this.backpack, backpackUses);
         const outputSlots = this.getInventoryZoneSlots(outputZone);
         const destinationIndex = outputIndex;
         if (destinationIndex < 0 || outputSlots[destinationIndex]) {
@@ -11615,17 +11595,10 @@ class Game {
         for (const [comboKey, combo] of recipes) {
           const limit=this.getShopPassiveDef(comboKey)?.maxOwned;
           if(limit && virtual.reduce((count,slot)=>count+(slot?.key===comboKey?(slot.count||1):0),0)>=limit)continue;
-          const indices = [], used = new Map();
-          for (const part of combo.parts) {
-            const index = virtual.findIndex((slot, i) => (used.get(i) || 0) < (slot?.count || 1) && slot?.key === part && (slot.count || 1) > 0);
-            if (index < 0) break;
-            indices.push(index); used.set(index, (used.get(index) || 0) + 1);
-          }
-          if (indices.length !== combo.parts.length) continue;
-          for (const [index, usedCount] of used) {
-            virtual[index].count = (virtual[index].count || 1) - usedCount;
-            if (virtual[index].count <= 0) virtual[index] = null;
-          }
+          const ingredients = this.findShopRecipeIngredients(combo.parts, virtual);
+          if (!ingredients) continue;
+          const { used } = ingredients;
+          this.consumeShopIngredients(virtual, used);
           const mainIndex = [...used].find(([index]) => index < 6 && !virtual[index])?.[0];
           const freeMain = virtual.slice(0, 6).findIndex(slot => !slot);
           const bagIngredient = [...used].find(([index]) => index >= 6 && !virtual[index])?.[0];
@@ -13165,52 +13138,11 @@ class Game {
       bossTimer1: 0, bossTimer2: 0, freezeTimer: 0, enrage: false
     };
 
-    if (minute === 1) {
-      b.bossType = 'deadlock';
-      b.name = 'СКУД SIGUR НЕ ВИДИТ КОНТРОЛЛЕР';
-      b.hp = 2700; b.dmg = 24; b.icon = '🔒'; b.col = '#c0392b';
+    if (Number.isInteger(minute) && minute >= 1 && minute <= EARLY_MINI_BOSSES.length) {
+      const { log, ...stats } = EARLY_MINI_BOSSES[minute - 1];
+      Object.assign(b, stats);
       this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('Клиент уверяет, что СКУД включена. Через AnyDesk выяснилось: к сети её никто не подключил.');
-    } else if (minute === 2) {
-      b.bossType = 'tax';
-      b.name = 'ВЫШЕЛ НОВЫЙ РЕЛИЗ И ИНТЕГРАЦИИ СЛОМАЛИСЬ';
-      b.hp = 3600; b.dmg = 28; b.icon = '📲'; b.col = '#8e44ad';
-      this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('Вышел новый релиз, интеграции сломались. По телефону техспец подключается через AnyDesk и просит клиента пока не нажимать «Подключить» ещё раз.');
-    } else if (minute === 3) {
-      b.bossType = 'tamara';
-      b.name = 'ОБНОВЛЕНИЕ КОНФИГУРАЦИИ БЕЗ РЕЗЕРВНОЙ КОПИИ';
-      b.hp = 6000; b.dmg = 36; b.icon = '🎟️'; b.col = '#d35400';
-      this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('Клиент требует обновить прямо сейчас. На вопрос о резервной копии отвечает: «Какая копия?»');
-    } else if (minute === 4) {
-      b.bossType = 'ldf_blob';
-      b.name = 'БАЗА КЛИЕНТА РАЗВЁРНУТА НЕ НА ТОМ СЕРВЕРЕ';
-      b.hp = 12500; b.dmg = 48; b.icon = '🗄️'; b.col = '#2c3e50';
-      b.size = 52;
-      this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('База развёрнута на сервере клиента. Свободно 2 ГБ, резервная копия весит 240 ГБ. Клиент уверен, что места хватит.');
-    } else if (minute === 5) {
-      b.bossType = 'ceo';
-      b.name = 'КЛИЕНТСКИЙ СЕРВЕР ВЫКЛЮЧИЛИ ИЗ РОЗЕТКИ';
-      b.hp = 16500; b.dmg = 54; b.icon = '👔'; b.col = '#b71540';
-      b.size = 50;
-      this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('«После обновления всё перестало работать». Через Rudesktop техспец видит один кадр в минуту. Клиент: «Я думал, зависло, поэтому сервер выключил».');
-    } else if (minute === 6) {
-      b.bossType = 'franchisee';
-      b.name = 'ПОДОЖДИТЕ, КУРСОР ДОЕДЕТ';
-      b.hp = 21000; b.dmg = 58; b.icon = '💸'; b.col = '#10ac84';
-      b.size = 54;
-      this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('Клиент просит настроить турникет через Rudesktop. Курсор ползёт к настройкам — обновление уже вышло.');
-    } else if (minute === 7) {
-      b.bossType = 'year_close';
-      b.name = 'ЗАКРЫТИЕ ГОДА: БАЛАНС НЕ СОШЁЛСЯ';
-      b.hp = 24500; b.dmg = 61; b.icon = '📒'; b.col = '#e17055';
-      b.size = 56;
-      this.showBanner(`🚨 БОСС: ${b.name}!`);
-      this.log('Дебет с кредитом разошлись на одну копейку. Бухгалтерия заблокировала период и вызвала весь ИТ-отдел.');
+      this.log(log);
     } else if (minute >= 20) {
       const lateBossIndex = Math.max(0, minute - 21 - (Math.floor((minute - 1) / 5) - Math.floor(20 / 5)));
       const stage = Math.floor(lateBossIndex / 4);
@@ -18705,4 +18637,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-

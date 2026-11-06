@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-<title>1С:Фитнес Клуб КОРП 3.2.0</title>
+<title>1С:Фитнес Клуб КОРП 3.2.1</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -1273,7 +1273,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v3.2.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v3.2.1 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1464,7 +1464,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.1</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1476,11 +1476,12 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>3.2.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>3.2.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
+              <p><b>Патч 3.2.1.</b> М.В. медленнее в PvP и BR; большие боссы отключены в Battle Royale.</p>
               <p><b>Обзор после смерти.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
               <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
             </div>
@@ -1513,7 +1514,7 @@
     </div>
   </div>
   <div id="modal-knowledge" class="modal-overlay">
-    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.0</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
+    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.1</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
       <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
@@ -1725,6 +1726,10 @@
           <p><b>Безопасное появление мобов.</b> Обычные волны и RuDesktop появляются за пределами обзора живых игроков с запасом расстояния. Учитываются размер экрана, масштаб камеры и другие участники комнаты. Координаты больше не прижимаются к краю карты, что могло поставить врага рядом с игроком. Камера погибшего наблюдателя не ограничивает спавн.</p>
           <p><b>Матч после смерти хоста.</b> Исправлена обработка выбывания в комнатах на двух участников: смерть больше не считается выходом из сессии и не передаёт роль хоста. PvE продолжается до гибели последнего союзника, PvP и BR определяют последнего выжившего. Синхронизация и таймер комнаты работают, пока хост наблюдает или открывает свои итоги.</p>
           <p><b>Общие предметы.</b> Выдачу снаряжения подтверждает хост: одна вещь достаётся одному участнику, повторные сообщения не выдают её повторно. При нехватке места предмет остаётся доступен на карте. Боты тоже подбирают снаряжение.</p>
+                  <h4>Патч 3.2.1 — темп онлайна</h4>
+          <h5>Ребаланс</h5>
+          <p><b>М.В. в PvP и Battle Royale.</b> Заметно снижена скорость преследования. В одиночной игре и кооперативном PvE сохранён прежний темп.</p>
+          <p><b>Battle Royale без больших боссов.</b> Пятиминутные большие боссы больше не появляются в BR и не прерывают обычные волны. Убрано ожидание этих боссов при выдаче тикетов. Легендарные выборы за убийство больших боссов в BR больше не выдаются. Обычные мини-боссы и М.В. сохраняются.</p>
         </details>
         <details class="release-notes patch-minor"><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
           <h4>Нововведения</h4>
@@ -2280,7 +2285,7 @@
 </script>
 
 <script>
-const GAME_VERSION = '3.2.0';
+const GAME_VERSION = '3.2.1';
 const MAX_PLAYER_DODGE = 0.50;
 const NETWORK_PROTOCOL = 5;
 const BR_ZONE_SHRINK_DURATION = 30;
@@ -6819,7 +6824,7 @@ class Game {
     this.backupTimer = this.player.backupInterval;
     this.nextBossMinute = 1;
     this.nextMiniBossAllowedTime = 0;
-    this.nextMegaBossTime = 300;
+    this.nextMegaBossTime = this.isBattleRoyale ? Infinity : 300;
     this.nextBananaSupplyTime = 75;
     this.nextBrSupplyTime = 30;
     this.megaBossCount = 0;
@@ -10756,6 +10761,7 @@ class Game {
   }
 
   isMegaBossTicketWindow() {
+    if(this.isBattleRoyale)return false;
     const megaBossAlive = this.enemies?.some(enemy => enemy.isMegaBoss && enemy.hp > 0);
     const timeUntilMegaBoss = Number(this.nextMegaBossTime) - this.time;
     // Leave room for the 20-second response window and the longest 55-second task.
@@ -12812,7 +12818,7 @@ class Game {
         this.announceOfficeEvent('🚀 ПЯТНИЧНЫЙ РЕЛИЗ В ПРОДЕ! Мобы ускорились на 8 секунд. Тестовой базы, разумеется, не было.');
       }
     }
-    if (this.time >= this.nextMegaBossTime) {
+    if (!this.isBattleRoyale && this.time >= this.nextMegaBossTime) {
       this.spawnMegaBoss();
       this.nextMegaBossTime += 300;
       while (this.nextBossMinute * 60 <= this.time) this.nextBossMinute++;
@@ -13044,6 +13050,7 @@ class Game {
   }
 
   spawnMegaBoss() {
+    if(this.isBattleRoyale)return;
     // Обычные мобы остаются на карте; спавн новых волн остановлен в spawnDirector,
     // пока большой босс активен.
     this.enemyProjectiles = [];
@@ -13128,7 +13135,7 @@ class Game {
         : '🚨 ТРИ ПРОВАЛЕННЫХ ТИКЕТА — М.В. ВЫШЕЛ НА ЛИНИЮ!';
     this.showBanner(announcement);
     this.addPopup(x, y - boss.size - 20, '📞 М.В. НАГОНЯЕТ!', '#ff4757');
-    this.log(`${announcement.replace('🚨 ', '')} Он быстро догоняет героя и наносит большой урон.`);
+    this.log(`${announcement.replace('🚨 ', '')} Он преследует игроков и наносит большой урон.`);
     this.sound.boss();
   }
   spawnBananaSupply() {
@@ -15016,6 +15023,7 @@ class Game {
           ? this.currentMoveSpeed
           : this.player.baseSpeed * (this.player.speedMult || 1);
         moveSpeed = Math.min(moveSpeed, Math.max(0, playerSpeed - 0.01));
+        if(this.pvp?.started && ['pvp','battle_royale'].includes(this.pvp.mode))moveSpeed*=.6;
       }
       if (worldAuthority && !e.isMegaBoss) {
         e.x += Math.cos(ang) * moveSpeed * frameScale;
@@ -18674,9 +18682,9 @@ const PATCH300_EVENTS = [
   ['🧾','Сверка с ОФД','Урон героя +25% на 10 секунд; приходят главбух и две кассы.'],
   ['💳','Кэшбэк без согласования','Лечение на 18 HP, десять дискет и два вора фиткоинов.'],
   ['☎️','Звонок отдела продаж','Каждые три минуты открывается возможность посетить магазин; наценка растёт после звонка.'],
-  ['👹','Большой босс','Каждые пять минут; новые обычные волны временно прекращаются. Большие боссы и их части не оглушаются и не сдвигаются навыками, оружием, следами или ветром. Защитник комитета восстанавливает другим живым частям 0,3% максимального HP в секунду; себя не лечит.'],
+  ['👹','Большой босс','Вне Battle Royale появляется каждые пять минут; новые обычные волны временно прекращаются. В BR большие боссы отключены. Большие боссы и их части не оглушаются и не сдвигаются навыками, оружием, следами или ветром. Защитник комитета восстанавливает другим живым частям 0,3% максимального HP в секунду; себя не лечит.'],
   ['🐢','RuDesktop: 24ч ЛИМИТ','С пятнадцатой минуты за игроками идёт неуязвимый преследователь. До двадцать пятой минуты плавно ускоряется на 35%, затем сохраняет эту скорость. Касание смертельно, кроме одноразовых спасений.'],
-  ['📩','Тикеты Максима Воронина','Случайные задания с наградами и помехами управлению. Отказ, игнор или три провала вызывают М.В.'],
+  ['📩','Тикеты Максима Воронина','Случайные задания с наградами и помехами управлению. Отказ, игнор или три провала вызывают М.В. В PvP и BR он передвигается заметно медленнее.'],
   ['📈','Перегрузка продакшна','С пятнадцатой минуты каждые три минуты усиливаются HP, урон и состав обычных волн. Опыт растёт значительно медленнее силы врагов.'],
   ['⭐','Элитные враги','С четвёртой минуты отдельные враги получают усиление и дополнительную награду.']
 ];

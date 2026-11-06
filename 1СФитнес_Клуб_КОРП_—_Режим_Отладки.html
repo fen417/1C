@@ -1198,7 +1198,16 @@
   .knowledge-body { flex:1; min-height:0; display:flex; flex-direction:column; gap:9px; overflow:hidden; }
   #knowledge-tabs { display:flex; gap:5px; flex-wrap:wrap; }
   #knowledge-tabs .selected { background:#ffd200; }
-  #knowledge-list { overflow:auto; min-height:0; flex:1; display:grid; grid-template-columns:1fr 1fr; gap:9px; align-content:start; touch-action:pan-y; }
+  #knowledge-list { overflow:auto; min-height:0; flex:1; display:flex; flex-direction:column; gap:16px; touch-action:pan-y; }
+  .knowledge-section { flex:none; min-width:0; }
+  .knowledge-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; align-items:start; }
+  .knowledge-column { display:flex; flex-direction:column; gap:9px; min-width:0; }
+  .knowledge-section-title { margin:0 0 8px; padding-bottom:6px; border-bottom:1px solid #c8cdd3; color:#216541; font-size:14px; }
+  .knowledge-section[data-group^=legendary] .knowledge-section-title { color:#8a570f; border-color:#b77900; }
+  .knowledge-section-description { margin:0 0 9px; color:#72531e; font-size:12px; line-height:1.5; }
+  .knowledge-link { display:inline; border:0; padding:0; background:none; color:#205c94; font:inherit; text-align:left; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+  .knowledge-link:hover { color:#8a570f; }.knowledge-link:focus-visible { outline:2px solid #b77900; outline-offset:2px; }
+  .knowledge-card.knowledge-focused { outline:2px solid #b77900; outline-offset:2px; }
   .knowledge-legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:11px; }
   .knowledge-legend span { display:inline-flex; align-items:center; gap:5px; }
   .knowledge-legend span::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
@@ -1208,6 +1217,7 @@
   .knowledge-card[data-category=actives] { --knowledge-accent:#69449d; }
   .knowledge-card[data-category=events],.knowledge-card[data-category=modifiers] { --knowledge-accent:#a33030; }
   .knowledge-card[data-tier="3"] { --knowledge-accent:#8a570f; }.knowledge-card[data-tier="4"] { --knowledge-accent:#69449d; }
+  .knowledge-card[data-legendary=true] { --knowledge-accent:#8a570f; border:2px solid #b77900; background:#fffdf4; }
   .knowledge-card h3 { font-size:14px; margin:-11px -11px 9px; padding:9px 11px; color:var(--knowledge-accent); background:#f4f6f8; border-bottom:1px solid #e1e5e9; }
   .knowledge-card p { font-size:12px; line-height:1.65; margin-bottom:6px; color:#3c4651; }
   .knowledge-card details { margin-top:9px; border-top:1px solid #e1e5e9; font-size:11px; line-height:1.5; }
@@ -1215,8 +1225,9 @@
   .knowledge-card .knowledge-detail { margin:5px 0 0; padding:6px 8px; background:#f5f7fa; border-radius:3px; }
   .knowledge-card .knowledge-label { color:#4b5663; }.knowledge-card .knowledge-level { color:#69449d; font-weight:bold; }
   #modal-knowledge .knowledge-bonus { color:#216541; }#modal-knowledge .knowledge-penalty { color:#a33030; }#modal-knowledge .knowledge-value { color:#205c94; }
+  #modal-knowledge .knowledge-class-bonus { color:#b77900; font-weight:bold; }
   .knowledge-card span.knowledge-bonus,.knowledge-card span.knowledge-penalty,.knowledge-card span.knowledge-value { font-weight:bold; }
-  @media(max-width:650px) { .solo-modifier-list,#knowledge-list { grid-template-columns:1fr; } }
+  @media(max-width:650px) { .solo-modifier-list,.knowledge-columns { grid-template-columns:1fr; } }
   @media (max-width:1300px) and (pointer:coarse) { #hud-kill-feed { top:76px; right:8px; gap:2px; } .kill-feed-row { font-size:10px; gap:5px; } .kill-feed-name { max-width:110px; } .kill-feed-icon { font-size:15px; } }
   #sales-call.hud-size-custom { transform:scale(var(--hud-scale)); transform-origin:top left; }
   #modal-hud-editor { z-index:290; padding:12px; background:rgba(5,10,18,.96); }
@@ -1433,7 +1444,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 3.1.0 — «Зона ответственности»</h3>
-              <p><b>Боты в BR.</b> Фармят мобов, прокачиваются под свой класс, воюют с игроками и держатся внутри сжимающейся зоны. Можно заполнить свободные места лобби ботами.</p>
+              <p><b>Боты в BR.</b> Фармят мобов, прокачиваются под свой класс, воюют с игроками и держатся внутри сжимающейся зоны. Можно заполнить свободные места лобби ботами. После босса 30-й минуты можно развить выбранную легендарную миграцию.</p>
               <p><b>Боссы держат позицию.</b> Большие боссы защищены от оглушения и смещения. Комитет стал крепче, защитник лечит другие части; монолит быстрее возвращает модули.</p>
               <p><b>Темп боя.</b> Первые волны меньше, раннего опыта больше, исправлены интервалы стрелков. Sigur и аварийный ИБП готовы чаще; динамическое обновление отключено в PvP и BR.</p>
             </div>
@@ -1464,7 +1475,7 @@
   </div>
   <div id="modal-knowledge" class="modal-overlay">
     <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.1.0</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
-      <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
+      <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
 
@@ -1662,10 +1673,16 @@
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
         <details class="release-notes patch-minor" open><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
-          <p><b>Боты в Battle Royale.</b> Хост добавляет и убирает ботов в лобби, может заполнить ими свободные места и запустить матч без других людей. Боты фармят мобов, собирают дискеты и прокачиваются с приоритетом способностей своего класса. После стартового периода защиты воюют с людьми и друг с другом. При выборе целей и направления движения учитывают безопасный круг и предстоящее сжатие, возвращаются внутрь зоны и не преследуют добычу за её пределами. Зона наносит ботам тот же урон, что и людям; выбывание и победитель определяются общими правилами. Магазин в BR остаётся закрыт для всех.</p>
-          <p><b>Большие боссы.</b> Все большие боссы, части комитета и защитные модули монолита невосприимчивы к станам, оглушениям, отталкиванию и притягиванию. Защита учитывает активные навыки, предметы, оружие, следы кроссовок, взрыв от поджога с замедлением и ветер. Первый босс стал крепче. Пока жив защитник комитета, он снижает урон по остальным частям и понемногу восстанавливает им здоровье. Себя защитник не лечит, уничтоженные части не воскрешаются. Монолит быстрее восстанавливает уничтоженные защитные модули.</p>
-          <p><b>Ранний забег.</b> Первые волны стали немного меньше, после шестой минуты возвращается прежний лимит. До появления первого большого босса игроки и боты получают больше опыта. Дробная часть бонуса накапливается, поэтому маленькие награды тоже получают прибавку. Начисление фиткоинов от этого бонуса не меняется.</p>
-          <p><b>Стрелки и навыки.</b> Стрелки сохраняют свой индивидуальный интервал между выстрелами после первой атаки. «Sigur: блокировка турникетов» и «Аварийный ИБП» перезаряжаются быстрее. Динамическое обновление отключено в PvP и Battle Royale: недоступно по клавише, кнопке и ботам. В одиночной игре и PvE оно сохраняется. Порыв офисного ветра стал продолжительнее; предупреждение и плавное нарастание силы сохранены.</p>
+          <h4 style="margin:12px 0 6px;">Нововведения</h4>
+          <p><b>Боты в Battle Royale.</b> Хост добавляет и убирает ботов в лобби, заполняет ими свободные места и запускает матч без других людей. Боты фармят мобов, собирают дискеты и прокачиваются с приоритетом способностей своего класса. После стартового периода защиты воюют с людьми и друг с другом. Учитывают безопасный круг и предстоящее сжатие, возвращаются в зону, не преследуют добычу за её пределами и проверяют точки рывка и переноса. Зона и ветер действуют на ботов; выбывание и победитель определяются общими правилами. Магазин в BR закрыт для всех.</p>
+          <p><b>Развитие легендарных миграций.</b> После победы над большим боссом 30-й минуты открывается второй выбор: оставить текущую миграцию или выбрать одно из двух её продолжений. Для «Перехода на 8.5» доступны «Боевой кластер» и «Отказоустойчивый контур»; для старого кластера — «Горячий разгон» и «Резервный узел»; для тонкого клиента — «Прямой канал» и «Локальный кэш». У каждого развития свои усиления и штрафы, которые добавляются к исходной миграции. Сохранение текущей не начисляет её бонусы повторно. Выбор выдаётся один раз за забег после победы над нужным боссом, включая сетевые режимы. Миграции видны в характеристиках и информации о результате.</p>
+          <p><b>База знаний.</b> В названиях оружия, навыков и перков указана классовая специализация, её бонусы выделены золотом. Легендарные перки и их поздние развития находятся в отдельных блоках той же вкладки «Перки» с золотыми рамками. Названия умений в карточках классов, компоненты рецептов и связанные миграции стали ссылками: открывают нужную вкладку, раскрывают характеристики и подсвечивают карточку. Магазин автоматически сгруппирован по тиру, внутри тира предметы отсортированы по названию. Активные предметы подписаны, расходники показаны отдельно.</p>
+          <h4 style="margin:12px 0 6px;">Ребаланс</h4>
+          <p><b>Большие боссы.</b> Первый босс стал крепче. Пока жив защитник комитета, он снижает урон по остальным частям и понемногу восстанавливает им здоровье. Себя защитник не лечит, уничтоженные части не воскрешаются. Монолит быстрее восстанавливает уничтоженные защитные модули. Большие боссы и их части невосприимчивы к станам, оглушениям и принудительному перемещению.</p>
+          <p><b>Ранний забег и навыки.</b> Первые волны немного меньше, после шестой минуты возвращается прежний лимит. До появления первого большого босса игроки и боты получают больше опыта; дробный остаток бонуса накапливается. Фиткоины от этой прибавки не меняются. Блокировка Sigur и аварийный ИБП перезаряжаются быстрее. Радиусы блокировки Sigur и ауры «Сброс Кэша Сеансов» заметнее растут с уровнем. Динамическое обновление отключено в PvP и BR — по клавише, кнопке и ботам. В одиночной игре и PvE оно сохранено. Порыв офисного ветра стал продолжительнее, сохранились предупреждение и плавное нарастание силы.</p>
+          <h4 style="margin:12px 0 6px;">Исправления ошибок</h4>
+          <p><b>Стрелки и контроль боссов.</b> Индивидуальный интервал стрельбы больше не заменяется общим после первого выстрела. Следы кроссовок, активные навыки, предметы, оружие и ветер больше не сдвигают больших боссов и их части. Краткая заморозка от взрыва поджога с замедлением тоже учитывает иммунитет.</p>
+          <p><b>Карточки и радиусы.</b> Карточки базы знаний находятся в независимых колонках: раскрытие одной не растягивает соседнюю пустым блоком. При смене ширины окна сохраняются раскрытые характеристики. Боевые радиусы согласованы с отрисовкой, описаниями и сравнением улучшений.</p>
         </details>
         <details class="release-notes patch-minor"><summary><h3>3.0.0 — «Продакшн живой. Пока»</h3></summary>
           <p><b>Исправления боя.</b> У каждой из трёх частей комитета теперь отдельная треть HP босса и постоянная способность. Части уничтожаются навсегда, а победа засчитывается после уничтожения всех трёх. Диск ИТС и завершение сеансов воздействуют на части по правилам боссов. Стартовые волны появляются немного реже, а обычные враги имеют чуть меньше HP и урона; послабление плавно исчезает к пятой минуте. «Согласующий» создаёт круг только в пределах 520 м, не атакует во время заморозки, перезаряжается 6,5 с и предупреждает об ударе за 1,4 с. Между кругами группы согласующих выдерживается минимум 2,5 с.</p>
@@ -3136,7 +3153,7 @@ const WEAPONS_DEF = {
   cache_aura: {
     name: 'Сброс Кэша Сеансов',
     icon: '🧄',
-    desc: 'Постоянная аура вокруг сервера разработки. Чистит кэш, кроме папки «Новая папка (7) — точно не трогать».',
+    desc: 'Постоянная аура вокруг сервера разработки. Радиус растёт с уровнем оружия. Чистит кэш, кроме папки «Новая папка (7) — точно не трогать».',
     baseCooldown: 0.4,
     baseDmg: 12
   },
@@ -3395,6 +3412,9 @@ function applyPassiveLevel(player, key, fromLevel, toLevel, mode = 'solo') {
    ============================================================ */
 const activeSkillDamageMultiplier = level => level >= 5 ? 1.16 : level === 4 ? 1.12 : level === 3 ? 1.05 : 1;
 const activeSkillDamage = (damage, level) => damage * activeSkillDamageMultiplier(level);
+const SIGUR_LOCKDOWN_RADII = [310, 360, 410, 490, 600];
+const CACHE_AURA_RADII = [86, 110, 140, 180, 230];
+const radiusAtLevel = (radii, level) => radii[Math.max(0, Math.min(radii.length - 1, Math.floor(Number(level) || 1) - 1))];
 
 const ACTIVE_SKILLS_DEF = {
   act_backup_dt: {
@@ -3516,11 +3536,11 @@ const ACTIVE_SKILLS_DEF = {
     desc: 'Антипассбэк сработал: отбрасывает врагов вокруг и наносит урон.',
     baseCd: 20,
     cast: (g, lvl) => {
+      const radius = classValue(g, 'act_sigur_lockdown', radiusAtLevel(SIGUR_LOCKDOWN_RADII, lvl), 1.15);
       for (const e of g.enemies) {
         if (e.is24hPursuer) continue;
         const dx = e.x - g.player.x, dy = e.y - g.player.y;
         const d = Math.hypot(dx, dy);
-        const radius = classValue(g, 'act_sigur_lockdown', 310, 1.15);
         if (d < radius) {
           const push = (radius - d) * 0.55;
           g.displaceEnemy(e, (dx / (d || 1)) * push, (dy / (d || 1)) * push);
@@ -3733,7 +3753,7 @@ const ACTIVE_SKILL_LEVEL_SUMMARIES = {
   act_turbo_mssql: level => `На ${formatStatNumber(6.5 + level * 0.5)} с: скорость бега +50% и оружие стреляет вдвое чаще; запуск тратит 6% текущего HP.`,
   act_lavender_raf: level => `Притягивает все дискеты; сбор опыта действует на ${[0, 10, 25, 50, 75, 100][level]}% радиуса карты. Аура: 24 снаряда по ${activeDamageLevelText(65, 20, level)} урона.`,
   act_messenger_blast: level => `Все враги получают урон: обычные — ${activeDamageLevelText(35, 15, level)}, боссы — ${activeDamageLevelText(80, 25, level)}; оглушение ${formatStatNumber(1.8 + level * 0.25)} / ${formatStatNumber(0.7 + level * 0.2)} с.`,
-  act_sigur_lockdown: level => `Радиус 310. Урон: ${activeDamageLevelText(120, 30, level)} обычным врагам и ${activeDamageLevelText(90, 30, level)} боссам; оглушение ${formatStatNumber(0.6 + level * 0.15)} с.`,
+  act_sigur_lockdown: level => `Радиус ${radiusAtLevel(SIGUR_LOCKDOWN_RADII, level)}. Урон: ${activeDamageLevelText(120, 30, level)} обычным врагам и ${activeDamageLevelText(90, 30, level)} боссам; оглушение ${formatStatNumber(0.6 + level * 0.15)} с.`,
   act_atol_receipt_rain: level => `${16 + level * 2} чеков по ${activeDamageLevelText(38, 14, level)} урона каждый.`,
   act_shtrikh_reconciliation: level => `Поражает ${5 + level} ближайших целей; урон каждой: ${activeDamageLevelText(180, 35, level)} обычным врагам / ${activeDamageLevelText(110, 35, level)} боссам; оглушение ${formatStatNumber(0.45 + level * 0.12)} с.`,
   act_evotor_approval: level => `Урон +60% и шанс крита +10% на ${formatStatNumber(8 + level * 1.5)} с; скорость бега −8% на время синхронизации.`,
@@ -4338,7 +4358,7 @@ function describeActiveLevel(player, key, level, mode, rich = false) {
     act_turbo_mssql: () => [duration(6.5 + level * 0.5, 1.15), bonus('Скорость', 50), bonus('Скорострельность оружия', 100), pct('Расход текущего HP', 6)],
     act_lavender_raf: () => ['Притяжение всех дискет', pct('Радиус постоянного сбора от радиуса карты', [0, 10, 25, 50, 75, 100][level]), n('Снарядов', 24), damage('Урон снаряда', 65 + level * 20)],
     act_messenger_blast: () => [damage('Урон обычным врагам', 35 + level * 15), damage('Урон боссам', 80 + level * 25), n('Оглушение обычных', 1.8 + level * 0.25, 1.20, ' с'), n('Оглушение мини-боссов', 0.7 + level * 0.2, 1, ' с')],
-    act_sigur_lockdown: () => [n('Радиус', 310, 1.15), damage('Урон обычным врагам', 120 + level * 30), damage('Урон боссам', 90 + level * 30), n('Оглушение, кроме больших боссов', 0.6 + level * 0.15, 1, ' с'), 'Отталкивание'],
+    act_sigur_lockdown: () => [n('Радиус', radiusAtLevel(SIGUR_LOCKDOWN_RADII, level), 1.15), damage('Урон обычным врагам', 120 + level * 30), damage('Урон боссам', 90 + level * 30), n('Оглушение, кроме больших боссов', 0.6 + level * 0.15, 1, ' с'), 'Отталкивание'],
     act_atol_receipt_rain: () => [n('Чеков', 16 + level * 2), damage('Урон чека', 38 + level * 14)],
     act_shtrikh_reconciliation: () => [n('Целей', 5 + level), damage('Урон обычным врагам', 180 + level * 35), damage('Урон боссам', 110 + level * 35), n('Оглушение, кроме больших боссов', 0.45 + level * 0.12, 1, ' с')],
     act_evotor_approval: () => [bonus('Урон', 60), bonus('Шанс крита', 10), bonus('Скорость', -8), duration(8 + level * 1.5, 1.20)],
@@ -4445,6 +4465,33 @@ const LEGENDARY_MIGRATIONS = [
    ============================================================ */
 // Боты управляются только хостом. Их боевые контексты используют те же оружие,
 // навыки, выборы прокачки, рецепты и цены, что и обычный игрок.
+function scaleLegendaryHealth(game, multiplier) {
+  const player = game.player, before = player.maxHp;
+  player.maxHp = Math.max(1, Math.round(before * multiplier));
+  player.hp = Math.min(player.maxHp, player.hp + Math.max(0, player.maxHp - before));
+}
+
+const LEGENDARY_DEVELOPMENTS = [
+  {key:'migration_85_combat',parent:'migration_85',name:'8.5: боевой кластер',icon:'⚔️',
+    description:'Дополнительно к «Переходу на 8.5»: урон +35%, шанс крита +12 п.п. Цена боевого режима: максимальный HP −15%, перезарядка оружия и навыков дольше на 15%.',
+    apply:g=>{g.player.dmgMult*=1.35;g.player.critChance+=.12;scaleLegendaryHealth(g,.85);g.player.cdMult*=1.15;}},
+  {key:'migration_85_failover',parent:'migration_85',name:'8.5: отказоустойчивый контур',icon:'🏰',
+    description:'Дополнительно к «Переходу на 8.5»: максимальный HP +35%, регенерация +4 HP/с. Резервирование ресурсов: урон −18%, скорость бега −8%.',
+    apply:g=>{scaleLegendaryHealth(g,1.35);g.player.regen+=4;g.player.dmgMult*=.82;g.player.speedMult*=.92;}},
+  {key:'legacy_overclock',parent:'legacy_cluster',name:'Старый кластер: горячий разгон',icon:'🔥',
+    description:'Дополнительно к старому кластеру: перезарядка оружия и навыков короче на 20%, скорость бега +15%. Перегрев: максимальный HP −20%, получаемый опыт −10%.',
+    apply:g=>{g.player.cdMult*=.80;g.player.speedMult*=1.15;scaleLegendaryHealth(g,.80);g.player.xpMult*=.90;}},
+  {key:'legacy_spare_node',parent:'legacy_cluster',name:'Старый кластер: резервный узел',icon:'🛡️',
+    description:'Дополнительно к старому кластеру: максимальный HP +45%, регенерация +3 HP/с. Синхронизация резервного узла: перезарядка оружия и навыков дольше на 15%, скорость бега −10%.',
+    apply:g=>{scaleLegendaryHealth(g,1.45);g.player.regen+=3;g.player.cdMult*=1.15;g.player.speedMult*=.90;}},
+  {key:'thin_client_direct',parent:'thin_client',name:'Тонкий клиент: прямой канал',icon:'📡',
+    description:'Дополнительно к тонкому клиенту: урон +25%, шанс крита +10 п.п. Канал занят боевыми данными: получаемый опыт −20%, доход фиткоинов с дискет −15%.',
+    apply:g=>{g.player.dmgMult*=1.25;g.player.critChance+=.10;g.player.xpMult*=.80;g.player.currencyMult*=.85;}},
+  {key:'thin_client_edge',parent:'thin_client',name:'Тонкий клиент: локальный кэш',icon:'☁️',
+    description:'Дополнительно к тонкому клиенту: опыт и доход фиткоинов с дискет +25%, радиус сбора +35%, перезарядка рывка короче на 25%. Накладные расходы: урон −15%, максимальный HP −15%.',
+    apply:g=>{g.player.xpMult*=1.25;g.player.currencyMult*=1.25;g.player.magnetMult*=1.35;g.player.dashCooldownMult*=.75;g.player.dmgMult*=.85;scaleLegendaryHealth(g,.85);}}
+];
+
 const BOT_SHOP_BUILDS = {
   technician: ['shop_health_cache', 'shop_damage_chip', 'shop_cooldown_relay', 'active_firewall', 'corp_citadel', 'corp_quantum_bus'],
   courier: ['shop_health_cache', 'shop_speed_tracker', 'shop_dash_oil', 'active_hotfix', 'corp_phase_drive', 'corp_citadel'],
@@ -5771,6 +5818,9 @@ class Game {
     if (!Number.isFinite(this.cameraZoom)) this.cameraZoom = this.getCameraZoom();
     this.syncMobileDynamicButtonLabel();
     if (this.activeChallenge) this.updateChallengeUI();
+    const knowledgeList = document.getElementById('knowledge-list');
+    if (document.getElementById('modal-knowledge')?.style.display === 'flex' &&
+        Number(knowledgeList.dataset.columns) !== (window.matchMedia('(max-width:650px)').matches ? 1 : 2)) this.renderKnowledgeBase();
     this.hudLayout?.scheduleApply();
   }
 
@@ -6029,6 +6079,12 @@ class Game {
     this.legendaryMigrationChosen = false;
     this.firstMegaBossDefeated = false;
     this.legendaryOffered = false;
+    this.legendaryMigrationKey = null;
+    this.legendaryDevelopmentKey = null;
+    this.legendaryDevelopmentUnlocked = false;
+    this.legendaryDevelopmentOffered = false;
+    this.legendaryChoiceStage = null;
+    this.legendaryChoices = null;
     if (this.pvp) this.pvp.brPaused = false;
     document.getElementById('modal-br-pause').style.display = 'none';
     document.getElementById('btn-pause').textContent = this.isBattleRoyale ? '⏸ Общая пауза · F9' : '⏸ Пауза [Esc / P]';
@@ -7489,7 +7545,7 @@ class Game {
       // A channel belongs to one guest; never trust a supplied sender identity.
       message = { ...message, uid: senderUid };
       if (message.skill) message.skill = { ...message.skill, senderUid };
-      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete'].includes(message.type)) return;
+      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
     }
     if(message.type==='patch-repair-drop'&&pvp.host&&senderUid) {
       const state=pvp.remotePlayers?.[senderUid]?.state,drop=message.drop,id=String(message.id||'').slice(0,100);
@@ -7622,7 +7678,10 @@ class Game {
     else if (message.type === 'integration-shop-result' && pvp.mode === 'pvp') this.receiveIntegrationShopResult(message);
     else if (message.type === 'integration-shop-done' && pvp.host && pvp.mode === 'pvp') this.receiveIntegrationShopDone(message);
     else if (message.type === 'integration-shop-resume' && pvp.mode === 'pvp') this.resumeIntegrationShop(message);
-    else if (message.type === 'legendary-offer') this.offerLegendaryMigrations(false);
+    else if (message.type === 'legendary-offer') {
+      if (message.stage === 'development') this.offerLegendaryDevelopment(false);
+      else this.offerLegendaryMigrations(false);
+    }
     else if (message.type === 'br-winner' && this.isBattleRoyale) {
       const winnerName = String(message.winner || '');
       const localWinner = message.winnerUid ? message.winnerUid === pvp.uid : winnerName && winnerName === pvp.name;
@@ -11435,6 +11494,10 @@ class Game {
       icon: PASSIVES_DEF[key]?.icon || '⬆️', name: PASSIVES_DEF[key]?.name || key, value: `ур. ${passive.lvl}/5`,
       detail: describePassiveLevel(player, key, passive.lvl, this.pvp?.mode)
     }));
+    const selectedMigrations = [LEGENDARY_MIGRATIONS.find(item=>item.key===this.legendaryMigrationKey),
+      LEGENDARY_DEVELOPMENTS.find(item=>item.key===this.legendaryDevelopmentKey)];
+    for (const migration of selectedMigrations) if (migration) passives.push({icon:migration.icon,name:migration.name,
+      value:migration.parent?'Легендарное развитие · 30-я минута':'Легендарная миграция',detail:migration.description});
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
     ].filter(([stat]) => player[stat] > 0).map(([stat, key]) => ({
@@ -12328,6 +12391,7 @@ class Game {
       xp: (280 + this.megaBossCount * 30)*(this.getDailyRules().bossXpMult||1),
       isBoss: true,
       isMegaBoss: true,
+      megaBossNumber: this.megaBossCount,
       isMobileMegaBoss,
       bossType: variant.type,
       patchBossType:variant.patchBossType||null,
@@ -13439,7 +13503,7 @@ class Game {
     // Аура
     if (this.weapons.cache_aura) {
       const w = this.weapons.cache_aura;
-      const rad = (72 + w.lvl * 14) * (this.player.areaMult || 1);
+      const rad = radiusAtLevel(CACHE_AURA_RADII, w.lvl) * (this.player.areaMult || 1);
       this.forEachEnemyNear(this.player.x, this.player.y, rad, e => {
         if (e.hp <= 0 || e.is24hPursuer) return;
         const dx = e.x - this.player.x;
@@ -14437,6 +14501,7 @@ class Game {
           this.sound.updateBossMusic(0, remainingBosses.filter(enemy => !enemy.isMegaBoss).length, remainingBosses.filter(enemy => enemy.isMegaBoss).length);
           if (!this.legendaryOffered && !this.pvp?.started) this.offerLegendaryMigrations(false);
           else if (!this.legendaryOffered && this.pvp?.host) this.offerLegendaryMigrations(true);
+          if (e.megaBossNumber === 6) this.offerLegendaryDevelopment(Boolean(this.pvp?.host));
         }
         if (!guestGotKillCredit) {
           this.kills++;
@@ -14745,9 +14810,26 @@ class Game {
     this.legendaryOffered = true;
     if (broadcast && this.pvp?.started && this.pvp.host) this.sendPvpNetworkMessage({ type: 'legendary-offer' });
     const choices = [...LEGENDARY_MIGRATIONS].sort(() => this.rollRng() - 0.5).slice(0, 3);
+    this.showLegendaryChoices(choices, 'initial', 'Первый большой босс пал. Выберите одну легендарную миграцию; сила релиза приходит с побочным эффектом.');
+  }
+
+  offerLegendaryDevelopment(broadcast = true) {
+    this.legendaryDevelopmentUnlocked = true;
+    if (broadcast && this.pvp?.started && this.pvp.host) this.sendPvpNetworkMessage({type:'legendary-offer',stage:'development'},null,true);
+    if (this.legendaryDevelopmentOffered || this.pvp?.eliminated || this.player.hp <= 0) return;
+    const current = LEGENDARY_MIGRATIONS.find(migration=>migration.key===this.legendaryMigrationKey);
+    if (!current) return;
+    this.legendaryDevelopmentOffered = true;
+    const keep = {key:'keep_current_migration',name:`Оставить: ${current.name}`,icon:current.icon,keepCurrent:true,
+      description:`Сохранить текущую миграцию без новых усилений и штрафов. ${current.description}`};
+    const developments = LEGENDARY_DEVELOPMENTS.filter(migration=>migration.parent===current.key);
+    this.showLegendaryChoices([keep,...developments], 'development', 'Босс 30-й минуты побеждён. Оставьте текущую миграцию или выберите одно из двух её развитий. Новые эффекты добавляются к уже действующим.');
+  }
+
+  showLegendaryChoices(choices, stage, subtitle) {
     const container = document.getElementById('legendary-items');
     container.replaceChildren();
-    document.getElementById('legendary-subtitle').textContent = 'Первый большой босс пал. Выберите одну легендарную миграцию; сила релиза приходит с побочным эффектом.';
+    document.getElementById('legendary-subtitle').textContent = subtitle;
     for (const migration of choices) {
       const card = document.createElement('button');
       card.className = 'legendary-card';
@@ -14763,6 +14845,7 @@ class Game {
       container.appendChild(card);
     }
     this.legendaryChoices = choices;
+    this.legendaryChoiceStage = stage;
     this.paused = !this.isBattleRoyale;
     this.setPvpChoosing('legendary');
     document.getElementById('modal-legendary').style.display = 'flex';
@@ -14771,13 +14854,20 @@ class Game {
   chooseLegendaryMigration(key) {
     const migration = this.legendaryChoices?.find(item => item.key === key);
     if (!migration) return;
-    this.withCleanShopStats(() => migration.apply(this));
+    const stage = this.legendaryChoiceStage;
+    if (!migration.keepCurrent) this.withCleanShopStats(() => migration.apply(this));
+    if (stage === 'initial') {
+      this.legendaryMigrationKey = migration.key;
+      this.legendaryMigrationChosen = true;
+    } else if (stage === 'development') this.legendaryDevelopmentKey = migration.keepCurrent ? 'keep' : migration.key;
     document.getElementById('modal-legendary').style.display = 'none';
     this.legendaryChoices = null;
+    this.legendaryChoiceStage = null;
     this.paused = false;
     this.setPvpChoosing(null);
     this.updateHUD();
     this.addPopup(this.player.x, this.player.y - 34, `ЛЕГЕНДАРНАЯ МИГРАЦИЯ: ${migration.name}`, '#ffad42');
+    if (stage === 'initial' && this.legendaryDevelopmentUnlocked) this.offerLegendaryDevelopment(false);
   }
 
   buildUpgradeChoices() {
@@ -14867,7 +14957,7 @@ class Game {
       support_phone: `залп ${1 + this.player.multishotLevel} обращений`,
       heavy_archive: 'снаряд пробивает врагов насквозь',
       protein: `лужа радиусом ${46 + level * 7}`,
-      cache_aura: `постоянная аура радиусом ${72 + level * 14}`,
+      cache_aura: `постоянная аура радиусом ${radiusAtLevel(CACHE_AURA_RADII, level) * (this.player.areaMult || 1)}`,
       iron_logic: `залп ${1 + this.player.multishotLevel} пропуск(а)`,
       egais_laser: `до ${[1, 2, 3, 3, 4][Math.max(0, Math.min(4, Math.floor(level) - 1))]} рикошетов`,
       batch_query: `радиус ${75 + level * 9}; задержка 0,65 с`,
@@ -16843,7 +16933,7 @@ class Game {
     if (this.weapons.fusion_callcenter || this.weapons.cache_aura) {
       const isCallcenter = Boolean(this.weapons.fusion_callcenter);
       const auraW = this.weapons.fusion_callcenter || this.weapons.cache_aura;
-      const auraR = (isCallcenter ? (90 + auraW.lvl * 15) : (72 + auraW.lvl * 14)) * (this.player.areaMult || 1);
+      const auraR = (isCallcenter ? (90 + auraW.lvl * 15) : radiusAtLevel(CACHE_AURA_RADII, auraW.lvl)) * (this.player.areaMult || 1);
       this.ctx.beginPath();
       this.ctx.arc(0, 0, auraR, 0, Math.PI * 2);
       this.ctx.fillStyle = isCallcenter ? 'rgba(0, 206, 201, 0.08)' : 'rgba(85, 239, 196, 0.06)';
@@ -17499,10 +17589,10 @@ const PATCH300_METHODS = {
       const def=WEAPONS_DEF[choice.key];const value=(l,p)=>l?Math.round((damageAt[choice.key]?.(l)||def.baseDmg||0)*damageMult(p)*(hasClassAffinity(p,choice.key)?1.15:1)):0;
       add('Урон без крита',value(oldLevel,before),value(newLevel,after));
       if(!['turnstile','cache_aura'].includes(choice.key))add('Перезарядка',oldLevel?(def.baseCooldown||1)*before.cdMult:0,(def.baseCooldown||1)*after.cdMult,' с',Boolean(oldLevel));
-      if(choice.key==='cache_aura')add('Радиус ауры',oldLevel?72+oldLevel*14:0,72+newLevel*14);
+      if(choice.key==='cache_aura')add('Радиус ауры',oldLevel?radiusAtLevel(CACHE_AURA_RADII,oldLevel)*(before.areaMult||1):0,radiusAtLevel(CACHE_AURA_RADII,newLevel)*(after.areaMult||1));
     }
     if(choice.type.startsWith('active_')){add('Перезарядка навыка',oldLevel?this.getActiveSkillCooldown(choice.key):0,preview.getActiveSkillCooldown(choice.key),' с',Boolean(oldLevel));
-      const radius={act_backup_dt:l=>300,act_cache_purge:l=>300+l*24,act_unloading:l=>200+l*20,act_hot_deploy:l=>240+l*20,act_emergency_ups:l=>160+l*20}[choice.key];if(radius)add('Радиус',oldLevel?radius(oldLevel):0,radius(newLevel));
+      const radius={act_sigur_lockdown:l=>classValue(this,'act_sigur_lockdown',radiusAtLevel(SIGUR_LOCKDOWN_RADII,l),1.15),act_backup_dt:l=>300,act_cache_purge:l=>300+l*24,act_unloading:l=>200+l*20,act_hot_deploy:l=>240+l*20,act_emergency_ups:l=>160+l*20}[choice.key];if(radius)add('Радиус',oldLevel?radius(oldLevel):0,radius(newLevel));
       const summoners={act_support_call:{hp:l=>78+l*16,life:l=>11+l*1.4,dmg:l=>15+l*4},act_technician_drone:{hp:l=>110+l*28,life:l=>10+l*2,dmg:l=>34+l*12},act_senior_escalation:{hp:l=>205+l*38,life:l=>8+l*1.6,dmg:l=>34+l*9},act_incident_engineer:{hp:l=>140+l*28,life:l=>12+l*2,dmg:l=>28+l*9}};
       const summon=summoners[choice.key];if(summon){const hpMult=1.35*(before.classId==='support'?1.25:1)*(this.hasPatchItem('support_package')?1.4:1),lifeMult=1.25*(before.classId==='support'?1.3:1);add('HP помощника',oldLevel?summon.hp(oldLevel)*hpMult:0,summon.hp(newLevel)*hpMult);add('Время помощника',oldLevel?summon.life(oldLevel)*lifeMult:0,summon.life(newLevel)*lifeMult,' с');add('Урон помощника',oldLevel?this.scaleActiveSkillHit(summon.dmg(oldLevel),oldLevel,false)*1.3:0,preview.scaleActiveSkillHit(summon.dmg(newLevel),newLevel,false)*1.3);}
     }
@@ -17517,6 +17607,23 @@ const PATCH300_METHODS = {
   },
   closeKnowledgeBase() {document.getElementById('modal-knowledge').style.display='none';document.getElementById(this.knowledgeReturn||'modal-main-menu').style.display='flex';this.setMobileMenuScroll(true);},
   setKnowledgeTab(tab) {this.knowledgeTab=tab;this.renderKnowledgeBase();},
+  knowledgeAbilityLink(key) {
+    const def = WEAPONS_DEF[key] || PASSIVES_DEF[key] || ACTIVE_SKILLS_DEF[key] || COMBAT_UPGRADES[key];
+    if (!def) return null;
+    return {key,label:def.name,tab:WEAPONS_DEF[key]?'weapons':ACTIVE_SKILLS_DEF[key]?'actives':'passives'};
+  },
+  openKnowledgeEntry(tab,key) {
+    this.knowledgeTab = tab;
+    document.getElementById('knowledge-search').value = '';
+    this.renderKnowledgeBase();
+    const card = [...document.getElementById('knowledge-list').querySelectorAll('.knowledge-card')].find(card=>card.dataset.key===key);
+    if (!card) return;
+    const details = card.querySelector('details');
+    if (details) details.open = true;
+    card.classList.add('knowledge-focused');
+    requestAnimationFrame(()=>card.scrollIntoView({block:'nearest',inline:'nearest'}));
+    setTimeout(()=>card.classList.remove('knowledge-focused'),1800);
+  },
   knowledgeNumberKind(head, tail, token) {
     if (/^(?:Ур\.|[IVX]+\s+уров)/iu.test(token)) return 'level';
     // Сравниваем число с его характеристикой, а не с соседним эффектом.
@@ -17555,6 +17662,56 @@ const PATCH300_METHODS = {
     if (!direction) return 'value';
     return (direction > 0) !== lowerIsBetter ? 'bonus' : 'penalty';
   },
+  knowledgeClassBonus(key,kind) {
+    const owner = ABILITY_CLASS_BY_KEY[key];
+    if (!owner) return '';
+    const className = PLAYER_CLASSES[owner].name;
+    let bonuses = [];
+    if (kind === 'weapon') bonuses.push('урон оружия +15%');
+    if (kind === 'active') {
+      if (CLASS_ACTIVE_DAMAGE.has(key)) bonuses.push('урон навыка +15%');
+      const extra = {
+        act_backup_dt:'лечение +15%',
+        act_turbo_mssql:'длительность разгона +15%',
+        act_lavender_raf:'перезарядка короче на 10%',
+        act_messenger_blast:'оглушение обычных врагов дольше на 20%',
+        act_sigur_lockdown:'радиус +15%',
+        act_evotor_approval:'длительность усиления +20%',
+        act_membership_reactivation:'лечение +20%',
+        act_transaction_rollback:'перезарядка короче на 15%',
+        act_urgent_transfer:'дальность переноса +20%',
+        act_emergency_ups:'длительность щита +20%',
+        act_unloading:'радиус +15%',
+        act_remote_restore:'лечение героя и помощников +20%'
+      }[key];
+      if (extra) bonuses.push(extra);
+      if (['act_support_call','act_technician_drone','act_senior_escalation','act_incident_engineer'].includes(key)) {
+        bonuses.push('HP помощников +25%', 'время жизни помощников +30%');
+      }
+    }
+    if (kind === 'passive') {
+      const base = passiveLevelStats({classId:null},key,5,'solo');
+      const actual = passiveLevelStats({classId:owner},key,5,'solo');
+      const labels = {critChance:'шанс крита',dmgMult:'урон',speedMult:'скорость',xpMult:'опыт',currencyMult:'фиткоины',
+        magnetMult:'радиус сбора',dodge:'уклонение',summonDamageBonus:'урон призывов',regen:'регенерация',maxHp:'максимум HP',backupDuration:'длительность щита'};
+      for (const [stat,value] of Object.entries(actual)) {
+        if (typeof value !== 'number' || Math.abs(value-base[stat]) < 1e-6) continue;
+        if (PASSIVE_MULTIPLIERS.has(stat) && base[stat] < 1) {
+          const percent = Math.round(((1-value)/(1-base[stat])-1)*100);
+          bonuses.push(`сокращение ${stat==='dashCooldownMult'?'перезарядки рывка':'перезарядки'} эффективнее на ${percent}%`);
+        } else if (base[stat] > 0) {
+          bonuses.push(`${labels[stat]||stat}: +${Math.round((value/base[stat]-1)*100)}% к силе бонуса перка`);
+        }
+      }
+    }
+    if (kind === 'combat') {
+      const extra = {ricochet:'урон первого рикошета +10%',multishot:'штраф к урону слабее на 20%',
+        slowshot:'длительность замедления +20%',burnshot:'урон горения +20%'}[key];
+      if (extra) bonuses.push(extra);
+    }
+    return bonuses.length ? `Классовый бонус [${className}]: ${bonuses.join('; ')}.`
+      : `Специализация [${className}]: приоритет при выборе улучшений; отдельного числового усиления нет.`;
+  },
   appendKnowledgeText(element,text,tone='',prefix='') {
     const value=String(text||'');if(tone)element.classList.add(`knowledge-${tone}`);
     // Вставляем только текстовые узлы: описания и поиск не становятся HTML.
@@ -17573,24 +17730,60 @@ const PATCH300_METHODS = {
     const tabs={classes:'Классы',weapons:'Оружие',passives:'Перки',actives:'Навыки',items:'Магазин',events:'События',modifiers:'Модификаторы'};
     const nav=document.getElementById('knowledge-tabs');nav.replaceChildren();for(const [id,title] of Object.entries(tabs)){const button=document.createElement('button');button.className='btn-1c'+(this.knowledgeTab===id?' selected':'');button.textContent=title;button.onclick=()=>this.setKnowledgeTab(id);nav.appendChild(button);}
     const entries=[];
-    const add=(icon,name,desc,details=[])=>{
+    const add=(icon,name,desc,details=[],options={})=>{
       const descriptions=Array.isArray(desc)?desc:[{text:desc}];
-      entries.push({icon,name,descriptions,details});
+      entries.push({icon,name,descriptions,details,...options});
     };
-    if(this.knowledgeTab==='classes')for(const [id,def] of Object.entries(PLAYER_CLASSES)){const s=def.stats;add('🧑‍💻',def.name,def.perkDesc,[`${s.hp} HP · скорость ${s.baseSpeed} · урон ${Math.round(s.dmgMult*100)}% · опыт ${Math.round(s.xpMult*100)}%`,`Стартовое оружие: ${WEAPONS_DEF[def.weapon].name}`,`Классовые умения: ${ABILITY_CLASSES[id].map(key=>WEAPONS_DEF[key]?.name||PASSIVES_DEF[key]?.name||ACTIVE_SKILLS_DEF[key]?.name||COMBAT_UPGRADES[key]?.name).filter(Boolean).join(', ')}`]);}
+    const addAbility=(kind,key,def,details=[])=>{
+      const owner = ABILITY_CLASS_BY_KEY[key];
+      const name = `${def.name} [${owner?PLAYER_CLASSES[owner].name:'Общее'}]`;
+      const descriptions = [{text:def.desc||def.description||'Боевой модификатор'}];
+      const bonus = this.knowledgeClassBonus(key,kind);
+      if (bonus) descriptions.push({text:bonus,tone:'class-bonus'});
+      add(def.icon,name,descriptions,details,{key});
+    };
+    if(this.knowledgeTab==='classes')for(const [id,def] of Object.entries(PLAYER_CLASSES)){
+      const s=def.stats;
+      add('🧑‍💻',def.name,def.perkDesc,[`${s.hp} HP · скорость ${s.baseSpeed} · урон ${Math.round(s.dmgMult*100)}% · опыт ${Math.round(s.xpMult*100)}%`,
+        {label:'Стартовое оружие',links:[this.knowledgeAbilityLink(def.weapon)].filter(Boolean)},
+        {label:'Классовые умения',links:ABILITY_CLASSES[id].map(key=>this.knowledgeAbilityLink(key)).filter(Boolean)}],{key:id});
+    }
     if(this.knowledgeTab==='weapons'){
       const context=Object.create(this);
       context.player={classId:null,multishotLevel:0};
-      for(const [key,def] of Object.entries(WEAPONS_DEF))add(def.icon,def.name,def.desc,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${context.getWeaponUpgradeSummary(key,i+1,false)}`));
+      for(const [key,def] of Object.entries(WEAPONS_DEF))addAbility('weapon',key,def,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${context.getWeaponUpgradeSummary(key,i+1,false)}`));
     }
     if(this.knowledgeTab==='passives'){
-      for(const [key,def] of Object.entries(PASSIVES_DEF))add(def.icon,def.name,def.desc,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${def.levelDescriptions?.[i]||describePassiveLevel({classId:null},key,i+1,'solo',false)}`));
-      for(const [key,def] of Object.entries(COMBAT_UPGRADES))add(def.icon,def.name,def.desc||'Боевой модификатор',Array.from({length:3},(_,i)=>`Ур. ${i+1}: ${describeCombatLevel({classId:null},key,i+1,false)}`));
-      for(const def of REPEATABLE_UPGRADES)add(def.icon,def.name,def.desc);
-      for(const def of LEGENDARY_MIGRATIONS)add(def.icon,def.name,def.description);
+      for(const [key,def] of Object.entries(PASSIVES_DEF))addAbility('passive',key,def,Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${def.levelDescriptions?.[i]||describePassiveLevel({classId:null},key,i+1,'solo',false)}`));
+      for(const [key,def] of Object.entries(COMBAT_UPGRADES))addAbility('combat',key,def,Array.from({length:3},(_,i)=>`Ур. ${i+1}: ${describeCombatLevel({classId:null},key,i+1,false)}`));
+      for(const def of REPEATABLE_UPGRADES)addAbility('common',def.key,def);
+      for(const def of LEGENDARY_MIGRATIONS)add(def.icon,`${def.name} [Общее]`,def.description,
+        [{label:'Развития после босса 30-й минуты',links:LEGENDARY_DEVELOPMENTS.filter(item=>item.parent===def.key).map(item=>({key:item.key,label:item.name,tab:'passives'}))}],
+        {key:def.key,legendary:true});
+      for(const def of LEGENDARY_DEVELOPMENTS){
+        const parent = LEGENDARY_MIGRATIONS.find(item=>item.key===def.parent);
+        add(def.icon,`${def.name} [Общее]`,def.description,
+          [{label:'Исходная миграция',links:[{key:parent.key,label:parent.name,tab:'passives'}]}],
+          {key:def.key,legendary:true,legendaryGroup:'legendary-development'});
+      }
     }
-    if(this.knowledgeTab==='actives')for(const [key,def] of Object.entries(ACTIVE_SKILLS_DEF))add(def.icon,def.name,def.desc,[`Базовая перезарядка: ${def.baseCd} с`,...Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${ACTIVE_SKILL_LEVEL_SUMMARIES[key]?.(i+1)||def.desc}`)]);
-    if(this.knowledgeTab==='items')for(const item of this.getShopCatalogItems())add(item.icon,`${item.tier===4?'IV · ':item.tier===3?'III · ':''}${item.name}`,item.desc,[`Базовая стоимость до наценки: ${item.cost||this.collectShopLeafKeys(item.key).reduce((sum,key)=>sum+(this.getShopPassiveDef(key)?.cost||0),0)} фиткоинов`,...(item.cooldown?[`Перезарядка: ${item.cooldown} с`]:[]),...(item.parts?[`Рецепт: ${item.parts.map(key=>this.getShopCatalogItem(key)?.name||key).join(' + ')}`]:[]),...(item.maxOwned?[`Лимит на игрока: ${item.maxOwned}`]:[])]);
+    if(this.knowledgeTab==='actives')for(const [key,def] of Object.entries(ACTIVE_SKILLS_DEF))addAbility('active',key,def,[`Базовая перезарядка: ${def.baseCd} с`,...Array.from({length:5},(_,i)=>`Ур. ${i+1}: ${ACTIVE_SKILL_LEVEL_SUMMARIES[key]?.(i+1)||def.desc}`)]);
+    if(this.knowledgeTab==='items'){
+      const tierOf = item => Number(item.tier) || (item.parts ? 2 : 1);
+      const groupOf = item => item.shopKind==='consumable' ? 5 : tierOf(item);
+      const items = this.getShopCatalogItems().sort((a,b)=>groupOf(a)-groupOf(b)||a.name.localeCompare(b.name,'ru'));
+      for(const item of items){
+        const consumable = item.shopKind==='consumable', tier = tierOf(item);
+        const kind = consumable?'Расходник':item.type==='active'?'Активный':item.parts?'Комплект':'Пассивный';
+        const prefix = consumable?'':`${['I','II','III','IV'][tier-1]} · `;
+        add(item.icon,`${prefix}${item.name} [${kind}]`,item.desc,
+          [`Базовая стоимость до наценки: ${item.cost||this.collectShopLeafKeys(item.key).reduce((sum,key)=>sum+(this.getShopPassiveDef(key)?.cost||0),0)} фиткоинов`,
+            ...(item.cooldown?[`Перезарядка: ${item.cooldown} с`]:[]),
+            ...(item.parts?[{label:'Рецепт',links:item.parts.map(key=>({key,tab:'items',label:this.getShopCatalogItem(key)?.name||key}))}]:[]),
+            ...(item.maxOwned?[`Лимит на игрока: ${item.maxOwned}`]:[])],
+          {key:item.key,tier:consumable?null:tier,shopGroup:consumable?'consumables':String(tier)});
+      }
+    }
     if(this.knowledgeTab==='modifiers')for(const m of SOLO_RUN_MODIFIERS)add(m.icon,m.name,[{text:m.risk,tone:'penalty'}],[`Награда: ${m.reward}`]);
     if(this.knowledgeTab==='events'){
       for(const [icon,name,description] of PATCH300_EVENTS)add(icon,name,description);
@@ -17601,14 +17794,45 @@ const PATCH300_METHODS = {
         add('📅','Ежедневная смена: '+daily.name,descriptions.length?descriptions:daily.desc);
       }
     }
-    const visible=entries.filter(entry=>!query||[entry.name,...entry.descriptions.map(part=>part.text),...entry.details].join(' ').toLocaleLowerCase().includes(query));
-    const box=document.getElementById('knowledge-list');box.replaceChildren();
+    const detailText = detail => typeof detail==='string' ? detail : `${detail.label}: ${(detail.links||[]).map(link=>link.label).join(', ')}`;
+    const visible=entries.filter(entry=>!query||[entry.name,...entry.descriptions.map(part=>part.text),...entry.details.map(detailText)].join(' ').toLocaleLowerCase().includes(query));
+    const box=document.getElementById('knowledge-list');
+    const expanded = new Set([...box.querySelectorAll('.knowledge-card')].filter(card=>card.querySelector('details')?.open)
+      .map(card=>`${card.dataset.category}:${card.dataset.key||card.dataset.entry}`));
+    box.replaceChildren();
+    const columnCount = window.matchMedia('(max-width:650px)').matches ? 1 : 2;
+    box.dataset.columns = String(columnCount);
     document.getElementById('knowledge-count').textContent=`${tabs[this.knowledgeTab]} · ${visible.length} из ${entries.length}`;
-    for(const entry of visible){
+    const groups = this.knowledgeTab==='passives'
+      ? [{id:'normal',title:'Перки и боевые модификаторы'},
+        {id:'legendary',title:'Легендарные перки',description:'После победы над первым большим боссом можно выбрать одну из трёх исходных миграций.'},
+        {id:'legendary-development',title:'Развития легендарных миграций · 30-я минута',description:'После победы над боссом 30-й минуты можно оставить текущую миграцию или выбрать одно из двух её развитий. Новые бонусы и штрафы добавляются к исходным.'}]
+      : this.knowledgeTab==='items'
+        ? [{id:'1',title:'I тир · базовые предметы'},{id:'2',title:'II тир · улучшенные предметы'},{id:'3',title:'III тир · продвинутые предметы'},{id:'4',title:'IV тир · КОРП'},{id:'consumables',title:'Расходники'}]
+        : [{id:'normal'}];
+    for (const group of groups) {
+      const members = visible.filter(entry=>(entry.legendary?entry.legendaryGroup||'legendary':entry.shopGroup||'normal')===group.id);
+      if (!members.length) continue;
+      const section = document.createElement('section');
+      section.className = 'knowledge-section';section.dataset.group = group.id;
+      if (group.title) {
+        const heading = document.createElement('h3');heading.className = 'knowledge-section-title';heading.textContent = group.title;section.appendChild(heading);
+      }
+      if (group.description) {
+        const description = document.createElement('p');description.className = 'knowledge-section-description';description.textContent = group.description;section.appendChild(description);
+      }
+      const layout = document.createElement('div');layout.className = 'knowledge-columns';
+      const columns = Array.from({length:columnCount},()=>{const column=document.createElement('div');column.className='knowledge-column';layout.appendChild(column);return column;});
+      section.appendChild(layout);
+      let index = 0;
+      for(const entry of members){
       const article=document.createElement('article');
       article.className='knowledge-card';
       article.dataset.category=this.knowledgeTab;
-      if(this.knowledgeTab==='items')article.dataset.tier=entry.name.startsWith('IV · ')?'4':entry.name.startsWith('III · ')?'3':'1';
+      article.dataset.entry=entry.name;
+      if(entry.key)article.dataset.key=entry.key;
+      if(entry.tier)article.dataset.tier=String(entry.tier);
+      if(entry.legendary)article.dataset.legendary='true';
       const title=document.createElement('h3');
       title.textContent=`${entry.icon||'📖'} ${entry.name}`;
       article.appendChild(title);
@@ -17620,12 +17844,23 @@ const PATCH300_METHODS = {
       }
       if(entry.details.length){
         const details=document.createElement('details');
+        details.open=expanded.has(`${this.knowledgeTab}:${entry.key||entry.name}`);
         const summary=document.createElement('summary');
         summary.textContent='Характеристики и подробности';
         details.appendChild(summary);
         for(const text of entry.details){
           const line=document.createElement('p');
           line.className='knowledge-detail';
+          if (typeof text==='object' && text.links) {
+            const label = document.createElement('b');label.className='knowledge-label';label.textContent=`${text.label}: `;line.appendChild(label);
+            text.links.forEach((link,index)=>{
+              if(index)line.appendChild(document.createTextNode(', '));
+              const button=document.createElement('button');button.type='button';button.className='knowledge-link';button.textContent=link.label;
+              button.setAttribute('aria-label',`Открыть в базе знаний: ${link.label}`);
+              button.onclick=()=>this.openKnowledgeEntry(link.tab,link.key);line.appendChild(button);
+            });
+            details.appendChild(line);continue;
+          }
           const value=String(text||'');
           const label=value.match(/^(Ур\.\s*\d+|[^:]{1,55}):\s*/u);
           if(label){
@@ -17639,7 +17874,9 @@ const PATCH300_METHODS = {
         }
         article.appendChild(details);
       }
-      box.appendChild(article);
+      columns[index++%columnCount].appendChild(article);
+      }
+      box.appendChild(section);
     }
     if(!visible.length)box.textContent='По этому запросу ничего не найдено.';
   }

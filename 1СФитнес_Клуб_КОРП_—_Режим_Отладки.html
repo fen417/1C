@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-<title>1С:Фитнес Клуб КОРП 3.1.0</title>
+<title>1С:Фитнес Клуб КОРП 3.2.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -457,6 +457,10 @@
     text-align: center;
   }
 
+  #spectator-hud { position:absolute; bottom:175px; left:50%; transform:translateX(-50%); z-index:140; max-width:calc(100% - 24px); padding:9px 12px; border:1px solid #81ecec; border-radius:7px; background:#111d2aee; color:#fff; text-align:center; font:12px Tahoma,sans-serif; }
+  #spectator-hud[hidden] { display:none; }
+  #spectator-hud small { display:block; margin:5px 0; color:#cbd5e1; }
+  #spectator-hud .spectator-actions { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; }
   #weapon-evolution-notice {
     position:absolute; top:110px; left:50%; transform:translateX(-50%);
     box-sizing:border-box; width:min(440px,calc(100% - 32px)); padding:12px 16px;
@@ -1266,7 +1270,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v3.1.0 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v3.2.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1359,6 +1363,17 @@
     <div id="dash-hud">💨 Рывок · ПКМ / Shift</div>
 
     <div id="event-banner">⚠️ ВНИМАНИЕ: СЕРВЕР ОБНАРУЖИЛ КРИТИЧЕСКИЙ СБОЙ!</div>
+    <div id="spectator-hud" hidden>
+      <b id="spectator-status">Наблюдение · матч продолжается</b>
+      <small>Колесо — масштаб · перетаскивание — обзор карты</small>
+      <div class="spectator-actions">
+        <button class="btn-1c" onclick="game.zoomSpectator(.8)">−</button>
+        <button class="btn-1c" onclick="game.zoomSpectator(1.25)">+</button>
+        <button class="btn-1c" onclick="game.resetSpectatorView()">Вся карта</button>
+        <button class="btn-1c" onclick="game.showSpectatorResults()">Итоги</button>
+        <button id="spectator-exit" class="btn-1c" onclick="game.pvp ? game.leavePvpRoom() : game.showMainMenu()">В главное меню</button>
+      </div>
+    </div>
     <div id="weapon-evolution-notice" role="status" aria-live="polite" hidden>
       <small>ОРУЖИЕ ЭВОЛЮЦИОНИРОВАЛО!</small><b></b><span></span>
     </div>
@@ -1446,7 +1461,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.1.0</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1458,19 +1473,21 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>3.1.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>3.2.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
+            <div class="release-notes">
+              <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
+              <p><b>Обзор после смерти.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
+              <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
+            </div>
             <div class="release-notes">
               <h3>Версия 3.1.0 — «Зона ответственности»</h3>
               <p><b>Боты в BR.</b> Фармят мобов, прокачиваются под свой класс, воюют с игроками и держатся внутри сжимающейся зоны. Можно заполнить свободные места лобби ботами. После босса 30-й минуты можно развить выбранную легендарную миграцию.</p>
               <p><b>Боссы держат позицию.</b> Большие боссы защищены от оглушения и смещения. Комитет стал крепче, защитник лечит другие части; монолит быстрее возвращает модули.</p>
               <p><b>Темп боя.</b> Первые волны меньше, раннего опыта больше, исправлены интервалы стрелков. Sigur и аварийный ИБП готовы чаще; динамическое обновление отключено в PvP и BR.</p>
             </div>
-            <div class="release-notes">
-              <h3>Версия 3.0.0 — «Продакшн живой. Пока»</h3>
-              <p>Модификаторы одиночных забегов, новые перки и предметы, усиленные помощники, новые мобы и боссы. База знаний и сравнение характеристик в карточках. Патч 3.0.1: более доступные покупки и плавные музыкальные переходы.</p>
-            </div>
+
           </div>
         </div>
       </div>
@@ -1493,7 +1510,7 @@
     </div>
   </div>
   <div id="modal-knowledge" class="modal-overlay">
-    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.1.0</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
+    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.0</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
       <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
@@ -1691,7 +1708,21 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
+        <details class="release-notes patch-minor" open><summary><h3>3.2.0 — «Кластер живёт дальше»</h3></summary>
+          <h4>Нововведения</h4>
+          <p><b>Обзор после смерти.</b> Погибший игрок переходит к обзору всей карты. Колесо мыши приближает и отдаляет камеру, перетаскивание перемещает её; есть кнопки масштаба и возврата ко всей карте. Итоги забега доступны отдельно, наблюдение не останавливает остальных участников.</p>
+          <p><b>Хост остаётся в комнате.</b> Пока матч продолжается, хост не может выйти через меню или перезапустить игру, в том числе после смерти. Он продолжает рассчитывать мир, ботов, общие предметы и определение победителя. После завершения матча выход снова доступен. При закрытии или обновлении страницы браузер предупреждает о незавершённом матче.</p>
+          <p><b>Аирдропы Battle Royale.</b> На краю экрана появляется стрелка к одной ближайшей поставке за пределами обзора. В аирдропе лежат случайный предмет и отдельный расходник: их можно подобрать независимо. Предметы действуют по обычным правилам инвентаря, рюкзака и сборки комплектов.</p>
+          <p><b>Добыча с погибших.</b> Погибшие игроки и боты оставляют немного опыта и один случайный предмет из основного инвентаря. Предмет исчезает у погибшего; если инвентарь был пуст, выпадает только опыт. Подбор доступен оставшимся в живых участникам.</p>
+          <h4>Ребаланс</h4>
+          <p><b>Уникальное снаряжение.</b> Каждый предмет II, III и IV тира можно иметь только в одном экземпляре на основной инвентарь и рюкзак вместе. Повторная покупка, сборка второго одинакового комплекта и подбор дубликата заблокированы. Бонусы одинаковых предметов этих тиров не складываются; предметы I тира сохраняют прежние правила.</p>
+          <p><b>Рост тира поставок.</b> Первые три аирдропа содержат предмет I тира, следующие три — II, с седьмого выпадают случайные предметы III тира. Количество опыта с погибшего увеличивается с его уровнем и имеет верхний предел.</p>
+          <h4>Исправления ошибок</h4>
+          <p><b>Матч после смерти хоста.</b> Исправлена обработка выбывания в комнатах на двух участников: смерть больше не считается выходом из сессии и не передаёт роль хоста. PvE продолжается до гибели последнего союзника, PvP и BR определяют последнего выжившего. Синхронизация и таймер комнаты работают, пока хост наблюдает или открывает свои итоги.</p>
+          <p><b>Общие предметы.</b> Выдачу снаряжения подтверждает хост: одна вещь достаётся одному участнику, повторные сообщения не выдают её повторно. При нехватке места предмет остаётся доступен на карте. Боты тоже подбирают снаряжение.</p>
+          <p><b>Совместимость.</b> Сетевой протокол обновлён до 5: всем участникам нужно обновить игру и создать новую комнату. Для онлайна требуются обновлённые RTDB Rules. Сводка 3.0.0 убрана из главного меню; полная история сохранена.</p>
+        </details>
+        <details class="release-notes patch-minor"><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
           <h4>Нововведения</h4>
           <p><b>История обновлений.</b> Старые версии оформлены по общему шаблону: нововведения, ребаланс и исправления ошибок. Длинные описания разбиты на абзацы, заголовки получили одинаковые отступы. Исторические значения сохранены; изменения 3.0.1 остаются внутри записи 3.0.0.</p>
           <p><b>Уведомление об эволюции.</b> После объединения оружия появляется отдельный баннер с иконкой, названием новой пушки и исходными компонентами.</p>
@@ -2120,6 +2151,7 @@
 
         <div style="display:flex; justify-content:space-around;">
           <button class="btn-1c" id="gameover-primary-button" onclick="game.restartFromGameOver()">🔄 Сделать ТиИ и начать заново</button>
+          <button class="btn-1c" id="gameover-spectate-button" onclick="game.enterSpectatorMode()">👁 Обзор карты</button>
           <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Посмотреть таблицу</button>
         </div>
       </div>
@@ -2244,9 +2276,9 @@
 </script>
 
 <script>
-const GAME_VERSION = '3.1.0';
+const GAME_VERSION = '3.2.0';
 const MAX_PLAYER_DODGE = 0.50;
-const NETWORK_PROTOCOL = 4;
+const NETWORK_PROTOCOL = 5;
 const BR_ZONE_SHRINK_DURATION = 30;
 const BR_ZONE_PAUSE_DURATION = 10;
 const BR_ZONE_BASE_DAMAGE_PER_SECOND = 25;
@@ -4784,7 +4816,8 @@ class PvpKillFeed {
     clearTimeout(this.reportTimer);
     const pvp=this.game.pvp;
     if(!this.pendingReport || !this.enabled() || pvp.leaving || performance.now()-this.pendingReport.createdAt>15000)return;
-    this.game.sendPvpNetworkMessage({type:'player-death',uid:pvp.uid,hit:this.pendingReport.hit,room:pvp.code},null,true);
+    this.game.sendPvpNetworkMessage({type:'player-death',uid:pvp.uid,hit:this.pendingReport.hit,room:pvp.code,
+      loot:{x:this.game.player.x,y:this.game.player.y,level:this.game.level,inventoryLoot:this.game.getLootInventory()}},null,true);
     this.reportTimer=setTimeout(()=>this.flushReport(),700);
   }
 
@@ -4794,6 +4827,7 @@ class PvpKillFeed {
     const victim=this.member(victimUid);if(!victim)return;
     const hit=this.describeHit(rawHit?.source || 'Неизвестная атака',{killFeed:rawHit});
     this.deaths.add(victimUid);
+    this.game.spawnPlayerDeathLoot(victimUid);
     const event={id:victimUid,room:pvp.code,victimUid,victimName:String(victim.name || 'Игрок').slice(0,20),...hit};
     this.receive(event);
     this.game.sendPvpNetworkMessage({type:'kill-feed',event},null,true);
@@ -5059,6 +5093,11 @@ class PvpBotController {
         const distance=Math.hypot(item.x-p.x,item.y-p.y);
         if(distance<best){best=distance;goal={kind:'heal',x:item.x,y:item.y,ref:item};}
       }
+      if(!goal)for(const item of g.pickups) {
+        if(!g.isEquipmentPickup(item) || !a.canReceiveEquipment(item.itemKey) || !inSafeZone(item.x,item.y))continue;
+        const distance=Math.hypot(item.x-p.x,item.y-p.y);
+        if(distance<1200 && distance<best){best=distance;goal={kind:'loot',x:item.x,y:item.y,ref:item};}
+      }
       if(!goal) for(const gem of g.gems) {
         if (!inSafeZone(gem.x, gem.y)) continue;
         const distance=Math.hypot(gem.x-p.x,gem.y-p.y);
@@ -5194,8 +5233,10 @@ class PvpBotController {
     }
     for(let i=g.pickups.length-1;i>=0;i--) {
       const item=g.pickups[i];if(Math.hypot(item.x-p.x,item.y-p.y)>30)continue;
+      if(g.isEquipmentPickup(item)) {g.claimEquipmentPickup(bot.uid,item.syncId);continue;}
       if(item.type==='banana'&&p.hp<p.maxHp)a.healPatchActor(a,20);
       else if(item.type==='coffee'){p.speedBuffTimer=Math.max(p.speedBuffTimer,8);p.coffeeBuffTimer=Math.max(p.coffeeBuffTimer,8);}
+      else if(item.type==='consumable'&&a.canAddConsumableToInventory(item.consumableKey))a.addConsumableToInventory(item.consumableKey);
       else continue;
       if(item.syncId)(g.pvp.claimedDrops ||= {})[item.syncId]=true;
       g.pickups.splice(i,1);
@@ -5827,6 +5868,9 @@ class Game {
         return;
       }
       if (e.code === 'Escape') {
+        if(this.spectatorMode && document.getElementById('modal-gameover').style.display!=='flex') {
+          e.preventDefault();this.showSpectatorResults();return;
+        }
         if (document.getElementById('modal-record-detail').style.display === 'flex') {
           this.closeLeaderboardRecord();
         } else if (document.getElementById('modal-lb').style.display === 'flex') {
@@ -5849,6 +5893,7 @@ class Game {
         return;
       }
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target?.tagName) || e.target?.isContentEditable) return;
+      if(this.spectatorMode)return;
       if (e.code === 'KeyL' || ['l', 'д'].includes(e.key.toLowerCase())) {
         this.finishRunWithCurrentScore();
         return;
@@ -5902,6 +5947,10 @@ class Game {
       for (const action of ['moveUp', 'moveDown', 'moveLeft', 'moveRight']) if (this.keyBindings[action] === e.code) this.keys[action] = false;
     });
     this.canvas.addEventListener('pointerdown', (e) => {
+      if(this.spectatorMode && e.button===0) {
+        this.spectatorDrag={id:e.pointerId,x:e.clientX,y:e.clientY};
+        this.canvas.setPointerCapture(e.pointerId);e.preventDefault();return;
+      }
       if (e.pointerType !== 'mouse' || e.button !== 0 || this.paused || !this.player || this.player.hp <= 0 || this.player.stunTimer > 0) return;
       e.preventDefault();
       this.mouseMovePointerId = e.pointerId;
@@ -5920,17 +5969,25 @@ class Game {
       if (e.button === 2) this.tryDash();
     }, true);
     this.canvas.addEventListener('pointermove', (e) => {
+      if(this.spectatorMode && this.spectatorDrag?.id===e.pointerId && this.spectatorCamera) {
+        const camera=this.spectatorCamera, rect=this.canvas.getBoundingClientRect();
+        camera.x=Math.max(0,Math.min(this.MAP_SIZE,camera.x-(e.clientX-this.spectatorDrag.x)*this.viewportWidth/rect.width/camera.zoom));
+        camera.y=Math.max(0,Math.min(this.MAP_SIZE,camera.y-(e.clientY-this.spectatorDrag.y)*this.viewportHeight/rect.height/camera.zoom));
+        this.spectatorDrag.x=e.clientX;this.spectatorDrag.y=e.clientY;return;
+      }
       if (e.pointerId === this.mouseMovePointerId && (e.buttons & 1)) {
         this.setMouseMoveAim(e.clientX, e.clientY);
       }
     });
     window.addEventListener('pointerup', (e) => {
+      if(this.spectatorDrag?.id===e.pointerId)this.spectatorDrag=null;
       if (e.pointerId === this.mouseMovePointerId) {
         this.mouseMovePointerId = null;
         this.mouseMoveAim = null;
       }
     });
     window.addEventListener('pointercancel', () => {
+      this.spectatorDrag=null;
       this.mouseMovePointerId = null;
       this.mouseMoveAim = null;
     });
@@ -5941,6 +5998,11 @@ class Game {
       this.syncPvpHostWindowActivity();
     });
     window.addEventListener('focus', () => this.syncPvpHostWindowActivity());
+    this.canvas.addEventListener('wheel',e=>{
+      if(!this.spectatorMode)return;
+      e.preventDefault();this.zoomSpectator(Math.exp(-Math.max(-250,Math.min(250,e.deltaY))*.002),e.clientX,e.clientY);
+    },{passive:false});
+    window.addEventListener('beforeunload',e=>{if(this.isHostExitLocked()){e.preventDefault();e.returnValue='';}});
 
     document.addEventListener('visibilitychange', () => {
       this.lastTime = performance.now();
@@ -6028,6 +6090,7 @@ class Game {
     this.canvas.height = Math.max(1, Math.round(this.viewportHeight * pixelRatio));
     this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     if (!Number.isFinite(this.cameraZoom)) this.cameraZoom = this.getCameraZoom();
+    if(this.spectatorMode)this.resetSpectatorView();
     this.syncMobileDynamicButtonLabel();
     if (this.activeChallenge) this.updateChallengeUI();
     const knowledgeList = document.getElementById('knowledge-list');
@@ -6267,6 +6330,247 @@ class Game {
     };
   }
 
+  isHostExitLocked() {
+    const pvp = this.pvp;
+    return Boolean(pvp?.host && pvp.started && !pvp.matchOver && !pvp.brWinnerSent && !pvp.opponentLost);
+  }
+
+  blockHostExit() {
+    if (!this.isHostExitLocked()) return false;
+    this.showBanner('Хост остаётся в комнате до завершения матча — в том числе после смерти.');
+    if (this.player?.hp <= 0) this.enterSpectatorMode();
+    return true;
+  }
+
+  getSpectatorMinZoom() {
+    return Math.max(.01, Math.min(this.viewportWidth / this.MAP_SIZE, this.viewportHeight / this.MAP_SIZE) * .94);
+  }
+
+  enterSpectatorMode() {
+    if (!this.player || this.player.hp > 0) return;
+    if (!this.spectatorMode) {
+      this.spectatorMode = true;
+      this.spectatorCamera = {x:this.MAP_SIZE/2,y:this.MAP_SIZE/2,zoom:this.getSpectatorMinZoom()};
+    }
+    document.getElementById('modal-gameover').style.display = 'none';
+    document.getElementById('modal-pause').style.display = 'none';
+    this.keys = {}; this.mobileMove = null; this.mouseMoveAim = null;
+    if (this.pvp?.started && !this.pvp.matchOver) {
+      this.pvp.choosing = null;
+      this.pvp.manualPaused = false;
+      this.paused = Boolean(this.pvp.brPaused);
+      this.syncPvpWait();
+    }
+    this.updateSpectatorHud();
+  }
+
+  showSpectatorResults() {
+    document.getElementById('modal-gameover').style.display = 'flex';
+    this.updateSpectatorHud();
+  }
+
+  resetSpectatorView() {
+    if (!this.spectatorMode) return;
+    this.spectatorCamera = {x:this.MAP_SIZE/2,y:this.MAP_SIZE/2,zoom:this.getSpectatorMinZoom()};
+  }
+
+  zoomSpectator(factor, clientX, clientY) {
+    if (!this.spectatorMode || !this.spectatorCamera) return;
+    const camera = this.spectatorCamera, rect = this.canvas.getBoundingClientRect();
+    const px = Number.isFinite(clientX) ? (clientX-rect.left)*this.viewportWidth/rect.width-this.viewportWidth/2 : 0;
+    const py = Number.isFinite(clientY) ? (clientY-rect.top)*this.viewportHeight/rect.height-this.viewportHeight/2 : 0;
+    const before = camera.zoom;
+    camera.zoom = Math.max(this.getSpectatorMinZoom(), Math.min(2, before*factor));
+    camera.x = Math.max(0,Math.min(this.MAP_SIZE,camera.x+px/before-px/camera.zoom));
+    camera.y = Math.max(0,Math.min(this.MAP_SIZE,camera.y+py/before-py/camera.zoom));
+    if (camera.zoom <= this.getSpectatorMinZoom()+.00001) this.resetSpectatorView();
+  }
+
+  getRenderCamera() {
+    return this.spectatorMode && this.spectatorCamera ? this.spectatorCamera
+      : {x:this.player.x,y:this.player.y,zoom:this.cameraZoom || 1};
+  }
+
+  updateSpectatorHud() {
+    const hud = document.getElementById('spectator-hud');
+    hud.hidden = !this.spectatorMode;
+    if (!this.spectatorMode) return;
+    const locked = this.isHostExitLocked();
+    document.getElementById('spectator-status').textContent = this.pvp?.started && !this.pvp.matchOver
+      ? 'Наблюдение · матч продолжается' : 'Обзор карты · забег завершён';
+    const exit = document.getElementById('spectator-exit');
+    exit.disabled = locked;
+    exit.textContent = locked ? 'Хост · ждём конца матча' : 'В главное меню';
+    const primary = document.getElementById('gameover-primary-button');
+    primary.disabled = locked;
+    primary.textContent = locked ? 'Хост остаётся до завершения матча' : '⌂ Выйти в главное меню';
+  }
+
+  getLootInventory() {
+    return (this.shopPassives || []).filter(slot=>slot && this.getShopPassiveDef(slot.key))
+      .map(slot=>({key:slot.key,count:Math.max(1,Math.min(1000,Math.floor(Number(slot.count)||1))),cooldown:Math.max(0,Number(slot.cooldown)||0)}));
+  }
+
+  canReceiveEquipment(key) {
+    const def = this.getShopPassiveDef(key);
+    return Boolean(def && (!def.maxOwned || this.getOwnedShopItemCount(key)<def.maxOwned) &&
+      (this.findInventoryFreeSlot()>=0 || this.findBackpackFreeSlot()>=0));
+  }
+
+  receiveEquipment(item) {
+    const key = item?.itemKey;
+    if (!this.player || this.player.hp<=0 || this.pvp?.eliminated || !this.canReceiveEquipment(key)) return false;
+    const main = this.findInventoryFreeSlot(), backpack = this.findBackpackFreeSlot();
+    const shared = [...this.shopPassives,...(this.backpack||[])].reduce((cd,slot)=>slot?.key===key?Math.max(cd,slot.cooldown||0):cd,0);
+    const slot = {key,count:1,cooldown:Math.max(shared,Number(item.cooldown)||0)};
+    if (main>=0) this.shopPassives[main]=slot;
+    else {slot.inactive=true;this.backpack[backpack]=slot;}
+    const combo = this.combineShopPassives(key,{skipRecalc:true});
+    this.recalculateShopPassives({healOnGain:main>=0 || Boolean(combo)});
+    this.updateInventoryHUD();this.updateHUD();
+    const def = this.getShopPassiveDef(key);
+    this.addPopup(this.player.x,this.player.y-30,`${def.icon} ${def.name}${main<0 && !combo?' · в рюкзаке':''}`,'#ffd166');
+    return true;
+  }
+
+  isEquipmentPickup(item) {
+    return Boolean(item?.itemKey && (item.type==='br_supply' || item.type==='equipment_drop'));
+  }
+
+  addEquipmentPickup(x,y,itemKey,extra={}) {
+    const def = this.getShopPassiveDef(itemKey);
+    if (!def) return null;
+    const pvp = this.pvp;
+    const item = {x,y,type:'equipment_drop',itemKey,icon:def.icon,...extra};
+    if (pvp?.host) {pvp.nextDropId=(Number(pvp.nextDropId)||0)+1;item.syncId=`p${pvp.nextDropId}`;}
+    this.pickups.push(item);
+    return item;
+  }
+
+  requestEquipmentPickup(item) {
+    if (!this.isEquipmentPickup(item) || !this.player || this.player.hp<=0 || this.pvp?.eliminated) return;
+    if (!this.canReceiveEquipment(item.itemKey)) {
+      if (!item.fullInventoryNotified) {item.fullInventoryNotified=true;this.addPopup(this.player.x,this.player.y-25,'Нет места или достигнут лимит предмета','#aaa');}
+      return;
+    }
+    if (!this.pvp?.started) {
+      if (this.receiveEquipment(item)) this.pickups.splice(this.pickups.indexOf(item),1);
+    } else if (this.pvp.host) this.claimEquipmentPickup(this.pvp.uid,item.syncId);
+    else if (!this.pvp.pendingEquipmentClaim && item.syncId) {
+      if(this.sendPvpNetworkMessage({type:'equipment-claim',id:item.syncId},null,true))this.pvp.pendingEquipmentClaim={id:item.syncId,at:performance.now()};
+    }
+  }
+
+  sendEquipmentMessage(uid,message) {
+    const pvp = this.pvp;
+    const peer = pvp?.peerConnections?.[uid] || (pvp?.rtc?.uid===uid?pvp.rtc:null);
+    return Boolean(peer?.connected && this.sendPvpNetworkMessage(message,peer.controlChannel||peer.channel,true));
+  }
+
+  claimEquipmentPickup(uid,id) {
+    const pvp = this.pvp;
+    if (!pvp?.host || !pvp.started || pvp.matchOver) return;
+    const prior=pvp.equipmentGrants?.get(id);
+    if(prior?.uid===uid){this.sendEquipmentMessage(uid,{type:'equipment-grant',item:prior.item});return;}
+    const index=this.pickups.findIndex(item=>item.syncId===id && this.isEquipmentPickup(item));
+    const actor=uid===pvp.uid?this:this.botController?.bots.get(uid)?.actor;
+    const state=actor?.player || pvp.remotePlayers?.[uid]?.state;
+    if(index<0 || !state || state.hp<=0 || state.over) {
+      if(!actor)this.sendEquipmentMessage(uid,{type:'equipment-denied',id});
+      return;
+    }
+    const item=this.pickups[index];
+    if(Math.hypot(state.x-item.x,state.y-item.y)>100) {
+      if(!actor)this.sendEquipmentMessage(uid,{type:'equipment-denied',id});
+      return;
+    }
+    if(actor) {
+      if(!actor.receiveEquipment(item))return;
+    } else {
+      if(!this.sendEquipmentMessage(uid,{type:'equipment-grant',item}))return;
+      (pvp.equipmentGrants ||= new Map()).set(id,{uid,item,at:performance.now()});
+    }
+    this.pickups.splice(index,1);
+    (pvp.claimedDrops ||= {})[id]=true;
+  }
+
+  receiveEquipmentGrant(item) {
+    const pvp=this.pvp;
+    if(!pvp?.started || pvp.host || !this.isEquipmentPickup(item) || typeof item.syncId!=='string')return;
+    pvp.receivedEquipment ||= new Set();
+    const duplicate=pvp.receivedEquipment.has(item.syncId);
+    const accepted=duplicate || this.receiveEquipment(item);
+    if(accepted) {
+      pvp.receivedEquipment.add(item.syncId);
+      this.pickups=this.pickups.filter(drop=>drop.syncId!==item.syncId);
+      (pvp.claimedDrops ||= {})[item.syncId]=true;
+    }
+    if(pvp.pendingEquipmentClaim?.id===item.syncId)pvp.pendingEquipmentClaim=null;
+    this.sendPvpNetworkMessage({type:'equipment-ack',id:item.syncId,accepted},null,true);
+  }
+
+  acknowledgeEquipment(uid,id,accepted) {
+    const grant=this.pvp?.equipmentGrants?.get(id);
+    if(!grant || grant.uid!==uid)return;
+    this.pvp.equipmentGrants.delete(id);
+    if(!accepted) {delete this.pvp.claimedDrops[id];this.pickups.push(grant.item);}
+  }
+
+  removeDeathLootItem(key) {
+    const index=this.shopPassives.findIndex(slot=>slot?.key===key);
+    if(index<0)return;
+    const slot=this.shopPassives[index];
+    if((slot.count||1)>1)slot.count--;else this.shopPassives[index]=null;
+    this.recalculateShopPassives({healOnGain:false});this.updateInventoryHUD();this.updateHUD();
+  }
+
+  spawnPlayerDeathLoot(uid) {
+    const pvp=this.pvp;
+    if(!pvp?.host || !pvp.started)return;
+    pvp.deathLootSpawned ||= new Set();
+    if(pvp.deathLootSpawned.has(uid))return;
+    pvp.deathLootSpawned.add(uid);
+    const actor=uid===pvp.uid?this:this.botController?.bots.get(uid)?.actor;
+    const state=actor?{...actor.player,level:actor.level,inventoryLoot:actor.getLootInventory()}
+      : pvp.remoteDeathLoot?.[uid] || pvp.remotePlayers?.[uid]?.state;
+    if(!state || !Number.isFinite(Number(state.x)) || !Number.isFinite(Number(state.y)))return;
+    const x=Math.max(this.BOUND_MIN+30,Math.min(this.BOUND_MAX-30,Number(state.x)));
+    const y=Math.max(this.BOUND_MIN+30,Math.min(this.BOUND_MAX-30,Number(state.y)));
+    const xp=Math.min(100,20+Math.max(1,Math.floor(Number(state.level)||1))*5)/5;
+    for(let i=0;i<5;i++) {
+      const angle=i*Math.PI*2/5;
+      this.gems.push({x:x+Math.cos(angle)*20,y:y+Math.sin(angle)*20,xp,baseXp:xp,col:'#c99aff',deathLoot:true});
+    }
+    const inventory=(Array.isArray(state.inventoryLoot)?state.inventoryLoot:[]).slice(0,6)
+      .filter(slot=>slot && this.getShopPassiveDef(slot.key));
+    if(!inventory.length)return;
+    const slot=inventory[Math.floor(Math.random()*inventory.length)];
+    this.addEquipmentPickup(x,y,slot.key,{cooldown:Math.max(0,Math.min(600,Number(slot.cooldown)||0)),deathLoot:true});
+    if(actor)actor.removeDeathLootItem(slot.key);
+    else this.sendEquipmentMessage(uid,{type:'death-loot-lost',key:slot.key});
+  }
+
+  renderNearestAirdropIndicator(camera) {
+    if(!this.isBattleRoyale || this.player.hp<=0)return;
+    let nearest=null,best=Infinity;
+    for(const item of this.pickups) {
+      if(item.type!=='br_supply')continue;
+      const distance=Math.hypot(item.x-this.player.x,item.y-this.player.y);
+      if(distance<best){best=distance;nearest=item;}
+    }
+    if(!nearest)return;
+    const dx=(nearest.x-camera.x)*camera.zoom,dy=(nearest.y-camera.y)*camera.zoom;
+    const halfW=Math.max(20,this.viewportWidth/2-35),halfH=Math.max(20,this.viewportHeight/2-45);
+    if(Math.abs(dx)<=halfW && Math.abs(dy)<=halfH)return;
+    const factor=Math.min(halfW/Math.max(.001,Math.abs(dx)),halfH/Math.max(.001,Math.abs(dy)));
+    const x=this.viewportWidth/2+dx*factor,y=this.viewportHeight/2+dy*factor;
+    const ctx=this.ctx;
+    ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(dy,dx));ctx.fillStyle='#ffd166';ctx.strokeStyle='#222';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-9,-9);ctx.lineTo(-9,9);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+    ctx.save();ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffd166';ctx.strokeStyle='#111';ctx.lineWidth=3;
+    const label=`📦 ${Math.round(best)}`;ctx.strokeText(label,x,y+23);ctx.fillText(label,x,y+23);ctx.restore();
+  }
+
   isPvpCombatAvailable() {
     const pvp = this.pvp;
     return Boolean(pvp?.started && !pvp.classSelectionPending && !pvp.matchOver &&
@@ -6299,6 +6603,12 @@ class Game {
   }
 
   start(options = {}) {
+    if(this.pvp===this.activeMatchPvp && this.blockHostExit())return;
+    this.activeMatchPvp=this.pvp;
+    this.spectatorMode=false;this.spectatorCamera=null;this.spectatorDrag=null;
+    document.getElementById('spectator-hud').hidden=true;
+    document.getElementById('gameover-primary-button').disabled=false;
+    this.brSupplyCount=0;
     this.botController = null;
     this.killFeed?.reset();
     const runtimeErrorNotice = document.getElementById('game-runtime-error');
@@ -6323,6 +6633,8 @@ class Game {
     if (this.pvp?.started) {
       this.pvp.classSelectionPending = true;
       this.pvp.classSelectionReadyUids = new Set();
+      this.pvp.equipmentGrants=new Map();this.pvp.receivedEquipment=new Set();
+      this.pvp.pendingEquipmentClaim=null;this.pvp.deathLootSpawned=new Set();this.pvp.remoteDeathLoot={};
     }
     this.legendaryMigrationChosen = false;
     this.firstMegaBossDefeated = false;
@@ -6579,6 +6891,9 @@ class Game {
   }
 
   showMainMenu() {
+    if(this.blockHostExit())return;
+    this.spectatorMode=false;this.spectatorDrag=null;
+    document.getElementById('spectator-hud').hidden=true;
     this.unsubscribePvpRoomDirectory();
     if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
     this.rudesktopSkillFrame = null;
@@ -7374,6 +7689,7 @@ class Game {
   }
 
   async createPvpRoom() {
+    if(this.blockHostExit())return;
     if (this.pvp?.started) {
       this.pvpStatus('Сначала завершите текущий матч, затем можно будет создать комнату.', true);
       return;
@@ -7438,6 +7754,7 @@ class Game {
   }
 
   async joinPvpRoom() {
+    if(this.blockHostExit())return;
     const code = document.getElementById('pvp-room-code').value.trim();
     if (!/^[0-9]{4}$/.test(code)) { this.pvpStatus('Введите четырёхзначный код комнаты.', true); return; }
     if (this.pvp?.started) {
@@ -7783,8 +8100,13 @@ class Game {
       // A channel belongs to one guest; never trust a supplied sender identity.
       message = { ...message, uid: senderUid };
       if (message.skill) message.skill = { ...message.skill, senderUid };
-      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
+      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'equipment-grant', 'equipment-denied', 'death-loot-lost', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
     }
+    if(message.type==='equipment-claim' && pvp.host && senderUid) {this.claimEquipmentPickup(senderUid,message.id);return;}
+    if(message.type==='equipment-ack' && pvp.host && senderUid) {this.acknowledgeEquipment(senderUid,message.id,message.accepted===true);return;}
+    if(message.type==='equipment-grant' && !pvp.host) {this.receiveEquipmentGrant(message.item);return;}
+    if(message.type==='equipment-denied' && !pvp.host) {if(pvp.pendingEquipmentClaim?.id===message.id)pvp.pendingEquipmentClaim=null;return;}
+    if(message.type==='death-loot-lost' && !pvp.host && this.player?.hp<=0) {this.removeDeathLootItem(message.key);return;}
     if(message.type==='patch-repair-drop'&&pvp.host&&senderUid) {
       const state=pvp.remotePlayers?.[senderUid]?.state,drop=message.drop,id=String(message.id||'').slice(0,100);
       if(state&&drop&&id&&Number.isFinite(drop.x)&&Number.isFinite(drop.y)&&Math.hypot(drop.x-state.x,drop.y-state.y)<250){
@@ -7802,6 +8124,7 @@ class Game {
     } else if(message.type==='patch-summon-damage'&&!pvp.host) {
       const summon=this.summons.find(s=>s.role==='mirror'&&s.id===message.id);if(summon)summon.hp=Math.max(0,summon.hp-Math.max(0,Number(message.damage)||0));
     } else if(message.type==='player-death' && pvp.host && senderUid && message.room===pvp.code) {
+      if(message.loot && typeof message.loot==='object')(pvp.remoteDeathLoot ||= {})[senderUid]=message.loot;
       this.killFeed.publishDeath(senderUid,message.hit || this.killFeed.lastHits.get(senderUid));
     } else if(message.type==='kill-feed' && !pvp.host) {
       this.killFeed.receive(message.event);
@@ -7859,7 +8182,10 @@ class Game {
       }
       pvp.remoteStateSequences[uid] = sequence || Number(pvp.remoteStateSequences[uid] || 0) + 1;
       const state = validation.state;
-      if(pvp.host && state.over && state.hp<=0)this.killFeed.publishDeath(uid,state.deathHit || this.killFeed.lastHits.get(uid));
+      if(pvp.host && state.over && state.hp<=0) {
+        (pvp.remoteDeathLoot ||= {})[uid]=state;
+        this.killFeed.publishDeath(uid,state.deathHit || this.killFeed.lastHits.get(uid));
+      }
       if(!pvp.host && Array.isArray(state.killFeedEvents))for(const event of state.killFeedEvents.slice(-5))this.killFeed.receive(event);
       if(!pvp.host&&Array.isArray(state.patchZones))this.patchZones=state.patchZones.slice(0,16);
       this.recordPvpPosition(`@remote-${uid}`, state.x, state.y);
@@ -7875,6 +8201,9 @@ class Game {
         pvp.remoteShots = Array.isArray(message.shots) ? message.shots : [];
         pvp.remoteShotsAt = performance.now();
         this.recordPvpPosition('@remote', state.x, state.y);
+      }
+      if(!isMultiPlayerMatch) {
+        (pvp.remotePlayers ||= {})[uid]={...remotePlayer,stateAt:performance.now(),shots:pvp.remoteShots || [],shotsAt:performance.now()};
       }
       if (!pvp.host && isMultiPlayerMatch && uid) {
         pvp.remotePlayers ||= {};
@@ -8052,7 +8381,8 @@ class Game {
         finally { pvp.applyingRemoteEnemyDamage = false; }
       }
     }
-    const claimed = new Set(Object.keys(state.claimedDrops || {}).filter(id => state.claimedDrops[id]));
+    const equipmentIds=new Set(this.pickups.filter(item=>this.isEquipmentPickup(item)).map(item=>item.syncId));
+    const claimed = new Set(Object.keys(state.claimedDrops || {}).filter(id => state.claimedDrops[id] && !equipmentIds.has(id)));
     if (claimed.size) {
       this.gems = this.gems.filter(item => !claimed.has(item.syncId));
       this.pickups = this.pickups.filter(item => !claimed.has(item.syncId));
@@ -8181,7 +8511,7 @@ class Game {
     if (!p) return null;
     return { x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10), maxHp: Math.round(p.maxHp), level: this.level,
       time: Number(this.time) || 0, attackTotal: Number(this.pvp?.attackTotal || 0), enemyAttackTotal: Number(this.pvp?.enemyAttackTotal || 0),
-      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85) };
+      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85),inventoryLoot:this.getLootInventory() };
   }
 
   handlePvpRtcRecovered(rtc) {
@@ -8257,7 +8587,7 @@ class Game {
       over: pvp.matchOver || player.hp <= 0,
       migration85: Boolean(player.migration85)
     };
-    state={...state,attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
+    state={...state,inventoryLoot:this.getLootInventory(),attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
       deathHit:player.hp<=0 ? this.lastPlayerDamage?.hit || null : null,
       patchMirror:this.summons.filter(s=>s.role==='mirror'&&s.hp>0&&s.life>0).map(s=>({id:s.id,x:s.x,y:s.y,hp:s.hp,size:s.size,life:s.life}))[0]||null,
       ...(pvp.host ? {killFeedEvents:this.killFeed.entries.map(({expiresAt,...event})=>event),patchZones:(this.patchZones||[]).map(z=>({ownerUid:z.ownerUid,x:z.x,y:z.y,radius:z.radius,life:z.life}))} : {})};
@@ -8565,7 +8895,7 @@ class Game {
     const local = { x: this.player.x, y: this.player.y, hp: this.player.hp, maxHp: this.player.maxHp, isRemote: false, uid: this.pvp?.uid || 'local' };
     const nonPausingLevelUp = Boolean(this.isBattleRoyale || this.isPvpMassUpgradeMode?.());
     if (nonPausingLevelUp && this.pvp?.choosing === 'levelup' && !this.pvp.host) return { ...local, untargetable: true };
-    if ((this.isBattleRoyale || Number(this.pvp?.actualPlayerCount) >= 3 || this.botController?.bots.size) && this.pvp?.host && this.pvp.started) {
+    if (this.pvp?.host && this.pvp.started) {
       const targets = [];
       if (this.player.hp > 0 && (!nonPausingLevelUp || this.pvp.choosing !== 'levelup')) targets.push(local);
       for (const remoteTarget of this.getHostRemotePlayerTargets({ excludeLevelup: nonPausingLevelUp })) {
@@ -8603,7 +8933,7 @@ class Game {
   }
 
   getPvpSpawnCenter() {
-    if ((this.isBattleRoyale || Number(this.pvp?.actualPlayerCount) >= 3 || this.botController?.bots.size) && this.pvp?.host && this.pvp.started) {
+    if (this.pvp?.host && this.pvp.started) {
       const excludeLevelup = Boolean(this.isBattleRoyale || this.isPvpMassUpgradeMode?.());
       const remoteAlive = this.getHostRemotePlayerTargets({ excludeLevelup });
       const targets = [];
@@ -8674,6 +9004,7 @@ class Game {
       disconnected: true,
       state: { ...previousState, hp: 0, over: true }
     };
+    if(uid===pvp.opponentUid){pvp.remotePlayer=pvp.remotePlayers[uid];pvp.remoteState=pvp.remotePlayer.state;pvp.remoteChoosing=null;pvp.remotePaused=false;}
     const peer = pvp.peerConnections?.[uid] || pvp.threePeers?.[uid] || (pvp.rtc?.uid === uid ? pvp.rtc : null);
     if (peer && !peer.disconnectedHandled) {
       peer.disconnectedHandled = true;
@@ -8754,7 +9085,7 @@ class Game {
     const allOpponentsOnline = pvp.host
       ? opponents.length > 0 && opponents.every(player => player.online)
       : Boolean(room.players?.[room.hostUid]?.online);
-    if (pvp.started && pvp.host && Number(pvp.actualPlayerCount) >= 3) {
+    if (pvp.started && pvp.host && Number(pvp.actualPlayerCount) >= 2) {
       const participantUids = pvp.matchPlayerUids || Object.keys(room.players || {});
       for (const uid of participantUids) {
         if (uid === pvp.uid) continue;
@@ -8834,6 +9165,17 @@ class Game {
   handlePvpOpponentLost(message, promoteToHost = false) {
     const pvp = this.pvp;
     if (!pvp?.started || pvp.opponentLost) return;
+    if(pvp.host) {
+      const uid=pvp.opponentUid || pvp.remotePlayer?.uid;
+      if(uid)this.handlePvpPeerDisconnected(uid,message);
+      clearTimeout(pvp.opponentMissingTimer);pvp.opponentMissingTimer=null;
+      clearTimeout(pvp.recoveryRequestTimer);clearTimeout(pvp.recoveryRetryTimer);
+      pvp.connectionLost=false;pvp.recoveryRequested=false;pvp.remotePaused=false;pvp.remoteChoosing=null;
+      this.pvpPausedByRemote=false;
+      document.getElementById('modal-pvp-wait').style.display='none';
+      this.paused=Boolean(pvp.brPaused || pvp.manualPaused || pvp.choosing);
+      return;
+    }
     if (pvp.mode === 'pvp' && /соперник выбыл/i.test(String(message || ''))) {
       this.recordAchievementCounter('pvpEliminations');
       this.recordAchievementCounter('pvpWins');
@@ -8947,6 +9289,11 @@ class Game {
         return;
       }
       const p = this.player;
+      const now=performance.now();
+      if(pvp.host)for(const grant of pvp.equipmentGrants?.values() || []) {
+        if(now-grant.at>=1000){this.sendEquipmentMessage(grant.uid,{type:'equipment-grant',item:grant.item});grant.at=now;}
+      }
+      if(pvp.pendingEquipmentClaim && now-pvp.pendingEquipmentClaim.at>2500)pvp.pendingEquipmentClaim=null;
       const state = {
         x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10),
         maxHp: Math.round(p.maxHp), shield: p.shieldTimer > 0, level: this.level,
@@ -8970,7 +9317,7 @@ class Game {
       const brRosterReady = this.pvp.classSelectionPending !== true
         && Number.isFinite(Number(this.pvp.spawnGraceUntil))
         && performance.now() >= Number(this.pvp.spawnGraceUntil);
-      if (this.pvp.host && !this.isBattleRoyale && (Number(pvp.actualPlayerCount) >= 3 || this.botController?.bots.size) && !pvp.classSelectionPending) {
+      if (this.pvp.host && !this.isBattleRoyale && Number(pvp.actualPlayerCount) >= 2 && !pvp.classSelectionPending) {
         const participants = pvp.matchPlayerUids || [];
         const alive = participants.filter(uid => uid === pvp.uid ? p.hp > 0 : pvp.remotePlayers?.[uid]?.state && !pvp.remotePlayers[uid].state.over && pvp.remotePlayers[uid].state.hp > 0);
         const allKnown = participants.every(uid => uid === pvp.uid || pvp.remotePlayers?.[uid]?.state);
@@ -8994,14 +9341,14 @@ class Game {
         const survivors = alive.filter(member => !member.over);
         if (alive.length === this.pvp.actualPlayerCount && survivors.length <= 1) {
           this.pvp.brWinnerSent = true;
-          this.cleanupPvpRoom();
           const winner = survivors[0] || null;
-          this.sendPvpNetworkMessage({ type: 'br-winner', winner: winner?.name || '', winnerUid: winner?.uid || null });
+          this.sendPvpNetworkMessage({ type: 'br-winner', winner: winner?.name || '', winnerUid: winner?.uid || null }, null, true);
           if (winner?.uid === this.pvp.uid) {
             this.gameOver('Вы победили: все соперники выбыли.', { victory: true });
             return;
           }
           this.pvp.matchOver = true;
+          this.cleanupPvpRoom();
           this.paused = true;
           this.showBanner(winner ? `🏆 ПОБЕДИТЕЛЬ BATTLE ROYALE: ${this.escapeHtml(winner.name)}` : 'BATTLE ROYALE ЗАВЕРШИЛСЯ БЕЗ ПОБЕДИТЕЛЯ');
           if (this.pvpTimer) clearInterval(this.pvpTimer);
@@ -9245,16 +9592,10 @@ class Game {
     if (this.pvp.host) {
       this.processPvpGuestWorldActions(this.pvp.opponentUid || 'remote', state);
     }
-    if (state.over && (this.isBattleRoyale || Number(this.pvp.actualPlayerCount) >= 3)) {
-      if (this.isBattleRoyale && this.pvp.host && this.pvp.remotePlayer?.uid) {
-        this.markBattleRoyalePlayerEliminated(this.pvp.remotePlayer.uid, 'Соперник выбыл.');
-        return;
-      }
+    if (state.over && this.pvp.started) {
       if (this.pvp.remotePlayer) this.pvp.remotePlayer.state = { ...state, over: true };
       this.pvp.remotePlayers ||= {};
       if (this.pvp.remotePlayer?.uid) this.pvp.remotePlayers[this.pvp.remotePlayer.uid] = this.pvp.remotePlayer;
-    } else if (state.over && !this.pvp.matchOver && !this.pvp.opponentLost) {
-      this.handlePvpOpponentLost('Соперник выбыл. Ваш забег продолжается.', !this.pvp.host);
     }
   }
 
@@ -9464,6 +9805,7 @@ class Game {
   }
 
   async restartFromGameOver() {
+    if(this.blockHostExit())return;
     const wasDaily = Boolean(this.isDailyRun && !this.pvp);
     if (this.pvp) await this.leavePvpRoom();
     this.start(wasDaily ? { daily: true } : {soloModifiers:[...(this.patchSoloIds||[])]});
@@ -9588,6 +9930,9 @@ class Game {
   async leavePvpRoom({ keepMenuOpen = false } = {}) {
     const pvp = this.pvp;
     if (!pvp) return;
+    if(this.blockHostExit())return false;
+    this.spectatorMode=false;this.spectatorCamera=null;this.spectatorDrag=null;
+    document.getElementById('spectator-hud').hidden=true;
     pvp.leaving = true;
     this.botController = null;
     this.killFeed.reset();
@@ -10639,7 +10984,9 @@ class Game {
     return item.shopKind === 'consumable' ? this.canBuyConsumableItem(key) : this.hasInventorySpaceFor(key);
   }
   canCombinePassiveItem(key) {
-    return Object.values(STORE_RECIPES).some(recipe => {
+    return Object.entries(STORE_RECIPES).some(([comboKey,recipe]) => {
+      const limit=this.getShopPassiveDef(comboKey)?.maxOwned;
+      if(limit && this.getOwnedShopItemCount(comboKey)>=limit)return false;
       if (!recipe.parts.includes(key)) return false;
       const available = new Map();
       for (const slot of [...this.shopPassives, ...(this.backpack || [])]) if (slot) available.set(slot.key, (available.get(slot.key) || 0) + (slot.count || 1));
@@ -10694,6 +11041,8 @@ class Game {
     while (changed) {
       changed = false;
       for (const [comboKey, combo] of orderedRecipes) {
+        const limit=this.getShopPassiveDef(comboKey)?.maxOwned;
+        if(limit && this.getOwnedShopItemCount(comboKey)>=limit)continue;
         const locations = [];
         const used = new Map();
         for (const part of combo.parts) {
@@ -10832,10 +11181,15 @@ class Game {
     const cleanBoolean = {};
     for (const flag of booleanStats) cleanBoolean[flag] = Boolean(this.player[flag]);
 
+    const appliedUniqueItems=new Set();
     for (const slot of this.shopPassives || []) {
       if (!slot || this.isConsumableSlot(slot)) continue;
       delete slot.inactive;
-      const copies = Math.max(1, Number(slot.count) || 1);
+      const definition=this.getShopPassiveDef(slot.key);
+      const unique=(Number(definition?.tier)||(definition?.parts?2:1))>=2;
+      if(unique && appliedUniqueItems.has(slot.key))continue;
+      if(unique)appliedUniqueItems.add(slot.key);
+      const copies = unique?1:Math.max(1, Number(slot.count) || 1);
       for (let i = 0; i < copies; i++) this.applyShopItemRecursive(slot.key);
     }
     for (const slot of this.backpack || []) {
@@ -11137,12 +11491,13 @@ class Game {
     const missingItem = missingKey ? this.getShopCatalogItem(missingKey) : null;
     const missingCost = missingItem ? this.getShopItemTotalCost(missingKey) : 0;
     const canPurchase = missingItem && this.canBuyShopItem(missingKey);
-    buy.disabled = Boolean(selected) || !canPurchase;
-    buy.textContent = item.parts ? (missingItem ? `Купить компонент · ${missingCost} 💰` : 'Уже собрано') : `Купить · ${totalCost} 💰`;
+    const reachedLimit=Boolean(item.maxOwned && this.getOwnedShopItemCount(item.key)>=item.maxOwned);
+    buy.disabled = Boolean(selected) || reachedLimit || !canPurchase;
+    buy.textContent = reachedLimit?'Уже есть · один экземпляр':item.parts ? (missingItem ? `Купить компонент · ${missingCost} 💰` : 'Уже собрано') : `Купить · ${totalCost} 💰`;
     buy.title = missingItem ? `${missingItem.name} · ${missingCost} 💰` : '';
     buyFull.style.display = item.parts && !selected ? '' : 'none';
     buyFull.textContent = `Купить весь комплект · ${remainingCost} 💰`;
-    buyFull.disabled = Boolean(selected) || this.currency < remainingCost || !this.canFitShopPurchasePlan(purchasePlan, item.key);
+    buyFull.disabled = Boolean(selected) || reachedLimit || this.currency < remainingCost || !this.canFitShopPurchasePlan(purchasePlan, item.key);
     sell.style.display = selected ? '' : 'none';
     if (selected) sell.textContent = `Продать · ${this.getShopSellRefund(item.key)} 💰`;
   }
@@ -11176,6 +11531,8 @@ class Game {
   }
 
   canFitShopPurchasePlan(plan, preferredRecipeKey = null) {
+    const targetLimit=this.getShopPassiveDef(preferredRecipeKey)?.maxOwned;
+    if(targetLimit && this.getOwnedShopItemCount(preferredRecipeKey)>=targetLimit)return false;
     const virtual = [
       ...(this.shopPassives || []).map(slot => slot && ({ ...slot })),
       ...(this.backpack || []).map(slot => slot && ({ ...slot }))
@@ -11185,6 +11542,8 @@ class Game {
       while (combined) {
         combined = false;
         for (const [comboKey, combo] of recipes) {
+          const limit=this.getShopPassiveDef(comboKey)?.maxOwned;
+          if(limit && virtual.reduce((count,slot)=>count+(slot?.key===comboKey?(slot.count||1):0),0)>=limit)continue;
           const indices = [], used = new Map();
           for (const part of combo.parts) {
             const index = virtual.findIndex((slot, i) => (used.get(i) || 0) < (slot?.count || 1) && slot?.key === part && (slot.count || 1) > 0);
@@ -11211,6 +11570,8 @@ class Game {
     };
     const stepRecipes = this.getOrderedShopRecipes(preferredRecipeKey, preferredRecipeKey);
     for (const key of plan) {
+      const limit=this.getShopPassiveDef(key)?.maxOwned;
+      if(limit && virtual.reduce((count,slot)=>count+(slot?.key===key?(slot.count||1):0),0)>=limit)return false;
       let free = virtual.slice(0, 6).findIndex(slot => !slot);
       if (free < 0) {
         const bagFree = virtual.slice(6, 9).findIndex(slot => !slot);
@@ -11326,6 +11687,7 @@ class Game {
     if (this.selectedShopInventory) return;
     const item = this.getShopCatalogItem(this.selectedShopItemKey);
     if (!item) return;
+    if(item.maxOwned && this.getOwnedShopItemCount(item.key)>=item.maxOwned)return;
     const key = item.parts ? this.findMissingShopComponent(item.key, new Set(), true) : item.key;
     const next = key && this.getShopCatalogItem(key);
     if (!next || !this.canBuyShopItem(key)) return;
@@ -11337,6 +11699,7 @@ class Game {
     if (this.selectedShopInventory) return;
     const target = this.getShopCatalogItem(this.selectedShopItemKey);
     if (!target?.parts) return;
+    if(target.maxOwned && this.getOwnedShopItemCount(target.key)>=target.maxOwned)return;
     const plan = this.getShopPurchasePlan(target.key);
     const total = this.getShopPlanTotalCost(plan);
     const targetCountBefore = this.getOwnedShopItemCount(target.key);
@@ -11631,7 +11994,7 @@ class Game {
 
   syncPvpHostWindowActivity() {
     const pvp = this.pvp;
-    if (!pvp?.host || !pvp.started || pvp.matchOver || pvp.eliminated) return;
+    if (!pvp?.host || !pvp.started || pvp.matchOver) return;
     const active = !document.hidden && document.hasFocus();
     if (!active) {
       if (pvp.hostInactivePause || this.paused) return;
@@ -12437,6 +12800,7 @@ class Game {
   }
 
   spawnBrSupply() {
+    if(!this.isBattleRoyale || (this.pvp && !this.pvp.host))return;
     const center = this.MAP_SIZE / 2;
     const angle = Math.random() * Math.PI * 2;
     const radius = this.getBattleRoyaleSafeRadius() * (0.35 + Math.random() * 0.45);
@@ -12444,8 +12808,14 @@ class Game {
     const y = Math.max(this.BOUND_MIN + 80, Math.min(this.BOUND_MAX - 80, center + Math.sin(angle) * radius));
     const consumableKeys = Object.keys(CONSUMABLES_DEF);
     const consumableKey = consumableKeys[Math.floor(Math.random() * consumableKeys.length)];
-    this.pickups.push({ x, y, type: 'br_supply', consumableKey, icon: '📦' });
-    this.announceOfficeEvent('📦 В Battle Royale сброшена поставка! Внутри случайный расходник — успейте добраться.');
+    const number=(this.brSupplyCount||0)+1;
+    this.brSupplyCount=number;
+    const tier=number<=3?1:number<=6?2:3;
+    const pool=this.getShopCatalogItems().filter(item=>item.shopKind!=='consumable' && (Number(item.tier)||(item.parts?2:1))===tier);
+    const equipment=pool[Math.floor(Math.random()*pool.length)];
+    if(equipment)this.addEquipmentPickup(x,y,equipment.key,{type:'br_supply',icon:'📦',tier,supplyNumber:number});
+    this.pickups.push({x:x+24,y,type:'consumable',consumableKey,icon:CONSUMABLES_DEF[consumableKey].icon});
+    this.announceOfficeEvent(`📦 Аирдроп №${number}: предмет ${['I','II','III'][tier-1]} тира и случайный расходник!`);
   }
 
   announceOfficeEvent(message) {
@@ -14860,6 +15230,7 @@ class Game {
       const pdx = this.player.x - item.x;
       const pdy = this.player.y - item.y;
       if (this.player.hp > 0 && !this.pvp?.eliminated && pdx * pdx + pdy * pdy < 32 * 32) {
+        if(this.isEquipmentPickup(item)){this.requestEquipmentPickup(item);continue;}
         if (item.type === 'banana' && this.player.hp >= this.player.maxHp - 0.0001) continue;
         if ((item.type === 'br_supply' || item.type === 'consumable') && !this.canAddConsumableToInventory(item.consumableKey)) {
           if (!item.fullInventoryNotified) {
@@ -15518,7 +15889,7 @@ class Game {
     this.rudesktopSkillFrame = null;
     this.rudesktopRescueState = null;
     document.getElementById('modal-rudesktop-rescue').style.display = 'none';
-    const multiplayerElimination = Boolean((this.isBattleRoyale || Number(this.pvp?.actualPlayerCount) >= 3 || this.botController?.bots.size) && this.pvp?.started && !victory && this.player?.hp <= 0);
+    const multiplayerElimination = Boolean(this.pvp?.started && !victory && this.player?.hp <= 0);
     if (multiplayerElimination && this.pvp.eliminated) return;
     if (victory && this.isBattleRoyale && this.pvp?.started && !this.pvp.brAchievementWinRecorded) {
       this.pvp.brAchievementWinRecorded = true;
@@ -15611,6 +15982,8 @@ class Game {
     document.getElementById('submit-status').innerText = '';
     document.getElementById('btn-submit-score').disabled = false;
     document.getElementById('modal-gameover').style.display = 'flex';
+    document.getElementById('gameover-spectate-button').style.display=this.player?.hp<=0?'':'none';
+    if(this.player?.hp<=0)this.enterSpectatorMode();
   }
 
   getFinalLoadout(reason = '') {
@@ -15621,7 +15994,7 @@ class Game {
   }
 
   async cleanupPvpRoom(pvp = this.pvp, attempt = 0) {
-    if (!pvp?.host || !pvp.code || pvp.roomCleanupStarted || pvp.localOnly) return;
+    if (!pvp?.host || !pvp.code || pvp.roomCleanupStarted || pvp.localOnly || (pvp.started && !pvp.matchOver && !pvp.brWinnerSent && !pvp.opponentLost)) return;
     pvp.roomCleanupStarted = true;
     try {
       const fb = await window.firebaseLeaderboardReady;
@@ -16466,7 +16839,7 @@ class Game {
 
   getGlyphSprite(glyph, font, fillStyle) {
     if (!glyph || typeof document === 'undefined' || !document.createElement) return null;
-    const scale = (this.pixelRatio || 1) * (this.cameraZoom || 1);
+    const scale = (this.pixelRatio || 1) * this.getRenderCamera().zoom;
     if (this._glyphCacheScale !== scale || !this._glyphCache) {
       this._glyphCache = new Map();
       this._glyphCacheScale = scale;
@@ -16568,11 +16941,12 @@ class Game {
   render(dt = 1 / 60) {
     this.ctx.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
 
-    const zoom = this.cameraZoom || 1;
+    const camera = this.getRenderCamera();
+    const zoom = camera.zoom;
     const viewWidth = this.viewportWidth / zoom;
     const viewHeight = this.viewportHeight / zoom;
-    const camX = this.player.x - viewWidth / 2;
-    const camY = this.player.y - viewHeight / 2;
+    const camX = camera.x - viewWidth / 2;
+    const camY = camera.y - viewHeight / 2;
     const camRight = camX + viewWidth;
     const camBottom = camY + viewHeight;
     // Skip canvas work for off-screen entities. The margin accounts for labels,
@@ -16583,7 +16957,7 @@ class Game {
     this.ctx.save();
     this.ctx.translate(this.viewportWidth / 2, this.viewportHeight / 2);
     this.ctx.scale(zoom, zoom);
-    this.ctx.translate(-this.player.x, -this.player.y);
+    this.ctx.translate(-camera.x, -camera.y);
 
     // Fill the arena with a cached repeating checkerboard pattern.
     this.ctx.fillStyle = '#0a0a0a';
@@ -17282,6 +17656,8 @@ class Game {
     this.ctx.restore();
 
     this.drawMegaBossAtmosphere(dt);
+    this.renderNearestAirdropIndicator(camera);
+    this.updateSpectatorHud();
 
     if (this.player.hasSecondMonitor) {
       const margin = 38;
@@ -17384,6 +17760,9 @@ class Game {
     this.lastTime = frameTime;
     let frameHadError = false;
     let updateSucceeded = false;
+    if(this.spectatorMode && this.pvp?.started && !this.pvp.matchOver && !this.gameFrameFaultActive && !this.integrationShopWait) {
+      this.paused=Boolean(this.pvp.brPaused || this.pvp.manualPaused || this.pvpPausedByRemote || this.pvp.classSelectionPending);
+    }
 
     try {
       if (!this.paused) {
@@ -18240,6 +18619,12 @@ const PATCH300_EVENTS = [
 ];
 
 installPatch300();
+// Apply after all catalog extensions so shop, recipes and world loot share the limit.
+for(const catalog of [STORE_PASSIVES_DEF,STORE_ACTIVES_DEF,STORE_RECIPES]) {
+  for(const item of Object.values(catalog)) {
+    if((Number(item.tier)||(item.parts?2:1))>=2)item.maxOwned=1;
+  }
+}
 /* END PATCH300 EXTENSION */
 
 window.onload = () => {

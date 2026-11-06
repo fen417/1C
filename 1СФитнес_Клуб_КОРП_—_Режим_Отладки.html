@@ -1200,10 +1200,12 @@
   .knowledge-body { flex:1; min-height:0; display:flex; flex-direction:column; gap:9px; overflow:hidden; }
   #knowledge-tabs { display:flex; gap:5px; flex-wrap:wrap; }
   #knowledge-tabs .selected { background:#ffd200; }
-  #knowledge-list { overflow:auto; min-height:0; flex:1; display:flex; flex-direction:column; gap:16px; touch-action:pan-y; }
+  #knowledge-list { overflow:auto; scrollbar-gutter:stable; min-height:0; flex:1; display:flex; flex-direction:column; gap:16px; touch-action:pan-y; }
   .knowledge-section { flex:none; min-width:0; }
-  .knowledge-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; align-items:start; }
-  .knowledge-column { display:flex; flex-direction:column; gap:9px; min-width:0; }
+  .knowledge-columns { display:flex; flex-direction:column; gap:9px; }
+  .knowledge-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; align-items:start; }
+  .knowledge-description-block { display:flow-root; min-height:var(--knowledge-description-height,0px); }
+  .knowledge-footer { display:flow-root; min-height:var(--knowledge-footer-height,0px); }
   .knowledge-section-title { margin:0 0 8px; padding-bottom:6px; border-bottom:1px solid #c8cdd3; color:#216541; font-size:14px; }
   .knowledge-section[data-group^=legendary] .knowledge-section-title { color:#8a570f; border-color:#b77900; }
   .knowledge-section-description { margin:0 0 9px; color:#72531e; font-size:12px; line-height:1.5; }
@@ -1220,7 +1222,7 @@
   .knowledge-card[data-category=events],.knowledge-card[data-category=modifiers] { --knowledge-accent:#a33030; }
   .knowledge-card[data-tier="3"] { --knowledge-accent:#8a570f; }.knowledge-card[data-tier="4"] { --knowledge-accent:#69449d; }
   .knowledge-card[data-legendary=true] { --knowledge-accent:#8a570f; border:2px solid #b77900; background:#fffdf4; }
-  .knowledge-card h3 { font-size:14px; margin:-11px -11px 9px; padding:9px 11px; color:var(--knowledge-accent); background:#f4f6f8; border-bottom:1px solid #e1e5e9; }
+  .knowledge-card h3 { box-sizing:border-box; min-height:var(--knowledge-title-height,0px); font-size:14px; margin:-11px -11px 9px; padding:9px 11px; color:var(--knowledge-accent); background:#f4f6f8; border-bottom:1px solid #e1e5e9; }
   .knowledge-card p { font-size:12px; line-height:1.65; margin-bottom:6px; color:#3c4651; }
   .knowledge-card details { margin-top:9px; border-top:1px solid #e1e5e9; font-size:11px; line-height:1.5; }
   .knowledge-card summary { padding:7px 0 2px; color:var(--knowledge-accent); font-size:11px; font-weight:bold; cursor:pointer; }
@@ -1229,7 +1231,7 @@
   #modal-knowledge .knowledge-bonus { color:#216541; }#modal-knowledge .knowledge-penalty { color:#a33030; }#modal-knowledge .knowledge-value { color:#205c94; }
   #modal-knowledge .knowledge-class-bonus { color:#b77900; font-weight:bold; }
   .knowledge-card span.knowledge-bonus,.knowledge-card span.knowledge-penalty,.knowledge-card span.knowledge-value { font-weight:bold; }
-  @media(max-width:650px) { .solo-modifier-list,.knowledge-columns { grid-template-columns:1fr; } }
+  @media(max-width:650px) { .solo-modifier-list,.knowledge-row { grid-template-columns:1fr; } }
   @media (max-width:1300px) and (pointer:coarse) { #hud-kill-feed { top:76px; right:8px; gap:2px; } .kill-feed-row { font-size:10px; gap:5px; } .kill-feed-name { max-width:110px; } .kill-feed-icon { font-size:15px; } }
   #sales-call.hud-size-custom { transform:scale(var(--hud-scale)); transform-origin:top left; }
   #modal-hud-editor { z-index:290; padding:12px; background:rgba(5,10,18,.96); }
@@ -1684,7 +1686,7 @@
           <p><b>Ранний забег и навыки.</b> Первые волны немного меньше, после шестой минуты возвращается прежний лимит. До появления первого большого босса игроки и боты получают больше опыта; дробный остаток бонуса накапливается. Фиткоины от этой прибавки не меняются. Блокировка Sigur и аварийный ИБП перезаряжаются быстрее. Радиусы блокировки Sigur и ауры «Сброс Кэша Сеансов» заметнее растут с уровнем. Динамическое обновление отключено в PvP и BR — по клавише, кнопке и ботам. В одиночной игре и PvE оно сохранено. Порыв офисного ветра стал продолжительнее, сохранились предупреждение и плавное нарастание силы.</p>
           <h4>Исправления ошибок</h4>
           <p><b>Стрелки и контроль боссов.</b> Индивидуальный интервал стрельбы больше не заменяется общим после первого выстрела. Следы кроссовок, активные навыки, предметы, оружие и ветер больше не сдвигают больших боссов и их части. Краткая заморозка от взрыва поджога с замедлением тоже учитывает иммунитет.</p>
-          <p><b>Карточки и радиусы.</b> Карточки базы знаний находятся в независимых колонках: раскрытие одной не растягивает соседнюю пустым блоком. При смене ширины окна сохраняются раскрытые характеристики. Боевые радиусы согласованы с отрисовкой, описаниями и сравнением улучшений.</p>
+          <p><b>Карточки и радиусы.</b> Карточки базы знаний выровнены попарно по заголовкам, описаниям и строкам раскрытия. Открытие подробностей увеличивает только выбранную карточку, соседняя не растягивается пустым блоком. Следующие ряды начинаются на общей горизонтали. При смене ширины окна выравнивание пересчитывается, раскрытые характеристики сохраняются. Боевые радиусы согласованы с отрисовкой, описаниями и сравнением улучшений.</p>
         </details>
         <details class="release-notes patch-minor"><summary><h3>3.0.0 — «Продакшн живой. Пока»</h3></summary>
           <p><b>Исправления боя.</b> У каждой из трёх частей комитета теперь отдельная треть HP босса и постоянная способность. Части уничтожаются навсегда, а победа засчитывается после уничтожения всех трёх. Диск ИТС и завершение сеансов воздействуют на части по правилам боссов. Стартовые волны появляются немного реже, а обычные враги имеют чуть меньше HP и урона; послабление плавно исчезает к пятой минуте. «Согласующий» создаёт круг только в пределах 520 м, не атакует во время заморозки, перезаряжается 6,5 с и предупреждает об ударе за 1,4 с. Между кругами группы согласующих выдерживается минимум 2,5 с.</p>
@@ -5821,8 +5823,10 @@ class Game {
     this.syncMobileDynamicButtonLabel();
     if (this.activeChallenge) this.updateChallengeUI();
     const knowledgeList = document.getElementById('knowledge-list');
-    if (document.getElementById('modal-knowledge')?.style.display === 'flex' &&
-        Number(knowledgeList.dataset.columns) !== (window.matchMedia('(max-width:650px)').matches ? 1 : 2)) this.renderKnowledgeBase();
+    if (document.getElementById('modal-knowledge')?.style.display === 'flex') {
+      if (Number(knowledgeList.dataset.columns) !== (window.matchMedia('(max-width:650px)').matches ? 1 : 2)) this.renderKnowledgeBase();
+      else this.scheduleKnowledgeAlignment();
+    }
     this.hudLayout?.scheduleApply();
   }
 
@@ -17609,6 +17613,41 @@ const PATCH300_METHODS = {
   },
   closeKnowledgeBase() {document.getElementById('modal-knowledge').style.display='none';document.getElementById(this.knowledgeReturn||'modal-main-menu').style.display='flex';this.setMobileMenuScroll(true);},
   setKnowledgeTab(tab) {this.knowledgeTab=tab;this.renderKnowledgeBase();},
+  scheduleKnowledgeAlignment() {
+    if (this.knowledgeAlignmentFrame) cancelAnimationFrame(this.knowledgeAlignmentFrame);
+    this.knowledgeAlignmentFrame = requestAnimationFrame(()=>{
+      this.knowledgeAlignmentFrame = null;
+      this.alignKnowledgeCards();
+    });
+  },
+  alignKnowledgeCards() {
+    if (document.getElementById('modal-knowledge')?.style.display !== 'flex') return;
+    const rows = [...document.getElementById('knowledge-list').querySelectorAll('.knowledge-row')];
+    for (const row of rows) {
+      row.style.removeProperty('--knowledge-title-height');
+      row.style.removeProperty('--knowledge-description-height');
+      row.style.removeProperty('--knowledge-footer-height');
+    }
+    const measurements = rows.filter(row=>row.children.length>1).map(row=>{
+      const cards = [...row.children];
+      const title = Math.ceil(Math.max(...cards.map(card=>card.querySelector('h3').getBoundingClientRect().height)));
+      const description = Math.ceil(Math.max(...cards.map(card=>card.querySelector('.knowledge-description-block').getBoundingClientRect().height)));
+      // Only measure the closed header of details, never their expanded contents.
+      const footer = Math.ceil(Math.max(...cards.map(card=>{
+        const details = card.querySelector('.knowledge-footer > details');
+        if (!details) return 0;
+        const style = getComputedStyle(details);
+        return details.querySelector('summary').getBoundingClientRect().height +
+          (parseFloat(style.marginTop)||0) + (parseFloat(style.borderTopWidth)||0);
+      })));
+      return {row,title,description,footer};
+    });
+    for (const {row,title,description,footer} of measurements) {
+      row.style.setProperty('--knowledge-title-height',`${title}px`);
+      row.style.setProperty('--knowledge-description-height',`${description}px`);
+      row.style.setProperty('--knowledge-footer-height',`${footer}px`);
+    }
+  },
   knowledgeAbilityLink(key) {
     const def = WEAPONS_DEF[key] || PASSIVES_DEF[key] || ACTIVE_SKILLS_DEF[key] || COMBAT_UPGRADES[key];
     if (!def) return null;
@@ -17824,10 +17863,11 @@ const PATCH300_METHODS = {
         const description = document.createElement('p');description.className = 'knowledge-section-description';description.textContent = group.description;section.appendChild(description);
       }
       const layout = document.createElement('div');layout.className = 'knowledge-columns';
-      const columns = Array.from({length:columnCount},()=>{const column=document.createElement('div');column.className='knowledge-column';layout.appendChild(column);return column;});
       section.appendChild(layout);
       let index = 0;
+      let row = null;
       for(const entry of members){
+      if(index++%columnCount===0){row=document.createElement('div');row.className='knowledge-row';layout.appendChild(row);}
       const article=document.createElement('article');
       article.className='knowledge-card';
       article.dataset.category=this.knowledgeTab;
@@ -17838,12 +17878,16 @@ const PATCH300_METHODS = {
       const title=document.createElement('h3');
       title.textContent=`${entry.icon||'📖'} ${entry.name}`;
       article.appendChild(title);
+      const descriptionBlock=document.createElement('div');
+      descriptionBlock.className='knowledge-description-block';
       for(const part of entry.descriptions){
         const desc=document.createElement('p');
         desc.className='knowledge-description';
         this.appendKnowledgeText(desc,part.text,part.tone);
-        article.appendChild(desc);
+        descriptionBlock.appendChild(desc);
       }
+      article.appendChild(descriptionBlock);
+      const footer=document.createElement('div');footer.className='knowledge-footer';
       if(entry.details.length){
         const details=document.createElement('details');
         details.open=expanded.has(`${this.knowledgeTab}:${entry.key||entry.name}`);
@@ -17874,13 +17918,23 @@ const PATCH300_METHODS = {
           }else this.appendKnowledgeText(line,value);
           details.appendChild(line);
         }
-        article.appendChild(details);
+        footer.appendChild(details);
       }
-      columns[index++%columnCount].appendChild(article);
+      article.appendChild(footer);
+      row.appendChild(article);
       }
       box.appendChild(section);
     }
     if(!visible.length)box.textContent='По этому запросу ничего не найдено.';
+    this.scheduleKnowledgeAlignment();
+    if (!this.knowledgeResizeObserver) {
+      this.knowledgeResizeObserver = new ResizeObserver(()=>{
+        if (this.knowledgeLayoutWidth === box.clientWidth) return;
+        this.knowledgeLayoutWidth = box.clientWidth;
+        this.scheduleKnowledgeAlignment();
+      });
+      this.knowledgeResizeObserver.observe(box);
+    }
   }
 };
 

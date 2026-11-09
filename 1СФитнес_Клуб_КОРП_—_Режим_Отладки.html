@@ -677,6 +677,19 @@
   .main-menu-layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; }
   .main-menu-actions { display: flex; flex-direction: column; gap: 9px; }
   .main-menu-actions .btn-1c { padding: 11px 14px; text-align: left; }
+  #global-chat { grid-column:1/-1; min-width:0; padding:9px; border:1px solid #c6cbd0; background:#fff; font-size:11px; }
+  .global-chat-head { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px; }
+  #global-chat h3 { margin:0; font-size:12px; color:#5d4720; }
+  #global-chat-retry { border:0; background:none; color:#28649a; cursor:pointer; font-size:10px; }
+  #global-chat-messages { height:180px; min-height:90px; overflow:auto; overscroll-behavior:contain; overflow-wrap:anywhere; border-block:1px solid #e5e9ed; padding:5px 0; }
+  .global-chat-message { margin:0 0 7px; line-height:1.4; white-space:pre-wrap; }
+  .global-chat-message time { display:block; color:#848b93; font-size:9px; white-space:normal; }
+  .global-chat-message b { color:#28649a; }
+  .global-chat-message.own b { color:#218252; }
+  #global-chat-form { display:flex; gap:5px; margin-top:7px; }
+  #global-chat-input { flex:1; min-width:0; width:auto; font-size:12px; }
+  #global-chat #global-chat-send { padding:6px 9px; text-align:center; }
+  #global-chat-status { margin:6px 0 0; min-height:14px; color:#6d7882; font-size:10px; line-height:1.3; }
   #modal-player-skin .skin-window { width:min(560px,96vw); }
   .skin-help { font-size:12px; line-height:1.5; margin-bottom:10px; }
   .skin-editor-layout { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; align-items:center; }
@@ -974,17 +987,26 @@
   #lb-body tr.leaderboard-record:hover, #lb-body tr.leaderboard-record:focus { background:#fff2b3; outline:2px solid #d4af00; outline-offset:-2px; }
   #modal-record-detail { z-index:360; }
   #record-detail-content { max-height:min(72vh,720px); overflow:auto; }
+  .record-profile { display:flex; gap:20px; align-items:center; padding:15px; margin-bottom:14px; border:1px solid #c5cbd1; background:#f8f9fa; }
+  .record-avatar { flex:0 0 120px; text-align:center; }
+  #record-skin-canvas { display:block; width:110px; height:110px; margin:0 auto 6px; }
+  #record-skin-label { display:block; font-size:10px; color:#68717b; }
+  .record-profile h2 { font-size:24px; margin:0 0 5px; overflow-wrap:anywhere; }
+  .record-profile p { margin:0 0 5px; font-size:13px; }
+  .record-profile small { color:#6b7681; font-size:11px; }
+  .record-profile > div:last-child { min-width:0; overflow-wrap:anywhere; }
   .record-detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
-  .record-detail-stat { padding:7px; border:1px solid #dfe6e9; background:#f8f9fa; }
-  .record-detail-stat b { display:block; color:#777; font-size:10px; margin-bottom:3px; }
+  .record-detail-stat { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.85fr); border:1px solid #d1d7dd; background:#fff; }
+  .record-detail-stat b { padding:8px; color:#333; font-size:11px; background:#f0f2f4; overflow-wrap:anywhere; }
+  .record-detail-stat > span { padding:8px; border-left:1px solid #d1d7dd; font-size:12px; overflow-wrap:anywhere; }
   .record-detail-section { margin:12px 0 5px; font-size:13px; }
   .record-detail-list { margin:0; padding-left:20px; }
   .record-detail-list li { margin:3px 0; }
-  .record-item { margin:6px 0 !important; }
+  .record-item { margin:6px 0 !important; padding:7px; border:1px solid #d1d7dd; background:#fff; list-style:none; }
   .record-item-title { display:flex; justify-content:space-between; gap:10px; }
   .record-item-title b { white-space:nowrap; }
   .record-item small { display:block; margin:2px 0 0 24px; color:#666; font-size:11px; }
-  @media (max-width:600px) { .record-detail-grid { grid-template-columns:1fr 1fr; gap:5px; } #record-detail-content { max-height:68vh; font-size:11px; } }
+  @media (max-width:600px) { .record-detail-grid { grid-template-columns:1fr 1fr; gap:5px; } .record-detail-stat { display:block; } .record-detail-stat b,.record-detail-stat > span { display:block; border:0; padding:5px; } .record-profile { padding:10px; gap:10px; } .record-avatar { flex-basis:90px; } #record-skin-canvas { width:80px; height:80px; } .record-profile h2 { font-size:20px; } #record-detail-content { max-height:68vh; font-size:11px; } }
 
   .btn-1c {
     background: #eaeaea;
@@ -1494,6 +1516,12 @@
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
             <div class="main-menu-version">Текущая версия: <b>3.2.2</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <section id="global-chat" aria-labelledby="global-chat-title">
+              <div class="global-chat-head"><h3 id="global-chat-title" title="Последние 50 сообщений. История старше 7 дней удаляется.">💬 Общий чат</h3><button id="global-chat-retry" type="button" onclick="game.chat.connect()">Обновить</button></div>
+              <div id="global-chat-messages" role="log" aria-live="polite" aria-relevant="additions text"><span>Для чата войдите в аккаунт.</span></div>
+              <form id="global-chat-form"><input id="global-chat-input" class="input-1c" type="text" maxlength="300" autocomplete="off" placeholder="Сообщение всем…" aria-label="Сообщение в общий чат" disabled><button id="global-chat-send" class="btn-1c" type="submit" aria-label="Отправить сообщение" disabled>➤</button></form>
+              <p id="global-chat-status" role="status">Общий для всех игроков.</p>
+            </section>
           </div>
           <div>
             <div class="release-notes">
@@ -1501,7 +1529,7 @@
               <p><b>Обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
               <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
               <p><b>Патч 3.2.1.</b> М.В. медленнее в PvP и BR; большие боссы отключены в Battle Royale.</p>
-              <p><b>Патч 3.2.2.</b> Покупка перебросов в магазине, собственный скин аккаунта с кадрированием и показом в онлайне. Добавлено редкое событие с ослабленным М.В.; усилены штрафы мультивыстрела и рикошета.</p>
+              <p><b>Патч 3.2.2.</b> Перебросы в магазине, скины аккаунта и их снимки в карточках рекордов, общий чат в главном меню. Добавлено редкое событие с ослабленным М.В.; усилены штрафы мультивыстрела и рикошета.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 3.1.0 — «Зона ответственности»</h3>
@@ -1777,9 +1805,13 @@
           <h5>Нововведения</h5>
           <p><b>Платные перебросы.</b> В магазине можно докупить пакет из трёх перебросов карточек прокачки за 750 фиткоинов. Покупки повторяются, пока хватает денег; перебросы прибавляются к оставшимся и действуют до конца текущего забега. Цена фиксирована и не растёт от звонков отдела продаж. Пакет не занимает место в инвентаре и доступен в режимах, где разрешены перебросы карточек.</p>
           <p><b>Скин аккаунта.</b> Кнопка «Мой скин» в главном меню открывает загрузку, кадрирование с перетаскиванием и масштабом, предпросмотр и автоматическое сжатие изображения. На аккаунте хранится один скин; его можно заменить или сбросить на стандартный значок. В обычном состоянии скин круглый, после перехода на 8.5 — квадратный со скруглёнными углами. Скины видны другим игрокам в PvP, PvE и Battle Royale.</p>
+          <p><b>Карточка рекорда.</b> Вверху показаны сохранённый скин, ник, класс и режим забега. Снимок сохраняет форму персонажа и не меняется при замене или сбросе скина в аккаунте. Старые записи без снимка показывают стандартный «1С». Характеристики и списки снаряжения оформлены отдельными блоками.</p>
+          <p><b>Общий чат.</b> Под кнопками главного меню появились последние сообщения всех игроков с ником, датой и временем отправки. Чат обновляется в реальном времени; писать могут игроки с подключённым аккаунтом. Ник берётся из профиля, время назначает сервер. Добавлены ограничение длины сообщения и интервал между отправками.</p>
           <p><b>Редкое событие «М.В. обиделся».</b> Каждую игровую минуту отдельно проверяется шанс 1%: «На М.В. пожаловались и он обиделся. Разбирайтесь с ним сами». Появляется М.В. с половиной обычных HP, урона касанием и снарядами, а также скорости передвижения. Событие не повторяется чаще одного раза за минуту; в онлайне проверку выполняет хост, а объявление получают все участники.</p>
           <h5>Ребаланс</h5>
           <p><b>Мультивыстрел и рикошет.</b> Усилены штраф к общему урону у мультивыстрела и увеличение перезарядки у рикошета на всех ступенях. С прокачкой рикошета каждый отскок сохраняет меньшую долю урона предыдущего попадания. Классовые бонусы сохранены; карточки прокачки и база знаний показывают актуальные значения.</p>
+          <h5>Исправления ошибок</h5>
+          <p><b>Зафиксированные итоги.</b> При записи рекорда очки, время и класс берутся из снимка завершённого забега. Наблюдение за продолжающимся матчем после смерти больше не увеличивает время записываемого результата.</p>
         </details>
         <details class="release-notes patch-minor"><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
           <h4>Нововведения</h4>
@@ -2245,7 +2277,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithCredential, linkWithPopup, linkWithRedirect, linkWithCredential, getRedirectResult, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-  import { getDatabase, ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
+  import { getDatabase, ref, get, query, orderByChild, limitToLast, limitToFirst, endAt, push, set, update, onValue, remove, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: 'AIzaSyDI54wAFmr2y_kHg1-wwcHgOwF8zWGK0L4',
@@ -2265,7 +2297,7 @@
   googleProvider.setCustomParameters({ prompt: 'select_account' });
   const makeFirebaseContext = user => ({
     app, auth, user, db, uid: user.uid,
-    ref, get, query, orderByChild, limitToLast, push, set, update, onValue, remove, onDisconnect
+    ref, get, query, orderByChild, limitToLast, limitToFirst, endAt, push, set, update, onValue, remove, onDisconnect, serverTimestamp
   });
   let resolveFirebaseLeaderboard;
   window.firebaseLeaderboardReady = new Promise((resolve, reject) => {
@@ -5878,6 +5910,138 @@ class HudLayoutManager {
   }
 }
 
+class GlobalChat {
+  constructor(game) {
+    this.game = game; this.fb = null; this.uid = null; this.epoch = 0;
+    this.sending = false; this.connected = false; this.ready = false; this.nextSendAt = 0; this.offset = 0;
+    document.getElementById('global-chat-form').addEventListener('submit', event => { event.preventDefault(); this.send(); });
+    this.menuObserver = new MutationObserver(() => this.sync());
+    this.menuObserver.observe(document.getElementById('modal-main-menu'), { attributes:true, attributeFilter:['style','hidden'] });
+    document.addEventListener('visibilitychange', () => this.sync());
+  }
+  visible() { return !document.hidden && document.getElementById('modal-main-menu').style.display === 'flex'; }
+  now() { return Date.now() + this.offset; }
+  status(text) { document.getElementById('global-chat-status').textContent = text; }
+  attachAccount(fb) {
+    this.stop(); this.fb = fb; this.uid = fb.uid; this.sending = false; this.nextSendAt = 0; this.sync();
+  }
+  detach() {
+    this.stop(); this.fb = null; this.uid = null; this.sending = false;
+    document.getElementById('global-chat-messages').textContent = 'Для чата войдите в аккаунт.';
+    this.status('Общий для всех игроков.'); this.updateControls();
+  }
+  stop() {
+    this.epoch++;
+    for (const key of ['messagesUnsub','senderUnsub','connectionUnsub']) { this[key]?.(); this[key] = null; }
+    clearTimeout(this.cooldownTimer); this.cooldownTimer = null;
+    this.connected = false; this.ready = false; this.updateControls();
+  }
+  sync() {
+    if (!this.visible() || !this.fb || this.game.localDebugAuth) { this.stop(); return; }
+    if (!this.messagesUnsub) this.connect();
+  }
+  connect() {
+    if (!this.visible() || !this.fb || this.game.localDebugAuth) return;
+    this.stop();
+    const fb = this.fb, epoch = this.epoch;
+    this.status('Подключаемся к общему чату…');
+    const failed = () => {
+      if (this.fb !== fb || epoch !== this.epoch) return;
+      this.stop(); this.status('Чат недоступен. Нажмите «Обновить» или повторите позже.');
+    };
+    this.connectionUnsub = fb.onValue(fb.ref(fb.db, '.info/connected'), snapshot => {
+      if (epoch !== this.epoch) return;
+      this.connected = snapshot.val() === true;
+      if (!this.connected) this.status('Нет соединения с чатом.');
+      else if (this.ready && !this.sending) this.status('До 300 символов · интервал отправки 5 секунд.');
+      this.updateControls();
+    }, failed);
+    this.senderUnsub = fb.onValue(fb.ref(fb.db, `globalChat/senders/${fb.uid}`), snapshot => {
+      if (epoch !== this.epoch) return;
+      this.nextSendAt = Math.max(0, Number(snapshot.val()?.lastAt) || 0) + 5000;
+      this.updateControls();
+    }, failed);
+    this.messagesUnsub = fb.onValue(fb.query(fb.ref(fb.db, 'globalChat/messages'), fb.orderByChild('createdAt'), fb.limitToLast(50)), snapshot => {
+      if (epoch !== this.epoch) return;
+      this.ready = true; this.render(snapshot); this.updateControls();
+      if (this.connected && !this.sending) this.status('До 300 символов · интервал отправки 5 секунд.');
+    }, failed);
+    fb.get(fb.ref(fb.db, '.info/serverTimeOffset')).then(snapshot => {
+      if (epoch === this.epoch) { this.offset = Number(snapshot.val()) || 0; this.updateControls(); }
+    }).catch(() => {});
+    this.prune(fb);
+  }
+  updateControls() {
+    clearTimeout(this.cooldownTimer); this.cooldownTimer = null;
+    const allowed = Boolean(this.fb && this.connected && this.ready && !this.game.localDebugAuth && this.game.profileReady);
+    const remaining = Math.max(0, Math.ceil((this.nextSendAt - this.now()) / 1000));
+    const button = document.getElementById('global-chat-send');
+    document.getElementById('global-chat-input').disabled = !allowed;
+    button.disabled = !allowed || this.sending || remaining > 0;
+    button.textContent = this.sending ? '…' : remaining > 0 ? `${remaining}с` : '➤';
+    if (allowed && remaining > 0 && this.visible()) this.cooldownTimer = setTimeout(() => this.updateControls(), 500);
+  }
+  render(snapshot) {
+    const box = document.getElementById('global-chat-messages');
+    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 35;
+    const previousScroll = box.scrollTop, first = !box.querySelector('.global-chat-message');
+    const fragment = document.createDocumentFragment();
+    let count = 0;
+    snapshot.forEach(child => {
+      const message = child.val();
+      if (!message || typeof message.uid !== 'string' || typeof message.name !== 'string' || typeof message.text !== 'string' ||
+          message.name.length > 15 || message.text.length > 300 || !Number.isFinite(message.createdAt) || message.createdAt <= 0) return;
+      const date = new Date(message.createdAt);
+      if (!Number.isFinite(date.getTime())) return;
+      const row = document.createElement('p'); row.className = 'global-chat-message' + (message.uid === this.uid ? ' own' : '');
+      const time = document.createElement('time'); time.dateTime = date.toISOString();
+      time.textContent = date.toLocaleString('ru-RU', { day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit' });
+      const name = document.createElement('b'); name.textContent = message.name;
+      row.append(time, name, document.createTextNode(`: ${message.text}`)); fragment.appendChild(row); count++;
+    });
+    if (!count) { const empty = document.createElement('span'); empty.textContent = 'Сообщений пока нет. Напишите первым.'; fragment.appendChild(empty); }
+    box.replaceChildren(fragment);
+    box.scrollTop = nearBottom || first || this.sending ? box.scrollHeight : previousScroll;
+  }
+  async send() {
+    if (!this.fb || !this.connected || !this.ready || this.sending || !this.game.profileReady || this.game.localDebugAuth || this.now() < this.nextSendAt) return;
+    const input = document.getElementById('global-chat-input'), original = input.value, text = original.trim();
+    if (!text || text.length > 300) return;
+    const fb = this.fb;
+    this.sending = true; this.updateControls(); this.status('Отправляем сообщение…');
+    try {
+      const profile = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/profile/nickname`));
+      const name = profile.val();
+      if (typeof name !== 'string' || name.length < 2 || name.length > 15) throw new Error('Нужно сохранить ник в профиле.');
+      if (this.fb !== fb || this.game.localDebugAuth) return;
+      const key = fb.push(fb.ref(fb.db, 'globalChat/messages')).key;
+      await fb.update(fb.ref(fb.db, 'globalChat'), {
+        [`messages/${key}`]:{uid:fb.uid,name,text,createdAt:fb.serverTimestamp()},
+        [`senders/${fb.uid}`]:{lastAt:fb.serverTimestamp(),lastMessage:key}
+      });
+      if (this.fb !== fb) return;
+      if (input.value === original) input.value = '';
+      this.status('Сообщение отправлено.');
+    } catch (error) {
+      if (this.fb === fb) this.status(error.message === 'Нужно сохранить ник в профиле.' ? error.message : 'Не удалось отправить. Проверьте соединение или подождите 5 секунд.');
+    } finally { if (this.fb === fb) { this.sending = false; this.updateControls(); } }
+  }
+  async prune(fb) {
+    if (Date.now() - (this.lastPruneAt || 0) < 3600000) return;
+    this.lastPruneAt = Date.now();
+    try {
+      const offset = await fb.get(fb.ref(fb.db, '.info/serverTimeOffset'));
+      if (this.fb !== fb) return;
+      const cutoff = Date.now() + (Number(offset.val()) || 0) - 7 * 86400000 - 60000;
+      const old = await fb.get(fb.query(fb.ref(fb.db, 'globalChat/messages'), fb.orderByChild('createdAt'), fb.endAt(cutoff), fb.limitToFirst(100)));
+      if (this.fb !== fb) return;
+      const deletions = {};
+      old.forEach(child => { deletions[child.key] = null; });
+      if (Object.keys(deletions).length) await fb.update(fb.ref(fb.db, 'globalChat/messages'), deletions);
+    } catch (_) { /* Old-message cleanup must not interfere with chat or gameplay. */ }
+  }
+}
+
 // Images live outside room snapshots. Only their small version field is observed.
 class PlayerSkinManager {
   constructor(game) {
@@ -5888,6 +6052,7 @@ class PlayerSkinManager {
     this.watchers = new Map();
     this.versions = new Map();
     this.pending = new Map();
+    this.recordCache = new Map(); this.recordLoads = new Map(); this.archived = new Set();
     this.draft = null;
     this.busy = false;
     this.loadingFile = false;
@@ -5941,6 +6106,7 @@ class PlayerSkinManager {
   detach() {
     for (const unsubscribe of this.watchers.values()) unsubscribe();
     this.watchers.clear(); this.versions.clear(); this.cache.clear(); this.pending.clear();
+    this.recordCache.clear(); this.recordLoads.clear(); this.archived.clear();
     this.fileGeneration++;
     this.uid = null; this.fb = null; this.draft = null; this.drag = null; this.loadingFile = false;
     if (this.active()) { this.renderEditor(); this.updateControls(); }
@@ -6063,6 +6229,76 @@ class PlayerSkinManager {
     ctx.drawImage(square ? (radius === 19 ? entry.squareLocal : entry.square) : entry.circle,
       -radius, -radius, radius * 2, radius * 2);
     return true;
+  }
+
+  recordAppearance() {
+    const entry = this.cache.get(this.uid);
+    return { shape:this.game.player?.migration85 ? 'square' : 'circle',
+      skin:entry ? { uid:this.uid, version:entry.version } : null };
+  }
+
+  frozenRecordSkin() {
+    const entry = this.cache.get(this.uid);
+    return entry ? { uid:this.uid, version:entry.version, data:entry.data } : null;
+  }
+
+  async archiveForRecord(appearance, frozen) {
+    const skin = appearance?.skin;
+    if (!skin) return;
+    if (!this.validUid(skin.uid) || !this.validVersion(skin.version) || !this.fb || skin.uid !== this.fb.uid ||
+        frozen?.uid !== skin.uid || frozen?.version !== skin.version || !this.validRecord(frozen)) {
+      throw new Error('Не удалось подготовить сохранённый скин этого забега.');
+    }
+    const key = `${skin.uid}:${skin.version}`;
+    if (this.archived.has(key)) return;
+    const fb = this.fb;
+    await fb.set(fb.ref(fb.db, `recordSkins/${skin.uid}/${skin.version}`), frozen.data);
+    if (this.fb !== fb) throw new Error('Аккаунт изменился во время сохранения результата.');
+    this.archived.add(key);
+  }
+
+  async archivedSkin(skin) {
+    if (!this.validUid(skin?.uid) || !this.validVersion(skin?.version) || !this.fb) return null;
+    const key = `${skin.uid}:${skin.version}`;
+    if (this.recordCache.has(key)) return this.recordCache.get(key);
+    if (this.recordLoads.has(key)) return this.recordLoads.get(key);
+    const fb = this.fb;
+    const promise = (async () => {
+      const snapshot = await fb.get(fb.ref(fb.db, `recordSkins/${skin.uid}/${skin.version}`));
+      const prepared = await this.prepare({ version:skin.version, data:snapshot.val() });
+      if (this.fb !== fb) return null;
+      this.recordCache.set(key, prepared);
+      if (this.recordCache.size > 24) this.recordCache.delete(this.recordCache.keys().next().value);
+      return prepared;
+    })();
+    this.recordLoads.set(key, promise);
+    try { return await promise; } finally { if (this.recordLoads.get(key) === promise) this.recordLoads.delete(key); }
+  }
+
+  showRecord(canvas, label, appearance, version) {
+    const parts = String(version || '').split('.').slice(0, 3).map(Number);
+    const modern = parts.length === 3 && parts.every(Number.isFinite) &&
+      (parts[0] > 3 || (parts[0] === 3 && (parts[1] > 2 || (parts[1] === 2 && parts[2] >= 2))));
+    const saved = modern && appearance && typeof appearance === 'object' ? appearance : null;
+    const square = saved?.shape === 'square';
+    const ctx = canvas.getContext('2d');
+    const paint = skin => {
+      ctx.clearRect(0, 0, 128, 128); ctx.beginPath();
+      if (square && ctx.roundRect) ctx.roundRect(3, 3, 122, 122, 29);
+      else ctx.arc(64, 64, 61, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd200'; ctx.fill();
+      if (skin) { ctx.save(); ctx.clip(); ctx.drawImage(skin.image, 3, 3, 122, 122); ctx.restore(); }
+      else { ctx.fillStyle = '#c0392b'; ctx.font = 'bold 44px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('1С', 64, 64); }
+      ctx.strokeStyle = '#b29100'; ctx.lineWidth = 3; ctx.stroke();
+    };
+    paint(null); label.textContent = square ? 'Стандартный «1С» · 8.5' : 'Стандартный «1С»';
+    if (!saved?.skin || !this.validUid(saved.skin.uid) || !this.validVersion(saved.skin.version)) return;
+    label.textContent = 'Загрузка сохранённого скина…';
+    this.archivedSkin(saved.skin).then(skin => {
+      if (!canvas.isConnected || !label.isConnected) return;
+      if (!skin) throw new Error('Снимок скина недоступен.');
+      paint(skin); label.textContent = square ? 'Сохранённый скин · 8.5' : 'Сохранённый скин';
+    }).catch(() => { if (label.isConnected) label.textContent = 'Скин недоступен · стандартный «1С»'; });
   }
 
   async open() {
@@ -6483,6 +6719,7 @@ class Game {
     this.savedNick = (localStorage.getItem('1c_nick') || 'Архитектор_1С').slice(0, 15);
     this.firebaseUser = null;
     this.skins = new PlayerSkinManager(this);
+    this.chat = new GlobalChat(this);
     this.killFeed = new PvpKillFeed(this);
     this.hudLayout = new HudLayoutManager(this);
     this.profileReady = false;
@@ -7163,6 +7400,7 @@ class Game {
     this.damageDealtBySource = Object.create(null);
     this.level = 1;
     this.upgradeRerollsRemaining = 3;
+    this.finalLoadout = null; this.finalRecordSkin = null;
     this.xp = 0;
     this.earlyXpRemainder = 0;
     this.nextXp = 25;
@@ -7760,6 +7998,7 @@ class Game {
     this.localDebugAuth = true;
     this.firebaseUser = null;
     this.skins.detach();
+    this.chat.detach();
     this.firebaseAuthSetupUid = null;
     this.profileReady = true;
     this.setPlayerNickname(localStorage.getItem('1c_debug_local_nick') || 'Testov');
@@ -7874,6 +8113,7 @@ class Game {
     this.firebaseUser = fb.user;
     this.hudLayout.loadAccount(fb);
     this.skins.attachAccount(fb);
+    this.chat.attachAccount(fb);
     try {
       const profileSnapshot = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/profile`));
       if (this.localDebugAuth) return;
@@ -7891,6 +8131,7 @@ class Game {
         document.getElementById('google-auth-status').textContent = '';
       }
       document.getElementById('settings-account-email').textContent = fb.user.email || 'Аккаунт подключён';
+      this.chat.updateControls();
       const nicknameInput = document.getElementById('settings-account-nickname');
       if (nicknameInput) nicknameInput.value = this.savedNick;
       const achievementSnapshot = await fb.get(fb.ref(fb.db, `playerData/${fb.uid}/achievements`));
@@ -7919,6 +8160,7 @@ class Game {
       await fb.set(fb.ref(fb.db, `playerData/${fb.uid}/profile`), { nickname, updatedAt: Date.now() });
       this.profileReady = true;
       this.setPlayerNickname(nickname);
+      this.chat.updateControls();
       document.getElementById('google-auth-status').textContent = '';
       document.getElementById('modal-google-auth').style.display = 'none';
       document.getElementById('settings-account-email').textContent = fb.user.email || 'Аккаунт подключён';
@@ -12619,6 +12861,7 @@ class Game {
     const classId = player.classId || this.selectedClassId;
     return {
       schemaVersion: 1,
+      appearance: this.skins?.recordAppearance() || { shape:player.migration85 ? 'square' : 'circle', skin:null },
       reason: String(reason || '').slice(0, 240),
       daily: this.isDailyRun && this.dailyConfig ? {
         date: this.dailyDate,
@@ -16396,6 +16639,7 @@ class Game {
     gameoverTitle.textContent = victory ? 'ВЫ ОСТАЛИСЬ ПОСЛЕДНИМ!' : multiplayerElimination ? 'ВЫ ВЫБЫЛИ — МАТЧ ПРОДОЛЖАЕТСЯ' : 'СЕАНС ПРЕРВАН!';
     gameoverTitle.style.color = victory ? '#27ae60' : '#c0392b';
     this.sound.playTone(victory ? 660 : 60, victory ? 'sine' : 'sawtooth', 0.7, 0.45);
+    this.finalRecordSkin = this.skins.frozenRecordSkin();
     this.finalLoadout = this.getFinalLoadout(reason);
 
     const totalScore = this.calcScore();
@@ -16548,13 +16792,15 @@ class Game {
     let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-ЯёЁ0-9_-]/g, '').slice(0, 15) || 'Архитектор_1С';
     this.setPlayerNickname(nick);
 
-    const score = this.finalLoadout?.run?.score ?? this.calcScore();
-    const seconds = this.finalLoadout?.run?.seconds ?? Math.floor(this.time);
+    const loadout = this.finalLoadout || this.getFinalLoadout();
+    let snapshot = null;
+    try { snapshot = typeof loadout === 'string' ? JSON.parse(loadout) : loadout; } catch (_) {}
+    const score = snapshot?.run?.score ?? this.calcScore();
+    const seconds = snapshot?.run?.seconds ?? Math.floor(this.time);
     const status = document.getElementById('submit-status');
     const btn = document.getElementById('btn-submit-score');
 
-    const classId = this.player?.classId || this.selectedClassId;
-    const loadout = this.finalLoadout || this.getFinalLoadout();
+    const classId = snapshot?.classId || this.player?.classId || this.selectedClassId;
     if (this.isDailyRun && this.dailyDate) {
       const dailyRecord = {
         name: nick, score, seconds, version: GAME_VERSION, mode: 'daily', players: 1,
@@ -16567,6 +16813,7 @@ class Game {
       status.innerText = 'Сохраняем результат в рейтинг ежедневной смены…';
       btn.disabled = true;
       try {
+        await this.skins.archiveForRecord(snapshot?.appearance, this.finalRecordSkin);
         const fb = await window.firebaseLeaderboardReady;
         await fb.push(fb.ref(fb.db, `dailyLeaderboard/${this.dailyDate}`), dailyRecord);
         status.innerHTML = '<b style="color:#27ae60">Результат добавлен в отдельный рейтинг ежедневного забега.</b>';
@@ -16586,6 +16833,7 @@ class Game {
     status.innerText = 'Сохраняем результат...';
     btn.disabled = true;
     try {
+      await this.skins.archiveForRecord(snapshot?.appearance, this.finalRecordSkin);
       if (this.verifiedRunPromise) await this.verifiedRunPromise.catch(() => null);
       let response = null;
       let result = {};
@@ -16881,7 +17129,8 @@ class Game {
       cells.push(['Баффы смены', mod.buffDesc || mod.desc]);
       cells.push(['Дебаффы смены', mod.debuffDesc || '—']);
     }
-    let html = `<div class="record-detail-grid">${cells.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b>${h(value)}</div>`).join('')}</div>`;
+    let html = `<div class="record-profile"><div class="record-avatar"><canvas id="record-skin-canvas" width="128" height="128" aria-label="Скин игрока в этом забеге"></canvas><small id="record-skin-label">Стандартный «1С»</small></div><div><h2>${h(entry.name || 'Игрок')}</h2><p>${h(classNames[entry.classId] || snapshot?.className || '—')} · ${h(modeDisplay)}</p><small>Скин в этом забеге</small></div></div>`;
+    html += `<div class="record-detail-grid">${cells.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b><span>${h(value)}</span></div>`).join('')}</div>`;
     if (snapshot && typeof snapshot === 'object') {
       if (snapshot.reason) html += `<p><b>Причина завершения:</b> ${h(snapshot.reason)}</p>`;
       const run = snapshot.run || {};
@@ -16892,7 +17141,7 @@ class Game {
         ['Тикеты SLA', run.ticketsCompleted], ['Бонус перегрузки', run.difficultyBonusScore],
         ['Фиткоины', run.currency], ['Счёт снимка', run.score]
       ].filter(([, value]) => value !== undefined && value !== null);
-      if (extra.length) html += `<h3 class="record-detail-section">Статы на момент смерти</h3><div class="record-detail-grid">${extra.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b>${h(value)}</div>`).join('')}</div>`;
+      if (extra.length) html += `<h3 class="record-detail-section">Статы на момент смерти</h3><div class="record-detail-grid">${extra.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b><span>${h(value)}</span></div>`).join('')}</div>`;
       if (Array.isArray(stats) && stats.length) html += `<h3 class="record-detail-section">Характеристики персонажа</h3><ul class="record-detail-list">${stats.map(item => `<li>${h(item.icon || '')} ${h(item.name || '')}: ${h(item.value || '')}</li>`).join('')}</ul>`;
       const inventory = snapshot.inventory || {};
       const labels = { weapons: 'Оружие', passives: 'Пассивные улучшения', shopItems: 'Предметы магазина', combat: 'Боевые характеристики', activeSkills: 'Активные навыки', summons: 'Призывы', temporary: 'Временные эффекты', consumables: 'Расходники' };
@@ -16916,6 +17165,7 @@ class Game {
       html += '<p style="color:#777;">Для этой записи подробности забега не сохранились.</p>';
     }
     content.innerHTML = html;
+    this.skins.showRecord(document.getElementById('record-skin-canvas'), document.getElementById('record-skin-label'), snapshot?.appearance, entry.version);
     document.getElementById('modal-record-detail').style.display = 'flex';
   }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-<title>1С:Фитнес Клуб КОРП 3.2.1</title>
+<title>1С:Фитнес Клуб КОРП 3.2.2</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -793,7 +793,10 @@
   .dota-shop-bottom { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(130px,.65fr) minmax(0,1fr); gap:8px; min-height:96px; }
   .dota-shop-inventory-group { min-width:0; padding:8px; background:#202c39; border:1px solid #3a4c5e; }
   .dota-shop-inventory { display:flex; gap:5px; align-items:center; flex-wrap:nowrap; }
-  .dota-shop-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; color:#acbac8; font-size:10px; }
+  .dota-shop-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; color:#acbac8; font-size:10px; }
+  .dota-shop-footer #shop-message { flex:1 1 180px; }
+  .dota-shop-footer #shop-buy-rerolls { color:#fff; background:#6d8050; border-color:#a5c884; white-space:normal; }
+  .dota-shop-footer #shop-buy-rerolls:disabled { opacity:.45; cursor:not-allowed; }
   .dota-shop-footer #shop-close-button { color:#fff; background:#536e85; border-color:#8ba2b7; }
   @media(max-width:760px) {
     #modal-shop .dota-shop { width:96vw; height:94vh; }
@@ -848,6 +851,7 @@
     .dota-shop-inventory-slot.backpack-slot { width:38px; height:38px; flex-basis:38px; }
     .dota-shop-footer { position:relative; z-index:4; flex-wrap:wrap; padding:7px; margin:0 -8px -8px; background:#18212d; border-top:1px solid #3a4c5e; }
     .dota-shop-footer #shop-message { flex:1 1 150px; }
+    .dota-shop-footer #shop-buy-rerolls { flex:1 1 100%; min-height:42px; }
     .dota-shop-footer #shop-close-button { flex:1 1 100%; min-height:42px; }
   }
   #sales-call {
@@ -1273,7 +1277,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v3.2.1 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v3.2.2 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1464,7 +1468,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.1</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.2</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1476,11 +1480,12 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>3.2.1</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>3.2.2</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
+              <p><b>Патч 3.2.2.</b> В магазине можно покупать дополнительные перебросы карточек прокачки.</p>
               <p><b>Патч 3.2.1.</b> М.В. медленнее в PvP и BR; большие боссы отключены в Battle Royale.</p>
               <p><b>Обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
               <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
@@ -1514,7 +1519,7 @@
     </div>
   </div>
   <div id="modal-knowledge" class="modal-overlay">
-    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.1</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
+    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.2</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
       <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
@@ -1726,7 +1731,10 @@
           <p><b>Безопасное появление мобов.</b> Обычные волны и RuDesktop появляются за пределами обзора живых игроков с запасом расстояния. Учитываются размер экрана, масштаб камеры и другие участники комнаты. Координаты больше не прижимаются к краю карты, что могло поставить врага рядом с игроком. Камера погибшего наблюдателя не ограничивает спавн.</p>
           <p><b>Матч после смерти хоста.</b> Исправлена обработка выбывания в комнатах на двух участников: смерть больше не считается выходом из сессии и не передаёт роль хоста. PvE продолжается до гибели последнего союзника, PvP и BR определяют последнего выжившего. Синхронизация и таймер комнаты работают, пока хост наблюдает или открывает свои итоги.</p>
           <p><b>Общие предметы.</b> Выдачу снаряжения подтверждает хост: одна вещь достаётся одному участнику, повторные сообщения не выдают её повторно. При нехватке места предмет остаётся доступен на карте. Боты тоже подбирают снаряжение.</p>
-                  <h4>Патч 3.2.1 — темп онлайна</h4>
+          <h4>Патч 3.2.2 — дополнительные перебросы</h4>
+          <h5>Нововведения</h5>
+          <p><b>Платные перебросы.</b> В магазине можно докупить пакет из трёх перебросов карточек прокачки за 750 фиткоинов. Покупки повторяются, пока хватает денег; перебросы прибавляются к оставшимся и действуют до конца текущего забега. Цена фиксирована и не растёт от звонков отдела продаж. Пакет не занимает место в инвентаре и доступен в режимах, где разрешены перебросы карточек.</p>
+          <h4>Патч 3.2.1 — темп онлайна</h4>
           <h5>Ребаланс</h5>
           <p><b>М.В. в PvP и Battle Royale.</b> Заметно снижена скорость преследования. В одиночной игре и кооперативном PvE сохранён прежний темп.</p>
           <p><b>Battle Royale без больших боссов.</b> Пятиминутные большие боссы больше не появляются в BR и не прерывают обычные волны. Убрано ожидание этих боссов при выдаче тикетов. Легендарные выборы за убийство больших боссов в BR больше не выдаются. Обычные мини-боссы и М.В. сохраняются.</p>
@@ -2022,7 +2030,7 @@
           <section class="dota-shop-inventory-group"><div class="dota-shop-section-title">Рюкзак · <span id="shop-backpack-count">0/3</span></div><div id="shop-backpack" class="dota-shop-inventory"></div></section>
           <section class="dota-shop-inventory-group"><div class="dota-shop-section-title">Расходники · <span id="shop-consumables-count">0/4</span></div><div id="shop-consumables" class="dota-shop-inventory"></div></section>
         </div>
-        <div class="dota-shop-footer"><span id="shop-message">Магазин открылся по звонку отдела продаж.</span><button id="shop-close-button" class="btn-1c" onclick="game.closeShop()">Завершить звонок и продолжить</button></div>
+        <div class="dota-shop-footer"><span id="shop-message">Магазин открылся по звонку отдела продаж.</span><button id="shop-buy-rerolls" type="button" class="btn-1c" onclick="game.buyUpgradeRerolls()" disabled>🔄 Купить 3 переброса · 750 💰</button><button id="shop-close-button" class="btn-1c" onclick="game.closeShop()">Завершить звонок и продолжить</button></div>
       </div>
     </div>
   </div>
@@ -2287,7 +2295,8 @@
 </script>
 
 <script>
-const GAME_VERSION = '3.2.1';
+const GAME_VERSION = '3.2.2';
+const UPGRADE_REROLL_PACK = { count: 3, cost: 750 };
 const MAX_PLAYER_DODGE = 0.50;
 const NETWORK_PROTOCOL = 5;
 const BR_ZONE_SHRINK_DURATION = 30;
@@ -11663,6 +11672,11 @@ class Game {
     if (!catalog) return;
     catalog.replaceChildren();
     document.getElementById('shop-currency').textContent = `💰 ${this.currency} фиткоинов · наценка +${(((this.shopPriceMultiplier || 2.0) - 1) * 100).toFixed(1)}%`;
+    const rerolls = document.getElementById('shop-buy-rerolls');
+    rerolls.style.display = this.isBattleRoyale || this.isPvpMassUpgradeMode?.() ? 'none' : '';
+    rerolls.textContent = `🔄 +${UPGRADE_REROLL_PACK.count} переброса · ${UPGRADE_REROLL_PACK.cost} 💰 · осталось ${this.upgradeRerollsRemaining}`;
+    rerolls.title = 'Перебросы карточек прокачки на текущий забег. Цена без наценки.';
+    rerolls.disabled = !this.player || this.player.hp <= 0 || Boolean(this.pvp?.eliminated) || !Number.isFinite(this.currency) || this.currency < UPGRADE_REROLL_PACK.cost;
     const search = this.shopSearch;
     let items;
     if (this.shopView === 'sell') {
@@ -11718,6 +11732,17 @@ class Game {
     document.getElementById('shop-consumables-count').textContent = `${(this.consumables || []).filter(Boolean).length}/4`;
     document.getElementById('shop-backpack-count').textContent = `${this.getBackpackCount()}/3`;
     this.renderShopDetails();
+  }
+
+  buyUpgradeRerolls() {
+    if (this.isBattleRoyale || this.isPvpMassUpgradeMode?.() || !this.player || this.player.hp <= 0 || this.pvp?.eliminated ||
+        document.getElementById('modal-shop').style.display !== 'flex' || !Number.isFinite(this.currency) || this.currency < UPGRADE_REROLL_PACK.cost) return;
+    this.currency -= UPGRADE_REROLL_PACK.cost;
+    this.upgradeRerollsRemaining += UPGRADE_REROLL_PACK.count;
+    this.recordAchievementCounter('fitcoinsSpent', UPGRADE_REROLL_PACK.cost);
+    document.getElementById('shop-message').textContent = `Куплено ${UPGRADE_REROLL_PACK.count} переброса карточек прокачки. Осталось: ${this.upgradeRerollsRemaining}.`;
+    this.updateHUD();
+    this.renderShop();
   }
 
   toggleShopFavorite(key) {
@@ -15634,7 +15659,7 @@ class Game {
     const nonPausingUpgrade = Boolean(this.isBattleRoyale || this.isPvpMassUpgradeMode?.());
     document.getElementById('lvlup-subtitle').textContent = nonPausingUpgrade
       ? 'Выберите улучшение. Матч продолжается, мобы временно теряют вас из виду.'
-      : `Выберите улучшение. Перебросы на весь забег: ${this.upgradeRerollsRemaining} из 3.`;
+      : `Выберите улучшение. Осталось перебросов: ${this.upgradeRerollsRemaining}.`;
     this.currentUpgradeChoices.forEach(ch => {
       const card = document.createElement('div');
       card.className = 'card-upgrade';
@@ -18482,6 +18507,11 @@ const PATCH300_METHODS = {
             ...(item.maxOwned?[`Лимит на игрока: ${item.maxOwned}`]:[])],
           {key:item.key,tier:consumable?null:tier,shopGroup:consumable?'consumables':String(tier)});
       }
+      add('🔄','Пакет перебросов [Услуга]',`Добавляет ${UPGRADE_REROLL_PACK.count} переброса карточек прокачки на текущий забег. Не занимает ячейку инвентаря.`,
+        [`Фиксированная цена: ${UPGRADE_REROLL_PACK.cost} фиткоинов; наценка магазина не применяется.`,
+          'Можно покупать повторно; неиспользованные перебросы сохраняются до конца забега.',
+          'Недоступен в Battle Royale и PvP на 4–8 участников, где перебросы карточек отключены.'],
+        {key:'upgrade_reroll_pack',shopGroup:'services'});
     }
     if(this.knowledgeTab==='modifiers')for(const m of SOLO_RUN_MODIFIERS)add(m.icon,m.name,[{text:m.risk,tone:'penalty'}],[`Награда: ${m.reward}`]);
     if(this.knowledgeTab==='events'){
@@ -18507,7 +18537,7 @@ const PATCH300_METHODS = {
         {id:'legendary',title:'Легендарные перки',description:'После победы над первым большим боссом можно выбрать одну из трёх исходных миграций.'},
         {id:'legendary-development',title:'Развития легендарных миграций · 30-я минута',description:'После победы над боссом 30-й минуты можно оставить текущую миграцию или выбрать одно из двух её развитий. Новые бонусы и штрафы добавляются к исходным.'}]
       : this.knowledgeTab==='items'
-        ? [{id:'1',title:'I тир · базовые предметы'},{id:'2',title:'II тир · улучшенные предметы'},{id:'3',title:'III тир · продвинутые предметы'},{id:'4',title:'IV тир · КОРП'},{id:'consumables',title:'Расходники'}]
+        ? [{id:'1',title:'I тир · базовые предметы'},{id:'2',title:'II тир · улучшенные предметы'},{id:'3',title:'III тир · продвинутые предметы'},{id:'4',title:'IV тир · КОРП'},{id:'consumables',title:'Расходники'},{id:'services',title:'Услуги магазина'}]
         : [{id:'normal'}];
     for (const group of groups) {
       const members = visible.filter(entry=>(entry.legendary?entry.legendaryGroup||'legendary':entry.shopGroup||'normal')===group.id);

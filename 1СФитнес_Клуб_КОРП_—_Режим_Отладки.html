@@ -677,19 +677,21 @@
   .main-menu-layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; }
   .main-menu-actions { display: flex; flex-direction: column; gap: 9px; }
   .main-menu-actions .btn-1c { padding: 11px 14px; text-align: left; }
-  #global-chat { grid-column:1/-1; min-width:0; padding:9px; border:1px solid #c6cbd0; background:#fff; font-size:11px; }
-  .global-chat-head { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px; }
-  #global-chat h3 { margin:0; font-size:12px; color:#5d4720; }
+  #modal-global-chat { z-index:320; }
+  #modal-global-chat .win-1c { width:min(620px,94vw); height:min(560px,calc(100% - 24px)); display:flex; flex-direction:column; overflow:hidden; }
+  #modal-global-chat .win-1c-head { flex-shrink:0; }
+  #global-chat { flex:1; min-height:0; min-width:0; display:flex; flex-direction:column; font-size:12px; }
+  .global-chat-head { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px; flex-shrink:0; }
   #global-chat-retry { border:0; background:none; color:#28649a; cursor:pointer; font-size:10px; }
-  #global-chat-messages { height:180px; min-height:90px; overflow:auto; overscroll-behavior:contain; overflow-wrap:anywhere; border-block:1px solid #e5e9ed; padding:5px 0; }
+  #global-chat-messages { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; overflow-wrap:anywhere; border:1px solid #c6cbd0; background:#fff; padding:9px; }
   .global-chat-message { margin:0 0 7px; line-height:1.4; white-space:pre-wrap; }
   .global-chat-message time { display:block; color:#848b93; font-size:9px; white-space:normal; }
   .global-chat-message b { color:#28649a; }
   .global-chat-message.own b { color:#218252; }
-  #global-chat-form { display:flex; gap:5px; margin-top:7px; }
+  #global-chat-form { display:flex; gap:5px; margin-top:7px; flex-shrink:0; }
   #global-chat-input { flex:1; min-width:0; width:auto; font-size:12px; }
   #global-chat #global-chat-send { padding:6px 9px; text-align:center; }
-  #global-chat-status { margin:6px 0 0; min-height:14px; color:#6d7882; font-size:10px; line-height:1.3; }
+  #global-chat-status { margin:6px 0 0; min-height:14px; color:#6d7882; font-size:10px; line-height:1.3; flex-shrink:0; }
   #modal-player-skin .skin-window { width:min(560px,96vw); }
   .skin-help { font-size:12px; line-height:1.5; margin-bottom:10px; }
   .skin-editor-layout { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; align-items:center; }
@@ -1516,12 +1518,7 @@
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
             <div class="main-menu-version">Текущая версия: <b>3.2.2</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
-            <section id="global-chat" aria-labelledby="global-chat-title">
-              <div class="global-chat-head"><h3 id="global-chat-title" title="Последние 50 сообщений. История старше 7 дней удаляется.">💬 Общий чат</h3><button id="global-chat-retry" type="button" onclick="game.chat.connect()">Обновить</button></div>
-              <div id="global-chat-messages" role="log" aria-live="polite" aria-relevant="additions text"><span>Для чата войдите в аккаунт.</span></div>
-              <form id="global-chat-form"><input id="global-chat-input" class="input-1c" type="text" maxlength="300" autocomplete="off" placeholder="Сообщение всем…" aria-label="Сообщение в общий чат" disabled><button id="global-chat-send" class="btn-1c" type="submit" aria-label="Отправить сообщение" disabled>➤</button></form>
-              <p id="global-chat-status" role="status">Общий для всех игроков.</p>
-            </section>
+            <button id="global-chat-open" class="btn-1c" onclick="game.chat.open()">💬 Общий чат</button>
           </div>
           <div>
             <div class="release-notes">
@@ -1540,6 +1537,18 @@
 
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-global-chat" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="global-chat-title">
+    <div class="win-1c">
+      <div class="win-1c-head"><span id="global-chat-title">💬 Общий чат</span><button class="win-close-btn" onclick="game.chat.close()" aria-label="Закрыть общий чат">✕</button></div>
+      <div id="global-chat" class="win-1c-body">
+        <div class="global-chat-head"><span>Последние 50 сообщений · история за 7 дней</span><button id="global-chat-retry" type="button" onclick="game.chat.connect()">Обновить</button></div>
+        <div id="global-chat-messages" role="log" aria-live="polite" aria-relevant="additions text"><span>Для чата войдите в аккаунт.</span></div>
+        <form id="global-chat-form"><input id="global-chat-input" class="input-1c" type="text" maxlength="300" autocomplete="off" placeholder="Сообщение всем…" aria-label="Сообщение в общий чат" disabled><button id="global-chat-send" class="btn-1c" type="submit" aria-label="Отправить сообщение" disabled>➤</button></form>
+        <p id="global-chat-status" role="status">Общий для всех игроков.</p>
       </div>
     </div>
   </div>
@@ -1806,7 +1815,7 @@
           <p><b>Платные перебросы.</b> В магазине можно докупить пакет из трёх перебросов карточек прокачки за 750 фиткоинов. Покупки повторяются, пока хватает денег; перебросы прибавляются к оставшимся и действуют до конца текущего забега. Цена фиксирована и не растёт от звонков отдела продаж. Пакет не занимает место в инвентаре и доступен в режимах, где разрешены перебросы карточек.</p>
           <p><b>Скин аккаунта.</b> Кнопка «Мой скин» в главном меню открывает загрузку, кадрирование с перетаскиванием и масштабом, предпросмотр и автоматическое сжатие изображения. На аккаунте хранится один скин; его можно заменить или сбросить на стандартный значок. В обычном состоянии скин круглый, после перехода на 8.5 — квадратный со скруглёнными углами. Скины видны другим игрокам в PvP, PvE и Battle Royale.</p>
           <p><b>Карточка рекорда.</b> Вверху показаны сохранённый скин, ник, класс и режим забега. Снимок сохраняет форму персонажа и не меняется при замене или сбросе скина в аккаунте. Старые записи без снимка показывают стандартный «1С». Характеристики и списки снаряжения оформлены отдельными блоками.</p>
-          <p><b>Общий чат.</b> Под кнопками главного меню появились последние сообщения всех игроков с ником, датой и временем отправки. Чат обновляется в реальном времени; писать могут игроки с подключённым аккаунтом. Ник берётся из профиля, время назначает сервер. Добавлены ограничение длины сообщения и интервал между отправками.</p>
+          <p><b>Общий чат.</b> Кнопка в главном меню открывает отдельное окно с последними сообщениями всех игроков, ником, датой и временем отправки. Чат обновляется в реальном времени; писать могут игроки с подключённым аккаунтом. Ник берётся из профиля, время назначает сервер. Добавлены ограничение длины сообщения и интервал между отправками.</p>
           <p><b>Редкое событие «М.В. обиделся».</b> Каждую игровую минуту отдельно проверяется шанс 1%: «На М.В. пожаловались и он обиделся. Разбирайтесь с ним сами». Появляется М.В. с половиной обычных HP, урона касанием и снарядами, а также скорости передвижения. Событие не повторяется чаще одного раза за минуту; в онлайне проверку выполняет хост, а объявление получают все участники.</p>
           <h5>Ребаланс</h5>
           <p><b>Мультивыстрел и рикошет.</b> Усилены штраф к общему урону у мультивыстрела и увеличение перезарядки у рикошета на всех ступенях. С прокачкой рикошета каждый отскок сохраняет меньшую долю урона предыдущего попадания. Классовые бонусы сохранены; карточки прокачки и база знаний показывают актуальные значения.</p>
@@ -5916,10 +5925,22 @@ class GlobalChat {
     this.sending = false; this.connected = false; this.ready = false; this.nextSendAt = 0; this.offset = 0;
     document.getElementById('global-chat-form').addEventListener('submit', event => { event.preventDefault(); this.send(); });
     this.menuObserver = new MutationObserver(() => this.sync());
-    this.menuObserver.observe(document.getElementById('modal-main-menu'), { attributes:true, attributeFilter:['style','hidden'] });
+    this.menuObserver.observe(document.getElementById('modal-global-chat'), { attributes:true, attributeFilter:['style','hidden'] });
     document.addEventListener('visibilitychange', () => this.sync());
   }
-  visible() { return !document.hidden && document.getElementById('modal-main-menu').style.display === 'flex'; }
+  visible() { return !document.hidden && document.getElementById('modal-global-chat').style.display === 'flex'; }
+  open() {
+    if (document.getElementById('modal-main-menu').style.display !== 'flex') return;
+    document.getElementById('modal-main-menu').style.display = 'none';
+    document.getElementById('modal-global-chat').style.display = 'flex';
+    this.game.keys = {}; this.game.setMobileMenuScroll(true); this.sync();
+  }
+  close() {
+    document.getElementById('modal-global-chat').style.display = 'none';
+    document.getElementById('modal-main-menu').style.display = 'flex';
+    this.stop(); this.game.setMobileMenuScroll(true);
+    document.getElementById('global-chat-open').focus();
+  }
   now() { return Date.now() + this.offset; }
   status(text) { document.getElementById('global-chat-status').textContent = text; }
   attachAccount(fb) {
@@ -6525,6 +6546,7 @@ class Game {
     this.mouseMovePointerId = null;
     window.addEventListener('keydown', (e) => {
       if (this.hudLayout?.editing) { this.hudLayout.keydown(e); return; }
+      if(document.getElementById('modal-global-chat').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.chat.close();}return;}
       if(document.getElementById('modal-player-skin').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.skins.close();}return;}
       if(document.getElementById('modal-knowledge').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.closeKnowledgeBase();}return;}
       if(document.getElementById('modal-solo-modifiers').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.closeSoloModifiers();}return;}

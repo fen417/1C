@@ -693,6 +693,7 @@
   #global-chat #global-chat-send { padding:6px 9px; text-align:center; }
   #global-chat-status { margin:6px 0 0; min-height:14px; color:#6d7882; font-size:10px; line-height:1.3; flex-shrink:0; }
   #modal-player-skin .skin-window { width:min(560px,96vw); }
+  #modal-player-skin .skin-window.skin-drag-over { outline:3px dashed #b68b00; outline-offset:-5px; background:#fff8d8; }
   .skin-help { font-size:12px; line-height:1.5; margin-bottom:10px; }
   .skin-editor-layout { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; align-items:center; }
   #skin-crop { width:min(300px,74vw); height:auto; display:block; border:1px solid #89939f; background:#27313e; touch-action:none; cursor:grab; }
@@ -991,7 +992,9 @@
   #record-detail-content { max-height:min(72vh,720px); overflow:auto; }
   .record-profile { display:flex; gap:20px; align-items:center; padding:15px; margin-bottom:14px; border:1px solid #c5cbd1; background:#f8f9fa; }
   .record-avatar { flex:0 0 120px; text-align:center; }
-  #record-skin-canvas { display:block; width:110px; height:110px; margin:0 auto 6px; }
+  #record-skin-canvas { display:block; width:110px; height:110px; margin:0 auto 6px; cursor:grab; touch-action:none; }
+  #record-skin-canvas.turning { cursor:grabbing; }
+  #record-skin-canvas:focus-visible { outline:2px solid #b68b00; outline-offset:3px; }
   #record-skin-label { display:block; font-size:10px; color:#68717b; }
   .record-profile h2 { font-size:24px; margin:0 0 5px; overflow-wrap:anywhere; }
   .record-profile p { margin:0 0 5px; font-size:13px; }
@@ -1008,6 +1011,8 @@
   .record-item-title { display:flex; justify-content:space-between; gap:10px; }
   .record-item-title b { white-space:nowrap; }
   .record-item small { display:block; margin:2px 0 0 24px; color:#666; font-size:11px; }
+  .record-modifier-risk { color:#a33030; }
+  .record-modifier-reward { color:#216541; }
   @media (max-width:600px) { .record-detail-grid { grid-template-columns:1fr 1fr; gap:5px; } .record-detail-stat { display:block; } .record-detail-stat b,.record-detail-stat > span { display:block; border:0; padding:5px; } .record-profile { padding:10px; gap:10px; } .record-avatar { flex-basis:90px; } #record-skin-canvas { width:80px; height:80px; } .record-profile h2 { font-size:20px; } #record-detail-content { max-height:68vh; font-size:11px; } }
 
   .btn-1c {
@@ -1523,10 +1528,10 @@
           <div>
             <div class="release-notes">
               <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
-              <p><b>Обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
-              <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
+              <p><b>Патч 3.2.2.</b> Перебросы в магазине, скины аккаунта и их снимки в карточках рекордов, общий чат в отдельном окне из главного меню. Добавлено редкое событие с ослабленным М.В.; усилены штрафы мультивыстрела и рикошета. Снижен доход с дискет, усилено его снижение на длинных забегах и повышена наценка за звонки отдела продаж.</p>
               <p><b>Патч 3.2.1.</b> М.В. медленнее в PvP и BR; большие боссы отключены в Battle Royale.</p>
-              <p><b>Патч 3.2.2.</b> Перебросы в магазине, скины аккаунта и их снимки в карточках рекордов, общий чат в главном меню. Добавлено редкое событие с ослабленным М.В.; усилены штрафы мультивыстрела и рикошета.</p>
+              <p><b>Патч 3.2.0 — обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
+              <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
             </div>
             <div class="release-notes">
               <h3>Версия 3.1.0 — «Зона ответственности»</h3>
@@ -1557,7 +1562,7 @@
     <div class="win-1c skin-window">
       <div class="win-1c-head"><span id="skin-title">🎨 Скин аккаунта</span><button id="skin-close" class="win-close-btn" onclick="game.skins.close()" aria-label="Закрыть редактор скина">✕</button></div>
       <div class="win-1c-body">
-        <p class="skin-help">Один скин на аккаунт. Перетаскивайте картинку и меняйте масштаб для кадрирования. Скин автоматически сжимается; его видят другие игроки в PvP, PvE и Battle Royale.</p>
+        <p class="skin-help">Один скин на аккаунт. Выберите файл, перетащите PNG, JPG или WebP в это окно либо вставьте изображение из буфера через Ctrl+V. Для кадрирования двигайте картинку и меняйте масштаб. Скин автоматически сжимается; его видят другие игроки в PvP, PvE и Battle Royale.</p>
         <input id="skin-file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Выбрать изображение скина">
         <div class="skin-editor-layout">
           <div><canvas id="skin-crop" width="320" height="320" aria-label="Кадрирование скина перетаскиванием"></canvas>
@@ -1791,36 +1796,38 @@
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
         <details class="release-notes patch-minor" open><summary><h3>3.2.0 — «Кластер живёт дальше»</h3></summary>
-          <h4>Нововведения</h4>
-          <p><b>Обзор после смерти в онлайне.</b> В сетевом матче выбывший игрок автоматически переходит к наблюдению за всей картой. Колесо мыши приближает и отдаляет камеру, перетаскивание перемещает её; есть кнопки масштаба и возврата ко всей карте. Итоги забега доступны отдельно, наблюдение не останавливает остальных участников. В одиночной игре режима наблюдения нет.</p>
-          <p><b>Хост остаётся в комнате.</b> Пока матч продолжается, хост не может выйти через меню или перезапустить игру, в том числе после смерти. Он продолжает рассчитывать мир, ботов, общие предметы и определение победителя. После завершения матча выход снова доступен. При закрытии или обновлении страницы браузер предупреждает о незавершённом матче.</p>
-          <p><b>Аирдропы Battle Royale.</b> На краю экрана появляется стрелка к одной ближайшей поставке за пределами обзора. В аирдропе лежат случайный предмет и отдельный расходник: их можно подобрать независимо. Предметы действуют по обычным правилам инвентаря, рюкзака и сборки комплектов.</p>
-          <p><b>Добыча с погибших.</b> Погибшие игроки и боты оставляют немного опыта и один случайный предмет из основного инвентаря. Предмет исчезает у погибшего; если инвентарь был пуст, выпадает только опыт. Подбор доступен оставшимся в живых участникам.</p>
-          <h4>Ребаланс</h4>
-          <p><b>Уникальное снаряжение.</b> Каждый предмет II, III и IV тира можно иметь только в одном экземпляре на основной инвентарь и рюкзак вместе. Повторная покупка, сборка второго одинакового комплекта и подбор дубликата заблокированы. Бонусы одинаковых предметов этих тиров не складываются; предметы I тира сохраняют прежние правила.</p>
-          <p><b>Рост тира поставок.</b> Первые три аирдропа содержат предмет I тира, следующие три — II, с седьмого выпадают случайные предметы III тира. Количество опыта с погибшего увеличивается с его уровнем и имеет верхний предел.</p>
-          <h4>Исправления ошибок</h4>
-          <p><b>HUD наблюдателя.</b> После смерти скрываются личные здоровье, опыт, очки, инвентарь, активные навыки, рывок и указатель центра зоны. Панель обзора перенесена вниз вместо активных умений. Киллфид и события матча остаются видимыми; при новом забеге обычный HUD возвращается.</p>
-          <p><b>Безопасное появление мобов.</b> Обычные волны и RuDesktop появляются за пределами обзора живых игроков с запасом расстояния. Учитываются размер экрана, масштаб камеры и другие участники комнаты. Координаты больше не прижимаются к краю карты, что могло поставить врага рядом с игроком. Камера погибшего наблюдателя не ограничивает спавн.</p>
-          <p><b>Матч после смерти хоста.</b> Исправлена обработка выбывания в комнатах на двух участников: смерть больше не считается выходом из сессии и не передаёт роль хоста. PvE продолжается до гибели последнего союзника, PvP и BR определяют последнего выжившего. Синхронизация и таймер комнаты работают, пока хост наблюдает или открывает свои итоги.</p>
-          <p><b>Общие предметы.</b> Выдачу снаряжения подтверждает хост: одна вещь достаётся одному участнику, повторные сообщения не выдают её повторно. При нехватке места предмет остаётся доступен на карте. Боты тоже подбирают снаряжение.</p>
+          <h4>Патч 3.2.2 — скины, перебросы и обиженный М.В.</h4>
+          <h5>Нововведения</h5>
+          <p><b>Платные перебросы.</b> В магазине можно докупить пакет из трёх перебросов карточек прокачки за 750 фиткоинов. Покупки повторяются, пока хватает денег; перебросы прибавляются к оставшимся и действуют до конца текущего забега. Цена фиксирована и не растёт от звонков отдела продаж. Пакет не занимает место в инвентаре и доступен в режимах, где разрешены перебросы карточек.</p>
+          <p><b>Скин аккаунта.</b> Кнопка «Мой скин» в главном меню открывает загрузку из файла, перетаскиванием в окно или вставкой изображения из буфера обмена. Есть кадрирование с перетаскиванием и масштабом, предпросмотр и автоматическое сжатие изображения. На аккаунте хранится один скин; его можно заменить или сбросить на стандартный значок. В обычном состоянии скин круглый, после перехода на 8.5 — квадратный со скруглёнными углами. Скины видны другим игрокам в PvP, PvE и Battle Royale.</p>
+          <p><b>Карточка рекорда.</b> Вверху показаны сохранённый скин, ник, класс и режим забега. Скин можно крутить по кругу перетаскиванием или колесом мыши, как пластинку. Снимок сохраняет форму персонажа и не меняется при замене или сбросе скина в аккаунте. Старые записи без снимка показывают стандартный «1С». Для обычных одиночных забегов с модификаторами показаны их названия, усложнения и награды на момент забега. Характеристики и списки снаряжения оформлены отдельными блоками.</p>
+          <p><b>Общий чат.</b> Кнопка в главном меню открывает отдельное окно с последними сообщениями всех игроков, ником, датой и временем отправки. Чат обновляется в реальном времени; писать могут игроки с подключённым аккаунтом. Ник берётся из профиля, время назначает сервер. Добавлены ограничение длины сообщения и интервал между отправками.</p>
+          <p><b>Редкое событие «М.В. обиделся».</b> Каждую игровую минуту отдельно проверяется шанс 1%: «На М.В. пожаловались и он обиделся. Разбирайтесь с ним сами». Появляется М.В. с половиной обычных HP, урона касанием и снарядами, а также скорости передвижения. Событие не повторяется чаще одного раза за минуту; в онлайне проверку выполняет хост, а объявление получают все участники.</p>
+          <h5>Ребаланс</h5>
+          <p><b>Экономика.</b> Снижен базовый доход фиткоинов с дискет, усилено его плавное снижение с пятнадцатой до сорок пятой минуты. Каждый звонок отдела продаж сильнее повышает цены магазина. Классовые бонусы и бонусы предметов к доходу сохраняются; цена платных перебросов остаётся фиксированной.</p>
+          <p><b>Мультивыстрел и рикошет.</b> Усилены штраф к общему урону у мультивыстрела и увеличение перезарядки у рикошета на всех ступенях. С прокачкой рикошета каждый отскок сохраняет меньшую долю урона предыдущего попадания. Классовые бонусы сохранены; карточки прокачки и база знаний показывают актуальные значения.</p>
+          <h5>Исправления ошибок</h5>
+          <p><b>Зафиксированные итоги.</b> При записи рекорда очки, время и класс берутся из снимка завершённого забега. Наблюдение за продолжающимся матчем после смерти больше не увеличивает время записываемого результата.</p>
           <h4>Патч 3.2.1 — темп онлайна</h4>
           <h5>Ребаланс</h5>
           <p><b>М.В. в PvP и Battle Royale.</b> Заметно снижена скорость преследования. В одиночной игре и кооперативном PvE сохранён прежний темп.</p>
           <p><b>Battle Royale без больших боссов.</b> Пятиминутные большие боссы больше не появляются в BR и не прерывают обычные волны. Убрано ожидание этих боссов при выдаче тикетов. Легендарные выборы за убийство больших боссов в BR больше не выдаются. Обычные мини-боссы и М.В. сохраняются.</p>
           <h5>Исправления ошибок</h5>
           <p><b>Итоги одиночного забега.</b> После смерти, в том числе при неудачной попытке спасения от RuDesktop, открывается экран поражения. Режим наблюдения и кнопка обзора карты доступны только в онлайне; из одиночной игры они убраны.</p>
-          <h4>Патч 3.2.2 — скины, перебросы и обиженный М.В.</h4>
+          <h4>Обновление 3.2.0 — Кластер живёт дальше</h4>
           <h5>Нововведения</h5>
-          <p><b>Платные перебросы.</b> В магазине можно докупить пакет из трёх перебросов карточек прокачки за 750 фиткоинов. Покупки повторяются, пока хватает денег; перебросы прибавляются к оставшимся и действуют до конца текущего забега. Цена фиксирована и не растёт от звонков отдела продаж. Пакет не занимает место в инвентаре и доступен в режимах, где разрешены перебросы карточек.</p>
-          <p><b>Скин аккаунта.</b> Кнопка «Мой скин» в главном меню открывает загрузку, кадрирование с перетаскиванием и масштабом, предпросмотр и автоматическое сжатие изображения. На аккаунте хранится один скин; его можно заменить или сбросить на стандартный значок. В обычном состоянии скин круглый, после перехода на 8.5 — квадратный со скруглёнными углами. Скины видны другим игрокам в PvP, PvE и Battle Royale.</p>
-          <p><b>Карточка рекорда.</b> Вверху показаны сохранённый скин, ник, класс и режим забега. Снимок сохраняет форму персонажа и не меняется при замене или сбросе скина в аккаунте. Старые записи без снимка показывают стандартный «1С». Характеристики и списки снаряжения оформлены отдельными блоками.</p>
-          <p><b>Общий чат.</b> Кнопка в главном меню открывает отдельное окно с последними сообщениями всех игроков, ником, датой и временем отправки. Чат обновляется в реальном времени; писать могут игроки с подключённым аккаунтом. Ник берётся из профиля, время назначает сервер. Добавлены ограничение длины сообщения и интервал между отправками.</p>
-          <p><b>Редкое событие «М.В. обиделся».</b> Каждую игровую минуту отдельно проверяется шанс 1%: «На М.В. пожаловались и он обиделся. Разбирайтесь с ним сами». Появляется М.В. с половиной обычных HP, урона касанием и снарядами, а также скорости передвижения. Событие не повторяется чаще одного раза за минуту; в онлайне проверку выполняет хост, а объявление получают все участники.</p>
+          <p><b>Обзор после смерти в онлайне.</b> В сетевом матче выбывший игрок автоматически переходит к наблюдению за всей картой. Колесо мыши приближает и отдаляет камеру, перетаскивание перемещает её; есть кнопки масштаба и возврата ко всей карте. Итоги забега доступны отдельно, наблюдение не останавливает остальных участников. В одиночной игре режима наблюдения нет.</p>
+          <p><b>Хост остаётся в комнате.</b> Пока матч продолжается, хост не может выйти через меню или перезапустить игру, в том числе после смерти. Он продолжает рассчитывать мир, ботов, общие предметы и определение победителя. После завершения матча выход снова доступен. При закрытии или обновлении страницы браузер предупреждает о незавершённом матче.</p>
+          <p><b>Аирдропы Battle Royale.</b> На краю экрана появляется стрелка к одной ближайшей поставке за пределами обзора. В аирдропе лежат случайный предмет и отдельный расходник: их можно подобрать независимо. Предметы действуют по обычным правилам инвентаря, рюкзака и сборки комплектов.</p>
+          <p><b>Добыча с погибших.</b> Погибшие игроки и боты оставляют немного опыта и один случайный предмет из основного инвентаря. Предмет исчезает у погибшего; если инвентарь был пуст, выпадает только опыт. Подбор доступен оставшимся в живых участникам.</p>
           <h5>Ребаланс</h5>
-          <p><b>Мультивыстрел и рикошет.</b> Усилены штраф к общему урону у мультивыстрела и увеличение перезарядки у рикошета на всех ступенях. С прокачкой рикошета каждый отскок сохраняет меньшую долю урона предыдущего попадания. Классовые бонусы сохранены; карточки прокачки и база знаний показывают актуальные значения.</p>
+          <p><b>Уникальное снаряжение.</b> Каждый предмет II, III и IV тира можно иметь только в одном экземпляре на основной инвентарь и рюкзак вместе. Повторная покупка, сборка второго одинакового комплекта и подбор дубликата заблокированы. Бонусы одинаковых предметов этих тиров не складываются; предметы I тира сохраняют прежние правила.</p>
+          <p><b>Рост тира поставок.</b> Первые три аирдропа содержат предмет I тира, следующие три — II, с седьмого выпадают случайные предметы III тира. Количество опыта с погибшего увеличивается с его уровнем и имеет верхний предел.</p>
           <h5>Исправления ошибок</h5>
-          <p><b>Зафиксированные итоги.</b> При записи рекорда очки, время и класс берутся из снимка завершённого забега. Наблюдение за продолжающимся матчем после смерти больше не увеличивает время записываемого результата.</p>
+          <p><b>HUD наблюдателя.</b> После смерти скрываются личные здоровье, опыт, очки, инвентарь, активные навыки, рывок и указатель центра зоны. Панель обзора перенесена вниз вместо активных умений. Киллфид и события матча остаются видимыми; при новом забеге обычный HUD возвращается.</p>
+          <p><b>Безопасное появление мобов.</b> Обычные волны и RuDesktop появляются за пределами обзора живых игроков с запасом расстояния. Учитываются размер экрана, масштаб камеры и другие участники комнаты. Координаты больше не прижимаются к краю карты, что могло поставить врага рядом с игроком. Камера погибшего наблюдателя не ограничивает спавн.</p>
+          <p><b>Матч после смерти хоста.</b> Исправлена обработка выбывания в комнатах на двух участников: смерть больше не считается выходом из сессии и не передаёт роль хоста. PvE продолжается до гибели последнего союзника, PvP и BR определяют последнего выжившего. Синхронизация и таймер комнаты работают, пока хост наблюдает или открывает свои итоги.</p>
+          <p><b>Общие предметы.</b> Выдачу снаряжения подтверждает хост: одна вещь достаётся одному участнику, повторные сообщения не выдают её повторно. При нехватке места предмет остаётся доступен на карте. Боты тоже подбирают снаряжение.</p>
         </details>
         <details class="release-notes patch-minor"><summary><h3>3.1.0 — «Зона ответственности»</h3></summary>
           <h4>Нововведения</h4>
@@ -6081,6 +6088,36 @@ class PlayerSkinManager {
     this.maxLength = 16000;
     const crop = document.getElementById('skin-crop');
     document.getElementById('skin-file').addEventListener('change', event => this.selectFile(event.target.files?.[0]));
+    const editor = document.getElementById('modal-player-skin'), windowNode = editor.querySelector('.skin-window');
+    this.dropDepth = 0;
+    const hasFiles = event => Array.from(event.dataTransfer?.types || []).includes('Files');
+    editor.addEventListener('dragenter', event => {
+      if (!this.active() || !hasFiles(event)) return;
+      event.preventDefault(); this.dropDepth++;
+      windowNode.classList.add('skin-drag-over');
+    });
+    editor.addEventListener('dragover', event => {
+      if (!this.active() || !hasFiles(event)) return;
+      event.preventDefault(); event.dataTransfer.dropEffect = this.busy || this.loadingFile ? 'none' : 'copy';
+    });
+    editor.addEventListener('dragleave', event => {
+      if (!hasFiles(event)) return;
+      this.dropDepth = Math.max(0, this.dropDepth - 1);
+      if (!this.dropDepth) windowNode.classList.remove('skin-drag-over');
+    });
+    editor.addEventListener('drop', event => {
+      if (!this.active() || !hasFiles(event)) return;
+      event.preventDefault(); this.dropDepth = 0; windowNode.classList.remove('skin-drag-over');
+      const files = Array.from(event.dataTransfer.files || []);
+      this.selectFile(files.find(file => file.type.startsWith('image/')) || files[0]);
+    });
+    document.addEventListener('paste', event => {
+      if (!this.active()) return;
+      const item = Array.from(event.clipboardData?.items || []).find(item => item.kind === 'file' && item.type.startsWith('image/'));
+      const file = item?.getAsFile() || Array.from(event.clipboardData?.files || []).find(file => file.type.startsWith('image/'));
+      if (!file) return;
+      event.preventDefault(); this.selectFile(file);
+    });
     document.getElementById('skin-zoom').addEventListener('input', event => this.setZoom(Number(event.target.value)));
     crop.addEventListener('pointerdown', event => {
       if (!this.draft || this.busy || this.loadingFile || event.button !== 0) return;
@@ -6296,7 +6333,44 @@ class PlayerSkinManager {
     try { return await promise; } finally { if (this.recordLoads.get(key) === promise) this.recordLoads.delete(key); }
   }
 
+  makeRecordSkinTurnable(canvas) {
+    let rotation = 0, drag = null;
+    const turn = delta => { rotation = (rotation + delta) % 360; canvas.style.transform = `rotate(${rotation}deg)`; };
+    const angleAt = event => {
+      const rect = canvas.getBoundingClientRect(), x = event.clientX - rect.left - rect.width / 2, y = event.clientY - rect.top - rect.height / 2;
+      return Math.hypot(x, y) < 8 ? null : Math.atan2(y, x);
+    };
+    canvas.addEventListener('pointerdown', event => {
+      if (event.button !== 0 || drag) return;
+      const angle = angleAt(event); if (angle === null) return;
+      event.preventDefault(); canvas.focus({preventScroll:true});
+      drag = { id:event.pointerId, angle }; canvas.setPointerCapture(event.pointerId); canvas.classList.add('turning');
+    });
+    canvas.addEventListener('pointermove', event => {
+      if (drag?.id !== event.pointerId) return;
+      const angle = angleAt(event); if (angle === null) return;
+      const delta = angle - drag.angle;
+      turn(Math.atan2(Math.sin(delta), Math.cos(delta)) * 180 / Math.PI); drag.angle = angle;
+    });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(type, event => {
+      if (drag?.id !== event.pointerId) return;
+      drag = null; canvas.classList.remove('turning');
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    });
+    canvas.addEventListener('wheel', event => {
+      if (!event.deltaY) return;
+      event.preventDefault(); turn(Math.sign(event.deltaY) * 15);
+    }, {passive:false});
+    canvas.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home'].includes(event.code)) return;
+      event.preventDefault(); event.stopPropagation();
+      turn(event.code === 'Home' ? -rotation : event.code === 'ArrowLeft' ? -15 : 15);
+    });
+    canvas.addEventListener('dblclick', () => turn(-rotation));
+  }
+
   showRecord(canvas, label, appearance, version) {
+    this.makeRecordSkinTurnable(canvas);
     const parts = String(version || '').split('.').slice(0, 3).map(Number);
     const modern = parts.length === 3 && parts.every(Number.isFinite) &&
       (parts[0] > 3 || (parts[0] === 3 && (parts[1] > 2 || (parts[1] === 2 && parts[2] >= 2))));
@@ -6347,13 +6421,14 @@ class PlayerSkinManager {
       if (this.validVersion(version)) await this.load(uid, version);
       else this.cache.delete(uid);
       if (this.fb !== fb || !this.active() || generation !== this.fileGeneration) return;
-      if (!this.draft) this.status('Выберите PNG, JPG или WebP до 8 МБ. Готовый скин: 128×128, до 16 КБ.');
+      if (!this.draft) this.status('Выберите, перетащите или вставьте через Ctrl+V PNG, JPG или WebP до 8 МБ. Готовый скин: 128×128, до 16 КБ.');
       this.renderEditor(); this.updateControls();
     } catch (error) { this.loadError(uid, error); }
   }
 
   close() {
     this.fileGeneration++; this.draft = null; this.drag = null; this.loadingFile = false;
+    this.dropDepth = 0; document.querySelector('#modal-player-skin .skin-window').classList.remove('skin-drag-over');
     document.getElementById('skin-file').value = '';
     document.getElementById('modal-player-skin').style.display = 'none';
     document.getElementById('modal-main-menu').style.display = 'flex';
@@ -6371,7 +6446,7 @@ class PlayerSkinManager {
   }
 
   async selectFile(file) {
-    if (!file || this.busy || this.loadingFile || !this.fb || !this.active()) return;
+    if (!file || this.busy || this.loadingFile || !this.fb || !this.uid || this.game.localDebugAuth || !this.active()) return;
     const generation = ++this.fileGeneration;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) {
       this.status('Выберите PNG, JPG или WebP размером не больше 8 МБ.', true);
@@ -6420,7 +6495,7 @@ class PlayerSkinManager {
     const canvas = document.getElementById('skin-crop'), ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 320, 320); ctx.fillStyle = '#27313e'; ctx.fillRect(0, 0, 320, 320);
     if (!this.drawSource(ctx, 320)) {
-      ctx.fillStyle = '#e5e9ee'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Выберите изображение', 160, 164);
+      ctx.fillStyle = '#e5e9ee'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Выберите или перетащите фото', 160, 150); ctx.fillText('либо вставьте через Ctrl+V', 160, 176);
     }
     ctx.beginPath(); ctx.arc(160, 160, 158, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
     for (const [id, square] of [['skin-preview-circle', false], ['skin-preview-square', true]]) {
@@ -10894,7 +10969,7 @@ class Game {
     this.salesCallActive = true;
     this.salesCallCount = (this.salesCallCount || 0) + 1;
     this.recordAchievementCounter('salesCallsReceived');
-    this.shopPriceMultiplier = (this.shopPriceMultiplier || 2.0) * 1.08;
+    this.shopPriceMultiplier = (this.shopPriceMultiplier || 2.0) * 1.10;
     this.salesCallX = 12;
     this.salesCallY = 12;
     this.salesCallVX = 48;
@@ -10907,7 +10982,7 @@ class Game {
     card.style.top = `${this.salesCallY}px`;
     this.log('Mango Talker: звонит отдел продаж. «У нас для вас платные интеграции и всего пара уточняющих вопросов».' );
     this.salesCallFrame = requestAnimationFrame((t) => this.animateSalesCall(t));
-    this.log(`Новый звонок отдела продаж: цены магазина повышены на 8% (звонков: ${this.salesCallCount}).`);
+    this.log(`Новый звонок отдела продаж: цены магазина повышены на 10% (звонков: ${this.salesCallCount}).`);
   }
 
   animateSalesCall(timestamp) {
@@ -17151,8 +17226,12 @@ class Game {
       cells.push(['Баффы смены', mod.buffDesc || mod.desc]);
       cells.push(['Дебаффы смены', mod.debuffDesc || '—']);
     }
-    let html = `<div class="record-profile"><div class="record-avatar"><canvas id="record-skin-canvas" width="128" height="128" aria-label="Скин игрока в этом забеге"></canvas><small id="record-skin-label">Стандартный «1С»</small></div><div><h2>${h(entry.name || 'Игрок')}</h2><p>${h(classNames[entry.classId] || snapshot?.className || '—')} · ${h(modeDisplay)}</p><small>Скин в этом забеге</small></div></div>`;
+    let html = `<div class="record-profile"><div class="record-avatar"><canvas id="record-skin-canvas" width="128" height="128" tabindex="0" aria-label="Скин игрока: вращайте перетаскиванием, колесом или стрелками влево и вправо; Home сбрасывает поворот" title="Крутите перетаскиванием или колесом. Двойной щелчок — сброс поворота."></canvas><small id="record-skin-label">Стандартный «1С»</small><small>↻ Крутите мышью или колесом</small></div><div><h2>${h(entry.name || 'Игрок')}</h2><p>${h(classNames[entry.classId] || snapshot?.className || '—')} · ${h(modeDisplay)}</p><small>Скин в этом забеге</small></div></div>`;
     html += `<div class="record-detail-grid">${cells.map(([label, value]) => `<div class="record-detail-stat"><b>${h(label)}</b><span>${h(value)}</span></div>`).join('')}</div>`;
+    if (!dailyInfo && (entry.mode || 'solo') === 'solo' && Array.isArray(snapshot?.modifiers)) {
+      const modifiers = snapshot.modifiers.filter(item => item && typeof item === 'object' && typeof item.name === 'string').slice(0, SOLO_RUN_MODIFIERS.length);
+      if (modifiers.length) html += `<h3 class="record-detail-section">Модификаторы забега · ${modifiers.length}</h3><ul class="record-detail-list">${modifiers.map(item => `<li class="record-item"><b>${h(item.name)}</b>${item.risk ? `<div class="record-modifier-risk">Усложнение: ${h(item.risk)}</div>` : ''}${item.reward ? `<div class="record-modifier-reward">Награда: ${h(item.reward)}</div>` : ''}</li>`).join('')}</ul>`;
+    }
     if (snapshot && typeof snapshot === 'object') {
       if (snapshot.reason) html += `<p><b>Причина завершения:</b> ${h(snapshot.reason)}</p>`;
       const run = snapshot.run || {};
@@ -18749,9 +18828,9 @@ const PATCH300_METHODS = {
   },
   getPatchCurrency(xp, currencyMult=1, dropMult=1) {
     const time=this.time||0;
-    const economy=time<=360?1:time<=900?1-(time-360)/540*.15:Math.max(.70,.85-(time-900)/1800*.15);
+    const economy=time<=360?1:time<=900?1-(time-360)/540*.15:Math.max(.62,.85-(time-900)/1800*.23);
     const effective=currencyMult;
-    return Math.max(0,Math.round(Math.max(0,xp)*.45*effective*dropMult*economy));
+    return Math.max(0,Math.round(Math.max(0,xp)*.40*effective*dropMult*economy));
   },
   hasPatchItem(key) {return Boolean((this.shopPassives||[]).some(slot=>slot?.key===key));},
   redirectPatchProjectile(damage) {

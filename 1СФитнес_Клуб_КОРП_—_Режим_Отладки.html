@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-<title>1С:Фитнес Клуб КОРП 3.2.3</title>
+<title>1С:Фитнес Клуб КОРП 3.3.0</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -995,6 +995,11 @@
   .match-results-table { width:100%;border-collapse:collapse;font-size:12px; }
   .match-results-table td,.match-results-table th { border:1px solid #bbb;padding:7px;text-align:left; }
   .match-results-table tr.own { background:#fff2ad; }
+  #modal-run-decision { z-index:380; }
+  #run-decision-choices { display:flex;gap:10px;flex-wrap:wrap;margin:12px 0; }
+  #run-decision-choices button { flex:1 1 170px;text-align:left;padding:12px; }
+  #run-decision-choices b,#run-decision-choices span { display:block;margin-bottom:6px; }
+  #app-window.is-spectating #run-decisions { display:none!important; }
   #modal-record-detail { z-index:360; }
   #record-detail-content { max-height:min(72vh,720px); overflow:auto; }
   .record-profile { display:flex; gap:20px; align-items:center; padding:15px; margin-bottom:14px; border:1px solid #c5cbd1; background:#f8f9fa; }
@@ -1325,7 +1330,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v3.2.3 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v3.3.0 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1516,7 +1521,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.3</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.3.0</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1529,10 +1534,16 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>3.2.3</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>3.3.0</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
             <button id="global-chat-open" class="btn-1c" onclick="game.chat.open()">💬 Общий чат</button>
           </div>
           <div>
+            <div class="release-notes">
+              <h3>Версия 3.3.0 — «Инцидент в продакшне»</h3>
+              <p><b>Выездные инциденты.</b> Необязательные задачи на карте с выбором награды. Для части активок на V уровне доступны две специализации.</p>
+              <p><b>Новые противники и навыки.</b> Пользователь с макросом и Сборщик логов; четыре новых классовых активки. Помощники получили разные боевые роли.</p>
+              <p><b>Реворки и баланс.</b> Переработаны пятый, шестой и седьмой большие боссы. Легендарное развитие перенесено на пятого. У оружия выраженнее различаются сильные стороны против толпы, элиты и боссов.</p>
+            </div>
             <div class="release-notes">
               <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
               <p><b>Патч 3.2.3.</b> Переработаны первые четыре босса и приоритет автонаведения. Легендарное развитие доступно после четвёртого большого босса. Добавлены итоговая таблица сетевого матча и места игроков и ботов. Исправлены наблюдение в онлайне, выдача добычи, события и сохранение рекордов. Усилены проверки рейтингов и хранение данных.</p>
@@ -1541,12 +1552,7 @@
               <p><b>Патч 3.2.0 — обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
               <p><b>Аирдропы и добыча.</b> Указатель ближайшей поставки; внутри — расходник и предмет, тир которого растёт с номером дропа. Погибшие игроки и боты оставляют опыт и один предмет из инвентаря.</p>
             </div>
-            <div class="release-notes">
-              <h3>Версия 3.1.0 — «Зона ответственности»</h3>
-              <p><b>Боты в BR.</b> Фармят мобов, прокачиваются под свой класс, воюют с игроками и держатся внутри сжимающейся зоны. Можно заполнить свободные места лобби ботами. После босса 30-й минуты можно развить выбранную легендарную миграцию.</p>
-              <p><b>Боссы держат позицию.</b> Большие боссы защищены от оглушения и смещения. Комитет стал крепче, защитник лечит другие части; монолит быстрее возвращает модули.</p>
-              <p><b>Темп боя.</b> Первые волны меньше, раннего опыта больше, исправлены интервалы стрелков. Sigur и аварийный ИБП готовы чаще; динамическое обновление отключено в PvP и BR.</p>
-            </div>
+
 
           </div>
         </div>
@@ -1568,6 +1574,10 @@
 
   <div id="modal-match-results" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="match-results-title">
     <div class="win-1c" style="width:min(1200px,96vw)"><div class="win-1c-head"><span id="match-results-title">🏆 Итоги матча</span><button class="win-close-btn" onclick="game.closeMatchResults()" aria-label="Закрыть итоги матча">✕</button></div><div class="win-1c-body" id="match-results-body"></div></div>
+  </div>
+  <button id="run-decisions" type="button" class="btn-1c" style="display:none;position:absolute;left:12px;top:105px;z-index:145" onclick="game.showRunDecision()">📋 Доступен выбор</button>
+  <div id="modal-run-decision" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="run-decision-title">
+    <div class="win-1c" style="width:min(700px,94vw)"><div class="win-1c-head"><span id="run-decision-title"></span><button class="win-close-btn" onclick="game.closeRunDecision()" aria-label="Отложить выбор">✕</button></div><div class="win-1c-body"><p id="run-decision-description"></p><div id="run-decision-choices"></div><button class="btn-1c" onclick="game.closeRunDecision()">Выбрать позже</button></div></div>
   </div>
   <div id="modal-player-skin" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="skin-title">
     <div class="win-1c skin-window">
@@ -1608,7 +1618,7 @@
     </div>
   </div>
   <div id="modal-knowledge" class="modal-overlay">
-    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.3</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
+    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.3.0</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
       <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, босса, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
@@ -1806,7 +1816,20 @@
       <div class="win-1c-head"><span>📋 История обновлений</span><button class="win-close-btn" onclick="game.closeChangelog()" aria-label="Закрыть историю обновлений">✕</button></div>
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
-        <details class="release-notes patch-minor" open><summary><h3>3.2.0 — «Кластер живёт дальше»</h3></summary>
+        <details class="release-notes patch-minor" open><summary><h3>3.3.0 — «Инцидент в продакшне»</h3></summary>
+          <h4>Нововведения</h4>
+          <p><b>Выездные инциденты.</b> В обычном одиночном забеге и кооперативном PvE появляются необязательные задачи на карте: восстановить сервер, удержать участок или сопроводить резервную копию. Подойдите к маркеру, чтобы начать. За выполнение участники выбирают фиткоины, снаряжение или повышение уровня. Награду можно выбрать позже; во время большого босса отсчёт активной задачи приостанавливается.</p>
+          <p><b>Специализации активных навыков.</b> На V уровне Sigur, аварийного ИБП, удалённого восстановления и отложенного выполнения доступны два варианта развития с разными преимуществами и недостатками. Выбор сохраняется до конца забега и записывается в карточку результата.</p>
+          <p><b>Новые мобы.</b> Пользователь с макросом запоминает маршрут и предупреждает об атаке по следу. Сборщик логов перехватывает ограниченное число обычных непробивающих снарядов спереди, после предупреждения отвечает коротким веером и делает паузу. Его можно атаковать с другой стороны; одновременно таких противников немного.</p>
+          <p><b>Четыре активных навыка.</b> Аварийная перегородка защищает от снарядов мобов; перенаправление маршрута доворачивает собственные летящие снаряды; отложенное выполнение собирает новые снаряды оружия в усиленную очередь; эвакуация бригады отзывает помощников ради ограниченного защитного запаса. У каждого навыка пять уровней и классовый бонус к перезарядке.</p>
+          <h4>Ребаланс</h4>
+          <p><b>Большие боссы.</b> Переработаны механики пятого, шестого и седьмого больших боссов. У нестабильного релиза появились уничтожаемые точки сбоя, позволяющие отключать участки атаки. Резервные копии получили разные роли: лечение, усиление залпов и опасные зоны. Выбор развития легендарной миграции теперь выдаётся после окончательной победы над пятым большим боссом.</p>
+          <p><b>Роли помощников.</b> Обычная поддержка замедляет мобов, дрон сильнее против боссов, старший специалист удерживает ближайших врагов, дежурный инженер отвечает за площадь. Эвакуация не сбрасывает перезарядки призывов.</p>
+          <p><b>Назначение оружия.</b> Для части оружия разделены коэффициенты урона по обычным мобам, элите и боссам. Прицельные средства сильнее против одиночных крупных целей, средства зачистки выгоднее против толпы. Описания показывают преимущества и недостатки.</p>
+          <h4>Исправления ошибок</h4>
+          <p><b>База знаний.</b> Исправлена подсветка штрафа к опыту разработчика и похожих формулировок. Оставшиеся обозначения бонусов приведены к единому знаку процента. Добавлены сведения о новых противниках, навыках, специализациях и задачах.</p>
+        </details>
+        <details class="release-notes patch-minor"><summary><h3>3.2.0 — «Кластер живёт дальше»</h3></summary>
           <h4>Патч 3.2.3 — новые тактики боссов и итоги матчей</h4>
           <h5>Нововведения</h5>
           <p><b>Итоги сетевого матча.</b> В PvP, PvE и Battle Royale показана общая таблица игроков и ботов: места, убийства соперников и мобов, суммарные очки и очки за мобов и дискеты, собранные дискеты и фиткоины. Видно, кто кого убил. В PvP и BR места определяются по выживанию, в PvE — по очкам. Своя строка выделена.</p>
@@ -2033,7 +2056,7 @@
           <p>Обычная пауза недоступна; F9 ставит матч на общую паузу, которую может снять любой участник, а неактивное окно хоста автоматически приостанавливает матч. На HUD активных умений есть указатель к центру карты. Победитель Battle Royale получает зелёное окно итогов с возможностью записать рекорд.</p>
           <p>Таблица рекордов показывает режим и число игроков.</p>
           <h4>Ребаланс</h4>
-          <p>Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25 процентных пунктов за каждого. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках).</p>
+          <p>Максимальный уровень улучшения «Конверсия заявок в записи» ограничен восьмым. Число мобов растёт с размером группы: 1 игрок — 100%, 2 — 180%, далее по +25% за каждого. Базовая карта классического PvP увеличивается на 15% за каждого игрока сверх трёх (до +75% при восьми участниках).</p>
           <p>Тикеты выдаются случайно из общего пула, без выбора игроком.</p>
         </details>
         </section>
@@ -2447,7 +2470,7 @@ const BIG_BOSS_GUIDE = [
     'Дебет и кредит: по очереди опасны левая и правая половины карты. Перед включением урона есть 1,2 с предупреждения.',
     'На опасной половине — 20 урона каждые 0,7 с. Нельзя стоять прямо на разделительной линии: учитывается радиус персонажа.',
     'Сторона меняется каждые 5,5 с; при HP ниже 35% — каждые 3,8 с. Босс преследует цель уже на первом появлении.',
-    'Особая награда: после победы над четвёртым большим боссом на 20-й минуте — оставить легендарную миграцию или выбрать одно из двух её развитий.']},
+    'Особая награда: после победы над пятым большим боссом на 25-й минуте — оставить легендарную миграцию или выбрать одно из двух её развитий.']},
   {summary:'Совмещает прицельные вееры, кольца с проходами и опасные зоны. При HP 50% и ниже переходит в ярость.',details:[
     'Веер: 7 снарядов каждые 2,7 с; по 18,2 урона. В ярости: каждые 1,9 с, по 22,4 урона.',
     'Кольцо транзакций: 15 снарядов с тремя проходами каждые 6,2 с. Урон 21; в ярости — каждые 4,5 с, урон 25,2. Кольца поворачиваются между залпами.',
@@ -2457,7 +2480,7 @@ const BIG_BOSS_GUIDE = [
     'Релизные замечания: веер из 5 снарядов каждые 3,1 с, по 19,6 урона. В ярости: каждые 2,2 с, по 23,8 урона.',
     'Откат не предусмотрен: крест из 9 кругов радиусом 31. Предупреждение 1,05 с, интервал 7,2 с, урон 39,2 за круг. В ярости: интервал 5,4 с, урон 47,6.',
     'Перезапуск сервера: круг радиусом 128 в позиции цели. Предупреждение 1,35 с, интервал 10,5 с, урон 64,4. В ярости: интервал 8,2 с, урон 81,2.',
-    'Держится примерно в 145 единицах от цели. Легендарное развитие выдаётся раньше — за четвёртого большого босса.']},
+    'Держится примерно в 145 единицах от цели. Легендарное развитие выдаётся за предыдущего большого босса.']},
   {summary:'Призывает файлы и восстанавливает здоровье, пока они живы. Уничтожайте призывы, чтобы отключить лечение.',details:[
     'Веер: 5 снарядов каждые 3,3 с, по 22,4 урона. При HP 50% и ниже: каждые 2,4 с, по 28 урона.',
     'Каждые 9 с восстанавливает один файл, одновременно до трёх. В ярости интервал 7 с. Файл: 210 HP, контакт 15 HP/с, скорость 93 единицы/с; 9 базового опыта.',
@@ -2466,14 +2489,14 @@ const BIG_BOSS_GUIDE = [
     'Держится примерно в 225 единицах от цели.']}
 ];
 
-const GAME_VERSION = '3.2.3';
+const GAME_VERSION = '3.3.0';
 const UPGRADE_REROLL_PACK = { count: 3, cost: 750 };
 const MV_COMPLAINT_EVENT = {
   interval: 60, chance: .01, strength: .5,
   message: 'На М.В. пожаловались и он обиделся. Разбирайтесь с ним сами'
 };
 const MAX_PLAYER_DODGE = 0.50;
-const NETWORK_PROTOCOL = 6;
+const NETWORK_PROTOCOL = 7;
 const BR_ZONE_SHRINK_DURATION = 30;
 const BR_ZONE_PAUSE_DURATION = 10;
 const BR_ZONE_BASE_DAMAGE_PER_SECOND = 25;
@@ -2502,15 +2525,15 @@ const DAILY_MODIFIERS = [
   },
   {
     key: 'friday_prod', name: 'Пятничный деплой на прод',
-    desc: 'Крит +35 п.п., критический урон +80%, но здоровье боссов +90%, частота их атак +60%.',
-    buffDesc: 'Шанс крита +35 процентных пунктов (общий предел — 80%). Урон критических попаданий оружия и умений +80%.',
+    desc: 'Крит +35%, критический урон +80%, но здоровье боссов +90%, частота их атак +60%.',
+    buffDesc: 'Шанс крита +35% (общий предел — 80%). Урон критических попаданий оружия и умений +80%.',
     debuffDesc: 'Здоровье всех боссов +90%. Их специальные атаки срабатывают на 60% чаще.',
     rules: { critBonus: 0.35, critDamageMult: 1.8, bossHpMult: 1.9, bossAttackRate: 1.6 }
   },
   {
     key: 'release_rush', name: 'Срочный релиз к выставке',
-    desc: 'Скорость +50%, множитель урона +75 п.п., но максимальное здоровье −50%.',
-    buffDesc: 'Множитель скорости +50 п.п., множитель урона оружия +75 п.п. Бонус урона также усиливает активные умения.',
+    desc: 'Скорость +50%, множитель урона +75%, но максимальное здоровье −50%.',
+    buffDesc: 'Множитель скорости +50%, множитель урона оружия +75%. Бонус урона также усиливает активные умения.',
     debuffDesc: 'Максимальное и стартовое здоровье снижены вдвое.',
     rules: { speedBonus: 0.5, damageBonus: 0.75, maxHpMult: 0.5 }
   },
@@ -2530,8 +2553,8 @@ const DAILY_MODIFIERS = [
   },
   {
     key: 'budget_cut', name: 'Оптимизация бюджета',
-    desc: 'Множитель урона +100 п.п., опыт +100%, но доход −75%, магазин дороже на 60%.',
-    buffDesc: 'Множитель урона оружия +100 п.п. (также усиливает умения). Опыт +100%.',
+    desc: 'Множитель урона +100%, опыт +100%, но доход −75%, магазин дороже на 60%.',
+    buffDesc: 'Множитель урона оружия +100% (также усиливает умения). Опыт +100%.',
     debuffDesc: 'Доход с дискет снижен на 75%. Цены магазина +60%.',
     rules: { damageBonus: 1, xpBonus: 1, currencyMult: 0.25, shopPriceMult: 1.6 }
   }
@@ -3979,7 +4002,8 @@ const ACTIVE_SKILLS_DEF = {
     desc: 'Антипассбэк сработал: отбрасывает врагов вокруг и наносит урон.',
     baseCd: 20,
     cast: (g, lvl) => {
-      const radius = classValue(g, 'act_sigur_lockdown', radiusAtLevel(SIGUR_LOCKDOWN_RADII, lvl), 1.15);
+      const specialization=g.skillSpecialization('act_sigur_lockdown');
+      const radius = classValue(g, 'act_sigur_lockdown', radiusAtLevel(SIGUR_LOCKDOWN_RADII, lvl), 1.15)*(specialization.radius||1);
       for (const e of g.enemies) {
         if (e.is24hPursuer) continue;
         const dx = e.x - g.player.x, dy = e.y - g.player.y;
@@ -3987,8 +4011,8 @@ const ACTIVE_SKILLS_DEF = {
         if (d < radius) {
           const push = (radius - d) * 0.55;
           g.displaceEnemy(e, (dx / (d || 1)) * push, (dy / (d || 1)) * push);
-          g.dealActiveSkillDamage(e, (e.isBoss ? 90 : 120) + lvl * 30, lvl, ACTIVE_SKILLS_DEF.act_sigur_lockdown.name);
-          g.stunEnemy(e, 0.6 + lvl * 0.15);
+          g.dealActiveSkillDamage(e, ((e.isBoss ? 90 : 120) + lvl * 30)*(specialization.damage||1), lvl, ACTIVE_SKILLS_DEF.act_sigur_lockdown.name);
+          g.stunEnemy(e, (0.6 + lvl * 0.15)*(specialization.control||1));
           g.createHitFX(e.x, e.y, '#00cec9', 4);
         }
       }
@@ -4710,8 +4734,8 @@ Object.assign(ACTIVE_SKILLS_DEF, {
   act_emergency_ups: { name: 'Аварийный ИБП', icon: '🔋', baseCd: 24,
     desc: 'Включает щит на 2,2–3 с и уничтожает вражеские снаряды в радиусе 180–260.',
     cast(g, lvl) {
-      g.player.shieldTimer = Math.max(g.player.shieldTimer || 0, classValue(g, 'act_emergency_ups', 2 + lvl * 0.2, 1.20));
-      const radius = 160 + lvl * 20;
+      g.player.shieldTimer = Math.max(g.player.shieldTimer || 0, classValue(g, 'act_emergency_ups', 2 + lvl * 0.2, 1.20)*(g.skillSpecialization('act_emergency_ups').shield||1));
+      const radius = (160 + lvl * 20)*(g.skillSpecialization('act_emergency_ups').radius||1);
       g.enemyProjectiles = g.enemyProjectiles.filter(p => Math.hypot(p.x - g.player.x, p.y - g.player.y) > radius);
       g.createHitFX(g.player.x, g.player.y, '#ffeaa7', 16);
       g.addPopup(g.player.x, g.player.y - 30, '🔋 РЕЗЕРВНОЕ ПИТАНИЕ', '#ffeaa7');
@@ -4746,8 +4770,8 @@ Object.assign(ACTIVE_SKILLS_DEF, {
     desc: 'Восстанавливает герою 8–16% максимального HP, а всем живым помощникам — 40–60% их максимального HP.',
     cast(g, lvl) {
       const bonus = hasClassAffinity(g.player, 'act_remote_restore') ? 1.20 : 1;
-      g.player.hp = Math.min(g.player.maxHp, g.player.hp + g.player.maxHp * (0.06 + lvl * 0.02) * bonus);
-      for (const s of g.summons) if (s.hp > 0 && s.life > 0) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * (0.35 + lvl * 0.05) * bonus * (g.pvp?.mode === 'pvp' ? 0.5 : 1));
+      g.player.hp = Math.min(g.player.maxHp, g.player.hp + g.player.maxHp * (0.06 + lvl * 0.02) * bonus*(g.skillSpecialization('act_remote_restore').hero||1));
+      for (const s of g.summons) if (s.hp > 0 && s.life > 0) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * (0.35 + lvl * 0.05) * bonus*(g.skillSpecialization('act_remote_restore').team||1) * (g.pvp?.mode === 'pvp' ? 0.5 : 1));
       g.createHitFX(g.player.x, g.player.y, '#55efc4', 14);
       g.addPopup(g.player.x, g.player.y - 30, '🩺 СВЯЗЬ ВОССТАНОВЛЕНА', '#55efc4');
     } }
@@ -5100,6 +5124,7 @@ class PvpBotController {
     const actor = Object.create(Game.prototype);
     const spawn = g.getMatchSpawnPoint(member.slot, member.uid);
     const angle = Math.atan2(spawn.y - g.MAP_SIZE / 2, spawn.x - g.MAP_SIZE / 2);
+    actor.v330Bot=true;
     actor.player = { ...structuredClone(g.player), ...classDef.stats, classId:member.classId, className:classDef.name,
       x:spawn.x, y:spawn.y };
     actor.pvp = Object.assign(Object.create(g.pvp), { uid:member.uid, name:member.name, eliminated:false, matchOver:false });
@@ -5187,11 +5212,14 @@ class PvpBotController {
     const source = origin || bot?.actor.player;
     if (!source) return;
     const classId = bot?.classId || g.pvp.remotePlayers?.[uid]?.classId || g.player.classId;
-    const damage = (offensive[0] + (level - 1) * offensive[1]) * activeSkillDamageMultiplier(level) * classActiveDamageMultiplier({classId}, key) * .14;
+    const branch=bot?.actor.skillSpecializations?.[key]??g.pvp.remotePlayers?.[uid]?.state?.v330Specs?.[key]??(uid===g.pvp.uid?g.skillSpecializations?.[key]:undefined);
+    const spec=level===5?SKILL_SPECIALIZATIONS[key]?.[branch]||{}:{};
+    const radius=key==='act_sigur_lockdown'?radiusAtLevel(SIGUR_LOCKDOWN_RADII,level)*(classId==='technician'?1.15:1)*(spec.radius||1):900;
+    const damage = (offensive[0] + (level - 1) * offensive[1]) * activeSkillDamageMultiplier(level) * classActiveDamageMultiplier({classId}, key) * .14*(spec.damage||1);
     // Для человека его штатный пакет уже обрабатывает других людей. Здесь нужны только боты.
     const targets = bot ? this.targets(uid) : [...this.bots.values()].filter(b=>b.uid!==uid && b.actor.player.hp>0).map(b=>({...b.actor.player,uid:b.uid}));
     for (const target of targets) {
-      if (Math.hypot(target.x-source.x,target.y-source.y) > 900) continue;
+      if (Math.hypot(target.x-source.x,target.y-source.y) > radius) continue;
       this.attack(uid,target.uid,damage,ACTIVE_SKILLS_DEF[key].name);
     }
   }
@@ -5410,6 +5438,8 @@ class PvpBotController {
         if (anchor && !inSafeZone(anchor.x,anchor.y)) continue;
       }
       const defensive=/backup_dt|reactivation|remote_restore|rollback|emergency_ups/.test(skill.key);
+      if(skill.key==='act_team_evacuation'&&(!(a.summons||[]).some(s=>s.hp>0&&s.life>0)||health>.55))continue;
+      if(skill.key==='act_route_redirect'&&a.projectiles.length<2)continue;
       if(defensive?(health<.60||(threats.length>2&&p.shieldTimer<=0)):nearby)a.useActiveSkill(i);
     }
     for(let i=0;i<a.shopPassives.length;i++) {
@@ -6709,6 +6739,7 @@ class Game {
     this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     window.addEventListener('keydown', (e) => {
+      if(document.getElementById('modal-run-decision').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.closeRunDecision();}return;}
       if(document.getElementById('modal-match-results').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.closeMatchResults();}return;}
       if (this.hudLayout?.editing) { this.hudLayout.keydown(e); return; }
       if(document.getElementById('modal-global-chat').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.chat.close();}return;}
@@ -8993,8 +9024,29 @@ class Game {
       // A channel belongs to one guest; never trust a supplied sender identity.
       message = { ...message, uid: senderUid };
       if (message.skill) message.skill = { ...message.skill, senderUid };
-      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'equipment-grant', 'loot-grant', 'office-player-effect', 'equipment-denied', 'death-loot-lost', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
+      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'equipment-grant', 'loot-grant', 'v330-reward', 'v330-reward-grant', 'office-player-effect', 'equipment-denied', 'death-loot-lost', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
     }
+    if(message.type==='v330-log'&&pvp.host&&senderUid){
+      const enemy=this.enemies.find(e=>e.syncId===message.enemyId&&e.patchType==='log_collector'&&e.hp>0);
+      const state=pvp.remotePlayers?.[senderUid]?.state,sequence=Number(message.sequence);
+      pvp.v330LogSequences ||= {};
+      if(enemy&&state&&!state.over&&state.hp>0&&Number.isSafeInteger(sequence)&&sequence>(pvp.v330LogSequences[senderUid]||0)&&
+        Number.isFinite(message.x)&&Number.isFinite(message.y)&&Math.hypot(message.x-enemy.x,message.y-enemy.y)<enemy.size+40&&
+        Math.hypot(state.x-enemy.x,state.y-enemy.y)<1000&&!enemy.v330WarnAt&&(enemy.v330Stored||0)<3&&this.time>=(enemy.v330NextCollect||0)){
+        pvp.v330LogSequences[senderUid]=sequence;if(!enemy.v330Stored)enemy.v330FirstStored=this.time;enemy.v330Stored=(enemy.v330Stored||0)+1;
+      }return;
+    }
+    if(message.type==='v330-reward-ack'&&pvp.host&&senderUid){this.v330RewardGrants?.delete(senderUid+':'+message.id);return;}
+    if(message.type==='v330-wall'&&pvp.host&&senderUid){
+      const state=pvp.remotePlayers?.[senderUid]?.state,level=Math.max(1,Math.min(5,Math.floor(Number(message.level)||1)));
+      pvp.v330WallCooldowns ||= {};
+      if(state&&state.hp>0&&!state.over&&this.time>=(pvp.v330WallCooldowns[senderUid]||0)){
+        pvp.v330WallCooldowns[senderUid]=this.time+1;this.createIncidentWall(senderUid,state,level);
+      }return;
+    }
+    if(message.type==='v330-reward'&&!pvp.host){this.receiveIncidentReward(message.reward);return;}
+    if(message.type==='v330-reward-claim'&&pvp.host&&senderUid){this.grantIncidentReward(senderUid,message.id,message.choice);return;}
+    if(message.type==='v330-reward-grant'&&!pvp.host){this.applyIncidentReward(message.result);return;}
     if(message.type==='office-player-effect'&&!pvp.host){this.applyOfficePlayerEffect(message.roll);return;}
     if(message.type==='loot-claim'&&pvp.host&&senderUid){this.grantLoot(senderUid,message.id,message.collection);return;}
     if(message.type==='loot-grant'&&!pvp.host){this.receiveLootGrant(message);return;}
@@ -9019,7 +9071,7 @@ class Game {
     } else if(message.type==='patch-mail'&&!pvp.host&&message.targetUid===pvp.uid) {
       this.player.patchMagnetDebuffTimer=5;
     } else if(message.type==='patch-summon-damage'&&!pvp.host) {
-      const summon=this.summons.find(s=>s.role==='mirror'&&s.id===message.id);if(summon)summon.hp=Math.max(0,summon.hp-Math.max(0,Number(message.damage)||0));
+      const summon=this.summons.find(s=>s.id===message.id);if(summon)summon.hp=Math.max(0,summon.hp-Math.max(0,Number(message.damage)||0));
     } else if(message.type==='player-death' && pvp.host && senderUid && message.room===pvp.code) {
       if(message.loot && typeof message.loot==='object')(pvp.remoteDeathLoot ||= {})[senderUid]=message.loot;
       this.killFeed.publishDeath(senderUid,message.hit || this.killFeed.lastHits.get(senderUid));
@@ -9083,6 +9135,7 @@ class Game {
         (pvp.remoteDeathLoot ||= {})[uid]=state;
         this.killFeed.publishDeath(uid,state.deathHit || this.killFeed.lastHits.get(uid));
       }
+      if(!pvp.host&&state.v330World){this.v330Walls=state.v330World.walls||[];this.v330Incident=state.v330World.incident||null;for(const offer of state.v330World.rewardOffers||[])if(offer.uid===pvp.uid)this.receiveIncidentReward(offer.reward);}
       if(!pvp.host && Array.isArray(state.killFeedEvents))for(const event of state.killFeedEvents.slice(-5))this.killFeed.receive(event);
       if(!pvp.host&&Array.isArray(state.patchZones))this.patchZones=state.patchZones.slice(0,16);
       this.recordPvpPosition(`@remote-${uid}`, state.x, state.y);
@@ -9271,7 +9324,7 @@ class Game {
       totals[id] = Math.max(totals[id] || 0, amount);
       pvp.processedEnemyDamage[id] = (pvp.processedEnemyDamage[id] || 0) + delta;
       const enemy = enemies.get(id);
-      if (enemy && !enemy.is24hPursuer && enemy.patchBossType !== 'committee' && !(enemy.patchBossType==='monolith'&&(enemy.patchOpenUntil||0)<=this.time) && delta > 0) {
+      if (enemy && !enemy.is24hPursuer && enemy.patchBossType !== 'committee' && !enemy.v330Reviving && !(enemy.patchBossType==='monolith'&&(enemy.patchOpenUntil||0)<=this.time) && delta > 0) {
         pvp.applyingRemoteEnemyDamage = true;
         try {
           enemy.hp = Math.max(0, enemy.hp - delta);
@@ -9511,7 +9564,8 @@ class Game {
     const player = this.player;
     if (!player) return false;
     state ||= this.createPvpNetworkState();
-    state={...state,spawnView:this.getPlayerSpawnView(),inventoryLoot:this.getLootInventory(),attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
+    state={...state,v330Summons:this.summons.filter(s=>s.role==='senior'&&s.hp>0&&s.life>0).slice(0,4).map(s=>({id:s.id,role:s.role,x:s.x,y:s.y,hp:s.hp,size:s.size,life:s.life})),
+      facingX:this.player.facingX||1,facingY:this.player.facingY||0,v330Specs:this.skillSpecializations||{},...(pvp.host?{v330World:{walls:this.v330Walls||[],incident:this.v330Incident||null,rewardOffers:[...(this.v330IncidentRewards||[])].map(([key,reward])=>({uid:key.slice(0,key.indexOf(':')),reward}))}}:{}),spawnView:this.getPlayerSpawnView(),inventoryLoot:this.getLootInventory(),attackSource:pvp.attackSource || '',enemyAttackHit:pvp.enemyAttackHit || null,
       deathHit:player.hp<=0 ? this.lastPlayerDamage?.hit || null : null,
       patchMirror:this.summons.filter(s=>s.role==='mirror'&&s.hp>0&&s.life>0).map(s=>({id:s.id,x:s.x,y:s.y,hp:s.hp,size:s.size,life:s.life}))[0]||null,
       ...(pvp.host ? {killFeedEvents:this.killFeed.entries.map(({expiresAt,...event})=>event),patchZones:(this.patchZones||[]).map(z=>({ownerUid:z.ownerUid,x:z.x,y:z.y,radius:z.radius,life:z.life}))} : {})};
@@ -10710,7 +10764,10 @@ class Game {
     }
     const [base, perLevel, control] = offensive;
     const senderClassId = this.pvp.remotePlayers?.[skill.senderUid]?.classId || this.pvp.remotePlayer?.classId;
-    const damage = (base + (level - 1) * perLevel) * activeSkillDamageMultiplier(level) * classActiveDamageMultiplier({classId: senderClassId}, skill.key);
+    const branch=this.pvp.remotePlayers?.[skill.senderUid]?.state?.v330Specs?.[skill.key]??this.pvp.remoteState?.v330Specs?.[skill.key];
+    const spec=level===5?SKILL_SPECIALIZATIONS[skill.key]?.[branch]||{}:{};
+    if(skill.key==='act_sigur_lockdown'&&Math.hypot(this.player.x-Number(skill.x),this.player.y-Number(skill.y))>radiusAtLevel(SIGUR_LOCKDOWN_RADII,level)*(senderClassId==='technician'?1.15:1)*(spec.radius||1))return;
+    const damage = (base + (level - 1) * perLevel) * activeSkillDamageMultiplier(level) * classActiveDamageMultiplier({classId: senderClassId}, skill.key)*(spec.damage||1);
     const skillName = ACTIVE_SKILLS_DEF[skill.key]?.name || skill.key;
     const senderName = String(skill.senderName || this.pvp.remotePlayers?.[skill.senderUid]?.name || this.pvp.remotePlayer?.name || 'Соперник').slice(0, 20);
     if (this.isBattleRoyale) {
@@ -10719,7 +10776,7 @@ class Game {
       this.receivePvpDamage(damage * 0.14, `${senderName} · ${skillName}`,{attackerUid:skill.senderUid,weaponKey:skill.key});
     }
     if (control > 0 && this.player?.hp > 0) {
-      this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(0.65, control));
+      this.pvpControlTimer = Math.max(this.pvpControlTimer || 0, Math.min(0.65, control*(spec.control||1)));
       this.addPopup(this.player.x, this.player.y - 24, '⚠️ НАВЫК СОПЕРНИКА: СБОЙ УПРАВЛЕНИЯ', '#f1c40f');
     }
   }
@@ -13102,7 +13159,7 @@ class Game {
     const selectedMigrations = [LEGENDARY_MIGRATIONS.find(item=>item.key===this.legendaryMigrationKey),
       LEGENDARY_DEVELOPMENTS.find(item=>item.key===this.legendaryDevelopmentKey)];
     for (const migration of selectedMigrations) if (migration) passives.push({icon:migration.icon,name:migration.name,
-      value:migration.parent?'Легендарное развитие · 20-я минута':'Легендарная миграция',detail:migration.description});
+      value:migration.parent?'Легендарное развитие · 25-я минута':'Легендарная миграция',detail:migration.description});
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
     ].filter(([stat]) => player[stat] > 0).map(([stat, key]) => ({
@@ -13362,6 +13419,7 @@ class Game {
           if (dx * dx + dy * dy > maxRangeSq) return;
           this.damageEnemy(enemy, summon.dmg * (enemy.isBoss ? 0.48 : 1), summon.source || 'Эскалация во вторую линию');
           this.applyProjectileSlow(enemy);
+          if(!enemy.isBoss&&!this.isEnemyControlImmune(enemy)){enemy.slowTimer=Math.max(enemy.slowTimer||0,1.5);enemy.slowFactor=Math.min(enemy.slowFactor||1,.7);}
           this.createHitFX(enemy.x, enemy.y, '#f1c40f', 3);
           hits++;
         });
@@ -13934,6 +13992,8 @@ class Game {
       if(this.time>240)pool.push(['approver',6],['return_courier',5]);
       if(this.time>360)pool.push(['mass_mail',7],['missing_inn',6]);
       if(this.time>600)pool.push(['inheritance_admin',7]);
+      if(this.time>240&&this.enemies.filter(e=>e.patchType==='macro_user'&&e.hp>0).length<3)pool.push(['macro_user',4]);
+      if(this.time>420&&this.enemies.filter(e=>e.patchType==='log_collector'&&e.hp>0).length<2)pool.push(['log_collector',2]);
       const totalWeight = pool.reduce((sum, entry) => sum + entry[1], 0);
       let pick = rng() * totalWeight;
       for (let i = 0; i < pool.length; i++) {
@@ -14853,7 +14913,7 @@ class Game {
   forEachEnemyNear(x, y, radius, callback) {
     if (!this.enemyGridReady || !this._enemyGridMap) {
       for (let i = 0; i < this.enemies.length; i++) {
-        if (this.enemies[i].patchBossType === 'committee') continue;
+        if (this.enemies[i].patchBossType === 'committee'||this.enemies[i].v330Reviving) continue;
         if (callback(this.enemies[i]) === true) return;
       }
       return;
@@ -14871,7 +14931,7 @@ class Game {
         const bucket = map.get(baseKey + (cy + 2048));
         if (!bucket) continue;
         for (let i = 0; i < bucket.length; i++) {
-          if (bucket[i].patchBossType === 'committee') continue;
+          if (bucket[i].patchBossType === 'committee'||bucket[i].v330Reviving) continue;
           if (callback(bucket[i]) === true) return;
         }
       }
@@ -15501,7 +15561,7 @@ class Game {
     let aliveBosses = 0;
     let aliveMegaBosses = 0;
     for (const enemy of this.enemies) {
-      if (enemy.isBoss && enemy.hp > 0) {
+      if (enemy.isBoss && enemy.hp > 0 && !enemy.v330Reviving) {
         if (enemy.isMegaBoss) aliveMegaBosses++;
         else aliveBosses++;
       }
@@ -15856,6 +15916,8 @@ class Game {
       const e = this.enemies[i];
       const projectileStart=this.enemyProjectiles.length,warningStart=this.bossWarnings.length,puddleStart=this.puddles.length;
       const worldAuthority = !this.pvp?.started || this.pvp.host;
+      if(worldAuthority&&e.hp<=0&&this.beginBossRevival(e))continue;
+      if(worldAuthority&&e.hp<=0&&this.retireIncidentObject(e)){this.enemies.splice(i,1);continue;}
       this.updateEnemyBurn(e, dt);
 
       if (worldAuthority && e.patchCommitteePart && e.hp <= 0) {
@@ -16111,7 +16173,7 @@ class Game {
           this.sound.updateBossMusic(0, remainingBosses.filter(enemy => !enemy.isMegaBoss).length, remainingBosses.filter(enemy => enemy.isMegaBoss).length);
           if (!this.legendaryOffered && !this.pvp?.started) this.offerLegendaryMigrations(false);
           else if (!this.legendaryOffered && this.pvp?.host) this.offerLegendaryMigrations(true);
-          if (e.megaBossNumber === 4) this.offerLegendaryDevelopment(Boolean(this.pvp?.host));
+          if (e.megaBossNumber === 5) this.offerLegendaryDevelopment(Boolean(this.pvp?.host));
         }
         if (!guestGotKillCredit) {
           this.kills++;
@@ -16437,7 +16499,7 @@ class Game {
     const keep = {key:'keep_current_migration',name:`Оставить: ${current.name}`,icon:current.icon,keepCurrent:true,
       description:`Сохранить текущую миграцию без новых усилений и штрафов. ${current.description}`};
     const developments = LEGENDARY_DEVELOPMENTS.filter(migration=>migration.parent===current.key);
-    this.showLegendaryChoices([keep,...developments], 'development', 'Босс 20-й минуты побеждён. Оставьте текущую миграцию или выберите одно из двух её развитий. Новые эффекты добавляются к уже действующим.');
+    this.showLegendaryChoices([keep,...developments], 'development', 'Босс 25-й минуты побеждён. Оставьте текущую миграцию или выберите одно из двух её развитий. Новые эффекты добавляются к уже действующим.');
   }
 
   showLegendaryChoices(choices, stage, subtitle) {
@@ -17510,7 +17572,7 @@ class Game {
     let megaBoss = null;
     for (let i = 0; i < this.enemies.length; i++) {
       const enemy = this.enemies[i];
-      if (enemy.isMegaBoss && enemy.hp > 0) { megaBoss = enemy; break; }
+      if (enemy.isMegaBoss && enemy.hp > 0 && !enemy.v330Reviving) { megaBoss = enemy; break; }
     }
     const megaHud = this.getHudEl('mega-boss-hud');
     const hasMega = Boolean(megaBoss);
@@ -18184,6 +18246,7 @@ class Game {
 
     // Враги и боссы
     for (let e of this.enemies) {
+      if(e.v330Reviving)continue;
       const pos = this.getPvpRenderPosition(e.syncId, e.x, e.y);
       if (!isRenderVisible(pos.x, pos.y, Math.max(e.size || 0, e.auraRadius || 0) + 80)) continue;
 
@@ -18865,7 +18928,7 @@ function installPatch300() {
     const ready=!this.paused&&this.player.hp>0&&this.player.stunTimer<=0&&skill.cdTimer<=0;
     const before={hp:this.player.hp,shield:this.player.shieldTimer};const result=original.call(this,index);
     if(ready&&skill.cdTimer>0){
-      const expected={act_backup_dt:this.player.maxHp*(.35+skill.lvl*.05)*(this.player.classId==='courier'?1.15:1),act_membership_reactivation:this.player.maxHp*(.20+skill.lvl*.03)*(this.player.classId==='support'?1.2:1),act_remote_restore:this.player.maxHp*(.06+skill.lvl*.02)*(this.player.classId==='support'?1.2:1),act_transaction_rollback:this.player.maxHp*(.04+skill.lvl*.01)}[skill.key];
+      const expected={act_backup_dt:this.player.maxHp*(.35+skill.lvl*.05)*(this.player.classId==='courier'?1.15:1),act_membership_reactivation:this.player.maxHp*(.20+skill.lvl*.03)*(this.player.classId==='support'?1.2:1),act_remote_restore:this.player.maxHp*(.06+skill.lvl*.02)*(this.player.classId==='support'?1.2:1)*(this.skillSpecialization('act_remote_restore').hero||1),act_transaction_rollback:this.player.maxHp*(.04+skill.lvl*.01)}[skill.key];
       if(expected)this.finishPatchHealing(before.hp,expected*(this.pvp?.mode==='pvp'?.5:1));
       if(this.patchLicense?.until>this.time){this.patchLicense.used.add(skill.key);skill.cdTimer=Math.max(skill.cdTimer,35+this.patchLicense.until-this.time);}
       if(this.hasPatchItem('corp_hot_reserve')&&(this.player.hp>before.hp||this.player.shieldTimer>before.shield)&&this.time>=(this.patchReserveDroneAt||0)){
@@ -19437,7 +19500,8 @@ const PATCH300_METHODS = {
     const stats = /(?<![\p{L}\p{N}])(?:скорост[а-яё]*\s+(?:перезаряд|восстановлен)[а-яё]*|(?:защит|сопротивлен|поглощени|снижени)[а-яё]*\s+(?:от\s+)?(?:(?:входящ|получаем)[а-яё]*\s+)?урон[а-яё]*|(?:входящ|получаем)[а-яё]*\s+урон[а-яё]*|урон[а-яё]*\s+по\s+(?:герою|игроку)|следующ[а-яё]*\s+попадани[а-яё]*|(?:перезаряж|перезаряд|откат|цен|стоимост|наценк|скорост|урон|защит|здоров|опыт|фиткоин|радиус|крит|лечен|регенерац|замедлен)[а-яё]*|HP)/giu;
     const afterStat = after.match(stats)?.[0];
     // A following sentence must not override the stat immediately before a value.
-    const stat = before.match(stats)?.at(-1) || afterStat || '';
+    const explicitAfter=/^\s*(?:к|ко|от)\s+/iu.test(after);
+    const stat = (explicitAfter&&afterStat?afterStat:before.match(stats)?.at(-1)) || afterStat || '';
     const cooldown = /^(?:перезаряж|перезаряд|откат)/iu.test(stat);
     const enemyAction = /(?:враг|моб|босс|преследовател)[а-яё]*\s+(?:(?:и\s+)?(?:босс|моб)[а-яё]*\s+)?(?:ускор|бега|атаку|теря)/iu.test(before);
     const enemyStat = enemyAction || (/^(?:скорост|урон|здоров|HP)/iu.test(stat)
@@ -19565,8 +19629,24 @@ const PATCH300_METHODS = {
         'HP появления №n: (13000 для первого, иначе 11000) × (1 + 0,65 × (n − 1)) × 1,32 в степени max(0, n − 3), затем округление. Модификаторы забега применяются дополнительно.',
         'Опыт появления №n: 280 + 30 × n. Скорость с четвёртого появления: 63 единицы/с, затем +4,8 за каждое следующее появление, максимум 105.',
         'Фиткоины с дискеты: 40% базового опыта × коэффициент экономики по времени подбора × бонусы дохода. Это не отдельная фиксированная выплата за убийство.',
-        'За первую победу — исходная легендарная миграция; за четвёртого босса на двадцатой минуте — её развитие. Гарантированной магазинной вещи нет; возможны обычные случайные выпадения.'
+        'За первую победу — исходная легендарная миграция; за пятого босса на двадцать пятой минуте — её развитие. Гарантированной магазинной вещи нет; возможны обычные случайные выпадения.'
       ],{key:'boss-rules'});
+    }
+    if(this.knowledgeTab==='events'){
+      add('📍','Выездные инциденты','Необязательные задачи обычного одиночного забега и кооперативного PvE. В ежедневной смене, PvP и BR не появляются.',[
+        'Первое предложение — после седьмой минуты вне боя с большим боссом. Подойдите к маркеру в течение 45 с, чтобы принять задачу.',
+        'Восстановление сервера: находиться в радиусе 130 суммарно 12 с. Удержание участка: 18 с. Сопровождение копии: оставаться рядом, пока она движется к финишу со скоростью 70 единиц/с.',
+        'На принятую задачу отведено 65 с. Во время большого босса таймер задачи приостанавливается. За выполнение — выбор денег, случайного предмета доступного тира или одного уровня. Награда выдаётся один раз участникам, подошедшим к задаче.'
+      ]);
+      add('⌨️','Пользователь с макросом','С четвёртой минуты записывает короткий маршрут цели и атакует по отмеченному следу.',[
+        'Базовые HP 145, контакт 8 HP/с, скорость 66 единиц/с; 16 опыта. Обычное усиление волн применяется дополнительно.',
+        'Не более трёх одновременно. Четыре отмеченных круга радиусом 38; предупреждение от 1,3 с, урон 9. Личная перезарядка 8 с; группа не запускает макросы одновременно.'
+      ]);
+      add('🗃️','Сборщик логов','С седьмой минуты перехватывает обычные непробивающие снаряды перед собой, затем отвечает коротким веером.',[
+        'Базовые HP 125, контакт 6 HP/с, скорость 54 единицы/с; 17 опыта. Не имеет дополнительной брони. Не более двух одновременно.',
+        'Хранит до трёх снарядов. Через 1,2 с после первого перехвата готовит ответ с предупреждением 1,3 с: до трёх снарядов по 10 урона. Затем 7 с не перехватывает выстрелы.',
+        'Лазеры и пробивающие снаряды не перехватываются. Атакуйте с другой стороны или используйте паузу после ответа.'
+      ]);
     }
     if(this.knowledgeTab==='classes')for(const [id,def] of Object.entries(PLAYER_CLASSES)){
       const s=def.stats;
@@ -19584,7 +19664,7 @@ const PATCH300_METHODS = {
       for(const [key,def] of Object.entries(COMBAT_UPGRADES))addAbility('combat',key,def,Array.from({length:3},(_,i)=>`Ур. ${i+1}: ${describeCombatLevel({classId:null},key,i+1,false)}`));
       for(const def of REPEATABLE_UPGRADES)addAbility('common',def.key,def);
       for(const def of LEGENDARY_MIGRATIONS)add(def.icon,`${def.name} [Общее]`,def.description,
-        [{label:'Развития после босса 20-й минуты',links:LEGENDARY_DEVELOPMENTS.filter(item=>item.parent===def.key).map(item=>({key:item.key,label:item.name,tab:'passives'}))}],
+        [{label:'Развития после босса 25-й минуты',links:LEGENDARY_DEVELOPMENTS.filter(item=>item.parent===def.key).map(item=>({key:item.key,label:item.name,tab:'passives'}))}],
         {key:def.key,legendary:true});
       for(const def of LEGENDARY_DEVELOPMENTS){
         const parent = LEGENDARY_MIGRATIONS.find(item=>item.key===def.parent);
@@ -19637,7 +19717,7 @@ const PATCH300_METHODS = {
     const groups = this.knowledgeTab==='passives'
       ? [{id:'normal',title:'Перки и боевые модификаторы'},
         {id:'legendary',title:'Легендарные перки',description:'После победы над первым большим боссом можно выбрать одну из трёх исходных миграций.'},
-        {id:'legendary-development',title:'Развития легендарных миграций · 20-я минута',description:'После победы над боссом 20-й минуты можно оставить текущую миграцию или выбрать одно из двух её развитий. Новые бонусы и штрафы добавляются к исходным.'}]
+        {id:'legendary-development',title:'Развития легендарных миграций · 25-я минута',description:'После победы над боссом 25-й минуты можно оставить текущую миграцию или выбрать одно из двух её развитий. Новые бонусы и штрафы добавляются к исходным.'}]
       : this.knowledgeTab==='items'
         ? [{id:'1',title:'I тир · базовые предметы'},{id:'2',title:'II тир · улучшенные предметы'},{id:'3',title:'III тир · продвинутые предметы'},{id:'4',title:'IV тир · КОРП'},{id:'consumables',title:'Расходники'},{id:'services',title:'Услуги магазина'}]
         : [{id:'normal'}];
@@ -19767,6 +19847,531 @@ for(const catalog of [STORE_PASSIVES_DEF,STORE_ACTIVES_DEF,STORE_RECIPES]) {
   }
 }
 /* END PATCH300 EXTENSION */
+
+/* 3.3.0 — Инцидент в продакшне. */
+const SKILL_SPECIALIZATIONS = {
+  act_sigur_lockdown: [
+    {name:'Периметр',desc:'Радиус +25%, урон −20%, оглушение короче на 30%.',radius:1.25,damage:.8,control:.7},
+    {name:'Изоляция',desc:'Радиус −20%, урон +20%, оглушение дольше на 60%.',radius:.8,damage:1.2,control:1.6}
+  ],
+  act_emergency_ups: [
+    {name:'Автономность',desc:'Щит дольше на 50%, радиус очистки снарядов −25%.',shield:1.5,radius:.75},
+    {name:'Разряд',desc:'Радиус очистки снарядов +50%, щит короче на 30%.',shield:.7,radius:1.5}
+  ],
+  act_remote_restore: [
+    {name:'Личный резерв',desc:'Лечение героя +50%, лечение помощников −40%.',hero:1.5,team:.6},
+    {name:'Бригадный резерв',desc:'Лечение помощников +50%, лечение героя −35%.',hero:.65,team:1.5}
+  ],
+  act_deferred_execution: [
+    {name:'Быстрый запуск',desc:'Подготовка 0,5 с; урон удержанных снарядов +15%.',delay:.5,damage:1.15},
+    {name:'Полная сборка',desc:'Подготовка 2,8 с; урон удержанных снарядов +65%.',delay:2.8,damage:1.65}
+  ]
+};
+const WEAPON_ROLES = {
+  keys:{boss:1.15,mob:.9,text:'Точечный урон: большим и мини-боссам +15% урона, обычным врагам −10%.'},
+  heavy_archive:{boss:1.2,mob:.9,text:'Тяжёлый одиночный удар: боссам +20% урона, обычным врагам −10%.'},
+  cache_aura:{boss:.85,mob:1.1,text:'Зачистка вблизи: обычным врагам +10% урона, боссам −15%.'},
+  protein:{boss:.8,mob:1.1,text:'Покрытие площади: обычным врагам +10% урона, боссам −20%.'},
+  table_chart:{boss:.95,mob:1.1,text:'Стабильная зачистка: обычным врагам +10% урона, боссам −5%.'},
+  support_phone:{boss:1.15,mob:.95,text:'Прицельная поддержка: боссам +15% урона, обычным врагам −5%.'},
+  syntax:{boss:1.05,mob:.95,elite:1.25,text:'Разбор элиты: элитным мобам +25% урона, боссам +5%, остальным мобам −5%.'}
+};
+const WEAPON_ROLE_BY_SOURCE=Object.fromEntries(Object.entries(WEAPON_ROLES).map(([key,profile])=>[WEAPONS_DEF[key].name,profile]));
+const V330_SKILLS = {
+  act_emergency_partition:{name:'Аварийная перегородка',icon:'🧱',owner:'technician',baseCd:30,
+    desc:'Ставит перед героем перегородку от снарядов мобов на 4–6 с. Запас перехватов 8–16. Свои выстрелы проходят; зоны и проезды боссов не блокируются.',
+    cast(g,lvl){g.requestIncidentWall(lvl);}},
+  act_route_redirect:{name:'Перенаправление маршрута',icon:'↪️',owner:'courier',baseCd:24,
+    desc:'Доворачивает до 12–24 собственных летящих снарядов к приоритетной цели в радиусе 650. Урон и пробитие не увеличиваются.',
+    cast(g,lvl){
+      const target=g.getNearestWeaponTarget(650);if(!target)return;
+      let count=0;
+      for(let i=g.projectiles.length-1;i>=0&&count<9+lvl*3;i--){
+        const p=g.projectiles[i];if(p.isSummon||p.type==='laser_visual'||p.life<=0||!Number.isFinite(p.vx))continue;
+        const angle=Math.atan2(target.y-p.y,target.x-p.x),speed=Math.hypot(p.vx,p.vy);
+        p.vx=Math.cos(angle)*speed;p.vy=Math.sin(angle)*speed;count++;
+      }
+      g.addPopup(g.player.x,g.player.y-30,'↪️ МАРШРУТ ИЗМЕНЁН','#81ecec');
+    }},
+  act_deferred_execution:{name:'Отложенное выполнение',icon:'⏱️',owner:'developer',baseCd:28,
+    desc:'На 2 с удерживает до 24 новых непробивающих снарядов своего оружия, затем выпускает их очередью с уроном +20–40%. На V уровне доступна специализация.',
+    cast(g,lvl){
+      const spec=g.skillSpecialization('act_deferred_execution');
+      if(g.v330Held){g.v330Held.until=g.time;g.updateIncidentActor();}
+      g.v330Held={until:g.time+(spec.delay||2),damage:spec.damage||1.15+lvl*.05,shots:[]};
+      g.addPopup(g.player.x,g.player.y-30,'⏱️ ПОДГОТОВКА ОЧЕРЕДИ','#c99aff');
+    }},
+  act_team_evacuation:{name:'Эвакуация бригады',icon:'🚑',owner:'support',baseCd:34,
+    desc:'Досрочно отзывает живых помощников. Получает на 5 с защитный запас из 12–20% их оставшегося HP, максимум 40% HP героя. В PvP запас вдвое меньше. Перезарядки призывов не сбрасываются.',
+    cast(g,lvl){
+      let health=0;
+      for(const summon of g.summons)if(summon.hp>0&&summon.life>0&&summon.role!=='mirror'){health+=summon.hp;summon.life=0;}
+      g.v330Shield=Math.min(g.player.maxHp*.4,health*(.1+lvl*.02))*(g.pvp?.mode==='pvp'?.5:1);
+      g.v330ShieldUntil=g.time+5;
+      g.addPopup(g.player.x,g.player.y-30,'🚑 БРИГАДА ЭВАКУИРОВАНА','#55efc4');
+    }}
+};
+
+Object.assign(Game.prototype, {
+  skillSpecialization(key){return SKILL_SPECIALIZATIONS[key]?.[this.skillSpecializations?.[key]]||{};},
+  queueRunDecision(decision){
+    if(this!==window.game||this.player?.hp<=0)return;
+    (this.v330Decisions ||= []).push(decision);this.updateRunDecisionButton();
+    if(!document.querySelector('.modal-overlay[style*="display: flex"]'))this.showRunDecision();
+  },
+  updateRunDecisionButton(){
+    const button=document.getElementById('run-decisions');
+    button.style.display=this.v330Decisions?.length&&this.player?.hp>0?'block':'none';
+    button.textContent='📋 Доступен выбор · '+(this.v330Decisions?.length||0);
+  },
+  showRunDecision(){
+    const decision=this.v330Decisions?.[0];if(!decision||this.player?.hp<=0)return;
+    this.keys={};
+    document.getElementById('run-decision-title').textContent=decision.title;
+    document.getElementById('run-decision-description').textContent=decision.description||'Выбор можно отложить. Бой продолжается.';
+    const box=document.getElementById('run-decision-choices');box.replaceChildren();
+    decision.choices.forEach((choice,index)=>{
+      const button=document.createElement('button');button.className='btn-1c';
+      const title=document.createElement('b'),description=document.createElement('span');
+      title.textContent=choice.name;description.textContent=choice.desc;
+      button.append(title,description);button.onclick=()=>this.chooseRunDecision(index);box.append(button);
+    });
+    document.getElementById('modal-run-decision').style.display='flex';this.setMobileMenuScroll(true);
+  },
+  chooseRunDecision(index){
+    const decision=this.v330Decisions?.[0],choice=decision?.choices[index];if(!choice||this.player.hp<=0)return;
+    this.v330Decisions.shift();this.closeRunDecision();choice.take();this.updateRunDecisionButton();
+    if(this.v330Decisions.length)queueMicrotask(()=>{if(!document.querySelector('.modal-overlay[style*="display: flex"]'))this.showRunDecision();});
+  },
+  closeRunDecision(){document.getElementById('modal-run-decision').style.display='none';this.setMobileMenuScroll(true);},
+  offerSkillSpecialization(key){
+    if(!SKILL_SPECIALIZATIONS[key]||this.skillSpecializations?.[key]!==undefined)return;
+    const skill=this.activeSkills.find(s=>s?.key===key);if(!skill||skill.lvl<5)return;
+    this.skillSpecializations ||= {};
+    if(this.v330Bot&&!Object.prototype.hasOwnProperty.call(this,'v330Bot'))return;
+    if(this.v330Bot){this.skillSpecializations[key]=this.player.classId==='support'?1:0;return;}
+    if(this!==window.game||this.v330QueuedSpecs?.has(key))return;
+    (this.v330QueuedSpecs ||= new Set()).add(key);
+    this.queueRunDecision({title:'Специализация · '+ACTIVE_SKILLS_DEF[key].name,
+      choices:SKILL_SPECIALIZATIONS[key].map((spec,index)=>({...spec,take:()=>{this.skillSpecializations[key]=index;this.updateActiveHUD();}}))});
+  },
+  requestIncidentWall(level){
+    if(this.pvp?.started&&!this.pvp.host){this.sendPvpNetworkMessage({type:'v330-wall',level},null,true);return;}
+    const world=this.patchWorldOwner||this;
+    world.createIncidentWall(this.pvp?.uid||'local',this.player,level);
+  },
+  createIncidentWall(uid,state,level){
+    const walls=this.v330Walls ||= [];if(walls.some(w=>w.uid===uid&&w.until>this.time))return;
+    const angle=Math.atan2(Number(state.facingY)||0,Number(state.facingX)||1);
+    walls.push({uid,x:state.x+Math.cos(angle)*70,y:state.y+Math.sin(angle)*70,angle,
+      until:this.time+(3.5+level*.5)*(this.pvp?.mode==='pvp'?.7:1),charges:6+level*2});
+  },
+  incidentActors(){
+    return [...(this.player.hp>0&&!this.pvp?.eliminated?[{uid:this.pvp?.uid||'local',x:this.player.x,y:this.player.y}]:[]),...this.getHostRemotePlayerTargets()];
+  },
+  updateFieldIncident(dt){
+    if(this.isBattleRoyale||this.pvp?.mode==='pvp'||this.isDailyRun)return;
+    const actors=this.incidentActors();if(!actors.length)return;
+    let incident=this.v330Incident;
+    for(const [key] of this.v330IncidentRewards||[]){const uid=key.slice(0,key.indexOf(':'));if(!actors.some(a=>a.uid===uid))this.v330IncidentRewards.delete(key);}
+    if(!incident){
+      if((this.v330IncidentRewards?.size||0)>=24)return;
+      if(this.time<(this.v330NextIncident||420)||this.enemies.some(e=>e.isMegaBoss&&e.hp>0))return;
+      const owner=actors[Math.floor(this.rollRng()*actors.length)],angle=this.rollRng()*Math.PI*2;
+      const clamp=v=>Math.max(this.BOUND_MIN+200,Math.min(this.BOUND_MAX-200,v));
+      const kind=['repair','defend','escort'][Math.floor(this.rollRng()*3)];
+      incident=this.v330Incident={id:'incident-'+Math.floor(this.time),kind,x:clamp(owner.x+Math.cos(angle)*500),y:clamp(owner.y+Math.sin(angle)*500),progress:0,offeredUntil:this.time+45,participants:[]};
+      incident.endX=clamp(incident.x+Math.cos(angle+1)*700);incident.endY=clamp(incident.y+Math.sin(angle+1)*700);
+      this.announceOfficeEvent('📍 Выездной инцидент: подойдите к маркеру, чтобы принять задачу.');
+    }
+    const nearby=actors.filter(a=>Math.hypot(a.x-incident.x,a.y-incident.y)<130);
+    if(!incident.started){
+      if(this.time>=incident.offeredUntil){this.v330Incident=null;this.v330NextIncident=this.time+180;return;}
+      if(!nearby.length)return;incident.started=this.time;incident.deadline=this.time+65;
+    }
+    if(this.enemies.some(e=>e.isMegaBoss&&e.hp>0)){incident.deadline+=dt;return;}
+    for(const a of nearby)if(!incident.participants.includes(a.uid))incident.participants.push(a.uid);
+    if(this.time>=incident.deadline){this.announceOfficeEvent('📍 Инцидент закрыт без выполнения.');this.v330Incident=null;this.v330NextIncident=this.time+180;return;}
+    if(nearby.length){
+      if(incident.kind==='escort'){
+        const dx=incident.endX-incident.x,dy=incident.endY-incident.y,distance=Math.hypot(dx,dy);
+        const step=Math.min(distance,70*dt);incident.x+=dx/Math.max(1,distance)*step;incident.y+=dy/Math.max(1,distance)*step;
+        incident.progress=distance<30?1:Math.min(.99,(incident.progress||0)+step/700);
+      }else incident.progress=Math.min(1,incident.progress+dt/(incident.kind==='repair'?12:18));
+    }
+    if(incident.progress<1)return;
+    const reward={id:incident.id,coins:180+Math.floor(this.time/60)*8,tier:this.time>=900?2:1};
+    this.v330IncidentRewards ||= new Map();
+    for(const uid of incident.participants){
+      this.v330IncidentRewards.set(uid+':'+reward.id,reward);
+      if(uid===(this.pvp?.uid||'local'))this.receiveIncidentReward(reward);
+      else if(this.botController?.bots.has(uid)){const a=this.botController.bots.get(uid).actor;a.currency+=reward.coins;this.v330IncidentRewards.delete(uid+':'+reward.id);}
+      else this.sendEquipmentMessage(uid,{type:'v330-reward',reward});
+    }
+    this.announceOfficeEvent('✅ Выездной инцидент выполнен. Участникам доступен выбор награды.');
+    this.v330Incident=null;this.v330NextIncident=this.time+240;
+  },
+  receiveIncidentReward(reward){
+    if(this.v330SeenRewards?.has(reward.id)||this.player.hp<=0)return;
+    (this.v330SeenRewards ||= new Set()).add(reward.id);
+    this.queueRunDecision({title:'Награда за выездной инцидент',choices:[
+      {name:'Фиткоины',desc:reward.coins+' фиткоинов.',take:()=>this.claimIncidentReward(reward,'coins')},
+      {name:'Снаряжение',desc:'Случайный доступный предмет '+reward.tier+' тира. Если места нет — фиткоины.',take:()=>this.claimIncidentReward(reward,'item')},
+      {name:'Опыт',desc:'Повышение на один уровень и обычный выбор улучшения.',take:()=>this.claimIncidentReward(reward,'level')}
+    ]});
+  },
+  claimIncidentReward(reward,choice){
+    if(this.pvp?.started&&!this.pvp.host){this.sendPvpNetworkMessage({type:'v330-reward-claim',id:reward.id,choice},null,true);return;}
+    this.grantIncidentReward(this.pvp?.uid||'local',reward.id,choice);
+  },
+  grantIncidentReward(uid,id,choice){
+    const key=uid+':'+id,reward=this.v330IncidentRewards?.get(key);if(!reward||!['coins','item','level'].includes(choice))return;
+    const state=uid===(this.pvp?.uid||'local')?this.player:this.pvp?.remotePlayers?.[uid]?.state;
+    if(!state||state.hp<=0||state.over)return;
+    const items=this.getShopCatalogItems().filter(item=>item.shopKind!=='consumable'&&Number(item.tier||1)===reward.tier);
+    const result={id,choice,coins:reward.coins,itemKey:items[Math.floor(this.rollRng()*items.length)]?.key};
+    if(uid===(this.pvp?.uid||'local')){this.v330IncidentRewards.delete(key);this.applyIncidentReward(result);}
+    else if(this.sendEquipmentMessage(uid,{type:'v330-reward-grant',result})){this.v330IncidentRewards.delete(key);(this.v330RewardGrants ||= new Map()).set(key,{uid,result,nextAt:this.time+1});}
+  },
+  applyIncidentReward(result){
+    if(this.pvp?.started&&!this.pvp.host)this.sendPvpNetworkMessage({type:'v330-reward-ack',id:result.id},null,true);
+    if(this.v330AppliedRewards?.has(result.id)||this.player.hp<=0)return;
+    (this.v330AppliedRewards ||= new Set()).add(result.id);
+    if(result.choice==='level')this.addXP(Math.max(1,this.nextXp-this.xp));
+    else if(result.choice!=='item'||!result.itemKey||!this.receiveEquipment({itemKey:result.itemKey})){this.currency+=result.coins;this.runFitcoinsLooted=(this.runFitcoinsLooted||0)+result.coins;this.recordAchievementCounter('fitcoinsEarned',result.coins);}
+    this.updateHUD();
+  },
+  beginBossRevival(b){
+    if(b.bossType!=='cluster_core'||b.megaBossNumber!==5||b.v330FinalPhase||b.v330Reviving)return false;
+    b.hp=1;b.v330Reviving=true;b.v330ReviveAt=this.time+2.2;b.v330OldContact=b.dmg;b.dmg=0;
+    this.enemyProjectiles=this.enemyProjectiles.filter(p=>p.attackerName!==b.name);
+    this.bossWarnings=this.bossWarnings.filter(p=>p.attackerName!==b.name);
+    this.showBanner('Сбой устранён. Кластер отвечает…');
+    return true;
+  },
+  updateCoreFinalPhase(b,dt){
+    if(b.v330Reviving){
+      if(this.time<b.v330ReviveAt)return;
+      b.v330Reviving=false;b.v330FinalPhase=true;b.maxHp=Math.round(b.maxHp*.65);b.hp=b.maxHp;
+      b.dmg=b.v330OldContact*1.15;b.speed*=1.15;b.v330PhaseStarted=this.time;b.v330NextCast=0;
+      this.showBanner('🚨 КЛАСТЕР ВОССТАНОВИЛСЯ · АВАРИЙНАЯ ПЕРЕГРУЗКА');this.sound.boss();
+    }
+    const cycle=(this.time-b.v330PhaseStarted)%20,mode=Math.floor(cycle/5),within=cycle%5;
+    b.v330Mode=mode;
+    if(mode===3||within<1||this.time<(b.v330NextCast||0))return;
+    const target=this.getPvpEnemyTarget(b);
+    if(mode===0){this.firePatchFan(b,target,7,.15,4.5,19,b);b.v330NextCast=this.time+.9;}
+    if(mode===1){
+      for(let i=0;i<18;i++)if(i%6!==2){const angle=this.time*.15+i*Math.PI/9;this.enemyProjectiles.push({x:b.x,y:b.y,vx:Math.cos(angle)*3.8,vy:Math.sin(angle)*3.8,dmg:18,size:9,life:1.6,icon:'📡',isBossAttack:true,isMegaBossAttack:true,attackerName:b.name,attackerIcon:b.icon});}
+      b.v330NextCast=this.time+1.8;
+    }
+    if(mode===2){for(const offset of [-90,90])this.bossWarnings.push({x:target.x+offset,y:target.y,radius:76,dmg:36,life:1.3,maxLife:1.3,isMegaBossAttack:true,attackerName:b.name,attackerIcon:b.icon});b.v330NextCast=this.time+1.7;}
+  }
+});
+
+for(const [key,def] of Object.entries(V330_SKILLS)){
+  ACTIVE_SKILLS_DEF[key]=def;ABILITY_CLASSES[def.owner].push(key);ABILITY_CLASS_BY_KEY[key]=def.owner;
+  ACTIVE_SKILL_LEVEL_SUMMARIES[key]=level=>({
+    act_emergency_partition:()=>`Перегородка на ${formatStatNumber(3.5+level*.5)} с: ${6+level*2} перехватов. В PvP длительность короче на 30%. Собственные выстрелы, зоны и проезды не блокируются.`,
+    act_route_redirect:()=>`Доворачивает до ${9+level*3} своих летящих снарядов к приоритетной цели в радиусе 650. Урон и пробитие прежние.`,
+    act_deferred_execution:()=>`Подготовка 2 с, до 24 новых непробивающих снарядов оружия; урон очереди +${15+level*5}%.`,
+    act_team_evacuation:()=>`Отзывает живых помощников без сброса КД призывов. Щит на 5 с: ${10+level*2}% их оставшегося HP, максимум 40% HP героя. В PvP запас вдвое меньше.`
+  })[key]();
+}
+
+(() => {
+  const wrap=(name,hook)=>{const original=Game.prototype[name];Game.prototype[name]=function(...args){return hook.call(this,original,...args);};};
+  wrap('start',function(original,options){
+    this.skillSpecializations={};this.v330QueuedSpecs=new Set();this.v330Decisions=[];
+    this.v330Walls=[];this.v330Incident=null;this.v330NextIncident=420;this.v330IncidentRewards=new Map();
+    this.v330SeenRewards=new Set();this.v330AppliedRewards=new Set();this.v330RewardGrants=new Map();this.v330Held=null;this.v330Shield=0;
+    document.getElementById('modal-run-decision').style.display='none';this.updateRunDecisionButton();
+    return original.call(this,options);
+  });
+  wrap('applyUpgrade',function(original,choice){
+    const result=original.call(this,choice);
+    if(choice.type==='active_up')queueMicrotask(()=>this.offerSkillSpecialization(choice.key));
+    return result;
+  });
+  wrap('getActiveSkillCooldown',function(original,key){return original.call(this,key)*(V330_SKILLS[key]&&hasClassAffinity(this.player,key)?.9:1);});
+  wrap('knowledgeClassBonus',function(original,key,kind){return V330_SKILLS[key]?'Классовый бонус: перезарядка на 10% короче.':original.call(this,key,kind);});
+  wrap('capturePlayerSnapshot',function(original,reason){
+    const snapshot=original.call(this,reason);if(!snapshot)return snapshot;
+    snapshot.specializations={...(this.skillSpecializations||{})};
+    for(const item of snapshot.inventory.activeSkills){const key=Object.keys(ACTIVE_SKILLS_DEF).find(key=>ACTIVE_SKILLS_DEF[key].name===item.name);const spec=this.skillSpecialization(key);if(spec.name)item.value+=' · '+spec.name;}
+    return snapshot;
+  });
+  wrap('getWeaponUpgradeSummary',function(original,key,level,rich){return original.call(this,key,level,rich)+(WEAPON_ROLES[key]?' '+WEAPON_ROLES[key].text:'');});
+  wrap('updateWeapons',function(original,dt){
+    const before=this.projectiles.length;original.call(this,dt);
+    if(!this.v330Held||this.time>=this.v330Held.until)return;
+    for(let i=this.projectiles.length-1;i>=before&&this.v330Held.shots.length<24;i--){const p=this.projectiles[i];if(p.type==='laser_visual'||p.isSummon||p.piercing||!Number.isFinite(p.vx))continue;this.v330Held.shots.push(p);this.projectiles.splice(i,1);}
+  });
+  wrap('recordPlayerDamage',function(original,damage,source,options={}){
+    if(this.v330Shield>0&&this.time<this.v330ShieldUntil&&this.player.shieldTimer<=0&&this.player.dashInvulnerabilityTimer<=0&&this.player.networkFilterBlockTimer<=0&&!(this.player.hasNetworkFilter&&this.player.networkFilterCooldown<=0)&&!(this.isBattleRoyale&&!options.isPvp&&this.pvp?.started&&performance.now()<Number(this.pvp.spawnGraceUntil||0))){const absorbed=Math.min(damage,this.v330Shield);this.v330Shield-=absorbed;damage-=absorbed;}
+    return damage>0?original.call(this,damage,source,options):0;
+  });
+})();
+
+Object.assign(Game.prototype, {
+  updateIncidentActor(){
+    if(this.v330ShieldUntil<=this.time)this.v330Shield=0;
+    if(this.v330Held&&this.time>=this.v330Held.until){
+      const held=this.v330Held;this.v330Held=null;
+      if(this.player.hp>0&&!this.pvp?.eliminated)for(const shot of held.shots){shot.x=this.player.x;shot.y=this.player.y;shot.dmg*=held.damage;this.projectiles.push(shot);}
+      this.addPopup(this.player.x,this.player.y-35,'⏱️ ОЧЕРЕДЬ ВЫПОЛНЕНА','#c99aff');
+    }
+  },
+  updateIncidentWorld(dt){
+    this.updateIncidentActor();
+    if(this.pvp?.started&&!this.pvp.host)return;
+    for(const bot of this.botController?.bots.values()||[])bot.actor.updateIncidentActor();
+    this.v330Walls=(this.v330Walls||[]).filter(w=>w.until>this.time&&w.charges>0);
+    if(this.v330Walls.length)for(const projectile of this.enemyProjectiles){
+      if(projectile.life<=0)continue;
+      for(const wall of this.v330Walls){
+        const dx=projectile.x-wall.x,dy=projectile.y-wall.y;
+        const forward=dx*Math.cos(wall.angle)+dy*Math.sin(wall.angle),side=-dx*Math.sin(wall.angle)+dy*Math.cos(wall.angle);
+        if(Math.abs(forward)<18+(projectile.size||8)&&Math.abs(side)<95){projectile.life=0;wall.charges--;break;}
+      }
+    }
+    if(this.v330Walls.length)this.enemyProjectiles=this.enemyProjectiles.filter(p=>p.life>0);
+    for(const [key,grant] of this.v330RewardGrants||[]){const state=this.pvp?.remotePlayers?.[grant.uid]?.state;if(!state||state.over||state.hp<=0){this.v330RewardGrants.delete(key);continue;}if(this.time>=grant.nextAt){this.sendEquipmentMessage(grant.uid,{type:'v330-reward-grant',result:grant.result});grant.nextAt=this.time+1;}}
+    this.updateFieldIncident(dt);
+  },
+  retireIncidentObject(enemy){
+    if(!enemy.v330Fault)return false;
+    this.bossWarnings=this.bossWarnings.filter(w=>w.v330FaultId!==enemy.v330FaultId);
+    if(!enemy.v330Retired)this.addPopup(enemy.x,enemy.y-30,'✅ УЧАСТОК СТАБИЛЕН','#55efc4');
+    return true;
+  },
+  updateIncidentMob(enemy,dt){
+    if(enemy.v330Fault&&this.time>=enemy.v330Expires){enemy.v330Retired=true;enemy.hp=0;}
+    if(enemy.hp<=0||enemy.freezeTimer>0)return;
+    if(enemy.summonedByBackup&&enemy.v330FileRole==='zone'&&this.time>=(enemy.v330NextZone||0)){
+      enemy.v330NextZone=this.time+5;const target=this.getPvpEnemyTarget(enemy);
+      this.bossWarnings.push({x:target.x,y:target.y,radius:65,dmg:18,life:1.3,maxLife:1.3,isBossAttack:true,attackerName:enemy.name,attackerIcon:enemy.icon});
+    }
+    if(enemy.patchType!=='macro_user'&&enemy.patchType!=='log_collector')return;
+    const target=this.getPvpEnemyTarget(enemy);
+    if(enemy.patchType==='macro_user'){
+      enemy.v330Samples ||= [];
+      if(this.time>=(enemy.v330SampleAt||0)){
+        enemy.v330SampleAt=this.time+.45;
+        if(enemy.v330SampleUid!==target.uid){enemy.v330Samples=[];enemy.v330SampleUid=target.uid;}
+        enemy.v330Samples.push({x:target.x,y:target.y});if(enemy.v330Samples.length>4)enemy.v330Samples.shift();
+      }
+      if(this.time>=(enemy.v330NextMacro??(enemy.v330NextMacro=this.time+4))&&enemy.v330Samples.length===4&&
+          Math.hypot(target.x-enemy.x,target.y-enemy.y)<620&&this.time>=(this.v330NextMacroAt||0)){
+        enemy.v330NextMacro=this.time+8;this.v330NextMacroAt=this.time+1.8;
+        enemy.v330Samples.forEach((point,index)=>this.bossWarnings.push({...point,radius:38,dmg:9,life:1.3+index*.12,maxLife:1.3+index*.12,isBossAttack:false,attackerName:enemy.name,attackerIcon:enemy.icon}));
+        this.addPopup(enemy.x,enemy.y-35,'⌨️ МАКРОС ЗАПИСАН','#ffd200');
+      }
+    }
+    if(enemy.patchType==='log_collector'){
+      enemy.v330FrontAngle=Math.atan2(target.y-enemy.y,target.x-enemy.x);
+      if(enemy.v330Stored>0&&!enemy.v330WarnAt&&this.time>=enemy.v330FirstStored+1.2){
+        enemy.v330WarnAt=this.time+1.3;enemy.v330Aim=enemy.v330FrontAngle;
+      }
+      if(enemy.v330WarnAt&&this.time>=enemy.v330WarnAt){
+        const count=Math.min(3,enemy.v330Stored||0);
+        for(let i=0;i<count;i++){const angle=enemy.v330Aim+(i-(count-1)/2)*.28;this.enemyProjectiles.push({x:enemy.x,y:enemy.y,vx:Math.cos(angle)*3.2,vy:Math.sin(angle)*3.2,dmg:10,size:7,life:2,icon:'📄',attackerName:enemy.name,attackerIcon:enemy.icon});}
+        enemy.v330Stored=0;enemy.v330WarnAt=0;enemy.v330NextCollect=this.time+7;
+      }
+    }
+  },
+  collectIncidentProjectiles(){
+    const collectors=this.enemies.filter(e=>e.patchType==='log_collector'&&e.hp>0&&e.freezeTimer<=0&&
+      !e.v330WarnAt&&(e.v330Stored||0)<3&&this.time>=(e.v330NextCollect||0)).slice(0,2);
+    if(!collectors.length)return;
+    let absorbed=false;
+    for(const p of this.projectiles){
+      if(p.life<=0||p.piercing||p.type==='laser_visual'||!Number.isFinite(p.vx))continue;
+      for(const e of collectors){
+        if((e.v330Stored||0)>=3)continue;
+        const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy);
+        e.v330FrontAngle=Number(e.v330FrontAngle)||0;
+        if(d>e.size+(p.size||7)+10||d<.01||dx*Math.cos(e.v330FrontAngle)+dy*Math.sin(e.v330FrontAngle)<d*.35||dx*p.vx+dy*p.vy>=0)continue;
+        if(!e.v330Stored)e.v330FirstStored=this.time;
+        e.v330Stored=(e.v330Stored||0)+1;p.life=0;absorbed=true;
+        if(this.pvp?.started&&!this.pvp.host)this.sendPvpNetworkMessage({type:'v330-log',enemyId:e.syncId,sequence:this.v330LogSequence=(this.v330LogSequence||0)+1,x:p.x,y:p.y},null,true);
+        break;
+      }
+    }
+    if(absorbed)this.projectiles=this.projectiles.filter(p=>p.life>0);
+  },
+  createReleaseFaults(b,warnings){
+    if(warnings.length<5)return;
+    const groups=Array.from({length:4},()=>[]);warnings.forEach((w,i)=>groups[i%4].push(w));
+    groups.forEach((group,index)=>{
+      const warning=group[0],id=b.patchBossId+':'+Math.floor(this.time*10)+':'+index;
+      for(const w of group){w.life=w.maxLife=1.8;w.v330FaultId=id;}
+      this.enemies.push({x:warning.x,y:warning.y,hp:Math.min(400,Math.round(b.maxHp*.002)),maxHp:Math.min(400,Math.round(b.maxHp*.002)),
+        name:'Точка нестабильного релиза',icon:'⚠️',size:22,speed:0,dmg:0,xp:0,isBoss:false,freezeTimer:0,
+        v330BossPart:true,v330Fault:true,v330FaultId:id,v330Expires:this.time+1.85,col:'#ffd200'});
+    });
+  },
+  renderIncidentWorld(){
+    const ctx=this.ctx;ctx.save();
+    for(const wall of this.v330Walls||[])if(wall.until>this.time&&wall.charges>0){
+      ctx.save();ctx.translate(wall.x,wall.y);ctx.rotate(wall.angle);ctx.strokeStyle='#81ecec';ctx.lineWidth=12;
+      ctx.beginPath();ctx.moveTo(0,-95);ctx.lineTo(0,95);ctx.stroke();ctx.restore();
+    }
+    const incident=this.v330Incident;
+    if(incident){
+      const camera=this.getRenderCamera(),zoom=camera.zoom||1;
+      const dx=(incident.x-camera.x)*zoom,dy=(incident.y-camera.y)*zoom;
+      const halfW=Math.max(30,this.viewportWidth/2-45),halfH=Math.max(30,this.viewportHeight/2-60);
+      if(Math.abs(dx)>halfW||Math.abs(dy)>halfH){
+        const factor=Math.min(halfW/Math.max(1,Math.abs(dx)),halfH/Math.max(1,Math.abs(dy)));
+        const x=camera.x+dx*factor/zoom,y=camera.y+dy*factor/zoom;
+        ctx.save();ctx.translate(x,y);ctx.scale(1/zoom,1/zoom);ctx.rotate(Math.atan2(dy,dx));ctx.fillStyle='#55efc4';ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-8,-9);ctx.lineTo(-8,9);ctx.closePath();ctx.fill();ctx.restore();
+        ctx.save();ctx.translate(x,y);ctx.scale(1/zoom,1/zoom);ctx.fillStyle='#55efc4';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('📍 '+Math.round(Math.hypot(incident.x-this.player.x,incident.y-this.player.y)),0,24);ctx.restore();
+      }
+      ctx.strokeStyle='#55efc4';ctx.fillStyle='rgba(85,239,196,.10)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(incident.x,incident.y,130,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
+      ctx.fillText(({repair:'🛠 Восстановить сервер',defend:'🛡 Удержать участок',escort:'💾 Сопроводить копию'})[incident.kind],incident.x,incident.y-25);
+      ctx.fillText(incident.started?Math.round(incident.progress*100)+'% · '+Math.ceil(incident.deadline-this.time)+'с':'Подойдите к маркеру',incident.x,incident.y);
+      if(incident.kind==='escort'){ctx.strokeStyle='#55efc4';ctx.setLineDash([8,8]);ctx.beginPath();ctx.moveTo(incident.x,incident.y);ctx.lineTo(incident.endX,incident.endY);ctx.stroke();ctx.setLineDash([]);ctx.fillText('🏁',incident.endX,incident.endY);}
+    }
+    for(const e of this.enemies){
+      if(e.hp<=0)continue;
+      if(e.patchType==='log_collector'){
+        ctx.strokeStyle=e.v330WarnAt?'#ff7675':'#ffd200';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.size+9,e.v330FrontAngle-1.2,e.v330FrontAngle+1.2);ctx.stroke();
+        ctx.font='bold 11px sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText((e.v330WarnAt?'ОТВЕТ ЧЕРЕЗ '+Math.max(0,e.v330WarnAt-this.time).toFixed(1)+'с':'ЛОГИ '+(e.v330Stored||0)+'/3'),e.x,e.y-e.size-15);
+      }
+      if(e.v330FinalPhase){ctx.fillStyle='#ff7675';ctx.textAlign='center';ctx.font='bold 13px sans-serif';ctx.fillText(['ВЕЕРЫ','КОЛЬЦА','ПЕРЕГРУЗКА','СЕРВИСНОЕ ОКНО'][e.v330Mode||0],e.x,e.y-110);}
+    }
+    if(this.player.hp>0&&this.v330Shield>0){ctx.strokeStyle='#55efc4';ctx.lineWidth=4;ctx.beginPath();ctx.arc(this.player.x,this.player.y,29,0,Math.PI*2);ctx.stroke();}
+    if(this.player.hp>0&&this.v330Held){ctx.fillStyle='#c99aff';ctx.textAlign='center';ctx.font='bold 12px sans-serif';ctx.fillText('⏱ '+this.v330Held.shots.length+'/24',this.player.x,this.player.y-45);}
+    ctx.restore();
+  }
+});
+
+(() => {
+  const wrap=(name,hook)=>{const original=Game.prototype[name];Game.prototype[name]=function(...args){return hook.call(this,original,...args);};};
+  wrap('updatePatchWorld',function(original,dt){
+    const world=this.patchWorldOwner||this;
+    if(world===this){
+      this.v330HasRemoteTanks=Boolean(this.pvp?.host&&Object.values(this.pvp.remotePlayers||{}).some(p=>!p.isBot&&p.state?.v330Summons?.some(s=>s.role==='senior'&&s.hp>0&&s.life>0)));
+      this.v330HasTanks=this.v330HasRemoteTanks||this.getPatchActors().some(a=>a.summons.some(s=>s.role==='senior'&&s.hp>0&&s.life>0));
+    }
+    original.call(this,dt);this.updateIncidentWorld(dt);
+  });
+  wrap('renderPatchWorld',function(original){original.call(this);this.renderIncidentWorld();});
+  wrap('updatePatchMob',function(original,enemy,dt){if(enemy.patchType!=='macro_user'&&enemy.patchType!=='log_collector')original.call(this,enemy,dt);this.updateIncidentMob(enemy,dt);});
+  wrap('updatePlayerProjectiles',function(original,dt,scale){this.collectIncidentProjectiles();return original.call(this,dt,scale);});
+  wrap('patchMobDefs',function(original){return {...original.call(this),
+    macro_user:{name:'Пользователь с макросом',hp:145,speed:1.1,dmg:8,icon:'⌨️',xp:16,size:18,col:'#ffd200',patchType:'macro_user'},
+    log_collector:{name:'Сборщик логов',hp:125,speed:.9,dmg:6,icon:'🗃️',xp:17,size:20,col:'#81ecec',patchType:'log_collector'}
+  };});
+  wrap('damageEnemy',function(original,enemy,damage,source){
+    if(!enemy||enemy.v330Reviving)return 0;
+    const boss=enemy.isBoss||enemy.isMegaBoss||enemy.patchCommitteePart||enemy.patchMonolithModule||enemy.v330BossPart;
+    const profile=WEAPON_ROLE_BY_SOURCE[source];
+    if(profile)damage*=boss?profile.boss:enemy.eliteType&&profile.elite?profile.elite:profile.mob;
+    if(source===ACTIVE_SKILLS_DEF.act_technician_drone.name)damage*=boss?1.25:.85;
+    if(source===ACTIVE_SKILLS_DEF.act_support_call.name){damage*=.9;if(!boss&&!enemy.is24hPursuer){enemy.slowTimer=Math.max(enemy.slowTimer||0,1.2);enemy.slowFactor=Math.min(enemy.slowFactor||1,.75);}}
+    const dealt=original.call(this,enemy,damage,source);
+    if(enemy.hp<=0&&(!this.pvp?.started||this.pvp.host))this.beginBossRevival(enemy);
+    return dealt;
+  });
+  wrap('getWeaponTargetPriority',function(original,target){const enemy=target.ref||target;if(enemy.v330Reviving)return Infinity;if(enemy.v330BossPart&&enemy.hp>0)return 1;return original.call(this,target);});
+  wrap('isEnemyControlImmune',function(original,enemy){return Boolean(enemy?.v330BossPart)||original.call(this,enemy);});
+  wrap('updateBossAI',function(original,b,dt){
+    if(b.v330Reviving||b.v330FinalPhase){if(b.isMobileMegaBoss&&!b.v330Reviving)this.moveLateMegaBoss(b,this.getPvpEnemyTarget(b),dt);this.updateCoreFinalPhase(b,dt);return;}
+    return original.call(this,b,dt);
+  });
+  wrap('updateReleaseMegaBossAI',function(original,b,dt){const start=this.bossWarnings.length;original.call(this,b,dt);this.createReleaseFaults(b,this.bossWarnings.slice(start));});
+  wrap('getPvpEnemyTarget',function(original,enemy){
+    const target=original.call(this,enemy);if(!(this.patchWorldOwner||this).v330HasTanks||!enemy||enemy.isBoss||enemy.isMegaBoss||enemy.is24hPursuer)return target;
+    const senior=this.getPatchDamageableSummons().find(s=>s.role==='senior'&&s.hp>0&&s.life>0&&Math.hypot(s.x-enemy.x,s.y-enemy.y)<Math.min(260,Math.hypot(target.x-enemy.x,target.y-enemy.y)+60));
+    return senior?{x:senior.x,y:senior.y,hp:senior.hp,isDecoy:true,decoy:senior,uid:senior.patchRemoteOwner||this.pvp?.uid||'local',isRemote:false}:target;
+  });
+  wrap('getPatchDamageableSummons',function(original){
+    const summons=original.call(this),world=this.patchWorldOwner||this;
+    if(world.pvp?.host&&world.v330HasRemoteTanks)for(const member of Object.values(world.pvp.remotePlayers||{}))if(!member.isBot)for(const s of member.state?.v330Summons||[])if(s.role==='senior'&&s.hp>0&&s.life>0){s.patchRemoteOwner=member.uid;summons.push(s);}
+    return summons;
+  });
+  wrap('updateSummons',function(original,dt,scale){
+    for(const s of this.summons)if(s.role==='senior'&&!s.v330Tank){s.v330Tank=true;s.hp*=1.25;s.maxHp*=1.25;}
+    return original.call(this,dt,scale);
+  });
+})();
+
+Game.prototype.updateBackupMegaBossAI=function(b,dt){
+  const target=this.getPvpEnemyTarget(b),enraged=b.hp<=b.maxHp*.5;
+  b.bossTimer1+=dt;b.bossTimer2+=dt;b.bossTimer3+=dt;
+  const files=this.enemies.filter(e=>e.summonedByBackup&&e.hp>0);
+  if(b.bossTimer1>=(enraged?2.4:3.3)){
+    b.bossTimer1=0;
+    const gunner=files.filter(e=>e.v330FileRole==='gunner').length,count=5+gunner*2;
+    this.firePatchFan(b,target,count,.25,3.3,enraged?20:16,b);
+  }
+  if(b.bossTimer2>=(enraged?7:9)){
+    b.bossTimer2=0;
+    if(files.length<3){
+      const roles=['healer','gunner','zone'],role=roles[(b.v330FileIndex||0)%3];b.v330FileIndex=(b.v330FileIndex||0)+1;
+      const angle=this.rollRng()*Math.PI*2;
+      this.enemies.push({x:b.x+Math.cos(angle)*115,y:b.y+Math.sin(angle)*115,
+        name:({healer:'Резервная копия восстановления',gunner:'Резервная копия рассылки',zone:'Резервная копия блокировок'})[role],
+        hp:420,maxHp:420,speed:1.55,dmg:15,icon:({healer:'💚',gunner:'📨',zone:'🔒'})[role],size:18,
+        col:({healer:'#55efc4',gunner:'#fdcb6e',zone:'#c99aff'})[role],xp:9,freezeTimer:0,isBoss:false,summonedByBackup:true,v330FileRole:role,v330NextZone:this.time+3});
+    }
+  }
+  if(b.bossTimer3>=(enraged?6.2:8.4)){
+    b.bossTimer3=0;
+    const healers=files.filter(e=>e.v330FileRole==='healer').length;
+    if(healers){const heal=Math.min(b.maxHp-b.hp,360+healers*150);b.hp+=heal;this.addPopup(b.x,b.y-100,'💚 ВОССТАНОВЛЕНО '+Math.round(heal)+' HP','#55efc4');}
+    else{
+      for(let i=0;i<14;i++)if(i%7!==3){const angle=b.ringPhase+i*Math.PI/7;this.enemyProjectiles.push({x:b.x,y:b.y,vx:Math.cos(angle)*3.6,vy:Math.sin(angle)*3.6,dmg:enraged?21:17,size:10,life:3.4,icon:'🗂️',isMegaBossAttack:true,attackerName:b.name,attackerIcon:b.icon});}
+      b.ringPhase+=.22;
+    }
+  }
+};
+
+const describeActiveBefore330=describeActiveLevel;
+describeActiveLevel=function(player,key,level,mode,rich=false){
+  let text=V330_SKILLS[key]?ACTIVE_SKILL_LEVEL_SUMMARIES[key](level)+' Перезарядка: '+
+    formatStatNumber(V330_SKILLS[key].baseCd*(hasClassAffinity(player,key)?.9:1))+' с.':describeActiveBefore330(player,key,level,mode,rich);
+  if(level===5&&SKILL_SPECIALIZATIONS[key]&&!V330_SKILLS[key])text+=' Специализации: '+SKILL_SPECIALIZATIONS[key].map(spec=>spec.name+' — '+spec.desc).join(' / ');
+  return text;
+};
+
+(() => {
+  const over=Game.prototype.gameOver,menu=Game.prototype.showMainMenu;
+  Game.prototype.gameOver=function(...args){this.closeRunDecision();this.v330Decisions=[];this.updateRunDecisionButton();return over.apply(this,args);};
+  Game.prototype.showMainMenu=function(...args){this.closeRunDecision();this.v330Decisions=[];this.updateRunDecisionButton();return menu.apply(this,args);};
+})();
+
+// Descriptions share the actual role and specialization definitions.
+for(const [key,specializations] of Object.entries(SKILL_SPECIALIZATIONS)){
+  const summary=ACTIVE_SKILL_LEVEL_SUMMARIES[key];
+  ACTIVE_SKILL_LEVEL_SUMMARIES[key]=level=>summary(level)+(level===5?' На V уровне: '+specializations.map(s=>s.name+' — '+s.desc).join(' / '):'');
+}
+ACTIVE_SKILLS_DEF.act_support_call.desc+=' Роль: поддержка; попадания замедляют обычных мобов на 25% на 1,2 с, урон ниже на 10%.';
+ACTIVE_SKILLS_DEF.act_technician_drone.desc+=' Роль: прицельный урон; боссам +25% урона, обычным мобам −15%.';
+ACTIVE_SKILLS_DEF.act_senior_escalation.desc+=' Роль: удержание; +25% HP, отвлекает ближайших обычных мобов и замедляет их ударами.';
+ACTIVE_SKILLS_DEF.act_incident_engineer.desc+=' Роль: зачистка площади; основной урон и дополнительный взрыв по соседним мобам.';
+BIG_BOSS_GUIDE[3].details=BIG_BOSS_GUIDE[3].details.filter(text=>!text.startsWith('Особая награда:'));
+BIG_BOSS_GUIDE[4].details.push('Награда за окончательную победу на 25-й минуте: оставить легендарную миграцию или выбрать одно из двух её развитий.');
+BIG_BOSS_GUIDE[5].details.push('Точки нестабильного релиза можно уничтожить до срабатывания связанных зон: уничтоженная точка отменяет свой участок атаки. Предупреждение продлено до 1,8 с.');
+BIG_BOSS_GUIDE[6].summary='Призывает резервные копии разных ролей. Выбирайте, какой эффект отключить первым.';
+BIG_BOSS_GUIDE[6].details=[
+  'Файлы появляются по очереди: восстановление, рассылка и блокировки. Одновременно не более трёх. Каждый: 420 HP, контакт 15 HP/с, скорость 93 единицы/с; 9 базового опыта.',
+  'Файл восстановления включает лечение босса на 360 + 150 HP за каждый живой файл этой роли. Файл рассылки добавляет два снаряда к вееру. Файл блокировок создаёт круг радиусом 65 с предупреждением 1,3 с и уроном 18 каждые 5 с.',
+  'Призыв каждые 9 с, при HP босса 50% и ниже — каждые 7 с. Лечение или кольцо каждые 8,4 с, в ярости каждые 6,2 с. При отсутствии файлов восстановления вместо лечения идёт кольцо из 12 снарядов.',
+  'Обычный веер: пять снарядов и по два за файл рассылки; каждые 3,3 с, урон 22,4 за снаряд. В ярости — каждые 2,4 с, урон 28. Кольцо наносит 23,8 урона, в ярости 29,4.'
+];
+
+for(const [key,text] of Object.entries({
+  act_support_call:'Роль поддержки: замедляет обычных мобов на 25% на 1,2 с; прямой урон ниже на 10%.',
+  act_technician_drone:'Роль прицельного урона: боссам +25%, обычным мобам −15%.',
+  act_senior_escalation:'Роль удержания: дополнительно +25% HP; отвлекает обычных мобов и замедляет их на 30% на 1,5 с.',
+  act_incident_engineer:'Роль зачистки: попадание дополнительно поражает соседних врагов в радиусе 75.'
+})){
+  const summary=ACTIVE_SKILL_LEVEL_SUMMARIES[key];ACTIVE_SKILL_LEVEL_SUMMARIES[key]=level=>summary(level)+' '+text;
+}
 
 window.onload = () => {
   console.log('съеби с консоли');

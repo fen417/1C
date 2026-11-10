@@ -696,6 +696,9 @@
   #modal-player-skin .skin-window.skin-drag-over { outline:3px dashed #b68b00; outline-offset:-5px; background:#fff8d8; }
   .skin-help { font-size:12px; line-height:1.5; margin-bottom:10px; }
   .skin-editor-layout { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; align-items:center; }
+  .skin-crop-area { position:relative; }
+  #skin-crop-placeholder { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:18px; text-align:center; color:#e5e9ee; font:14px/1.4 sans-serif; pointer-events:none; }
+  #skin-crop-placeholder[hidden] { display:none; }
   #skin-crop { width:min(300px,74vw); height:auto; display:block; border:1px solid #89939f; background:#27313e; touch-action:none; cursor:grab; }
   #skin-crop:active { cursor:grabbing; }
   .skin-previews { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; font-size:11px; text-align:center; }
@@ -1573,7 +1576,7 @@
         <p class="skin-help">Один скин на аккаунт. Выберите файл, перетащите PNG, JPG или WebP в это окно либо вставьте изображение из буфера через Ctrl+V. Для кадрирования двигайте картинку и меняйте масштаб. Скин автоматически сжимается; его видят другие игроки в PvP, PvE и Battle Royale.</p>
         <input id="skin-file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Выбрать изображение скина">
         <div class="skin-editor-layout">
-          <div><canvas id="skin-crop" width="320" height="320" aria-label="Кадрирование скина перетаскиванием"></canvas>
+          <div><div class="skin-crop-area"><canvas id="skin-crop" width="320" height="320" aria-label="Кадрирование скина перетаскиванием"></canvas><div id="skin-crop-placeholder"><span>Выберите или перетащите фото</span><span>либо вставьте через Ctrl+V</span></div></div>
             <label class="skin-zoom">Масштаб <input id="skin-zoom" type="range" min="1" max="6" step="0.01" value="1" disabled></label>
           </div>
           <div class="skin-previews"><div><canvas id="skin-preview-circle" width="128" height="128"></canvas>Обычный · круг</div><div><canvas id="skin-preview-square" width="128" height="128"></canvas>8.5 · квадрат</div></div>
@@ -6517,9 +6520,7 @@ class PlayerSkinManager {
   renderEditor() {
     const canvas = document.getElementById('skin-crop'), ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 320, 320); ctx.fillStyle = '#27313e'; ctx.fillRect(0, 0, 320, 320);
-    if (!this.drawSource(ctx, 320)) {
-      ctx.fillStyle = '#e5e9ee'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Выберите или перетащите фото', 160, 150); ctx.fillText('либо вставьте через Ctrl+V', 160, 176);
-    }
+    document.getElementById('skin-crop-placeholder').hidden = this.drawSource(ctx, 320);
     ctx.beginPath(); ctx.arc(160, 160, 158, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
     for (const [id, square] of [['skin-preview-circle', false], ['skin-preview-square', true]]) {
       const preview = document.getElementById(id), p = preview.getContext('2d');

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-<title>1С:Фитнес Клуб КОРП 3.2.2</title>
+<title>1С:Фитнес Клуб КОРП 3.2.3</title>
 <style>
   :root {
     --c-yellow: #ffd200;
@@ -988,6 +988,10 @@
   #lb-body tr.lb-version-group td { background:#e7edf3; color:#263746; font-weight:bold; padding:6px 8px 6px 16px; }
   #lb-body tr.leaderboard-record { cursor:pointer; }
   #lb-body tr.leaderboard-record:hover, #lb-body tr.leaderboard-record:focus { background:#fff2b3; outline:2px solid #d4af00; outline-offset:-2px; }
+  #modal-match-results { z-index:390; }
+  .match-results-table { width:100%;border-collapse:collapse;font-size:12px; }
+  .match-results-table td,.match-results-table th { border:1px solid #bbb;padding:7px;text-align:left; }
+  .match-results-table tr.own { background:#fff2ad; }
   #modal-record-detail { z-index:360; }
   #record-detail-content { max-height:min(72vh,720px); overflow:auto; }
   .record-profile { display:flex; gap:20px; align-items:center; padding:15px; margin-bottom:14px; border:1px solid #c5cbd1; background:#f8f9fa; }
@@ -1318,7 +1322,7 @@
   <div id="header-1c">
     <div>
       <span class="logo-box">1С</span>
-      <span>1С:Фитнес Клуб КОРП v3.2.2 [Боевой кластер Продакшн]</span>
+      <span>1С:Фитнес Клуб КОРП v3.2.3 [Боевой кластер Продакшн]</span>
     </div>
     <div style="font-size:11px;">
       Грейд: <b id="arch-grade" style="color:#b33939;">Архитектор 1С</b> | Сеанс: <b>Монопольно</b>
@@ -1509,7 +1513,7 @@
   <!-- Главное меню -->
   <div id="modal-main-menu" class="modal-overlay">
     <div class="win-1c main-menu-window">
-      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.2</span></div>
+      <div class="win-1c-head"><span>🏋️ 1С:Фитнес Клуб КОРП</span><span id="menu-version">v3.2.3</span></div>
       <div class="win-1c-body">
         <div class="main-menu-layout">
           <div class="main-menu-actions">
@@ -1522,12 +1526,13 @@
             <button class="btn-1c" onclick="game.openAchievements()">🏅 Достижения</button>
             <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Таблица лидеров</button>
             <button class="btn-1c" onclick="game.showChangelog()">📋 Полная история обновлений</button>
-            <div class="main-menu-version">Текущая версия: <b>3.2.2</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
+            <div class="main-menu-version">Текущая версия: <b>3.2.3</b><br>Сборка фитнес-кластера: 8.5.1.1529</div>
             <button id="global-chat-open" class="btn-1c" onclick="game.chat.open()">💬 Общий чат</button>
           </div>
           <div>
             <div class="release-notes">
               <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
+              <p><b>Патч 3.2.3.</b> Добавлены итоговая таблица сетевого матча и места игроков и ботов. Исправлены наблюдение в онлайне, выдача добычи, события и сохранение рекордов. Усилены проверки рейтингов и хранение данных.</p>
               <p><b>Патч 3.2.2.</b> Перебросы в магазине, скины аккаунта и их снимки в карточках рекордов, общий чат в отдельном окне из главного меню. Добавлено редкое событие с ослабленным М.В.; усилены штрафы мультивыстрела и рикошета. Снижен доход с дискет, усилено его снижение на длинных забегах и повышена наценка за звонки отдела продаж.</p>
               <p><b>Патч 3.2.1.</b> М.В. медленнее в PvP и BR; большие боссы отключены в Battle Royale.</p>
               <p><b>Патч 3.2.0 — обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
@@ -1558,6 +1563,9 @@
     </div>
   </div>
 
+  <div id="modal-match-results" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="match-results-title">
+    <div class="win-1c" style="width:min(1200px,96vw)"><div class="win-1c-head"><span id="match-results-title">🏆 Итоги матча</span><button class="win-close-btn" onclick="game.closeMatchResults()" aria-label="Закрыть итоги матча">✕</button></div><div class="win-1c-body" id="match-results-body"></div></div>
+  </div>
   <div id="modal-player-skin" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="skin-title">
     <div class="win-1c skin-window">
       <div class="win-1c-head"><span id="skin-title">🎨 Скин аккаунта</span><button id="skin-close" class="win-close-btn" onclick="game.skins.close()" aria-label="Закрыть редактор скина">✕</button></div>
@@ -1597,7 +1605,7 @@
     </div>
   </div>
   <div id="modal-knowledge" class="modal-overlay">
-    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.2</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
+    <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.3</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
       <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
@@ -1796,6 +1804,13 @@
       <div class="win-1c-body">
         <section class="patch-major"><h2 class="patch-major-title">Версия 3.x</h2>
         <details class="release-notes patch-minor" open><summary><h3>3.2.0 — «Кластер живёт дальше»</h3></summary>
+          <h4>Патч 3.2.3 — исправления онлайна и результатов</h4>
+          <h5>Нововведения</h5>
+          <p><b>Итоги сетевого матча.</b> В PvP, PvE и Battle Royale показана общая таблица игроков и ботов: места, убийства соперников и мобов, суммарные очки и очки за мобов и дискеты, собранные дискеты и фиткоины. Видно, кто кого убил. В PvP и BR места определяются по выживанию, в PvE — по очкам. Своя строка выделена.</p>
+          <h5>Исправления ошибок</h5>
+          <p>Устранено восстановление HP погибшего хоста офисным событием. Наблюдатели получают объекты всей карты; указатель аирдропа учитывает удалённые поставки. Подбор дискет и расходников подтверждает хост, незавершённые выдачи возвращаются на карту при отключении получателя.</p>
+          <p>Сбой архива скина больше не блокирует запись результата. Уплотнены большие снимки снаряжения с сохранением модификаторов. Устранены повторная запись завершённого результата и подмена сессии запоздавшим ответом.</p>
+          <p>Обновлены проверки владельцев результатов и рейтинга достижений. Офисные усиления распространяются на живых игроков и ботов. Случайности ежедневных забегов используют генератор с сидом. История чата ограничена сроком хранения; архив новых скинов получил ограничение количества версий.</p>
           <h4>Патч 3.2.2 — скины, перебросы и обиженный М.В.</h4>
           <h5>Нововведения</h5>
           <p><b>Платные перебросы.</b> В магазине можно докупить пакет из трёх перебросов карточек прокачки за 750 фиткоинов. Покупки повторяются, пока хватает денег; перебросы прибавляются к оставшимся и действуют до конца текущего забега. Цена фиксирована и не растёт от звонков отдела продаж. Пакет не занимает место в инвентаре и доступен в режимах, где разрешены перебросы карточек.</p>
@@ -2258,7 +2273,7 @@
 
         <div style="display:flex; justify-content:space-around;">
           <button class="btn-1c" id="gameover-primary-button" onclick="game.restartFromGameOver()">🔄 Сделать ТиИ и начать заново</button>
-          <button class="btn-1c" id="gameover-spectate-button" onclick="game.enterSpectatorMode()">👁 Обзор карты</button>
+          <button class="btn-1c" onclick="game.showMatchResults()">🏆 Итоги матча</button><button class="btn-1c" id="gameover-spectate-button" onclick="game.enterSpectatorMode()">👁 Обзор карты</button>
           <button class="btn-1c" onclick="game.showLeaderboard()">🏆 Посмотреть таблицу</button>
         </div>
       </div>
@@ -2293,7 +2308,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithCredential, linkWithPopup, linkWithRedirect, linkWithCredential, getRedirectResult, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
-  import { getDatabase, ref, get, query, orderByChild, limitToLast, limitToFirst, endAt, push, set, update, onValue, remove, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
+  import { getDatabase, ref, get, query, orderByChild, limitToLast, limitToFirst, startAt, endAt, push, set, update, onValue, remove, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: 'AIzaSyDI54wAFmr2y_kHg1-wwcHgOwF8zWGK0L4',
@@ -2313,7 +2328,7 @@
   googleProvider.setCustomParameters({ prompt: 'select_account' });
   const makeFirebaseContext = user => ({
     app, auth, user, db, uid: user.uid,
-    ref, get, query, orderByChild, limitToLast, limitToFirst, endAt, push, set, update, onValue, remove, onDisconnect, serverTimestamp
+    ref, get, query, orderByChild, limitToLast, limitToFirst, startAt, endAt, push, set, update, onValue, remove, onDisconnect, serverTimestamp
   });
   let resolveFirebaseLeaderboard;
   window.firebaseLeaderboardReady = new Promise((resolve, reject) => {
@@ -2383,14 +2398,14 @@
 </script>
 
 <script>
-const GAME_VERSION = '3.2.2';
+const GAME_VERSION = '3.2.3';
 const UPGRADE_REROLL_PACK = { count: 3, cost: 750 };
 const MV_COMPLAINT_EVENT = {
   interval: 60, chance: .01, strength: .5,
   message: 'На М.В. пожаловались и он обиделся. Разбирайтесь с ним сами'
 };
 const MAX_PLAYER_DODGE = 0.50;
-const NETWORK_PROTOCOL = 5;
+const NETWORK_PROTOCOL = 6;
 const BR_ZONE_SHRINK_DURATION = 30;
 const BR_ZONE_PAUSE_DURATION = 10;
 const BR_ZONE_BASE_DAMAGE_PER_SECOND = 25;
@@ -4936,7 +4951,7 @@ class PvpKillFeed {
     const pvp=this.game.pvp;
     if(!this.pendingReport || !this.enabled() || pvp.leaving || performance.now()-this.pendingReport.createdAt>15000)return;
     this.game.sendPvpNetworkMessage({type:'player-death',uid:pvp.uid,hit:this.pendingReport.hit,room:pvp.code,
-      loot:{x:this.game.player.x,y:this.game.player.y,level:this.game.level,inventoryLoot:this.game.getLootInventory()}},null,true);
+      loot:{x:this.game.player.x,y:this.game.player.y,level:this.game.level,inventoryLoot:this.game.getLootInventory(),matchStats:this.game.getMatchStats()}},null,true);
     this.reportTimer=setTimeout(()=>this.flushReport(),700);
   }
 
@@ -4948,6 +4963,8 @@ class PvpKillFeed {
     this.deaths.add(victimUid);
     this.game.spawnPlayerDeathLoot(victimUid);
     const event={id:victimUid,room:pvp.code,victimUid,victimName:String(victim.name || 'Игрок').slice(0,20),...hit};
+    (pvp.matchDeaths ||= []).push({...event,at:this.game.time});
+    (pvp.finishedStats ||= {})[victimUid]=this.game.matchMemberStats(victimUid);
     this.receive(event);
     this.game.sendPvpNetworkMessage({type:'kill-feed',event},null,true);
   }
@@ -5021,7 +5038,7 @@ class PvpBotController {
     Object.assign(actor, { weapons:{[classDef.weapon]:{lvl:1,timer:0}}, passives:{}, activeSkills:[null,null,null,null],
       evolvedWeapons:new Set(), repeatableUpgradeCounts:{}, shopPassives:Array(6).fill(null), backpack:Array(3).fill(null), consumables:Array(4).fill(null),
       shopRepeatPurchases:{}, appliedShopEffects:null, projectiles:[], puddles:[], pendingQueryHits:[], summons:[], transactionHistory:[],
-      level:1, xp:0, earlyXpRemainder:0, nextXp:25, currency:220, kills:0, gemsCollected:0, eliteKills:0, miniBossKills:0, megaBossKills:0,
+      runFitcoinsLooted:0, level:1, xp:0, earlyXpRemainder:0, nextXp:25, currency:220, kills:0, gemsCollected:0, eliteKills:0, miniBossKills:0, megaBossKills:0,
       ticketsCompleted:0, difficultyBonusScore:0, dynUpdateCd:0, backupTimer:38, paused:false, isBattleRoyale:g.isBattleRoyale, isDailyRun:false,
       activeChallenge:null, castingActiveKey:null, _framePvpTargets:null });
     for (const key of ['time','MAP_SIZE','BOUND_MIN','BOUND_MAX','enemies','gems','pickups','enemyProjectiles',
@@ -5354,7 +5371,7 @@ class PvpBotController {
       if(gem.syncId && g.pvp.claimedDrops?.[gem.syncId])continue;
       if(gem.syncId)(g.pvp.claimedDrops ||= {})[gem.syncId]=true;
       const xp=Math.max(1,Math.round((gem.baseXp??gem.xp)*p.xpMult*p.xpEventMult));
-      a.xp+=a.getEarnedXp(xp);a.gemsCollected++;p.patchPacketCharges=(p.patchPacketCharges||0)+1;a.currency+=g.getPatchCurrency(gem.baseXp??gem.xp,p.currencyMult,gem.currencyMult||1);
+      a.xp+=a.getEarnedXp(xp);a.gemsCollected++;p.patchPacketCharges=(p.patchPacketCharges||0)+1;const coins=g.getPatchCurrency(gem.baseXp??gem.xp,p.currencyMult,gem.currencyMult||1);a.currency+=coins;a.runFitcoinsLooted=(a.runFitcoinsLooted||0)+coins;
       g.gems.splice(i,1);
       while(a.xp>=a.nextXp)this.level(bot);
     }
@@ -5959,7 +5976,7 @@ class GlobalChat {
     this.status('Общий для всех игроков.'); this.updateControls();
   }
   stop() {
-    this.epoch++;
+    this.epoch++; clearTimeout(this.retentionTimer);
     for (const key of ['messagesUnsub','senderUnsub','connectionUnsub']) { this[key]?.(); this[key] = null; }
     clearTimeout(this.cooldownTimer); this.cooldownTimer = null;
     this.connected = false; this.ready = false; this.updateControls();
@@ -5989,7 +6006,7 @@ class GlobalChat {
       this.nextSendAt = Math.max(0, Number(snapshot.val()?.lastAt) || 0) + 5000;
       this.updateControls();
     }, failed);
-    this.messagesUnsub = fb.onValue(fb.query(fb.ref(fb.db, 'globalChat/messages'), fb.orderByChild('createdAt'), fb.limitToLast(50)), snapshot => {
+    this.messagesUnsub = fb.onValue(fb.query(fb.ref(fb.db, 'globalChat/messages'), fb.orderByChild('createdAt'), fb.startAt(this.now()-7*86400000), fb.limitToLast(50)), snapshot => {
       if (epoch !== this.epoch) return;
       this.ready = true; this.render(snapshot); this.updateControls();
       if (this.connected && !this.sending) this.status('До 300 символов · интервал отправки 5 секунд.');
@@ -5998,6 +6015,7 @@ class GlobalChat {
       if (epoch === this.epoch) { this.offset = Number(snapshot.val()) || 0; this.updateControls(); }
     }).catch(() => {});
     this.prune(fb);
+    this.retentionTimer=setTimeout(()=>{if(this.visible())this.connect();},60000);
   }
   updateControls() {
     clearTimeout(this.cooldownTimer); this.cooldownTimer = null;
@@ -6018,7 +6036,7 @@ class GlobalChat {
     snapshot.forEach(child => {
       const message = child.val();
       if (!message || typeof message.uid !== 'string' || typeof message.name !== 'string' || typeof message.text !== 'string' ||
-          message.name.length > 15 || message.text.length > 300 || !Number.isFinite(message.createdAt) || message.createdAt <= 0) return;
+          message.name.length > 15 || message.text.length > 300 || !Number.isFinite(message.createdAt) || message.createdAt <= this.now()-7*86400000) return;
       const date = new Date(message.createdAt);
       if (!Number.isFinite(date.getTime())) return;
       const row = document.createElement('p'); row.className = 'global-chat-message' + (message.uid === this.uid ? ' own' : '');
@@ -6310,7 +6328,12 @@ class PlayerSkinManager {
     const key = `${skin.uid}:${skin.version}`;
     if (this.archived.has(key)) return;
     const fb = this.fb;
-    await fb.set(fb.ref(fb.db, `recordSkins/${skin.uid}/${skin.version}`), frozen.data);
+    const path=`recordSkins/${skin.uid}/${skin.version}`;
+    const existing=await fb.get(fb.ref(fb.db,path));
+    if(!existing.exists()){
+      const quota=await fb.get(fb.ref(fb.db,`recordSkinQuota/${skin.uid}`));
+      await fb.update(fb.ref(fb.db),{[path]:frozen.data,[`recordSkinQuota/${skin.uid}`]:{count:(Number(quota.val()?.count)||0)+1,lastVersion:skin.version}});
+    }
     if (this.fb !== fb) throw new Error('Аккаунт изменился во время сохранения результата.');
     this.archived.add(key);
   }
@@ -6620,6 +6643,7 @@ class Game {
     this.mouseMoveAim = null;
     this.mouseMovePointerId = null;
     window.addEventListener('keydown', (e) => {
+      if(document.getElementById('modal-match-results').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.closeMatchResults();}return;}
       if (this.hudLayout?.editing) { this.hudLayout.keydown(e); return; }
       if(document.getElementById('modal-global-chat').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.chat.close();}return;}
       if(document.getElementById('modal-player-skin').style.display==='flex'){if(e.code==='Escape'){e.preventDefault();this.skins.close();}return;}
@@ -7336,7 +7360,7 @@ class Game {
     const inventory=(Array.isArray(state.inventoryLoot)?state.inventoryLoot:[]).slice(0,6)
       .filter(slot=>slot && this.getShopPassiveDef(slot.key));
     if(!inventory.length)return;
-    const slot=inventory[Math.floor(Math.random()*inventory.length)];
+    const slot=inventory[Math.floor(this.rollRng()*inventory.length)];
     this.addEquipmentPickup(x,y,slot.key,{cooldown:Math.max(0,Math.min(600,Number(slot.cooldown)||0)),deathLoot:true});
     if(actor)actor.removeDeathLootItem(slot.key);
     else this.sendEquipmentMessage(uid,{type:'death-loot-lost',key:slot.key});
@@ -7425,7 +7449,7 @@ class Game {
     if (this.pvp?.started) {
       this.pvp.classSelectionPending = true;
       this.pvp.classSelectionReadyUids = new Set();
-      this.pvp.equipmentGrants=new Map();this.pvp.receivedEquipment=new Set();
+      this.pvp.equipmentGrants=new Map();this.pvp.receivedEquipment=new Set();this.pvp.lootGrants=new Map();this.pvp.authorizedLoot=new Set();this.pvp.matchDeaths=[];this.pvp.finishedStats={};this.pvp.matchResults=null;
       this.pvp.pendingEquipmentClaim=null;this.pvp.deathLootSpawned=new Set();this.pvp.remoteDeathLoot={};
     }
     this.legendaryMigrationChosen = false;
@@ -7493,11 +7517,12 @@ class Game {
     this.difficultyBonusScore = 0;
     this.nextDifficultyScoreAt = 180;
     this.achievementRunKillSnapshot = 0;
-    this.gemsCollected = 0;
+    this.gemsCollected = 0; this.runFitcoinsLooted=0;
     this.damageDealtBySource = Object.create(null);
     this.level = 1;
     this.upgradeRerollsRemaining = 3;
-    this.finalLoadout = null; this.finalRecordSkin = null;
+    this.finalLoadout = null; this.finalRecordSkin = null; this.verifiedRunGeneration=(this.verifiedRunGeneration||0)+1;
+    document.getElementById('modal-match-results').style.display='none';
     this.xp = 0;
     this.earlyXpRemainder = 0;
     this.nextXp = 25;
@@ -7658,7 +7683,7 @@ class Game {
     this.updateConsumableHUD();
     this.log("Сервер 1С запущен. Главный Архитектор встал на защиту кластера!");
     if (!options.skipScoreSession) {
-      if (!this.isDailyRun) this.beginVerifiedRunSession();
+      this.beginVerifiedRunSession();
       if (this.isDailyRun && this.dailyConfig) {
         const dailyClass = PLAYER_CLASSES[this.dailyConfig.classId] || PLAYER_CLASSES.technician;
         const mod = this.dailyConfig.modifier;
@@ -8517,7 +8542,7 @@ class Game {
       const { db, uid, ref, get, set, onDisconnect } = fb;
       let code = '';
       for (let attempt = 0; attempt < 12; attempt++) {
-        const candidate = Array.from({ length: 4 }, () => String(Math.floor(Math.random() * 10))).join('');
+        const candidate = Array.from({ length: 4 }, () => String(Math.floor(this.rollRng() * 10))).join('');
         const existing = await get(ref(db, `pvpRooms/${candidate}`));
         if (!existing.exists()) { code = candidate; break; }
       }
@@ -8643,7 +8668,7 @@ class Game {
         for(const index of slots){
           if(!free.includes(index))continue;
           const classes=Object.keys(PLAYER_CLASSES);
-          bots[`bot_${index}`]={slot:index,classId:classes[Math.floor(Math.random()*classes.length)]};
+          bots[`bot_${index}`]={slot:index,classId:classes[Math.floor(this.rollRng()*classes.length)]};
         }
       }else if(slot==='all'){for(const uid of Object.keys(bots))delete bots[uid];}
       else delete bots[`bot_${Number(slot)}`];
@@ -8902,8 +8927,12 @@ class Game {
       // A channel belongs to one guest; never trust a supplied sender identity.
       message = { ...message, uid: senderUid };
       if (message.skill) message.skill = { ...message.skill, senderUid };
-      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'equipment-grant', 'equipment-denied', 'death-loot-lost', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
+      if (['roster', 'player-state', 'bot-states', 'kill-feed', 'equipment-grant', 'loot-grant', 'office-player-effect', 'equipment-denied', 'death-loot-lost', 'patch-heal','patch-mail','patch-summon-damage','world-patch', 'world', 'world-chunk', 'world-positions', 'match-finished', 'br-winner', 'class-selection-complete', 'legendary-offer'].includes(message.type)) return;
     }
+    if(message.type==='office-player-effect'&&!pvp.host){this.applyOfficePlayerEffect(message.roll);return;}
+    if(message.type==='loot-claim'&&pvp.host&&senderUid){this.grantLoot(senderUid,message.id,message.collection);return;}
+    if(message.type==='loot-grant'&&!pvp.host){this.receiveLootGrant(message);return;}
+    if(message.type==='loot-ack'&&pvp.host&&senderUid){const grant=pvp.lootGrants?.get(message.id);if(grant?.uid===senderUid){pvp.lootGrants.delete(message.id);if(message.accepted!==true)this[grant.collection].push(grant.item);}return;}
     if(message.type==='equipment-claim' && pvp.host && senderUid) {this.claimEquipmentPickup(senderUid,message.id);return;}
     if(message.type==='equipment-ack' && pvp.host && senderUid) {this.acknowledgeEquipment(senderUid,message.id,message.accepted===true);return;}
     if(message.type==='equipment-grant' && !pvp.host) {this.receiveEquipmentGrant(message.item);return;}
@@ -9035,6 +9064,7 @@ class Game {
       } else this.applyPvpRemoteState(state);
       this.syncPvpWait();
     } else if (message.type === 'match-finished' && !pvp.host) {
+      if(message.results)queueMicrotask(()=>this.showMatchResults(message.results));
       this.finishPvpMultiplayerMatch(message.winnerUid || null, message.winner || '');
     } else if (message.type === 'mv-ticket-trigger' && pvp.host) this.spawnMVBoss(['declined','ignored','three-failures'].includes(message.reason) ? message.reason : 'three-failures', message.uid);
     else if (message.type === 'sales-call' && !pvp.host) this.showSalesCall();
@@ -9052,6 +9082,7 @@ class Game {
       else this.offerLegendaryMigrations(false);
     }
     else if (message.type === 'br-winner' && this.isBattleRoyale) {
+      if(message.results)queueMicrotask(()=>this.showMatchResults(message.results));
       const winnerName = String(message.winner || '');
       const localWinner = message.winnerUid ? message.winnerUid === pvp.uid : winnerName && winnerName === pvp.name;
       pvp.brWinnerUid = message.winnerUid || null;
@@ -9184,7 +9215,7 @@ class Game {
       }
     }
     const equipmentIds=new Set(this.pickups.filter(item=>this.isEquipmentPickup(item)).map(item=>item.syncId));
-    const claimed = new Set(Object.keys(state.claimedDrops || {}).filter(id => state.claimedDrops[id] && !equipmentIds.has(id)));
+    const claimed = new Set();
     if (claimed.size) {
       this.gems = this.gems.filter(item => !claimed.has(item.syncId));
       this.pickups = this.pickups.filter(item => !claimed.has(item.syncId));
@@ -9292,6 +9323,40 @@ class Game {
     this.sendPvpNetworkMessage({ type: 'roster', players, classSelectionPending: pvp.classSelectionPending });
   }
 
+  getMatchStats() {
+    return {score:this.calcScore(),mobs:this.kills||0,gems:this.gemsCollected||0,coins:this.runFitcoinsLooted||0,
+      mobPoints:(this.kills||0)*12+(this.eliteKills||0)*45+(this.miniBossKills||0)*450+(this.megaBossKills||0)*1800,
+      lootPoints:(this.gemsCollected||0)*3};
+  }
+  matchMemberStats(uid) {
+    const p=this.pvp,actor=uid===p.uid?this:this.botController?.bots.get(uid)?.actor;
+    const raw=actor?.getMatchStats()||p.remoteDeathLoot?.[uid]?.matchStats||p.remotePlayers?.[uid]?.state?.matchStats||{};
+    return Object.fromEntries(['score','mobs','gems','coins','mobPoints','lootPoints'].map(key=>[key,Math.max(0,Math.min(1e9,Math.floor(Number(raw[key])||0)))]));
+  }
+  buildMatchResults(winnerUid) {
+    const p=this.pvp,events=p.matchDeaths||[];
+    const rows=(p.matchPlayerUids||[p.uid]).map(uid=>{
+      const member=uid===p.uid?{name:p.name}:p.remotePlayers?.[uid]||{};
+      const death=events.find(event=>event.victimUid===uid);
+      return {uid,name:String(member.name||'Игрок').slice(0,20),bot:Boolean(member.isBot||this.botController?.bots.has(uid)),
+        ...(p.finishedStats?.[uid]||this.matchMemberStats(uid)),
+        playerKills:events.filter(e=>e.attackerUid===uid&&e.victimUid!==uid).length,
+        killed:events.filter(e=>e.attackerUid===uid&&e.victimUid!==uid).map(e=>e.victimName||p.remotePlayers?.[e.victimUid]?.name||p.name),
+        killer:death?.attackerName|| (uid===winnerUid?'Победитель':'—'),deathOrder:events.findIndex(e=>e.victimUid===uid)};
+    });
+    rows.sort((a,b)=>p.mode==='pve'?b.score-a.score||b.mobs-a.mobs||a.uid.localeCompare(b.uid):
+      Number(b.uid===winnerUid)-Number(a.uid===winnerUid)||(b.deathOrder<0?1e6:b.deathOrder)-(a.deathOrder<0?1e6:a.deathOrder)||b.score-a.score||a.uid.localeCompare(b.uid));
+    p.matchResults={mode:p.mode,rows:rows.map((row,i)=>({...row,place:i+1}))};return p.matchResults;
+  }
+  showMatchResults(results=this.pvp?.matchResults) {
+    if(!this.pvp||!results||!Array.isArray(results.rows))return;
+    this.pvp.matchResults=results;
+    const h=value=>this.escapeHtml(String(value??'—'));
+    document.getElementById('match-results-body').innerHTML='<p>'+ (results.mode==='pve'?'Места по набранным очкам.':'Места по выживанию; победитель занимает первое место.')+'</p><div style="overflow:auto"><table class="match-results-table"><thead><tr>'+['Место','Участник','Игроки / боты','Мобы','Очки всего','За мобов','За дискеты','Дискеты','Фиткоины','Убит кем','Кого убил'].map(x=>'<th>'+h(x)+'</th>').join('')+'</tr></thead><tbody>'+results.rows.slice(0,8).map(r=>'<tr'+(r.uid===this.pvp.uid?' class="own"':'')+'>'+[r.place,r.name+(r.bot?' [бот]':''),r.playerKills,r.mobs,r.score,r.mobPoints,r.lootPoints,r.gems,r.coins,r.killer,Array.isArray(r.killed)?r.killed.join(', '):''].map(x=>'<td>'+h(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+    document.getElementById('modal-match-results').style.display='flex';this.setMobileMenuScroll(true);
+  }
+  closeMatchResults(){document.getElementById('modal-match-results').style.display='none';this.setMobileMenuScroll(true);}
+
   finishPvpMultiplayerMatch(winnerUid, winner) {
     const pvp = this.pvp;
     if (!pvp || pvp.matchOver) return;
@@ -9305,6 +9370,7 @@ class Game {
     if (this.pvpTimer) clearInterval(this.pvpTimer);
     this.pvpTimer = null;
     this.cleanupPvpRoom();
+    this.showMatchResults(pvp.matchResults);
     this.showBanner(winnerUid ? '🏆 Матч завершён. Победитель: ' + (winner || 'Игрок') : 'Все участники выбыли. Забег завершён.');
   }
 
@@ -9313,7 +9379,7 @@ class Game {
     if (!p) return null;
     return { x: p.x, y: p.y, hp: Math.max(0, Math.round(p.hp * 10) / 10), maxHp: Math.round(p.maxHp), level: this.level,
       time: Number(this.time) || 0, attackTotal: Number(this.pvp?.attackTotal || 0), enemyAttackTotal: Number(this.pvp?.enemyAttackTotal || 0),
-      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, over: Boolean(this.pvp?.matchOver || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85),inventoryLoot:this.getLootInventory(),spawnView:this.getPlayerSpawnView() };
+      killCredits: { host: Number(this.pvp?.hostKillCount || 0), guest: Number(this.pvp?.guestKillCount || 0), players: this.pvp?.killCounts || {} }, matchStats:this.getMatchStats(),over: Boolean(this.pvp?.matchOver || this.pvp?.eliminated || p.hp <= 0), shield: p.shieldTimer > 0, migration85: Boolean(p.migration85),inventoryLoot:this.getLootInventory(),spawnView:this.getPlayerSpawnView() };
   }
 
   handlePvpRtcRecovered(rtc) {
@@ -9401,7 +9467,7 @@ class Game {
       enemyAttackTotal: Math.round(pvp.enemyAttackTotal * 100) / 100,
       enemyAttackSource: pvp.enemyAttackSource || 'Атака противника',
       killCredits: { host: Number(pvp.hostKillCount || 0), guest: Number(pvp.guestKillCount || 0), players: pvp.killCounts || {} },
-      over: pvp.matchOver || player.hp <= 0,
+      matchStats:this.getMatchStats(),over: Boolean(pvp.matchOver || pvp.eliminated || player.hp <= 0),
       migration85: Boolean(player.migration85)
     };
   }
@@ -9414,6 +9480,7 @@ class Game {
     const level = Math.max(1, Math.min(10000, Math.floor(Number(state.level))));
     const cleanState = {
       ...state,
+      matchStats:Object.fromEntries(['score','mobs','gems','coins','mobPoints','lootPoints'].map(key=>[key,Math.max(0,Math.min(1e9,Math.floor(Number(state.matchStats?.[key])||0)))])),
       x: Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, Number(state.x))),
       y: Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, Number(state.y))),
       hp: Math.max(0, Math.min(maxHp, Number(state.hp))),
@@ -9778,10 +9845,10 @@ class Game {
         targets.push({ x: this.player.x, y: this.player.y });
       }
       for (const remote of remoteAlive) targets.push({ x: remote.x, y: remote.y });
-      if (targets.length) return targets[Math.floor(Math.random() * targets.length)];
+      if (targets.length) return targets[Math.floor(this.rollRng() * targets.length)];
     }
     const remote = this.pvp?.host && this.pvp.started ? this.pvp.remoteState : null;
-    if (remote && !remote.over && remote.hp > 0 && Number.isFinite(remote.x) && Number.isFinite(remote.y) && Math.random() < 0.5) {
+    if (remote && !remote.over && remote.hp > 0 && Number.isFinite(remote.x) && Number.isFinite(remote.y) && this.rollRng() < 0.5) {
       return { x: remote.x, y: remote.y };
     }
     return { x: this.player.x, y: this.player.y };
@@ -9824,10 +9891,13 @@ class Game {
   handlePvpPeerDisconnected(uid, reason = 'Игрок отключился.') {
     const pvp = this.pvp;
     if (!pvp?.host || !pvp.started || !uid || uid === pvp.uid) return;
+    this.restorePendingLoot(uid);
     if (pvp.mode === 'battle_royale') {
       this.markBattleRoyalePlayerEliminated(uid, reason);
       return;
     }
+    this.restorePendingLoot(uid);
+    if(!this.pvp.matchDeaths?.some(e=>e.victimUid===uid)){(this.pvp.matchDeaths ||= []).push({victimUid:uid,attackerName:'Отключение',at:this.time});(this.pvp.finishedStats ||= {})[uid]=this.matchMemberStats(uid);}
     const prior = pvp.remotePlayers?.[uid] || {};
     if (prior.disconnected || prior.state?.over) return;
     const roomPlayer = pvp.roomCache?.players?.[uid] || {};
@@ -9855,6 +9925,8 @@ class Game {
   markBattleRoyalePlayerEliminated(uid, reason = 'Игрок покинул Battle Royale.') {
     const pvp = this.pvp;
     if (!pvp?.host || pvp.mode !== 'battle_royale' || !pvp.started || !uid || uid === pvp.uid) return;
+    this.restorePendingLoot(uid);
+    if(!this.pvp.matchDeaths?.some(e=>e.victimUid===uid)){(this.pvp.matchDeaths ||= []).push({victimUid:uid,attackerName:'Отключение',at:this.time});(this.pvp.finishedStats ||= {})[uid]=this.matchMemberStats(uid);}
     const prior = pvp.remotePlayers?.[uid] || {};
     if (prior.disconnected || prior.state?.over) return;
     const roomPlayer = pvp.roomCache?.players?.[uid] || {};
@@ -10126,6 +10198,7 @@ class Game {
       if(pvp.host)for(const grant of pvp.equipmentGrants?.values() || []) {
         if(now-grant.at>=1000){this.sendEquipmentMessage(grant.uid,{type:'equipment-grant',item:grant.item});grant.at=now;}
       }
+      if(pvp.host)for(const grant of pvp.lootGrants?.values()||[])if(now-grant.at>=1000){this.sendEquipmentMessage(grant.uid,{type:'loot-grant',...grant});grant.at=now;}
       if(pvp.pendingEquipmentClaim && now-pvp.pendingEquipmentClaim.at>2500)pvp.pendingEquipmentClaim=null;
       this.sendPvpNetworkState(this.createPvpNetworkState());
       if(pvp.host && this.botController && performance.now()-Number(pvp.lastBotStateSentAt||0)>=100){pvp.lastBotStateSentAt=performance.now();this.botController.sendStates();}
@@ -10146,7 +10219,7 @@ class Game {
         if (allKnown && alive.length <= (pvp.mode === 'pvp' ? 1 : 0)) {
           const winnerUid = alive[0] || null;
           const winner = winnerUid === pvp.uid ? pvp.name : pvp.remotePlayers?.[winnerUid]?.name || '';
-          this.sendPvpNetworkMessage({ type: 'match-finished', winnerUid, winner }, null, true);
+          this.sendPvpNetworkMessage({ type: 'match-finished', winnerUid, winner, results:this.buildMatchResults(winnerUid) }, null, true);
           this.finishPvpMultiplayerMatch(winnerUid, winner);
           return;
         }
@@ -10164,7 +10237,8 @@ class Game {
         if (alive.length === this.pvp.actualPlayerCount && survivors.length <= 1) {
           this.pvp.brWinnerSent = true;
           const winner = survivors[0] || null;
-          this.sendPvpNetworkMessage({ type: 'br-winner', winner: winner?.name || '', winnerUid: winner?.uid || null }, null, true);
+          this.sendPvpNetworkMessage({ type: 'br-winner', winner: winner?.name || '', winnerUid: winner?.uid || null, results:this.buildMatchResults(winner?.uid) }, null, true);
+          queueMicrotask(()=>this.showMatchResults(this.pvp?.matchResults));
           if (winner?.uid === this.pvp.uid) {
             this.gameOver('Вы победили: все соперники выбыли.', { victory: true });
             return;
@@ -10260,7 +10334,7 @@ class Game {
       const channel = peer.channel;
       if (!peer.connected || channel?.readyState !== 'open' || channel.bufferedAmount > 8192) continue;
       const state = pvp.remotePlayers?.[peer.uid]?.state;
-      const relevant = entities.filter(item => !state || item.isBoss || item.is24hPursuer ||
+      const relevant = entities.filter(item => !state || state.over || item.type === 'br_supply' || item.isBoss || item.is24hPursuer ||
         (item.x - state.x) ** 2 + (item.y - state.y) ** 2 <= 1600 ** 2);
       for (let i = 0; i < relevant.length; i += 100) {
         if (channel.bufferedAmount > 16384) break;
@@ -10295,7 +10369,7 @@ class Game {
       const state = pvp.remotePlayers?.[peer.uid]?.state;
       for (const name of names) {
         const baseline = peer.worldBaseline[name] ||= new Map();
-        const relevant = encoded[name].filter(({item}) => !state || item.isBoss || item.is24hPursuer ||
+        const relevant = encoded[name].filter(({item}) => !state || state.over || item.type === 'br_supply' || item.isBoss || item.is24hPursuer ||
           !Number.isFinite(item.x) || !Number.isFinite(item.y) || (item.x-state.x)**2 + (item.y-state.y)**2 <= 1600**2);
         const ids = new Set(relevant.map(record => record.id));
         const changes = relevant.filter(record => baseline.get(record.id) !== record.signature);
@@ -10345,6 +10419,7 @@ class Game {
     const byId = new Map(this[name].filter(item => item.syncId).map(item => [item.syncId, item]));
     for (const id of message.removed || []) {
       if (typeof id !== 'string' || revision <= (revisions.get(id) || 0)) continue;
+      if(pvp.authorizedLoot?.has(id))continue;
       byId.delete(id); revisions.set(id, revision);
       delete pvp.positionHistory?.[id];
       delete pvp.latestWorldPositions?.[id];
@@ -10458,7 +10533,7 @@ class Game {
       this.addPopup(this.player.x, this.player.y - 22, isPvp ? 'PvP-УДАР ПОГЛОЩЁН ЩИТОМ' : 'АТАКА МОБА ПОГЛОЩЕНА ЩИТОМ', '#00cec9');
       return 0;
     }
-    if (Math.random() < this.getEffectivePlayerDodge()) {
+    if (this.rollRng() < this.getEffectivePlayerDodge()) {
       this.addPopup(this.player.x, this.player.y - 22, isPvp ? 'PvP-ПРОМАХ!' : 'УКЛОНЕНИЕ!', '#f1c40f');
       return 0;
     }
@@ -10684,11 +10759,47 @@ class Game {
     this.syncPvpWait();
   }
 
+  restorePendingLoot(uid) {
+    for(const [id,grant] of this.pvp?.equipmentGrants || []) if(grant.uid===uid){this.pvp.equipmentGrants.delete(id);delete this.pvp.claimedDrops?.[id];this.pickups.push(grant.item);}
+    for(const [id,grant] of this.pvp?.lootGrants || []) if(grant.uid===uid){this.pvp.lootGrants.delete(id);delete this.pvp.claimedDrops?.[id];this[grant.collection].push(grant.item);}
+  }
+  authorizeLoot(item,collection) {
+    const pvp=this.pvp;
+    if(!pvp?.started||pvp.host||!item.syncId)return true;
+    if(pvp.authorizedLoot?.has(item.syncId))return true;
+    pvp.lootRequests ||= new Map();
+    if(performance.now()-(pvp.lootRequests.get(item.syncId)||-Infinity)>1000){pvp.lootRequests.set(item.syncId,performance.now());this.sendPvpNetworkMessage({type:'loot-claim',id:item.syncId,collection},null,true);}
+    return false;
+  }
+  grantLoot(uid,id,collection) {
+    const pvp=this.pvp;
+    if(!pvp?.host||!['gems','pickups'].includes(collection))return;
+    const previous=pvp.lootGrants?.get(id);
+    if(previous){if(previous.uid===uid)this.sendEquipmentMessage(uid,{type:'loot-grant',...previous});return;}
+    const index=this[collection].findIndex(item=>item.syncId===id&&!this.isEquipmentPickup(item));
+    const state=pvp.remotePlayers?.[uid]?.state;
+    if(index<0||!state||state.over||state.hp<=0)return;
+    const item=this[collection][index];
+    if(Math.hypot(state.x-item.x,state.y-item.y)>120)return;
+    const grant={uid,item,collection,at:performance.now()};
+    if(!this.sendEquipmentMessage(uid,{type:'loot-grant',...grant}))return;
+    (pvp.lootGrants ||= new Map()).set(id,grant);this[collection].splice(index,1);
+  }
+  receiveLootGrant(message) {
+    const pvp=this.pvp,item=message.item,id=item?.syncId;
+    if(!pvp||pvp.host||!id||!['gems','pickups'].includes(message.collection))return;
+    if(pvp.claimedDrops?.[id]){this.sendPvpNetworkMessage({type:'loot-ack',id,accepted:true},null,true);return;}
+    if(pvp.eliminated||this.player.hp<=0){pvp.authorizedLoot?.delete(id);this.sendPvpNetworkMessage({type:'loot-ack',id,accepted:false},null,true);return;}
+    if(message.collection==='pickups'&&((item.type==='consumable'&&!this.canAddConsumableToInventory(item.consumableKey))||(item.type==='banana'&&this.player.hp>=this.player.maxHp))){pvp.authorizedLoot?.delete(id);this.sendPvpNetworkMessage({type:'loot-ack',id,accepted:false},null,true);return;}
+    (pvp.authorizedLoot ||= new Set()).add(id);
+    item.x=this.player.x;item.y=this.player.y;
+    const local=this[message.collection].find(drop=>drop.syncId===id);if(local){local.x=item.x;local.y=item.y;}else this[message.collection].push(item);
+  }
   claimPvpDrop(item) {
     if (!this.pvp?.started || this.pvp.host || !item?.syncId) return;
     this.pvp.claimedDrops ||= {};
     this.pvp.claimedDrops[item.syncId] = true;
-    (this.pvp.pendingDropClaims ||= new Set()).add(item.syncId);
+    if(this.pvp.authorizedLoot?.delete(item.syncId))this.sendPvpNetworkMessage({type:'loot-ack',id:item.syncId,accepted:true},null,true);
   }
 
   syncPvpWait() {
@@ -10736,6 +10847,7 @@ class Game {
     if(this.blockHostExit())return false;
     this.spectatorMode=false;this.spectatorCamera=null;this.spectatorDrag=null;
     this.syncSpectatorHudVisibility();
+    this.closeMatchResults();
     pvp.leaving = true;
     this.skins.watchRoom(null);
     this.botController = null;
@@ -11043,7 +11155,7 @@ class Game {
     const pvp = this.pvp;
     if (!pvp?.host || !pvp.started || pvp.mode !== 'pvp') return;
     const participants = [...(pvp.eliminated ? [] : [pvp.uid]), ...Object.entries(pvp.peerConnections || {}).filter(([uid, peer]) => peer.connected && !pvp.remotePlayers?.[uid]?.state?.over).map(([uid]) => uid)];
-    const call = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, participants, votes: {}, completed: {}, voting: true, resolved: false };
+    const call = { id: `${Date.now()}-${this.rollRng().toString(36).slice(2, 8)}`, participants, votes: {}, completed: {}, voting: true, resolved: false };
     pvp.integrationShop = call;
     this.sendPvpNetworkMessage({ type: 'integration-shop-start', callId: call.id, participants });
   }
@@ -13267,8 +13379,23 @@ class Game {
     setTimeout(() => { g.style.display = 'none'; }, 400);
   }
 
+  applyOfficePlayerEffect(roll,actor=this) {
+    const p=actor.player;if(!p||p.hp<=0||actor.pvp?.eliminated)return;
+    if(roll===0)p.speedBuffTimer=Math.max(p.speedBuffTimer,10);
+    if(roll===1){p.xpEventMult=2;p.xpBoostTimer=14;}
+    if(roll===5)p.speedBuffTimer=Math.max(p.speedBuffTimer,8);
+    if(roll===6)p.shieldTimer=Math.max(p.shieldTimer,actor.pvp?.mode==='pvp'?1.5:3);
+    if(roll===16){p.damageBuffMult=Math.max(p.damageBuffTimer>0?p.damageBuffMult||1:1,1.25);p.damageBuffTimer=Math.max(p.damageBuffTimer,10);}
+    if(roll===17)actor.healPatchActor(actor,18);
+    if(actor===this)this.showBanner(({0:'⚡ Офисное событие: ускорение',1:'🎁 Офисное событие: опыт ×2',5:'📅 Офисное событие: ускорение',6:'🛡 Офисное событие: щит',16:'🧾 Офисное событие: урон +25%',17:'💳 Офисное событие: восстановление здоровья'})[roll]||'Офисное событие');
+  }
   triggerOfficeEvent() {
     const roll = Math.floor(this.rollRng() * 18);
+    if(this.pvp?.host&&[0,1,5,6,16,17].includes(roll)){
+      for(const bot of this.botController?.bots.values()||[])this.applyOfficePlayerEffect(roll,bot.actor);
+      this.sendPvpNetworkMessage({type:'office-player-effect',roll},null,true);
+    }
+    const origin=this.player.hp>0?this.player:this.getHostRemotePlayerTargets().find(target=>target.hp>0)||this.player;
     if (roll === 0) {
       this.showBanner('🔥 Три кассы подключены в один COM-порт. Очередь уже просит старшего администратора.');
       this.player.speedBuffTimer = 10;
@@ -13280,11 +13407,11 @@ class Game {
     } else if (roll === 2) {
       this.showBanner('🧹 Уборка завершена. Табличка «мокрый пол» ушла в отпуск вместе с уборщицей.');
       for (let i = 0; i < 8; i++) {
-        this.puddles.push({ x: this.player.x + (this.rollRng() - 0.5) * 500, y: this.player.y + (this.rollRng() - 0.5) * 500, radius: 60, dmg: 8, life: 12, isTrail: true, source: 'Офисное событие · мокрый пол' });
+        this.puddles.push({ x: origin.x + (this.rollRng() - 0.5) * 500, y: origin.y + (this.rollRng() - 0.5) * 500, radius: 60, dmg: 8, life: 12, isTrail: true, source: 'Офисное событие · мокрый пол' });
       }
     } else if (roll === 3) {
       this.showBanner('🎟️ Базу развернули через AnyDesk. Пароль нашли под клавиатурой — клиент прочитал его по телефону вверх ногами.');
-      for (let i = 0; i < 16; i++) this.gems.push({ x: this.player.x + (this.rollRng() - 0.5) * 350, y: this.player.y + (this.rollRng() - 0.5) * 350, xp: 15, col: '#ffd200' });
+      for (let i = 0; i < 16; i++) this.gems.push({ x: origin.x + (this.rollRng() - 0.5) * 350, y: origin.y + (this.rollRng() - 0.5) * 350, xp: 15, col: '#ffd200' });
     } else if (roll === 4) {
       this.showBanner('🖥️ Перезагрузка помогла. Правда, перезагрузили принтер, зато он теперь знает пароль от Wi-Fi.');
       for (const e of this.enemies) {
@@ -13295,7 +13422,7 @@ class Game {
     } else if (roll === 5) {
       this.showBanner('📅 Внеплановая планёрка назначена на вчера. За опоздание списали только половину опыта.');
       this.player.speedBuffTimer = Math.max(this.player.speedBuffTimer, 8);
-      for (let i = 0; i < 7; i++) this.gems.push({ x: this.player.x + (this.rollRng() - 0.5) * 280, y: this.player.y + (this.rollRng() - 0.5) * 280, xp: 11, col: '#55efc4' });
+      for (let i = 0; i < 7; i++) this.gems.push({ x: origin.x + (this.rollRng() - 0.5) * 280, y: origin.y + (this.rollRng() - 0.5) * 280, xp: 11, col: '#55efc4' });
     } else if (roll === 6) {
       this.showBanner('📞 «Алло, вы меня слышите?» — «Да». — «Тогда почему молчите?» За терпение: защитный щит на 3 секунды.');
       this.player.shieldTimer = Math.max(this.player.shieldTimer, this.pvp?.mode === 'pvp' ? 1.5 : 3);
@@ -13333,7 +13460,7 @@ class Game {
       this.announceOfficeEvent('🚧 На ресепшене заело турникет в час пик! Очередь прорвалась через калитку и рассыпала абонементы.');
       for (let i = 0; i < 2; i++) this.spawnEnemy('trainee', { noElite: true });
       for (let i = 0; i < 2; i++) this.spawnEnemy('fitgirl', { noElite: true });
-      for (let i = 0; i < 6; i++) this.gems.push({ x: this.player.x + (this.rollRng() - 0.5) * 320, y: this.player.y + (this.rollRng() - 0.5) * 320, xp: 17, col: '#ffeaa7' });
+      for (let i = 0; i < 6; i++) this.gems.push({ x: origin.x + (this.rollRng() - 0.5) * 320, y: origin.y + (this.rollRng() - 0.5) * 320, xp: 17, col: '#ffeaa7' });
     } else if (roll === 16) {
       this.announceOfficeEvent('🧾 Внеплановая сверка с ОФД! В зал вышла бухгалтерия, а урон героя +25% на 10 сек.');
       this.player.damageBuffMult = Math.max(this.player.damageBuffTimer > 0 ? (this.player.damageBuffMult || 1) : 1, 1.25);
@@ -13342,8 +13469,8 @@ class Game {
       for (let i = 0; i < 2; i++) this.spawnEnemy('atol_kkt', { noElite: true });
     } else {
       this.announceOfficeEvent('💳 Маркетинг запустил акцию «Кэшбэк 200% без согласования с ИТ»! Бонусы рассыпаны, но за возвратом уже бегут.');
-      this.player.hp = Math.min(this.player.maxHp, this.player.hp + 18);
-      for (let i = 0; i < 10; i++) this.gems.push({ x: this.player.x + (this.rollRng() - 0.5) * 340, y: this.player.y + (this.rollRng() - 0.5) * 340, xp: 14, col: '#55efc4' });
+      if (this.player.hp > 0 && !this.pvp?.eliminated) this.healPatchActor(this,18);
+      for (let i = 0; i < 10; i++) this.gems.push({ x: origin.x + (this.rollRng() - 0.5) * 340, y: origin.y + (this.rollRng() - 0.5) * 340, xp: 14, col: '#55efc4' });
       for (let i = 0; i < 2; i++) this.spawnEnemy('fitcoin_thief', { noElite: true });
     }
   }
@@ -13375,8 +13502,8 @@ class Game {
   }
 
   randomOfficeHazardPoint(center, spread) {
-    const angle = Math.random() * Math.PI * 2;
-    const distance = Math.sqrt(Math.random()) * spread;
+    const angle = this.rollRng() * Math.PI * 2;
+    const distance = Math.sqrt(this.rollRng()) * spread;
     return {
       x: Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.x + Math.cos(angle) * distance)),
       y: Math.max(this.BOUND_MIN + 30, Math.min(this.BOUND_MAX - 30, center.y + Math.sin(angle) * distance))
@@ -13391,7 +13518,7 @@ class Game {
       const strikes = center.type === 'boss' ? 5 : 7;
       for (let i = 0; i < strikes; i++) {
         const point = this.randomOfficeHazardPoint(center, center.type === 'boss' ? 520 : 680);
-        const impactAt = startsAt + 0.32 + i * (2.3 / Math.max(1, strikes - 1)) + Math.random() * 0.08;
+        const impactAt = startsAt + 0.32 + i * (2.3 / Math.max(1, strikes - 1)) + this.rollRng() * 0.08;
         this.officeHazards.push({
           syncId: this.createOfficeHazardId(), kind: 'bomb', x: point.x, y: point.y,
           radius: 132, damage: 27, impactAt, expiresAt: impactAt + 0.28,
@@ -13408,7 +13535,7 @@ class Game {
     for (const center of targets) {
       for (let i = 0; i < 3; i++) {
         const point = this.randomOfficeHazardPoint(center, center.type === 'boss' ? 520 : 620);
-        const impactAt = startsAt + 0.55 + i * 2.35 + Math.random() * 0.25;
+        const impactAt = startsAt + 0.55 + i * 2.35 + this.rollRng() * 0.25;
         this.officeHazards.push({
           syncId: this.createOfficeHazardId(), kind: 'meteor', x: point.x, y: point.y,
           radius: 92, damage: 24, burnDamage: 4.5, impactAt,
@@ -13426,7 +13553,7 @@ class Game {
       return;
     }
     const dodgeChance = this.getEffectivePlayerDodge();
-    if (Math.random() < dodgeChance) {
+    if (this.rollRng() < dodgeChance) {
       this.addPopup(this.player.x, this.player.y - 22, 'УКЛОНЕНИЕ!', '#f1c40f');
       return;
     }
@@ -13627,17 +13754,17 @@ class Game {
   spawnBrSupply() {
     if(!this.isBattleRoyale || (this.pvp && !this.pvp.host))return;
     const center = this.MAP_SIZE / 2;
-    const angle = Math.random() * Math.PI * 2;
-    const radius = this.getBattleRoyaleSafeRadius() * (0.35 + Math.random() * 0.45);
+    const angle = this.rollRng() * Math.PI * 2;
+    const radius = this.getBattleRoyaleSafeRadius() * (0.35 + this.rollRng() * 0.45);
     const x = Math.max(this.BOUND_MIN + 80, Math.min(this.BOUND_MAX - 80, center + Math.cos(angle) * radius));
     const y = Math.max(this.BOUND_MIN + 80, Math.min(this.BOUND_MAX - 80, center + Math.sin(angle) * radius));
     const consumableKeys = Object.keys(CONSUMABLES_DEF);
-    const consumableKey = consumableKeys[Math.floor(Math.random() * consumableKeys.length)];
+    const consumableKey = consumableKeys[Math.floor(this.rollRng() * consumableKeys.length)];
     const number=(this.brSupplyCount||0)+1;
     this.brSupplyCount=number;
     const tier=number<=3?1:number<=6?2:3;
     const pool=this.getShopCatalogItems().filter(item=>item.shopKind!=='consumable' && (Number(item.tier)||(item.parts?2:1))===tier);
-    const equipment=pool[Math.floor(Math.random()*pool.length)];
+    const equipment=pool[Math.floor(this.rollRng()*pool.length)];
     if(equipment)this.addEquipmentPickup(x,y,equipment.key,{type:'br_supply',icon:'📦',tier,supplyNumber:number});
     this.pickups.push({x:x+24,y,type:'consumable',consumableKey,icon:CONSUMABLES_DEF[consumableKey].icon});
     this.announceOfficeEvent(`📦 Аирдроп №${number}: предмет ${['I','II','III'][tier-1]} тира и случайный расходник!`);
@@ -13908,8 +14035,8 @@ class Game {
     const bananaCount = this.pickups.filter(item => item.type === 'banana').length;
     const supplyCount = Math.min(2, Math.max(0, 8 - bananaCount));
     for (let i = 0; i < supplyCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 170 + Math.random() * 380;
+      const angle = this.rollRng() * Math.PI * 2;
+      const distance = 170 + this.rollRng() * 380;
       const x = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.x + Math.cos(angle) * distance));
       const y = Math.max(this.BOUND_MIN, Math.min(this.BOUND_MAX, this.player.y + Math.sin(angle) * distance));
       this.pickups.push({ x, y, type: 'banana', icon: '🍌', age: 0 });
@@ -13921,7 +14048,7 @@ class Game {
      БОССЫ С УНИКАЛЬНЫМИ МЕХАНИКАМИ
      ============================================================ */
   spawn1CBoss(minute) {
-    const angle = Math.random() * Math.PI * 2;
+    const angle = this.rollRng() * Math.PI * 2;
     const center = this.getPvpSpawnCenter();
     const x = Math.max(200, Math.min(3800, center.x + Math.cos(angle) * 480));
     const y = Math.max(200, Math.min(3800, center.y + Math.sin(angle) * 480));
@@ -14105,7 +14232,7 @@ class Game {
       b.bossTimer2 = 0;
       const backupMobs = this.enemies.filter(enemy => enemy.summonedByBackup && enemy.hp > 0);
       if (backupMobs.length < 3) {
-        const angle = Math.random() * Math.PI * 2;
+        const angle = this.rollRng() * Math.PI * 2;
         this.enemies.push({ x: b.x + Math.cos(angle) * 115, y: b.y + Math.sin(angle) * 115,
           name: 'Файл из бэкапа: «финал_точно_последний»', hp: 210, maxHp: 210, speed: 1.55, dmg: 15,
           icon: '📁', size: 18, col: '#74b9ff', xp: 9, freezeTimer: 0, isBoss: false, summonedByBackup: true });
@@ -14344,7 +14471,7 @@ class Game {
       if (b.bossTimer2 > 8.0) {
         b.bossTimer2 = 0;
         // Рывок за спину
-        const a = Math.random() * Math.PI * 2;
+        const a = this.rollRng() * Math.PI * 2;
         b.x = target.x + Math.cos(a) * 140;
         b.y = target.y + Math.sin(a) * 140;
         this.addPopup(b.x, b.y - 25, 'ВНЕЗАПНАЯ ПЛАНЁРКА!', '#b71540');
@@ -14571,7 +14698,7 @@ class Game {
   applyProjectileBurn(enemy, source = 'Поджигающие снаряды') {
     const level = this.player.burnShotLevel || 0;
     const burnChanceByLevel = [0, 0.30, 0.50, 0.65];
-    if (level <= 0 || Math.random() >= (burnChanceByLevel[Math.min(3, level)] || 0)) return;
+    if (level <= 0 || this.rollRng() >= (burnChanceByLevel[Math.min(3, level)] || 0)) return;
     const damage = classValue(this, 'burnshot', 2.5 + level * 0.3, 1.20);
     if (!(enemy.burnTimer > 0) || damage >= (enemy.burnDamage || 0)) {
       enemy.burnSource = source;
@@ -14622,7 +14749,7 @@ class Game {
       const owner = this.pvp?.host ? this.botController?.bots.get(enemy.burnOwnerUid)?.actor : null;
       (owner || this).damageEnemy(enemy, enemy.burnDamage * (enemy.isBoss ? 0.5 : 1), enemy.burnSource || 'Поджигающие снаряды');
       enemy.burnTickTimer += 0.5;
-      if (Math.random() < 0.35) this.createHitFX(enemy.x, enemy.y, '#ff7b24', 2);
+      if (this.rollRng() < 0.35) this.createHitFX(enemy.x, enemy.y, '#ff7b24', 2);
     }
     if (enemy.burnTimer <= 0) {
       enemy.burnDamage = 0;
@@ -14767,7 +14894,7 @@ class Game {
             const hit = this.dealPlayerDamage(WEAPONS_DEF.turnstile.baseDmg + w.lvl * 5, 'turnstile');
             this.damageEnemy(e, hit.dmg * dt * 3.8, WEAPONS_DEF.turnstile.name);
             this.createHitFX(bx, by, '#ffd200', 1);
-            if (hit.isCrit && Math.random() < 0.2) {
+            if (hit.isCrit && this.rollRng() < 0.2) {
               this.addPopup(e.x, e.y - 12, `КРИТ! ${Math.round(hit.dmg)}`, '#f1c40f');
             }
           }
@@ -14907,8 +15034,8 @@ class Game {
       w.timer -= dt;
       if (w.timer <= 0) {
         w.timer = WEAPONS_DEF.protein.baseCooldown * cdFactor;
-        const ang = Math.random() * Math.PI * 2;
-        const dst = 80 + Math.random() * 120;
+        const ang = this.rollRng() * Math.PI * 2;
+        const dst = 80 + this.rollRng() * 120;
         const hit = this.dealPlayerDamage(WEAPONS_DEF.protein.baseDmg + w.lvl * 4, 'protein');
         this.puddles.push({
           x: this.player.x + Math.cos(ang) * dst,
@@ -15599,7 +15726,7 @@ class Game {
           const hitRadSq = (pud.radius + 18) * (pud.radius + 18);
           const ldx = this.player.x - pud.x;
           const ldy = this.player.y - pud.y;
-          if (this.player.hp > 0 && ldx * ldx + ldy * ldy < hitRadSq && this.player.shieldTimer <= 0 && Math.random() > this.getEffectivePlayerDodge()) {
+          if (this.player.hp > 0 && ldx * ldx + ldy * ldy < hitRadSq && this.player.shieldTimer <= 0 && this.rollRng() > this.getEffectivePlayerDodge()) {
             this.recordPlayerDamage(pud.dmg * dt, pud.source || 'Лужа босса', { isBoss: Boolean(pud.isBossAttack),attackerName:pud.attackerName,attackerIcon:pud.attackerIcon });
             if (this.player.hp <= 0) {
               this._framePvpTargets = null;
@@ -15841,7 +15968,7 @@ class Game {
           this.rudesktopRescueGraceUntil=this.time+2;
         }
 
-        if (!target.isRemote && e.isCleaner && Math.random() < 0.08) {
+        if (!target.isRemote && e.isCleaner && this.rollRng() < 0.08) {
           this.triggerGlitchScreen();
           this.addPopup(this.player.x, this.player.y - 20, "«КУДА ПО ПОМЫТОМУ?!» (Выдернут шнур)", "#00cec9");
         }
@@ -15849,21 +15976,21 @@ class Game {
         if (target.isRemote) {
           this.damageRemotePlayerFromEnemy(e.dmg * dt, enemyAttackSource, target.uid, { isBoss: Boolean(e.isBoss),attackerName:e.name,attackerIcon:e.icon });
         } else if (this.player.shieldTimer <= 0) {
-          if (Math.random() > this.getEffectivePlayerDodge()) {
+          if (this.rollRng() > this.getEffectivePlayerDodge()) {
             const damage = e.dmg * dt;
             const appliedHit = this.recordPlayerDamage(damage, enemyAttackSource, { isBoss: Boolean(e.isBoss),attackerName:e.name,attackerIcon:e.icon });
             if (e.eliteType === 'vampiric' && appliedHit > 0) {
               e.hp = Math.min(e.maxHp, e.hp + appliedHit * 4.5);
             }
-            if (Math.random() < 0.08) {
+            if (this.rollRng() < 0.08) {
               this.sound.hit();
               this.addPopup(this.player.x, this.player.y - 20, `-${Math.round(e.dmg)}`, '#e74c3c');
             }
-          } else if (Math.random() < 0.05) {
+          } else if (this.rollRng() < 0.05) {
             this.addPopup(this.player.x, this.player.y - 20, "DODGE (HASP)", '#f1c40f');
           }
         } else {
-          if (Math.random() < 0.08) this.addPopup(this.player.x, this.player.y - 20, "ЩИТ 1С", "#00cec9");
+          if (this.rollRng() < 0.08) this.addPopup(this.player.x, this.player.y - 20, "ЩИТ 1С", "#00cec9");
         }
 
         if (this.player.hp <= 0 && !this.pvp?.eliminated) {
@@ -15996,10 +16123,10 @@ class Game {
           col: e.xp > 15 ? '#e84393' : (e.xp > 5 ? '#0984e3' : '#00b894')
         });
 
-        const dropRoll = Math.random();
+        const dropRoll = this.rollRng();
 
         if (this.isBattleRoyale && dropRoll < 0.035) {
-          const consumableKey = consumableKeys[Math.floor(Math.random() * consumableKeys.length)];
+          const consumableKey = consumableKeys[Math.floor(this.rollRng() * consumableKeys.length)];
           this.pickups.push({ x: e.x, y: e.y, type: 'consumable', consumableKey, icon: CONSUMABLES_DEF[consumableKey].icon });
         } else if (!hasNukeOnMap && (e.xp >= 8 || e.isBoss) && dropRoll < 0.009) {
           this.pickups.push({ x: e.x, y: e.y, type: 'its_box', icon: '📦' });
@@ -16017,6 +16144,7 @@ class Game {
     // Лут
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const item = this.pickups[i];
+      if(item.type==='patch_repair')continue;
       if (item.type === 'banana' || item.type === 'coffee') {
         item.age = Math.max(0, (Number(item.age) || 0) + dt);
         if (item.age >= 180) {
@@ -16036,6 +16164,7 @@ class Game {
           }
           continue;
         }
+        if(!this.authorizeLoot(item,'pickups'))continue;
         this.claimPvpDrop(item);
         if (item.type === 'br_supply') {
           this.addConsumableToInventory(item.consumableKey);
@@ -16082,13 +16211,14 @@ class Game {
         g.y += Math.sin(a) * 9.8 * frameScale;
       }
       if (dSq < 22 * 22) {
+        if(!this.authorizeLoot(g,'gems'))continue;
         this.claimPvpDrop(g);
         this.gemsCollected++;
         this.player.patchPacketCharges=(this.player.patchPacketCharges||0)+1;
         this.recordChallengeProgress('gems');
         this.addXP(Math.max(1,Math.round((g.baseXp??g.xp)*this.player.xpMult*this.player.xpEventMult)));
         const fitcoins = this.getPatchCurrency(g.baseXp??g.xp,this.player.currencyMult||1,g.currencyMult||1);
-        this.currency += fitcoins;
+        this.currency += fitcoins; this.runFitcoinsLooted=(this.runFitcoinsLooted||0)+fitcoins;
         if (fitcoins && this.firebaseUser) {
           this.achievementProgress.fitcoinsEarned = (Number(this.achievementProgress.fitcoinsEarned) || 0) + fitcoins;
           this.checkAchievementUnlocks();
@@ -16567,7 +16697,7 @@ class Game {
 
   attemptRudesktopCacheReset() {
     if (this.rudesktopRescueState?.phase !== 'prompt') return;
-    if (Math.random() >= 0.5) {
+    if (this.rollRng() >= 0.5) {
       this.log('Сброс кэша через AppData не удался. RuDesktop завершил сеанс.');
       this.finishRudesktopRescue(false);
       return;
@@ -16585,7 +16715,7 @@ class Game {
     if (!state || state.phase !== 'skill') return;
     if (this.rudesktopSkillFrame) cancelAnimationFrame(this.rudesktopSkillFrame);
     this.rudesktopSkillFrame = null;
-    state.zoneStart = Math.random() * 360;
+    state.zoneStart = this.rollRng() * 360;
     state.startedAt = performance.now();
     document.getElementById('rudesktop-skill-stage').textContent = `Проверка ${state.stage} из 5`;
     document.getElementById('rudesktop-skill-status').textContent = 'Нажмите пробел или коснитесь круга, когда стрелка в зелёной зоне.';
@@ -16650,7 +16780,7 @@ class Game {
     }
     const enemy = state.enemy;
     if (enemy && this.player) {
-      const angle = Math.random() * Math.PI * 2;
+      const angle = this.rollRng() * Math.PI * 2;
       enemy.x = Math.max(this.BOUND_MIN + 60, Math.min(this.BOUND_MAX - 60, this.player.x + Math.cos(angle) * 620));
       enemy.y = Math.max(this.BOUND_MIN + 60, Math.min(this.BOUND_MAX - 60, this.player.y + Math.sin(angle) * 620));
     }
@@ -16782,7 +16912,15 @@ class Game {
   getFinalLoadout(reason = '') {
     const snapshot = this.capturePlayerSnapshot(reason);
     if (!snapshot) return '';
-    try { return JSON.stringify(snapshot); }
+    try {
+      let encoded=JSON.stringify(snapshot);
+      if(encoded.length>19500) {
+        for(const list of Object.values(snapshot.inventory||{})) if(Array.isArray(list)) for(const item of list) if(item&&typeof item==='object') delete item.detail;
+        encoded=JSON.stringify(snapshot);
+      }
+      if(encoded.length>19500) throw new Error('Снимок результата превышает допустимый размер.');
+      return encoded;
+    }
     catch (_) { return ''; }
   }
 
@@ -16813,23 +16951,26 @@ class Game {
     this.gameOver(`Забег завершён клавишей L. Текущий счёт: ${this.calcScore()}.`);
   }
 
+  async recordRequestHeaders() {const fb=await window.firebaseLeaderboardReady;return {'content-type':'application/json',authorization:'Bearer '+await fb.auth.currentUser.getIdToken()};}
+
   beginVerifiedRunSession() {
+    const generation=this.verifiedRunGeneration=(this.verifiedRunGeneration||0)+1;
     if (this.localDebugAuth) {
       this.verifiedRunId = null;
       this.verifiedRunPromise = Promise.resolve(null);
       return this.verifiedRunPromise;
     }
-    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
+    const mode = this.isDailyRun ? 'daily' : this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
     const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
     this.verifiedRunId = null;
-    this.verifiedRunPromise = fetch(RUN_START_API_URL, {
+    this.verifiedRunPromise = (async()=>fetch(RUN_START_API_URL, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: await this.recordRequestHeaders(),
       body: JSON.stringify({ version: GAME_VERSION, mode, players })
-    }).then(async response => {
+    }))().then(async response => {
       if (!response.ok) return null;
       const data = await response.json().catch(() => null);
-      if (data?.runId) this.verifiedRunId = String(data.runId);
+      if (generation===this.verifiedRunGeneration && data?.runId) this.verifiedRunId = String(data.runId);
       return this.verifiedRunId;
     }).catch(() => null);
     return this.verifiedRunPromise;
@@ -16889,7 +17030,7 @@ class Game {
     let nick = nickInput.value.trim().replace(/[^a-zA-Zа-яА-ЯёЁ0-9_-]/g, '').slice(0, 15) || 'Архитектор_1С';
     this.setPlayerNickname(nick);
 
-    const loadout = this.finalLoadout || this.getFinalLoadout();
+    let loadout = this.finalLoadout || this.getFinalLoadout();
     let snapshot = null;
     try { snapshot = typeof loadout === 'string' ? JSON.parse(loadout) : loadout; } catch (_) {}
     const score = snapshot?.run?.score ?? this.calcScore();
@@ -16898,59 +17039,28 @@ class Game {
     const btn = document.getElementById('btn-submit-score');
 
     const classId = snapshot?.classId || this.player?.classId || this.selectedClassId;
-    if (this.isDailyRun && this.dailyDate) {
-      const dailyRecord = {
-        name: nick, score, seconds, version: GAME_VERSION, mode: 'daily', players: 1,
-        classId, loadout: typeof loadout === 'string' ? loadout : JSON.stringify(loadout), dailyDate: this.dailyDate,
-        dailyModifierKey: this.dailyConfig?.modifier?.key || '',
-        dailyModifierName: this.dailyConfig?.modifier?.name || '',
-        createdAt: Date.now()
-      };
-      this.saveLocalDailyScore(dailyRecord);
-      status.innerText = 'Сохраняем результат в рейтинг ежедневной смены…';
-      btn.disabled = true;
-      try {
-        await this.skins.archiveForRecord(snapshot?.appearance, this.finalRecordSkin);
-        const fb = await window.firebaseLeaderboardReady;
-        await fb.push(fb.ref(fb.db, `dailyLeaderboard/${this.dailyDate}`), dailyRecord);
-        status.innerHTML = '<b style="color:#27ae60">Результат добавлен в отдельный рейтинг ежедневного забега.</b>';
-        if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
-        this.leaderboardOpenTimer = setTimeout(() => {
-          this.leaderboardOpenTimer = null;
-          if (document.getElementById('modal-gameover').style.display === 'flex') this.showLeaderboard('daily');
-        }, 800);
-      } catch (err) {
-        status.innerHTML = `<span style="color:#d35400">Локальный рекорд смены сохранён (${this.escapeHtml(err.message || 'сервер недоступен')}).</span>`;
-        btn.disabled = false;
-      }
-      return;
-    }
-    const mode = this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
+    if(this.isDailyRun)this.saveLocalDailyScore({name:nick,score,seconds,version:GAME_VERSION,mode:'daily',classId,loadout,dailyDate:this.dailyDate,createdAt:Date.now()});
+    const mode = this.isDailyRun ? 'daily' : this.pvp ? (this.pvp.mode === 'battle_royale' ? 'battle_royale' : (this.pvp.mode === 'pve' ? 'pve' : 'pvp')) : 'solo';
     const players = this.pvp?.started ? Math.max(2, Math.min(8, Number(this.pvp.actualPlayerCount) || 2)) : 1;
     status.innerText = 'Сохраняем результат...';
     btn.disabled = true;
     try {
-      await this.skins.archiveForRecord(snapshot?.appearance, this.finalRecordSkin);
+      try { await Promise.race([this.skins.archiveForRecord(snapshot?.appearance, this.finalRecordSkin), new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),5000))]); }
+      catch (_) { if(snapshot?.appearance) snapshot.appearance.skin=null; }
+      loadout = snapshot ? JSON.stringify(snapshot) : loadout;
       if (this.verifiedRunPromise) await this.verifiedRunPromise.catch(() => null);
       let response = null;
       let result = {};
       if (this.verifiedRunId) {
         response = await fetch(RUN_FINISH_API_URL, {
           method: 'POST',
-          headers: { 'content-type': 'application/json' },
+          headers: await this.recordRequestHeaders(),
           body: JSON.stringify({ runId: this.verifiedRunId, name: nick, score, seconds, classId, loadout })
         });
         result = await response.json().catch(() => ({}));
         if (response.ok) this.verifiedRunId = null;
       }
-      if (!response || response.status === 404) {
-        response = await fetch(SCORE_SUBMIT_API_URL, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ name: nick, score, seconds, version: GAME_VERSION, mode, players, classId, loadout })
-        });
-        result = await response.json().catch(() => ({}));
-      }
+      if(!response)throw new Error('Сессия забега не зарегистрирована. Результат не отправлен.');
       if (!response.ok) throw new Error(result.error || `сервер ответил ${response.status}`);
       status.innerHTML = '<b style="color:#27ae60">Результат этого забега добавлен в таблицу!</b>';
       if (this.leaderboardOpenTimer) clearTimeout(this.leaderboardOpenTimer);
@@ -16973,7 +17083,7 @@ class Game {
 
     try {
       if (LEADERBOARD_API_URL.includes('YOUR-SUBDOMAIN')) throw new Error('Сервер таблицы ещё не подключён.');
-      const workerPromise = fetch(LEADERBOARD_API_URL, { method: 'GET' }).then(async apiResponse => {
+      const workerPromise = fetch(LEADERBOARD_API_URL+(isDailyTab?'?mode=daily':''), { method: 'GET' }).then(async apiResponse => {
         const apiResult = await apiResponse.json().catch(() => ({}));
         if (!apiResponse.ok) throw new Error(apiResult.error || `сервер ответил ${apiResponse.status}`);
         return Array.isArray(apiResult.scores) ? apiResult.scores : [];
@@ -18769,7 +18879,7 @@ function installPatch300() {
       }
     }
     if(before>0&&enemy.hp<=0&&!enemy.patchCommitteePart){
-      if(enemy.patchStolenGems?.length){for(const gem of enemy.patchStolenGems)this.gems.push({...gem,x:enemy.x+(Math.random()-.5)*36,y:enemy.y+(Math.random()-.5)*36,xp:gem.xp*1.1,baseXp:(gem.baseXp||gem.xp)*1.1,syncId:undefined});enemy.patchStolenGems=[];}
+      if(enemy.patchStolenGems?.length){for(const gem of enemy.patchStolenGems)this.gems.push({...gem,x:enemy.x+(this.rollRng()-.5)*36,y:enemy.y+(this.rollRng()-.5)*36,xp:gem.xp*1.1,baseXp:(gem.baseXp||gem.xp)*1.1,syncId:undefined});enemy.patchStolenGems=[];}
     }
     return dealt;
   });
@@ -18835,7 +18945,7 @@ const PATCH300_METHODS = {
   hasPatchItem(key) {return Boolean((this.shopPassives||[]).some(slot=>slot?.key===key));},
   redirectPatchProjectile(damage) {
     if(!this.hasPatchItem('proxy_stool'))return false;const state=this.ensurePatchActor();
-    if(this.time<(state.proxyAt||0)||Math.random()>=.25)return false;
+    if(this.time<(state.proxyAt||0)||this.rollRng()>=.25)return false;
     const target=this.enemies.filter(e=>e.hp>0&&!e.is24hPursuer&&e.patchBossType!=='committee').sort((a,b)=>Math.hypot(a.x-this.player.x,a.y-this.player.y)-Math.hypot(b.x-this.player.x,b.y-this.player.y))[0];
     if(!target)return false;state.proxyAt=this.time+2.5;const a=Math.atan2(target.y-this.player.y,target.x-this.player.x);
     this.projectiles.push({x:this.player.x,y:this.player.y,vx:Math.cos(a)*8,vy:Math.sin(a)*8,dmg:damage*2,life:2,size:9,icon:'↪️',color:'#81ecec',homing:true,source:'Прокси-сервер на табуретке'});this.addPopup(this.player.x,this.player.y-25,'↪️ ПЕРЕНАПРАВЛЕНО','#81ecec');return true;
@@ -18874,7 +18984,7 @@ const PATCH300_METHODS = {
     if(this.hasPatchItem('support_package'))for(const summon of this.summons){if(summon.hp<=0||summon.life<=0)continue;for(const gem of this.gems){const dx=summon.x-gem.x,dy=summon.y-gem.y;if(dx*dx+dy*dy<70*70){gem.x=p.x;gem.y=p.y;}}}
     for(let i=this.pickups.length-1;i>=0;i--){const item=this.pickups[i];if(item.type!=='patch_repair')continue;
       if(this.pvp?.mode==='pvp'&&item.ownerUid!==this.pvp.uid)continue;
-      if(Math.hypot(item.x-p.x,item.y-p.y)<30){this.healPatchActor(this,p.maxHp*item.healFraction);if(item.syncId)this.claimPvpDrop(item);this.pickups.splice(i,1);}
+      if(Math.hypot(item.x-p.x,item.y-p.y)<30&&this.authorizeLoot(item,'pickups')){this.healPatchActor(this,p.maxHp*item.healFraction);if(item.syncId)this.claimPvpDrop(item);this.pickups.splice(i,1);}
     }
     state.lastHp=p.hp;state.lastMaxHp=p.maxHp;
   },
@@ -18924,7 +19034,7 @@ const PATCH300_METHODS = {
   updatePatchMob(e,dt) {
     if(!e.patchType||e.hp<=0)return;e.patchAge=(e.patchAge||0)+dt;
     const target=this.getPvpEnemyTarget(e);
-    if(e.patchType==='missing_inn'){const hidden=e.patchAge%6<1.2;if(e.patchGhostHidden&&!hidden){e.patchGhostTurnUntil=this.time+1;e.patchGhostAngle=Math.random()*Math.PI*2;}e.patchGhostHidden=hidden;if(hidden)e.slowTimer=0;}
+    if(e.patchType==='missing_inn'){const hidden=e.patchAge%6<1.2;if(e.patchGhostHidden&&!hidden){e.patchGhostTurnUntil=this.time+1;e.patchGhostAngle=this.rollRng()*Math.PI*2;}e.patchGhostHidden=hidden;if(hidden)e.slowTimer=0;}
     if(e.patchType==='approver'&&!(e.freezeTimer>0)){
       e.patchCast=(e.patchCast??(3+this.rollRng()*2))-dt;
       // Группа согласующих не должна накрывать игрока синхронными кругами издалека.
@@ -18936,7 +19046,7 @@ const PATCH300_METHODS = {
     if(e.patchType==='return_courier'){
       e.patchStolenGems ||= [];if(e.patchStolenGems.length<12)for(let i=this.gems.length-1;i>=0;i--){const gem=this.gems[i];if(Math.hypot(gem.x-e.x,gem.y-e.y)<55){e.patchStolenGems.push({...gem});this.gems.splice(i,1);if(e.patchStolenGems.length>=12)break;}}
     }
-    if(e.patchType==='inheritance_admin'){e.patchBaseSpeed??=e.speed;e.patchCopyTimer=(e.patchCopyTimer||0)-dt;if(e.patchCopyTimer<=0){e.patchCopyTimer=5;const nearby=this.enemies.filter(other=>other!==e&&!other.isBoss&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<230);const copy=nearby[Math.floor(Math.random()*nearby.length)];e.shooter=Boolean(copy?.shooter);e.explodes=Boolean(copy?.explodes);e.speed=e.patchBaseSpeed*(copy?.speed>2?1.25:1);if(e.shooter){e.shootInterval=1.7;e.shootTimer=e.shootInterval;}e.patchCopyIcon=copy?.icon;}}
+    if(e.patchType==='inheritance_admin'){e.patchBaseSpeed??=e.speed;e.patchCopyTimer=(e.patchCopyTimer||0)-dt;if(e.patchCopyTimer<=0){e.patchCopyTimer=5;const nearby=this.enemies.filter(other=>other!==e&&!other.isBoss&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<230);const copy=nearby[Math.floor(this.rollRng()*nearby.length)];e.shooter=Boolean(copy?.shooter);e.explodes=Boolean(copy?.explodes);e.speed=e.patchBaseSpeed*(copy?.speed>2?1.25:1);if(e.shooter){e.shootInterval=1.7;e.shootTimer=e.shootInterval;}e.patchCopyIcon=copy?.icon;}}
   },
   patchDamageArea(x,y,radius,damage,source,icon,options={}) {
     const p=this.player;if(p.hp>0&&Math.hypot(p.x-x,p.y-y)<radius+18)this.receiveEnemyDamage(damage,source,{isBoss:true,attackerName:source,attackerIcon:icon,...options});
@@ -19000,7 +19110,7 @@ const PATCH300_METHODS = {
       const modules=this.enemies.filter(e=>e.patchParent===b.patchBossId&&e.patchMonolithModule&&e.hp>0);
       if(modules.length===0){b.patchRebuild=(b.patchRebuild||0)+dt;if(b.patchRebuild>=9){b.patchRebuild=0;this.spawnPatchBossParts(b);}}
       if(b.patchCast<=0){b.patchCast=enraged?1.8:2.6;this.firePatchFan(b,target,3+modules.length,.16,4.2,15+modules.length*2,b);}
-      for(const module of modules){module.patchCast-=dt;if(module.patchCast<=0){module.patchCast=4.2;this.bossWarnings.push({x:target.x+(Math.random()-.5)*100,y:target.y+(Math.random()-.5)*100,radius:60,dmg:24,life:1.1,maxLife:1.1,isMegaBossAttack:true,attackerName:b.name,attackerIcon:b.icon});}}
+      for(const module of modules){module.patchCast-=dt;if(module.patchCast<=0){module.patchCast=4.2;this.bossWarnings.push({x:target.x+(this.rollRng()-.5)*100,y:target.y+(this.rollRng()-.5)*100,radius:60,dmg:24,life:1.1,maxLife:1.1,isMegaBossAttack:true,attackerName:b.name,attackerIcon:b.icon});}}
     }else if(b.patchBossType==='migration_train'){
       if(b.patchCast<=0){b.patchCast=enraged?3.8:5.2;const horizontal=Math.floor(b.patchAge/5)%2===0;b.patchRail={horizontal,coordinate:horizontal?target.y:target.x,age:0,hitAt:0};this.addPopup(target.x,target.y-65,'🚂 ЛИНИЯ МИГРАЦИИ · ОТОЙДИТЕ','#fdcb6e');}
       if(b.patchRail){const rail=b.patchRail;rail.age+=dt;if(rail.age>1.3&&rail.age<2.3){const coordinate=rail.horizontal?target.y:target.x;if(this.time>=rail.hitAt){rail.hitAt=this.time+.45;for(const actor of [{uid:this.pvp?.uid,x:this.player.x,y:this.player.y,isRemote:false},...this.getHostRemotePlayerTargets()]){if(Math.abs((rail.horizontal?actor.y:actor.x)-rail.coordinate)<65){if(actor.isRemote)this.damageRemotePlayerFromEnemy(28,b.name,actor.uid,{isBoss:true,attackerName:b.name,attackerIcon:b.icon});else this.receiveEnemyDamage(28,b.name,{isBoss:true,attackerName:b.name,attackerIcon:b.icon});}}}

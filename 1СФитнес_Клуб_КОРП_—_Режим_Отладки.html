@@ -1290,7 +1290,7 @@
   .knowledge-card[data-category=classes] { --knowledge-accent:#8a570f; }
   .knowledge-card[data-category=passives] { --knowledge-accent:#216541; }
   .knowledge-card[data-category=actives] { --knowledge-accent:#69449d; }
-  .knowledge-card[data-category=events],.knowledge-card[data-category=modifiers] { --knowledge-accent:#a33030; }
+  .knowledge-card[data-category=bosses],.knowledge-card[data-category=events],.knowledge-card[data-category=modifiers] { --knowledge-accent:#a33030; }
   .knowledge-card[data-tier="3"] { --knowledge-accent:#8a570f; }.knowledge-card[data-tier="4"] { --knowledge-accent:#69449d; }
   .knowledge-card[data-legendary=true] { --knowledge-accent:#8a570f; border:2px solid #b77900; background:#fffdf4; }
   .knowledge-card h3 { box-sizing:border-box; min-height:var(--knowledge-title-height,0px); font-size:14px; margin:-11px -11px 9px; padding:9px 11px; color:var(--knowledge-accent); background:#f4f6f8; border-bottom:1px solid #e1e5e9; }
@@ -1535,7 +1535,7 @@
           <div>
             <div class="release-notes">
               <h3>Версия 3.2.0 — «Кластер живёт дальше»</h3>
-              <p><b>Патч 3.2.3.</b> Новые атаки первых двух боссов и приоритет автонаведения. Добавлены итоговая таблица сетевого матча и места игроков и ботов. Исправлены наблюдение в онлайне, выдача добычи, события и сохранение рекордов. Усилены проверки рейтингов и хранение данных.</p>
+              <p><b>Патч 3.2.3.</b> Переработаны первые четыре босса и приоритет автонаведения. Легендарное развитие доступно после четвёртого большого босса. Добавлены итоговая таблица сетевого матча и места игроков и ботов. Исправлены наблюдение в онлайне, выдача добычи, события и сохранение рекордов. Усилены проверки рейтингов и хранение данных.</p>
               <p><b>Патч 3.2.2.</b> Перебросы в магазине, скины аккаунта и их снимки в карточках рекордов, общий чат в отдельном окне из главного меню. Добавлено редкое событие с ослабленным М.В.; усилены штрафы мультивыстрела и рикошета. Снижен доход с дискет, усилено его снижение на длинных забегах и повышена наценка за звонки отдела продаж.</p>
               <p><b>Патч 3.2.1.</b> М.В. медленнее в PvP и BR; большие боссы отключены в Battle Royale.</p>
               <p><b>Патч 3.2.0 — обзор после смерти в онлайне.</b> Вся карта, масштабирование колесом и перетаскивание камеры. Погибший хост продолжает обслуживать матч и остаётся в комнате до его завершения.</p>
@@ -1609,7 +1609,7 @@
   </div>
   <div id="modal-knowledge" class="modal-overlay">
     <div class="win-1c knowledge-window"><div class="win-1c-head"><span>📖 База знаний · 3.2.3</span><button class="win-close-btn" onclick="game.closeKnowledgeBase()" aria-label="Закрыть базу знаний">✕</button></div>
-      <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
+      <div class="win-1c-body knowledge-body"><div id="knowledge-tabs"></div><input id="knowledge-search" class="input-1c" type="search" placeholder="Найти класс, навык, босса, предмет или событие…" aria-label="Поиск по базе знаний" oninput="game.renderKnowledgeBase()"><div class="knowledge-legend"><span class="knowledge-bonus">Бонусы</span><span class="knowledge-penalty">Штрафы</span><span class="knowledge-value">Характеристики</span><span class="knowledge-class-bonus">Классовый бонус</span></div><div id="knowledge-count" style="font-size:11px;color:#666;"></div><div id="knowledge-list"></div></div>
     </div>
   </div>
 
@@ -1810,10 +1810,13 @@
           <h4>Патч 3.2.3 — новые тактики боссов и итоги матчей</h4>
           <h5>Нововведения</h5>
           <p><b>Итоги сетевого матча.</b> В PvP, PvE и Battle Royale показана общая таблица игроков и ботов: места, убийства соперников и мобов, суммарные очки и очки за мобов и дискеты, собранные дискеты и фиткоины. Видно, кто кого убил. В PvP и BR места определяются по выживанию, в PvE — по очкам. Своя строка выделена.</p>
+          <p><b>База знаний: боссы.</b> Добавлена отдельная вкладка с семью большими боссами, порядком их появления, базовыми характеристиками, уроном, фазами, механиками и наградами. Базовые HP, скорость и опыт рассчитываются общей формулой со спавном; есть поиск и раскрываемые подробности.</p>
           <p><b>Приоритет автонаведения.</b> В пределах дальности оружия герой выбирает соперников-игроков и ботов, затем больших боссов и их части, мини-боссов, врагов с модификаторами и обычных мобов. Среди целей одного приоритета выбирается ближайшая. Закрытое ядро Монолита пропускается в пользу модулей. Приоритет не добавляет снарядам пробитие: противники на пути по-прежнему могут принять попадание.</p>
           <h5>Ребаланс</h5>
           <p><b>Комитет по согласованию релиза.</b> Согласующий перекрывает сектор впереди по траектории игрока, стрелок проводит перекрёстную проверку двумя очередями с упреждением. Атаки заранее показываются и чередуются с передышками. Уничтожение части отменяет её подготовленную атаку и отключает соответствующую механику. Защитник сохраняет защиту и лечение других частей.</p>
           <p><b>Монолит без документации.</b> Ядро закрыто, пока игрок не уничтожит два защитных модуля. Затем наступает ограниченное окно полного урона по ядру, после которого защита восстанавливается. Аварийный сброс создаёт расходящуюся ударную волну с проходами: можно выбрать безопасный проход или пересечь волну рывком. Следующий сброс меняет расположение проходов.</p>
+          <p><b>Темп больших боссов.</b> После каждого переноса Пятничная миграция останавливается для атаки; маршрут заканчивается неподалёку от выбранной цели. Обычное преследование большими боссами начинается уже с четвёртого появления. У Главбуха убран безопасный центральный коридор: опасная половина меняется с предупреждением, игроку нужно переходить на другую сторону.</p>
+          <p><b>Легендарное развитие.</b> Второй выбор легендарной миграции перенесён с шестого большого босса на четвёртого — после победы на двадцатой минуте.</p>
           <h5>Исправления ошибок</h5>
           <p>Устранено восстановление HP погибшего хоста офисным событием. Наблюдатели получают объекты всей карты; указатель аирдропа учитывает удалённые поставки. Подбор дискет и расходников подтверждает хост, незавершённые выдачи возвращаются на карту при отключении получателя.</p>
           <p>Сбой архива скина больше не блокирует запись результата. Уплотнены большие снимки снаряжения с сохранением модификаторов. Устранены повторная запись завершённого результата и подмена сессии запоздавшим ответом.</p>
@@ -2405,6 +2408,63 @@
 </script>
 
 <script>
+const BIG_BOSS_VARIANTS = [
+  {type:'patch_committee',name:'Комитет по согласованию релиза',icon:'👔',col:'#e17055',label:'УНИЧТОЖЬТЕ ТРИ ЧАСТИ КОМИТЕТА',patchBossType:'committee'},
+  {type:'patch_monolith',name:'Монолит без документации',icon:'🗿',col:'#a29bfe',label:'МОДУЛИ ЗАЩИЩАЮТ МОНОЛИТ',patchBossType:'monolith'},
+  {type:'patch_migration_train',name:'Пятничная миграция',icon:'🚂',col:'#fdcb6e',label:'ПОКИНЬТЕ ЛИНИЮ ПЕРЕНОСА',patchBossType:'migration_train'},
+  {type:'patch_accountant_year',name:'Главбух: год не закрыт',icon:'🧮',col:'#55efc4',label:'ДЕБЕТ И КРЕДИТ · СЛЕДИТЕ ЗА СТОРОНОЙ',patchBossType:'accountant_year'},
+  { type: 'cluster_core', name: 'ОШИБКА: ИНФОРМАЦИОННАЯ БАЗА УНИЧТОЖЕНА', icon: '🧿', col: '#9b59b6', label: 'КРИТИЧЕСКАЯ ОШИБКА' },
+  { type: 'release_break', name: 'РЕЛИЗ НА ПРОДЕ: ТЕСТОВОЙ БАЗЫ НЕ БЫЛО', icon: '📦', col: '#e84393', label: 'ОБНОВЛЕНИЕ БЕЗ ОТКАТА' },
+  { type: 'backup_99', name: 'РЕЗЕРВНАЯ КОПИЯ: 99% (ОСТАЛОСЬ 14 ЧАСОВ)', icon: '💾', col: '#0984e3', label: 'БЭКАП НЕ ЗАВЕРШЁН' }
+];
+
+function bigBossBaseStats(number) {
+  const rawHp=(number===1?13000:11000)*(1+.65*(number-1))*Math.pow(1.32,Math.max(0,number-3));
+  return {rawHp,hp:Math.round(rawHp),xp:280+number*30,mobile:number>=4,
+    speed:number>=4?Math.min(1.75,1.05+(number-4)*.08):0,contactDps:33.6,size:76};
+}
+const BIG_BOSS_GUIDE = [
+  {summary:'Три части с отдельным HP. Победа засчитывается после уничтожения всех частей; центральное тело не получает урон.',details:[
+    'Части: Председатель комитета, Согласующий релиз и Защитник регламента. Каждая имеет треть общего HP; радиус тела части 26, контакт 15,12 HP/с.',
+    'Защитник снижает урон по другим частям на 40% и лечит их на 0,3% максимального HP в секунду. Себя не лечит и части не воскрешает.',
+    'Запрет согласования: сектор впереди движения цели, угол около 48°, радиус 1200. Предупреждение 1,3 с, опасная фаза 2,5 с; 24 урона каждые 0,75 с.',
+    'Перекрёстная проверка: две очереди по 3 снаряда с упреждением. Предупреждение 1,3 с, между очередями 0,65 с; 21 урона за снаряд.',
+    'При HP ниже 35% очереди увеличиваются до 5 снарядов. Атаки чередуются, между механиками пауза 2,5 с. Уничтожение части отменяет её атаку.',
+    'Особая награда: после первой победы открывается выбор одной из трёх легендарных миграций.']},
+  {summary:'Закрытое ядро не получает урон. Уничтожьте два из четырёх модулей и используйте окно атаки.',details:[
+    'HP каждого модуля: 5,5% HP ядра с округлением. На первом появлении — 998 HP. Контакт модуля: 15,12 HP/с; радиус тела 26.',
+    'После уничтожения двух модулей ядро открывается на 9 секунд. Затем модули восстанавливаются, уцелевшие лечатся полностью, ядро закрывается.',
+    'Аварийный сброс: расходящаяся волна с тремя проходами. Предупреждение 1,3 с; волна расширяется на 220 единиц/с в течение 4,2 с. Урон 28, не более одного попадания на участника за волну.',
+    'Расположение проходов меняется между сбросами. Волну можно пересечь рывком. Между волнами пауза 2,5 с.',
+    'Каждый уничтоженный модуль оставляет дискету с 20 базового опыта. Закрытое ядро пропускается автонаведением в пользу модулей.']},
+  {summary:'Переносит данные по предупреждённой линии, затем останавливается неподалёку от выбранной цели для атаки.',details:[
+    'Линия переноса: горизонтальный или вертикальный маршрут через позицию цели. Предупреждение 1,3 с, проезд занимает 1 с.',
+    'В опасной полосе шириной 130 единиц наносится 28 урона с интервалом 0,45 с. Опасен только показанный участок маршрута.',
+    'Конечная точка — до 360 единиц за отмеченной позицией цели с учётом границ карты. После проезда босс стоит 8 секунд; пауза сохраняется и при низком HP.',
+    'Используйте остановку для нанесения урона; следующий перенос начинается только после паузы.']},
+  {summary:'Опасная половина карты постоянно меняется. Центрального безопасного коридора нет; нужно переходить на другую сторону.',details:[
+    'Дебет и кредит: по очереди опасны левая и правая половины карты. Перед включением урона есть 1,2 с предупреждения.',
+    'На опасной половине — 20 урона каждые 0,7 с. Нельзя стоять прямо на разделительной линии: учитывается радиус персонажа.',
+    'Сторона меняется каждые 5,5 с; при HP ниже 35% — каждые 3,8 с. Босс преследует цель уже на первом появлении.',
+    'Особая награда: после победы над четвёртым большим боссом на 20-й минуте — оставить легендарную миграцию или выбрать одно из двух её развитий.']},
+  {summary:'Совмещает прицельные вееры, кольца с проходами и опасные зоны. При HP 50% и ниже переходит в ярость.',details:[
+    'Веер: 7 снарядов каждые 2,7 с; по 18,2 урона. В ярости: каждые 1,9 с, по 22,4 урона.',
+    'Кольцо транзакций: 15 снарядов с тремя проходами каждые 6,2 с. Урон 21; в ярости — каждые 4,5 с, урон 25,2. Кольца поворачиваются между залпами.',
+    'Зоны перегрузки: три круга радиусом 86 возле цели. Предупреждение 1,05 с, урон 47,6, интервал 9,1 с. В ярости: урон 58,8, интервал 6,2 с.',
+    'Босс движется и держится примерно в 185 единицах от цели.']},
+  {summary:'Подвижный босс с веерами и крестами опасных зон. При HP 50% и ниже ускоряет атаки.',details:[
+    'Релизные замечания: веер из 5 снарядов каждые 3,1 с, по 19,6 урона. В ярости: каждые 2,2 с, по 23,8 урона.',
+    'Откат не предусмотрен: крест из 9 кругов радиусом 31. Предупреждение 1,05 с, интервал 7,2 с, урон 39,2 за круг. В ярости: интервал 5,4 с, урон 47,6.',
+    'Перезапуск сервера: круг радиусом 128 в позиции цели. Предупреждение 1,35 с, интервал 10,5 с, урон 64,4. В ярости: интервал 8,2 с, урон 81,2.',
+    'Держится примерно в 145 единицах от цели. Легендарное развитие выдаётся раньше — за четвёртого большого босса.']},
+  {summary:'Призывает файлы и восстанавливает здоровье, пока они живы. Уничтожайте призывы, чтобы отключить лечение.',details:[
+    'Веер: 5 снарядов каждые 3,3 с, по 22,4 урона. При HP 50% и ниже: каждые 2,4 с, по 28 урона.',
+    'Каждые 9 с восстанавливает один файл, одновременно до трёх. В ярости интервал 7 с. Файл: 210 HP, контакт 15 HP/с, скорость 93 единицы/с; 9 базового опыта.',
+    'Каждые 8,4 с при живых файлах лечится на 360 + 150 HP за каждый файл: от 510 до 810 HP. В ярости интервал 6,2 с.',
+    'Если файлов нет, вместо лечения выпускает кольцо из 12 снарядов с двумя проходами: урон 23,8, в ярости 29,4.',
+    'Держится примерно в 225 единицах от цели.']}
+];
+
 const GAME_VERSION = '3.2.3';
 const UPGRADE_REROLL_PACK = { count: 3, cost: 750 };
 const MV_COMPLAINT_EVENT = {
@@ -13041,7 +13101,7 @@ class Game {
     const selectedMigrations = [LEGENDARY_MIGRATIONS.find(item=>item.key===this.legendaryMigrationKey),
       LEGENDARY_DEVELOPMENTS.find(item=>item.key===this.legendaryDevelopmentKey)];
     for (const migration of selectedMigrations) if (migration) passives.push({icon:migration.icon,name:migration.name,
-      value:migration.parent?'Легендарное развитие · 30-я минута':'Легендарная миграция',detail:migration.description});
+      value:migration.parent?'Легендарное развитие · 20-я минута':'Легендарная миграция',detail:migration.description});
     const combat = [
       ['ricochetLevel', 'ricochet'], ['multishotLevel', 'multishot'], ['slowShotLevel', 'slowshot'], ['burnShotLevel', 'burnshot']
     ].filter(([stat]) => player[stat] > 0).map(([stat, key]) => ({
@@ -13947,19 +14007,11 @@ class Game {
     this.bossWarnings = [];
     this.megaBossCount++;
 
-    const bossVariants = [
-      {type:'patch_committee',name:'Комитет по согласованию релиза',icon:'👔',col:'#e17055',label:'УНИЧТОЖЬТЕ ТРИ ЧАСТИ КОМИТЕТА',patchBossType:'committee'},
-      {type:'patch_monolith',name:'Монолит без документации',icon:'🗿',col:'#a29bfe',label:'МОДУЛИ ЗАЩИЩАЮТ МОНОЛИТ',patchBossType:'monolith'},
-      {type:'patch_migration_train',name:'Пятничная миграция',icon:'🚂',col:'#fdcb6e',label:'ПОКИНЬТЕ ЛИНИЮ ПЕРЕНОСА',patchBossType:'migration_train'},
-      {type:'patch_accountant_year',name:'Главбух: год не закрыт',icon:'🧮',col:'#55efc4',label:'ДЕБЕТ И КРЕДИТ · СЛЕДИТЕ ЗА СТОРОНОЙ',patchBossType:'accountant_year'},
-      { type: 'cluster_core', name: 'ОШИБКА: ИНФОРМАЦИОННАЯ БАЗА УНИЧТОЖЕНА', icon: '🧿', col: '#9b59b6', label: 'КРИТИЧЕСКАЯ ОШИБКА' },
-      { type: 'release_break', name: 'РЕЛИЗ НА ПРОДЕ: ТЕСТОВОЙ БАЗЫ НЕ БЫЛО', icon: '📦', col: '#e84393', label: 'ОБНОВЛЕНИЕ БЕЗ ОТКАТА' },
-      { type: 'backup_99', name: 'РЕЗЕРВНАЯ КОПИЯ: 99% (ОСТАЛОСЬ 14 ЧАСОВ)', icon: '💾', col: '#0984e3', label: 'БЭКАП НЕ ЗАВЕРШЁН' }
-    ];
-    const variant = bossVariants[(this.megaBossCount - 1) % bossVariants.length];
+    const variant = BIG_BOSS_VARIANTS[(this.megaBossCount - 1) % BIG_BOSS_VARIANTS.length];
+    const base = bigBossBaseStats(this.megaBossCount);
     const dailyBossHpMult = this.getDailyRules().bossHpMult || 1;
-    const hp = Math.round((this.megaBossCount===1?13000:11000)*(1+.65*(this.megaBossCount-1))*Math.pow(1.32,Math.max(0,this.megaBossCount-3))*dailyBossHpMult);
-    const isMobileMegaBoss = this.megaBossCount >= 6;
+    const hp = Math.round(base.rawHp*dailyBossHpMult);
+    const isMobileMegaBoss = base.mobile;
     const boss = {
       x: this.MAP_SIZE / 2,
       y: this.MAP_SIZE / 2,
@@ -13967,12 +14019,12 @@ class Game {
       bigLabel: variant.label,
       hp,
       maxHp: hp,
-      speed: isMobileMegaBoss ? Math.min(1.75, 1.05 + (this.megaBossCount - 6) * 0.08) : 0,
-      dmg: variant.patchBossType === 'committee' ? 0 : 33.6,
+      speed: base.speed,
+      dmg: variant.patchBossType === 'committee' ? 0 : base.contactDps,
       icon: variant.icon,
-      size: 76,
+      size: base.size,
       col: variant.col,
-      xp: (280 + this.megaBossCount * 30)*(this.getDailyRules().bossXpMult||1),
+      xp: base.xp*(this.getDailyRules().bossXpMult||1),
       isBoss: true,
       isMegaBoss: true,
       megaBossNumber: this.megaBossCount,
@@ -16058,7 +16110,7 @@ class Game {
           this.sound.updateBossMusic(0, remainingBosses.filter(enemy => !enemy.isMegaBoss).length, remainingBosses.filter(enemy => enemy.isMegaBoss).length);
           if (!this.legendaryOffered && !this.pvp?.started) this.offerLegendaryMigrations(false);
           else if (!this.legendaryOffered && this.pvp?.host) this.offerLegendaryMigrations(true);
-          if (e.megaBossNumber === 6) this.offerLegendaryDevelopment(Boolean(this.pvp?.host));
+          if (e.megaBossNumber === 4) this.offerLegendaryDevelopment(Boolean(this.pvp?.host));
         }
         if (!guestGotKillCredit) {
           this.kills++;
@@ -16384,7 +16436,7 @@ class Game {
     const keep = {key:'keep_current_migration',name:`Оставить: ${current.name}`,icon:current.icon,keepCurrent:true,
       description:`Сохранить текущую миграцию без новых усилений и штрафов. ${current.description}`};
     const developments = LEGENDARY_DEVELOPMENTS.filter(migration=>migration.parent===current.key);
-    this.showLegendaryChoices([keep,...developments], 'development', 'Босс 30-й минуты побеждён. Оставьте текущую миграцию или выберите одно из двух её развитий. Новые эффекты добавляются к уже действующим.');
+    this.showLegendaryChoices([keep,...developments], 'development', 'Босс 20-й минуты побеждён. Оставьте текущую миграцию или выберите одно из двух её развитий. Новые эффекты добавляются к уже действующим.');
   }
 
   showLegendaryChoices(choices, stage, subtitle) {
@@ -19149,17 +19201,46 @@ const PATCH300_METHODS = {
           gapAngle:(b.patchPatternIndex*.7+modules.length*.25)%(Math.PI*2),gapCount:3,gapHalf:.27,damage:28,hitUids:[]};
       }
     }else if(b.patchBossType==='migration_train'){
-      if(b.patchCast<=0){b.patchCast=enraged?3.8:5.2;const horizontal=Math.floor(b.patchAge/5)%2===0;b.patchRail={horizontal,coordinate:horizontal?target.y:target.x,age:0,hitAt:0};this.addPopup(target.x,target.y-65,'🚂 ЛИНИЯ МИГРАЦИИ · ОТОЙДИТЕ','#fdcb6e');}
-      if(b.patchRail){const rail=b.patchRail;rail.age+=dt;if(rail.age>1.3&&rail.age<2.3){const coordinate=rail.horizontal?target.y:target.x;if(this.time>=rail.hitAt){rail.hitAt=this.time+.45;for(const actor of [{uid:this.pvp?.uid,x:this.player.x,y:this.player.y,isRemote:false},...this.getHostRemotePlayerTargets()]){if(Math.abs((rail.horizontal?actor.y:actor.x)-rail.coordinate)<65){if(actor.isRemote)this.damageRemotePlayerFromEnemy(28,b.name,actor.uid,{isBoss:true,attackerName:b.name,attackerIcon:b.icon});else this.receiveEnemyDamage(28,b.name,{isBoss:true,attackerName:b.name,attackerIcon:b.icon});}}}
-          b.x=rail.horizontal?this.BOUND_MIN+(this.BOUND_MAX-this.BOUND_MIN)*(rail.age-1.3):rail.coordinate;b.y=rail.horizontal?rail.coordinate:this.BOUND_MIN+(this.BOUND_MAX-this.BOUND_MIN)*(rail.age-1.3);
-        }if(rail.age>2.3)b.patchRail=null;}
+      if(!b.patchRail&&b.patchCast<=0){
+        const horizontal=Math.floor(b.patchAge/5)%2===0;
+        const along=horizontal?target.x:target.y;
+        b.patchRail={horizontal,coordinate:horizontal?target.y:target.x,age:0,hitAt:0,
+          start:this.BOUND_MIN+b.size,end:Math.max(this.BOUND_MIN+b.size,Math.min(this.BOUND_MAX-b.size,along+360))};
+        this.addPopup(target.x,target.y-65,'🚂 ЛИНИЯ МИГРАЦИИ · ОТОЙДИТЕ','#fdcb6e');
+      }
+      if(b.patchRail){
+        const rail=b.patchRail;rail.age+=dt;
+        if(rail.age>1.3){
+          const progress=Math.min(1,(rail.age-1.3)/1);
+          const position=rail.start+(rail.end-rail.start)*progress;
+          b.x=rail.horizontal?position:rail.coordinate;b.y=rail.horizontal?rail.coordinate:position;
+          if(rail.age<2.3&&this.time>=rail.hitAt){
+            rail.hitAt=this.time+.45;
+            for(const actor of [...(this.player.hp>0?[{uid:this.pvp?.uid,x:this.player.x,y:this.player.y,isRemote:false}]:[]),...this.getHostRemotePlayerTargets()]){
+              const across=rail.horizontal?actor.y:actor.x,along=rail.horizontal?actor.x:actor.y;
+              if(Math.abs(across-rail.coordinate)<65&&along>=rail.start-18&&along<=rail.end+18){
+                const info={isBoss:true,attackerName:b.name,attackerIcon:b.icon};
+                if(actor.isRemote)this.damageRemotePlayerFromEnemy(28,b.name,actor.uid,info);else this.receiveEnemyDamage(28,b.name,info);
+              }
+            }
+          }
+        }
+        if(rail.age>=2.3){b.patchRail=null;b.patchCast=8;this.addPopup(b.x,b.y-100,'🚂 ОСТАНОВКА · АТАКУЙТЕ','#55efc4');}
+      }
     }else if(b.patchBossType==='accountant_year'){
-      const duration=enraged?3.8:5.5;const phase=Math.floor(b.patchAge/duration);b.patchDangerSide=phase%2;b.patchSideAge=b.patchAge%duration;b.patchCorridor=enraged?45:75;
-      if(b.patchCast<=0){b.patchCast=.7;if(b.patchSideAge>1.2)for(const actor of [{uid:this.pvp?.uid,x:this.player.x,y:this.player.y,isRemote:false},...this.getHostRemotePlayerTargets()]){
-        const center=this.MAP_SIZE/2;const side=actor.x>center?1:0;if(side!==b.patchDangerSide||Math.abs(actor.x-center)<b.patchCorridor)continue;
-        if(actor.isRemote)this.damageRemotePlayerFromEnemy(20,b.name,actor.uid,{isBoss:true,attackerName:b.name,attackerIcon:b.icon});else this.receiveEnemyDamage(20,b.name,{isBoss:true,attackerName:b.name,attackerIcon:b.icon});
-      }}
-      if(b.patchSideAge<dt)this.addPopup(b.x,b.y-b.size-30,b.patchDangerSide?'🧮 КРЕДИТ · ОПАСНО СПРАВА':'🧮 ДЕБЕТ · ОПАСНО СЛЕВА','#ffd200');
+      const duration=enraged?3.8:5.5,phase=Math.floor(b.patchAge/duration);
+      b.patchDangerSide=phase%2;b.patchSideAge=b.patchAge%duration;b.patchCorridor=0;
+      if(b.patchCast<=0){
+        b.patchCast=.7;
+        if(b.patchSideAge>1.2)for(const actor of [...(this.player.hp>0?[{uid:this.pvp?.uid,x:this.player.x,y:this.player.y,isRemote:false}]:[]),...this.getHostRemotePlayerTargets()]){
+          const center=this.MAP_SIZE/2;
+          const touchesDanger=b.patchDangerSide?actor.x+18>=center:actor.x-18<=center;
+          if(!touchesDanger)continue;
+          const info={isBoss:true,attackerName:b.name,attackerIcon:b.icon};
+          if(actor.isRemote)this.damageRemotePlayerFromEnemy(20,b.name,actor.uid,info);else this.receiveEnemyDamage(20,b.name,info);
+        }
+      }
+      if(b.patchAnnouncedPhase!==phase){b.patchAnnouncedPhase=phase;this.addPopup(b.x,b.y-b.size-35,b.patchDangerSide?'🧮 ОПАСНО СПРАВА · УХОДИТЕ ВЛЕВО':'🧮 ОПАСНО СЛЕВА · УХОДИТЕ ВПРАВО','#ffd200');}
     }
   },
   predictBossTarget(b,target,remember=false) {
@@ -19244,8 +19325,17 @@ const PATCH300_METHODS = {
       if(b.hp>0&&b.patchPattern)this.renderBossPattern(b);
       if(b.hp>0&&b.patchBossType==='monolith'){ctx.fillStyle=(b.patchOpenUntil||0)>this.time?'#55efc4':'#ffd200';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText((b.patchOpenUntil||0)>this.time?'ЯДРО ОТКРЫТО · '+Math.ceil(b.patchOpenUntil-this.time)+'с':'ЯДРО ЗАКРЫТО · УНИЧТОЖЬТЕ 2 МОДУЛЯ',b.x,b.y-85);}
       if(b.patchCommitteePart&&b.hp>0){ctx.fillStyle='#292c35';ctx.fillRect(b.x-29,b.y-43,58,5);ctx.fillStyle=b.col;ctx.fillRect(b.x-29,b.y-43,58*Math.max(0,b.hp/b.maxHp),5);ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(`${({shoot:'ОГОНЬ',zone:'ЗОНА',shield:'ЩИТ'})[b.patchRole]} · ${Math.ceil(b.hp)} HP`,b.x,b.y-49);}
-      if(b.patchBossType==='migration_train'&&b.patchRail){const rail=b.patchRail;ctx.strokeStyle=rail.age<1.3?'#ffd200':'#ff4757';ctx.globalAlpha=rail.age<1.3?.5:.8;ctx.lineWidth=rail.age<1.3?3:100;ctx.setLineDash(rail.age<1.3?[15,10]:[]);ctx.beginPath();if(rail.horizontal){ctx.moveTo(this.BOUND_MIN,rail.coordinate);ctx.lineTo(this.BOUND_MAX,rail.coordinate);}else{ctx.moveTo(rail.coordinate,this.BOUND_MIN);ctx.lineTo(rail.coordinate,this.BOUND_MAX);}ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;}
-      if(b.patchBossType==='accountant_year'){const center=this.MAP_SIZE/2;ctx.fillStyle=b.patchSideAge<1.2?'rgba(255,210,0,.07)':'rgba(255,71,87,.12)';const x=b.patchDangerSide?center+b.patchCorridor:this.BOUND_MIN;const width=center-b.patchCorridor-this.BOUND_MIN;ctx.fillRect(x,this.BOUND_MIN,width,this.BOUND_MAX-this.BOUND_MIN);ctx.strokeStyle='#ffd200';ctx.setLineDash([8,8]);ctx.strokeRect(center-b.patchCorridor,this.BOUND_MIN,b.patchCorridor*2,this.BOUND_MAX-this.BOUND_MIN);ctx.setLineDash([]);}
+      if(b.patchBossType==='migration_train'&&b.patchRail){const rail=b.patchRail;ctx.strokeStyle=rail.age<1.3?'#ffd200':'#ff4757';ctx.globalAlpha=rail.age<1.3?.5:.8;ctx.lineWidth=rail.age<1.3?3:100;ctx.setLineDash(rail.age<1.3?[15,10]:[]);ctx.beginPath();if(rail.horizontal){ctx.moveTo(rail.start,rail.coordinate);ctx.lineTo(rail.end,rail.coordinate);}else{ctx.moveTo(rail.coordinate,rail.start);ctx.lineTo(rail.coordinate,rail.end);}ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;}
+      if(b.patchBossType==='migration_train'&&!b.patchRail&&b.hp>0){ctx.fillStyle='#55efc4';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText('ОСТАНОВКА · '+Math.max(0,Math.ceil(b.patchCast||0))+'с',b.x,b.y-100);}
+      if(b.patchBossType==='accountant_year'){
+        const center=this.MAP_SIZE/2,warning=(b.patchSideAge||0)<1.2;
+        ctx.fillStyle=warning?'rgba(255,210,0,.10)':'rgba(255,71,87,.20)';
+        const x=b.patchDangerSide?center:this.BOUND_MIN,width=b.patchDangerSide?this.BOUND_MAX-center:center-this.BOUND_MIN;
+        ctx.fillRect(x,this.BOUND_MIN,width,this.BOUND_MAX-this.BOUND_MIN);
+        ctx.strokeStyle='#ffd200';ctx.lineWidth=3;ctx.setLineDash([8,8]);ctx.beginPath();ctx.moveTo(center,this.BOUND_MIN);ctx.lineTo(center,this.BOUND_MAX);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle=warning?'#ffd200':'#ff8a80';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+        ctx.fillText((b.patchDangerSide?'ОПАСНО СПРАВА → УХОДИТЕ ВЛЕВО':'ОПАСНО СЛЕВА → УХОДИТЕ ВПРАВО')+(warning?' · ПЕРЕХОДИТЕ':''),b.x,b.y-110);
+      }
     }ctx.restore();
   },
   patchUpgradeComparison(choice) {
@@ -19441,7 +19531,7 @@ const PATCH300_METHODS = {
   },
   renderKnowledgeBase() {
     const query=document.getElementById('knowledge-search').value.trim().toLocaleLowerCase();
-    const tabs={classes:'Классы',weapons:'Оружие',passives:'Перки',actives:'Навыки',items:'Магазин',events:'События',modifiers:'Модификаторы'};
+    const tabs={classes:'Классы',weapons:'Оружие',passives:'Перки',actives:'Навыки',items:'Магазин',bosses:'Боссы',events:'События',modifiers:'Модификаторы'};
     const nav=document.getElementById('knowledge-tabs');nav.replaceChildren();for(const [id,title] of Object.entries(tabs)){const button=document.createElement('button');button.className='btn-1c'+(this.knowledgeTab===id?' selected':'');button.textContent=title;button.onclick=()=>this.setKnowledgeTab(id);nav.appendChild(button);}
     const entries=[];
     const add=(icon,name,desc,details=[],options={})=>{
@@ -19456,6 +19546,27 @@ const PATCH300_METHODS = {
       if (bonus) descriptions.push({text:bonus,tone:'class-bonus'});
       add(def.icon,name,descriptions,details,{key});
     };
+    if(this.knowledgeTab==='bosses'){
+      const f=value=>Number(value).toLocaleString('ru-RU',{maximumFractionDigits:2});
+      BIG_BOSS_VARIANTS.forEach((boss,index)=>{
+        const n=index+1,stats=bigBossBaseStats(n),guide=BIG_BOSS_GUIDE[index];
+        add(boss.icon,`${n}. ${boss.name}`,guide.summary,[
+          `Первое появление: ${n*5}:00. Базовые характеристики без модификаторов забега; указанный урон — до защиты и уклонения игрока.`,
+          `HP: ${f(stats.hp)} · контакт: ${index===0?'0 (центр)':f(stats.contactDps)} HP/с · скорость: ${f(stats.speed*60)} единиц/с · радиус тела: ${stats.size}.`,
+          ...(index===0?[`HP каждой части: ${f(stats.hp/3)}; лечение от Защитника для других частей: ${f(stats.hp/3*.003)} HP/с.`]:index===1?[`HP каждого модуля: ${f(Math.round(stats.hp*.055))}.`]:[]),
+          ...guide.details,
+          `Награда: ${stats.xp} базового опыта в дискете; 1800 бонусных очков за большого босса и 12 за убийство. Подбор дискеты даёт ещё 3 очка. Бонусы опыта и фиткоинов применяются к подбирающему.`,
+        ],{key:boss.type});
+      });
+      add('📋','Общие правила больших боссов','Большие боссы появляются каждые пять минут; после седьмого ротация повторяется. В Battle Royale большие боссы отключены.',[
+        'Если предыдущий большой босс ещё жив, следующий всё равно появляется по расписанию. Новые обычные волны при живом большом боссе приостанавливаются, существующие мобы остаются.',
+        'Все большие боссы и их части защищены от оглушений и принудительного перемещения. Обычное преследование включается с четвёртого появления; у поезда собственный маршрут.',
+        'HP появления №n: (13000 для первого, иначе 11000) × (1 + 0,65 × (n − 1)) × 1,32 в степени max(0, n − 3), затем округление. Модификаторы забега применяются дополнительно.',
+        'Опыт появления №n: 280 + 30 × n. Скорость с четвёртого появления: 63 единицы/с, затем +4,8 за каждое следующее появление, максимум 105.',
+        'Фиткоины с дискеты: 40% базового опыта × коэффициент экономики по времени подбора × бонусы дохода. Это не отдельная фиксированная выплата за убийство.',
+        'За первую победу — исходная легендарная миграция; за четвёртого босса на двадцатой минуте — её развитие. Гарантированной магазинной вещи нет; возможны обычные случайные выпадения.'
+      ],{key:'boss-rules'});
+    }
     if(this.knowledgeTab==='classes')for(const [id,def] of Object.entries(PLAYER_CLASSES)){
       const s=def.stats;
       add('🧑‍💻',def.name,def.perkDesc,[`${s.hp} HP · скорость ${s.baseSpeed} · урон ${Math.round(s.dmgMult*100)}% · опыт ${Math.round(s.xpMult*100)}%`,
@@ -19472,7 +19583,7 @@ const PATCH300_METHODS = {
       for(const [key,def] of Object.entries(COMBAT_UPGRADES))addAbility('combat',key,def,Array.from({length:3},(_,i)=>`Ур. ${i+1}: ${describeCombatLevel({classId:null},key,i+1,false)}`));
       for(const def of REPEATABLE_UPGRADES)addAbility('common',def.key,def);
       for(const def of LEGENDARY_MIGRATIONS)add(def.icon,`${def.name} [Общее]`,def.description,
-        [{label:'Развития после босса 30-й минуты',links:LEGENDARY_DEVELOPMENTS.filter(item=>item.parent===def.key).map(item=>({key:item.key,label:item.name,tab:'passives'}))}],
+        [{label:'Развития после босса 20-й минуты',links:LEGENDARY_DEVELOPMENTS.filter(item=>item.parent===def.key).map(item=>({key:item.key,label:item.name,tab:'passives'}))}],
         {key:def.key,legendary:true});
       for(const def of LEGENDARY_DEVELOPMENTS){
         const parent = LEGENDARY_MIGRATIONS.find(item=>item.key===def.parent);
@@ -19525,7 +19636,7 @@ const PATCH300_METHODS = {
     const groups = this.knowledgeTab==='passives'
       ? [{id:'normal',title:'Перки и боевые модификаторы'},
         {id:'legendary',title:'Легендарные перки',description:'После победы над первым большим боссом можно выбрать одну из трёх исходных миграций.'},
-        {id:'legendary-development',title:'Развития легендарных миграций · 30-я минута',description:'После победы над боссом 30-й минуты можно оставить текущую миграцию или выбрать одно из двух её развитий. Новые бонусы и штрафы добавляются к исходным.'}]
+        {id:'legendary-development',title:'Развития легендарных миграций · 20-я минута',description:'После победы над боссом 20-й минуты можно оставить текущую миграцию или выбрать одно из двух её развитий. Новые бонусы и штрафы добавляются к исходным.'}]
       : this.knowledgeTab==='items'
         ? [{id:'1',title:'I тир · базовые предметы'},{id:'2',title:'II тир · улучшенные предметы'},{id:'3',title:'III тир · продвинутые предметы'},{id:'4',title:'IV тир · КОРП'},{id:'consumables',title:'Расходники'},{id:'services',title:'Услуги магазина'}]
         : [{id:'normal'}];
